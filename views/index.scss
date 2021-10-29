@@ -1,0 +1,41 @@
+@import "./colors.scss";
+
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+body {
+  background-color: $dimgray;
+  color: $powered;
+}
+body.container {
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 768px;
+}
+.btn {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.btn-outline-warning {
+  border-color: $powered;
+  color: $powered;
+}
+.btn-outline-warning:hover {
+  background-color: $powered;
+  border-color: $powered;
+}
+h1 {
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+}

@@ -1,0 +1,14 @@
+public/content/**/*.md
+public/views/**/*.pug
+node_modules/
+.env
+
+**/*.css
+**/*.css.map
+**/*.css.*.txt
+**/*.js
+**/*.js.map
+**/*.js.*.txt
+
+!jest.config.js
+!webpack.*.js

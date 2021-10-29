@@ -1,0 +1,102 @@
+extends ../index
+
+block globals
+  span#g-xpower-address(
+    style="display:none" data-value=`${XPOWER_ADDRESS}`)
+  span#g-xpower-symbol(
+    style="display:none" data-value=`${XPOWER_SYMBOL}`)
+  span#g-xpower-decimals(
+    style="display:none" data-value=`${XPOWER_DECIMALS}`)
+  span#g-xpower-image(
+    style="display:none" data-value=`${XPOWER_IMAGE}`)
+  span#g-persistence(
+    style="display:none" data-value=`${UI_PERSISTENCE}`)
+  span#g-mining-speed(
+    style="display:none" data-value=`${UI_MINING_SPEED}`)
+
+block header
+  include ../header/header.pug
+
+block content
+  content
+    h1: | Mine & Mint Proof-of-Work Tokens on Avalanche <img src="/images/png/avalanche-icon/avalanche-64x64.png" height=24 width=24>
+
+    form#connect
+      div.btn-group.connect-metamask(role="group")
+        button#connect-metamask.btn.btn-outline-warning(type="button")
+          | &nbsp;
+        button.btn.btn-outline-warning.info(
+          type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+          title="Authorize Metamask to connect"
+        )
+          include ../../public/images/pug/info-circle-fill.svg.pug
+
+    form#mining
+      label.form-label(for="miner-address")
+        | Miner's Address
+      div.input-group.mb-3.miner-address
+        input#miner-address.form-control(
+          type="text" placeholder="0x0000000000000000000000000000000000000000" readonly)
+        span.input-group-text.info(
+          data-bs-toggle="tooltip" data-bs-placement="top"
+          title="Address XP0W tokens shall be mined (and minted) for"
+        )
+          include ../../public/images/pug/info-circle-fill.svg.pug
+
+      div.btn-group.toggle-mining(role="group")
+        button#toggle-mining.btn.btn-outline-warning(
+          type="button" disabled
+        )
+          span.spinner.spinner-border.spinner-border-sm.float-start(
+            role="status" style="visibility: hidden"
+          )
+          span.text: | Start Mining
+        button.btn.btn-outline-warning.info(
+          type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+          title="Toggle mining for XPOW tokens (w/o minting them)"
+        )
+          include ../../public/images/pug/info-circle-fill.svg.pug
+
+      div.btn-group.tweak-mining(role="group")
+        div.btn-group.decelerator(role="group")
+          button.btn.btn-outline-warning#decelerate(
+            type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+            title="Decelerate mining speed" disabled
+          )
+            include ../../public/images/pug/dash-circle-fill.svg.pug
+        div.btn-group.progressor(role="group" title=`Mining speed: ${UI_MINING_SPEED}%`)
+          div.progress: div#speed.progress-bar.with-indicator(
+            role="progressbar" style=`width: ${UI_MINING_SPEED}%`
+          )
+        div.btn-group.accelerator(role="group")
+          button.btn.btn-outline-warning#accelerate(
+            type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+            title="Accelerate mining speed" disabled
+          )
+            include ../../public/images/pug/plus-circle-fill.svg.pug
+
+    form#minting
+      label.form-label(for="mined-nonces")
+        | Mined Amounts
+      - let index = 1
+      while index <= 64
+        - let amount_i = 2**(index++)-1
+        - let amount_n = filters.nice(amount_i)
+        div.btn-group.mint(role="group" data-amount=`${amount_i}`)
+          button.btn.btn-outline-warning.lhs(
+            type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+            title=`Total amount of ${amount_n} XPOW tokens mined so far` disabled
+          )
+            | 0
+          button.btn.btn-outline-warning.mid(
+            type="button" disabled
+          )
+            | Mint #{amount_n} XPOW
+          button.btn.btn-outline-warning.rhs(
+            type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+            title=`Forget the tokens mined so far (w/o minting them)` disabled
+          )
+            | &times;
+
+block footer
+  include ../footer/footer.pug

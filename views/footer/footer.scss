@@ -1,0 +1,66 @@
+@import "../colors.scss";
+
+footer {
+    nav {
+        border-top: 1px solid $powered;
+        border-bottom: 1px solid $powered;
+    }
+    a.nav-link {
+        svg {
+            color: $powered;
+        }
+        color: $powered;
+    }
+    a.nav-link.lower {
+        position: relative;
+        top: 1px;
+    }
+    a.nav-link:hover {
+        color: white;
+    }
+    a.add-token {
+        i.bi-lightning-charge {
+            display: none;
+        }
+    }
+    a.add-token:hover {
+        i.bi-lightning-charge-fill {
+            display: none;
+        }
+        i.bi-lightning-charge {
+            display: block;
+        }
+    }
+    a.smart-contract {
+        i.bi-cpu {
+            display: none;
+        }
+    }
+    a.smart-contract:hover {
+        i.bi-cpu-fill {
+            display: none;
+        }
+        i.bi-cpu {
+            display: block;
+        }
+    }
+    a.avalanche {
+        img.red {
+            display: none;
+        }
+    }
+    a.avalanche:hover {
+        img.fff {
+            display: none;
+        }
+        img.red {
+            display: block;
+        }
+    }
+    a.twitter {
+        svg:hover {
+            color: #55acee;
+        }
+    }
+    color: $powered;
+}

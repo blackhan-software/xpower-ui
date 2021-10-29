@@ -1,0 +1,12 @@
+header
+    nav#menu.nav.nav-pills.nav-justified.flex-column.flex-sm-row.mb-3
+        a.flex-sm-fill.text-sm-center.nav-link.home(
+            href="/" class=`${PAGE === 'home' ? 'active' : ''}`
+        )
+            i.bi-lightning-charge-fill.float-start
+            span: | XPower
+        a.flex-sm-fill.text-sm-center.nav-link.about(
+            href="/about"  class=`${PAGE === 'about' ? 'active' : ''}`
+        )
+            i.bi-lightbulb-fill.float-start
+            span: | About

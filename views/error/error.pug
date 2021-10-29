@@ -1,0 +1,14 @@
+extends ../index
+
+block styles
+  link(href="/styles/error/error.css" rel="stylesheet")
+
+block content
+  h1=`${message} (${status})`
+
+  table.buggy
+    td.text-center
+      i.bi.bi-bug-fill
+
+  if error && error.stack
+    pre.error-stack #{error.stack}

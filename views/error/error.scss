@@ -1,0 +1,17 @@
+@import "../index.scss";
+
+h1 {
+  margin: 1em 0 0 0;
+  text-align: center;
+}
+table.buggy {
+  i.bi {
+    font-size: 18em;
+  }
+  width: 100%;
+}
+pre.error-stack {
+  font-size: x-small;
+  margin: 3em 0;
+  padding: 1em;
+}
