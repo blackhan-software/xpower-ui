@@ -4,7 +4,7 @@ import app from '../app';
 describe('GET /ipfs', () => {
     let get: request.Test;
     beforeEach(() => {
-        const path = '/ipfs/QmX8CeKcBJAJcdynAeU1Ln74UXWG6RpakqWfbZSSLYppQA';
+        const path = '/ipfs/QmTvy3Vfnj4UNL5dpxDcA5fLLQpwzA2LMScsEpgsbYikLg';
         get = request(app).get(path);
     })
     it('should return w/an HTTP code = 302 OK', async () => {
@@ -20,7 +20,7 @@ describe('GET /ipfs', () => {
     it('should redirect with path', async () => {
         await get.expect((res) => {
             expect(res.header.location).toMatch(
-                /\/ipfs\/QmX8CeKcBJAJcdynAeU1Ln74UXWG6RpakqWfbZSSLYppQA$/
+                /\/ipfs\/QmTvy3Vfnj4UNL5dpxDcA5fLLQpwzA2LMScsEpgsbYikLg$/
             );
         });
     });

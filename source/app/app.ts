@@ -18,12 +18,12 @@ import { nonceReducer } from '../redux/reducers';
 import { onNonceAdded, OnNonceAdded } from '../redux/observers';
 import { onNonceRemoved, OnNonceRemoved } from '../redux/observers';
 
-import { Blockchain } from '../blockchain';
 import { StateDb } from '../state-db';
 import { Miner } from '../miner';
 
 import { Parser } from '../parser';
 import { Global } from '../types';
+import { Token } from '../token';
 declare const global: Global;
 
 export class App {
@@ -56,45 +56,57 @@ export class App {
             }
         });
     }
-    public addNonce(nonce: Nonce, amount: Amount): void {
+    public addNonce(
+        address: Address, nonce: Nonce, amount: Amount
+    ): void {
         this.store.dispatch(addNonce(nonce, {
-            address: this.address, amount
+            address, amount
         }));
     }
-    public removeNonce(nonce: Nonce): void {
+    public removeNonce(
+        address: Address, nonce: Nonce
+    ): void {
         this.store.dispatch(removeNonce(nonce, {
-            address: this.address
+            address
         }));
     }
-    public removeNonceByAmount(amount: Amount): void {
+    public removeNonceByAmount(
+        address: Address, amount: Amount
+    ): void {
         this.store.dispatch(removeNonceByAmount({
-            address: this.address, amount
+            address, amount
         }));
     }
-    public removeNonces(): void {
+    public removeNonces(address: Address): void {
         const { nonces } = this.store.getState();
         Object.keys(nonces).forEach(nonce => {
-            this.removeNonce(nonce);
+            this.removeNonce(address, nonce);
         });
     }
-    public onNonceAdded(callback: OnNonceAdded): void {
-        onNonceAdded(this.store, ((nonce, item, total_by, total) => {
-            if (item.address === this.address) {
+    public onNonceAdded(
+        address: Address, callback: OnNonceAdded
+    ) {
+        return onNonceAdded(this.store, ((nonce, item, total_by, total) => {
+            if (item.address === address) {
                 callback(nonce, item, total_by, total);
             }
         }));
     }
-    public onNonceRemoved(callback: OnNonceRemoved): void {
-        onNonceRemoved(this.store, ((nonce, item, total_by, total) => {
-            if (item.address === this.address) {
+    public onNonceRemoved(
+        address: Address, callback: OnNonceRemoved
+    ) {
+        return onNonceRemoved(this.store, ((nonce, item, total_by, total) => {
+            if (item.address === address) {
                 callback(nonce, item, total_by, total);
             }
         }));
     }
-    public getNonceBy(amount: Amount, index = 0): Nonce | undefined {
+    public getNonceBy(
+        address: Address, amount: Amount, index = 0
+    ): Nonce | undefined {
         const { nonces } = this.store.getState();
         return nonceBy(
-            nonces, { address: this.address, amount }, index
+            nonces, { address, amount }, index
         );
     }
     public refresh(): void {
@@ -105,12 +117,10 @@ export class App {
             address: null
         }));
     }
-    public get address(): Address {
-        return Blockchain.me.selectedAddress;
-    }
-    public get miner(): Miner {
+    public miner(address: Address): Miner {
         if (this._miner === undefined) {
-            this._miner = new Miner(this.address, this.speed);
+            const symbol = Token.symbol(this.params.get('token'));
+            this._miner = new Miner(symbol, address, this.speed);
         }
         return this._miner;
     }
@@ -137,19 +147,19 @@ export class App {
         const value = Parser.number(this.params.get('speed'), fallback);
         return Math.min(100, Math.max(0, value)) / 100;
     }
-    private get logger(): boolean {
-        return Parser.boolean(this.params.get('logger'), false);
-    }
     public get range(): { min: number, max: number } {
         const min = Parser.number(this.params.get('min-amount'), 1);
         const max = Parser.number(this.params.get('max-amount'), Infinity);
         return { min, max };
     }
-    private get params() {
+    public get params(): URLSearchParams {
         if (typeof document !== 'undefined') {
             return new URLSearchParams(document.location.search.substring(1));
         }
         return new URLSearchParams();
+    }
+    private get logger(): boolean {
+        return Parser.boolean(this.params.get('logger'), false);
     }
     private get store(): Store<State, Action> {
         return this._store;

@@ -1,34 +1,42 @@
 #!/usr/bin/npx ts-node
 /* eslint @typescript-eslint/no-var-requires: [off] */
-/**
- * Module dependencies.
- */
+const cluster_log = require('debug')('xpower-ui:cluster');
+const server_log = require('debug')('xpower-ui:server');
+
 import app from '../app';
-const debug = require('debug')('xpower-ui.git:server');
 import http from 'http';
+import process from 'process';
+import throng from 'throng';
 
 /**
- * Get port from environment and store in Express.
+ * Get port from environment and store in express:
  */
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
- * Create HTTP server.
+ * Determine how many processes to cluster & start:
  */
-const server = http.createServer(app);
+const count = process.env.WEB_CONCURRENCY || '1';
+throng({ worker, count: parseInt(count) || 1 });
 
 /**
- * Listen on provided port, on all network interfaces.
- */
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+* Entry point for each newly clustered process:
+*/
+function worker() {
+  const server = http.createServer(app);
+  server.listen(port);
+  server.on('error', (e) => onError(server, e));
+  server.on('listening', () => onListening(server));
+  cluster_log(`worker ${process.pid} started`);
+}
 
 /**
- * Normalize a port into a number, string, or false.
+ * Normalize a port into a number, string or false:
  */
-function normalizePort(value: string): boolean | number | string {
+function normalizePort(
+  value: string
+) {
   const port = parseInt(value, 10);
   if (isNaN(port)) {
     return value; // named pipe
@@ -40,39 +48,40 @@ function normalizePort(value: string): boolean | number | string {
 }
 
 /**
- * Event listener for HTTP server "error" event.
+ * Listener for HTTP server's 'error' event:
  */
-function onError(error: NodeJS.ErrnoException) {
-  if (error.syscall !== 'listen') {
-    throw error;
+function onError(
+  server: http.Server, e: NodeJS.ErrnoException
+) {
+  if (e.syscall !== 'listen') {
+    throw e;
   }
   const bind = typeof port === 'string'
-    ? `Pipe ${port}`
-    : `Port ${port}`;
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
+    ? `Pipe ${port}` : `Port ${port}`;
+  switch (e.code) {
     case 'EACCES':
-      console.error(`${bind} requires elevated privileges`);
+      server_log(`${bind} requires elevated privileges`);
       process.exit(1);
       break;
     case 'EADDRINUSE':
-      console.error(`${bind} is already in use`);
+      server_log(`${bind} is already in use`);
       process.exit(1);
       break;
     default:
-      throw error;
+      throw e;
   }
 }
 
 /**
- * Event listener for HTTP server "listening" event.
+ * Listener for HTTP server's 'listening' event:
  */
-function onListening() {
+function onListening(
+  server: http.Server
+) {
   const address = server.address();
   if (address) {
     const bind = typeof address === 'string'
-      ? `pipe ${address}`
-      : `port ${address.port}`;
-    debug('Listening on ' + bind);
+      ? `pipe ${address}` : `port ${address.port}`;
+    server_log(`listening on ${bind}`);
   }
 }

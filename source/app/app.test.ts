@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import { MemoryStorage } from '../state-db/memory-storage';
 import { Global } from '../types';
 declare const global: Global;

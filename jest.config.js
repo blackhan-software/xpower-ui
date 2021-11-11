@@ -6,6 +6,5 @@ module.exports = {
   setupFiles: [
     './test/env-vars.ts'
   ],
-  testEnvironment: 'jsdom',
   testPathIgnorePatterns : ['\.js$']
 };

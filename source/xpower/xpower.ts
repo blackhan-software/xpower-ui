@@ -4,6 +4,13 @@ import { Blockchain } from '../blockchain';
 
 import XPOWER_ABI from '../xpower-abi.json';
 
+export type OnInit = (
+    block_hash: string, timestamp: BigNumber, ev: Event
+) => void;
+export type OnTransfer = (
+    from: string, to: string, amount: BigNumber, ev: Event
+) => void;
+
 export class XPower {
     public constructor(
         address: string, abi = XPOWER_ABI
@@ -26,11 +33,6 @@ export class XPower {
         const signer = provider.getSigner();
         return this.contract.connect(signer);
     }
-    public filterEvents(): void {
-        const from = '0x0000000000000000000000000000000000000000';
-        const to = Blockchain.me.selectedAddress;
-        this.contract.filters.Transfer(from, to);
-    }
     private get contract(): Contract {
         if (this._contract === undefined) {
             this._contract = new Contract(
@@ -49,14 +51,4 @@ export class XPower {
     private _address: string;
     private _contract: Contract | undefined;
 }
-export const onTransferBefore = (
-    from: string, to: string, amount: BigNumber, ev: Event
-): void => {
-    console.debug('[on:transfer|before]', ev);
-};
-export const onTransferAfter = (
-    from: string, to: string, amount: BigNumber, ev: Event
-): void => {
-    console.debug('[on:transfer|after]', ev);
-};
 export default XPower;

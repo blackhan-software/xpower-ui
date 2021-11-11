@@ -29,6 +29,13 @@ form#mining {
   div.miner-address {
     input#miner-address {
       text-align: center;
+      width: calc(100% - 147px);
+      cursor: default;
+    }
+    input#balance {
+      text-align: center;
+      width: 105px;
+      cursor: help;
     }
     .info > svg {
       position: relative;
@@ -43,7 +50,16 @@ form#mining {
       span.spinner {
         margin-top: 0.25em;
       }
-      width: calc(100% - 42px);
+      span.spinner {
+        height: 1em;
+        width: 1em;
+      }
+      width: calc(100% - 147px);
+    }
+    button#select-token {
+      border-right: none;
+      border-radius: 0;
+      width: 105px;
     }
     .info > svg {
       position: relative;
@@ -70,17 +86,17 @@ form#mining {
     div.progressor {
       div.progress {
         div.progress-bar {
-          background-color: $powered;
+          background-color: var(--xp-powered);
         }
         div.progress-bar.with-indicator {
-          border-right: 1px dotted $dimgray;
+          border-right: 1px dotted var(--xp-dimgray);
         }
-        border: 3px double $dimgray;
+        border: 3px double var(--xp-dimgray);
         margin: 1em;
         width: 100%;
       }
-      border-top: 1px solid $powered;
-      border-bottom: 1px solid $powered;
+      border-top: 1px solid var(--xp-powered);
+      border-bottom: 1px solid var(--xp-powered);
       width: calc(100% - 82.5px);
     }
     padding-top: 1em;
@@ -94,11 +110,11 @@ form#minting {
   }
   div.btn-group.mint {
     button.lhs {
-      width: 84px;
-      cursor: help;
+      width: calc(100% - 147px);
     }
     button.mid {
-      width: calc(100% - 126px);
+      width: 105px;
+      cursor: help;
     }
     button.rhs {
       width: 42px;

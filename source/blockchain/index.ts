@@ -1,2 +1,2 @@
-export { Blockchain } from './blockchain';
-export { Chain, ChainId } from './chain';
+export * from './blockchain';
+export * from './chain';

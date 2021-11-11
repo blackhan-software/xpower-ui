@@ -1,18 +1,43 @@
 extends ../index
 
+block styles
+  style
+    | --xp-powered: var({{XP_POWERED}}, --xp-yellow);
+    | --xp-powered-dark: var({{XP_POWERED_DARK}}, --xp-yellow-dark);
+
 block globals
-  span#g-xpower-address(
-    style="display:none" data-value=`${XPOWER_ADDRESS}`)
-  span#g-xpower-symbol(
-    style="display:none" data-value=`${XPOWER_SYMBOL}`)
-  span#g-xpower-decimals(
-    style="display:none" data-value=`${XPOWER_DECIMALS}`)
-  span#g-xpower-image(
-    style="display:none" data-value=`${XPOWER_IMAGE}`)
-  span#g-persistence(
-    style="display:none" data-value=`${UI_PERSISTENCE}`)
+  span#g-xpower-address-XPOW_CPU(
+    style="display:none" data-value=`${XPOWER_ADDRESS_CPU}`)
+  span#g-xpower-address-XPOW_GPU(
+    style="display:none" data-value=`${XPOWER_ADDRESS_GPU}`)
+  span#g-xpower-address-XPOW_ASIC(
+    style="display:none" data-value=`${XPOWER_ADDRESS_ASC}`)
+
+  span#g-xpower-symbol-XPOW_CPU(
+    style="display:none" data-value=`${XPOWER_SYMBOL_CPU}`)
+  span#g-xpower-symbol-XPOW_GPU(
+    style="display:none" data-value=`${XPOWER_SYMBOL_GPU}`)
+  span#g-xpower-symbol-XPOW_ASIC(
+    style="display:none" data-value=`${XPOWER_SYMBOL_ASC}`)
+
+  span#g-xpower-decimals-XPOW_CPU(
+    style="display:none" data-value=`${XPOWER_DECIMALS_CPU}`)
+  span#g-xpower-decimals-XPOW_GPU(
+    style="display:none" data-value=`${XPOWER_DECIMALS_GPU}`)
+  span#g-xpower-decimals-XPOW_ASIC(
+    style="display:none" data-value=`${XPOWER_DECIMALS_ASC}`)
+
+  span#g-xpower-image-XPOW_CPU(
+    style="display:none" data-value=`${XPOWER_IMAGE_CPU}`)
+  span#g-xpower-image-XPOW_GPU(
+    style="display:none" data-value=`${XPOWER_IMAGE_GPU}`)
+  span#g-xpower-image-XPOW_ASIC(
+    style="display:none" data-value=`${XPOWER_IMAGE_ASC}`)
+
   span#g-mining-speed(
     style="display:none" data-value=`${UI_MINING_SPEED}`)
+  span#g-persistence(
+    style="display:none" data-value=`${UI_PERSISTENCE}`)
 
 block header
   include ../header/header.pug
@@ -33,10 +58,17 @@ block content
 
     form#mining
       label.form-label(for="miner-address")
-        | Miner's Address
+        | Miner's Address and Balance
       div.input-group.mb-3.miner-address
         input#miner-address.form-control(
-          type="text" placeholder="0x0000000000000000000000000000000000000000" readonly)
+          type="text" placeholder="0x0000000000000000000000000000000000000000"
+          readonly
+        )
+        input#balance.form-control(
+          data-bs-toggle="tooltip" data-bs-placement="top"
+          title=`Balance of {{TOKEN}} tokens` readonly
+          type="text" placeholder="0"
+        )
         span.input-group-text.info(
           data-bs-toggle="tooltip" data-bs-placement="top"
           title="Address XP0W tokens shall be mined (and minted) for"
@@ -44,13 +76,28 @@ block content
           include ../../public/images/pug/info-circle-fill.svg.pug
 
       div.btn-group.toggle-mining(role="group")
-        button#toggle-mining.btn.btn-outline-warning(
+        button.btn.btn-outline-warning#toggle-mining(
           type="button" disabled
         )
           span.spinner.spinner-border.spinner-border-sm.float-start(
             role="status" style="visibility: hidden"
           )
           span.text: | Start Mining
+
+        button.btn.btn-outline-warning#select-token.dropdown-toggle(
+          type="button" data-bs-toggle="dropdown"
+          title="Select from one of three XPOW tokens to mine"
+        )
+          | {{TOKEN_SUFFIX}}
+
+        ul.dropdown-menu
+          li: a.dropdown-item(href="/home?token=XPOW.CPU")
+            | XPOW.CPU: ideal for (in-browser) CPU miners
+          li: a.dropdown-item(href="/home?token=XPOW.GPU")
+            | XPOW.GPU: meant for dedicated GPU miners
+          li: a.dropdown-item(href="/home?token=XPOW.ASIC")
+            | XPOW.ASIC: choice of professional ASIC miners
+
         button.btn.btn-outline-warning.info(
           type="button" data-bs-toggle="tooltip" data-bs-placement="top"
           title="Toggle mining for XPOW tokens (w/o minting them)"
@@ -77,26 +124,35 @@ block content
 
     form#minting
       label.form-label(for="mined-nonces")
-        | Mined Amounts
+        | Mined Amounts (not minted yet)
       - let index = 1
       while index <= 64
-        - let amount_i = 2**(index++)-1
-        - let amount_n = filters.nice(amount_i)
-        div.btn-group.mint(role="group" data-amount=`${amount_i}`)
+        - let amount_asic = 16**index - 1
+        - let amount_gpu = 2**index - 1
+        - let amount_cpu = index
+        div.btn-group.mint(
+          role="group" data-index=`${index}`
+          data-amount-asic=`${amount_asic}`
+          data-amount-gpu=`${amount_gpu}`
+          data-amount-cpu=`${amount_cpu}`
+        )
           button.btn.btn-outline-warning.lhs(
-            type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-            title=`Total amount of ${amount_n} XPOW tokens mined so far` disabled
-          )
-            | 0
-          button.btn.btn-outline-warning.mid(
             type="button" disabled
           )
-            | Mint #{amount_n} XPOW
+            | Mint {{LEVEL_#{index}}} {{TOKEN}}
+          button.btn.btn-outline-warning.mid(
+            type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+            title=`Amount of {{LEVEL_${index}}} {{TOKEN}} tokens mined so far`
+            disabled
+          )
+            | 0
           button.btn.btn-outline-warning.rhs(
             type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-            title=`Forget the tokens mined so far (w/o minting them)` disabled
+            title=`Forget the tokens mined so far (w/o minting them)`
+            disabled
           )
             | &times;
+        - index++
 
 block footer
   include ../footer/footer.pug

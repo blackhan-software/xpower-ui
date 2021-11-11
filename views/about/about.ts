@@ -15,7 +15,7 @@ const anchor = global.markdownItAnchor as {
     }
 };
 /**
- * Render content text  with markdown-it:
+ * Render content text with markdown-it:
  */
 $(window).on('load', async () => {
     const mdi = markdownit({

@@ -11,23 +11,24 @@ footer.mt-auto.pb-3
         ul.navbar-nav.d-flex.flex-row.ml-auto
             li.nav-item
                 a.nav-link.link-light.lower.add-token(
-                    href="#" title="Add XPOW Token"
+                    href="#" title="Add the {{TOKEN}} token to Metamask"
                 )
                     i.bi.bi-lightning-charge-fill
                     i.bi.bi-lightning-charge
             li.nav-item
                 a.nav-link.link-light.lower.smart-contract.px-1(
-                    href="https://snowtrace.io/address/0x74A68215AEdf59f317a23E87C13B848a292F27A4"
-                    target="_blank" title="Smart Contract"
+                    target="_blank" title="Smart Contract for the {{TOKEN}} token"
                 )
                     i.bi.bi-cpu-fill
                     i.bi.bi-cpu
             li.nav-item
-                a.nav-link.link-light.lower.github.ps-1(
+                a.nav-link.link-light.lower.github.px-1(
                     href="https://github.com/karun-i-sfarda"
-                    target="_blank" title="GitHub.com"
+                    target="_blank" title="GitHub"
                 )
                     i.bi.bi-github
+            li.nav-item
+                include ./footer-discord.pug
             li.nav-item
                 include ./footer-twitter.pug
             li.nav-item

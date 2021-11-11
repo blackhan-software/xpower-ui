@@ -1,46 +1,69 @@
 extends ../index
 
 block styles
-    link(
-        integrity="sha384-2zx8BdwKFuNSCN7GLgJQsaHE2O069/0DdWh3ijV8LXacwoIjXgZXc6GDcyPdiUTy"
-        href="https://cdn.jsdelivr.net/npm/katex@0.14.1/dist/katex.min.css"
-        crossorigin="anonymous" rel="stylesheet")
+  style
+    | --xp-powered: var({{XP_POWERED}}, --xp-yellow);
+    | --xp-powered-dark: var({{XP_POWERED_DARK}}, --xp-yellow-dark);
+  link(
+    integrity="sha384-2zx8BdwKFuNSCN7GLgJQsaHE2O069/0DdWh3ijV8LXacwoIjXgZXc6GDcyPdiUTy"
+    href="https://cdn.jsdelivr.net/npm/katex@0.14.1/dist/katex.min.css"
+    crossorigin="anonymous" rel="stylesheet")
 
 block globals
-    span#g-urls-about(
-        style="display:none" data-value=`${MD_ABOUT_URL}`)
-    span#g-xpower-address(
-        style="display:none" data-value=`${XPOWER_ADDRESS}`)
-    span#g-xpower-symbol(
-        style="display:none" data-value=`${XPOWER_SYMBOL}`)
-    span#g-xpower-decimals(
-        style="display:none" data-value=`${XPOWER_DECIMALS}`)
-    span#g-xpower-image(
-        style="display:none" data-value=`${XPOWER_IMAGE}`)
+  span#g-xpower-address-XPOW_CPU(
+    style="display:none" data-value=`${XPOWER_ADDRESS_CPU}`)
+  span#g-xpower-address-XPOW_GPU(
+    style="display:none" data-value=`${XPOWER_ADDRESS_GPU}`)
+  span#g-xpower-address-XPOW_ASIC(
+    style="display:none" data-value=`${XPOWER_ADDRESS_ASC}`)
+
+  span#g-xpower-symbol-XPOW_CPU(
+    style="display:none" data-value=`${XPOWER_SYMBOL_CPU}`)
+  span#g-xpower-symbol-XPOW_GPU(
+    style="display:none" data-value=`${XPOWER_SYMBOL_GPU}`)
+  span#g-xpower-symbol-XPOW_ASIC(
+    style="display:none" data-value=`${XPOWER_SYMBOL_ASC}`)
+
+  span#g-xpower-decimals-XPOW_CPU(
+    style="display:none" data-value=`${XPOWER_DECIMALS_CPU}`)
+  span#g-xpower-decimals-XPOW_GPU(
+    style="display:none" data-value=`${XPOWER_DECIMALS_GPU}`)
+  span#g-xpower-decimals-XPOW.ASIC(
+    style="display:none" data-value=`${XPOWER_DECIMALS_ASC}`)
+
+  span#g-xpower-image-XPOW_CPU(
+    style="display:none" data-value=`${XPOWER_IMAGE_CPU}`)
+  span#g-xpower-image-XPOW_GPU(
+    style="display:none" data-value=`${XPOWER_IMAGE_GPU}`)
+  span#g-xpower-image-XPOW_ASIC(
+    style="display:none" data-value=`${XPOWER_IMAGE_ASC}`)
+
+  span#g-urls-about(
+    style="display:none" data-value=`${MD_ABOUT_URL}`)
 
 block header
-    include ../header/header.pug
+  include ../header/header.pug
 
 block content
-    content
+  content
 
 block footer
-    include ../footer/footer.pug
+  include ../footer/footer.pug
 
 block scripts
-    script(
-        integrity="sha384-G4iZzF9Q1vvkqA9laXwSt2Ny6DcbB5aeNHFpuGFdmXKHLaQw73gnLC5VFSavZoof"
-        src="https://cdn.jsdelivr.net/npm/katex@0.14.1/dist/katex.min.js"
-        crossorigin="anonymous" defer)
-    script(
-        integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR"
-        src="https://cdn.jsdelivr.net/npm/katex@0.14.1/dist/contrib/auto-render.min.js"
-        crossorigin="anonymous" defer)
-    script(
-        src="https://cdn.jsdelivr.net/npm/markdown-it@12.2.0/dist/markdown-it.min.js"
-        integrity="sha256-DeiqnTRRpbSmNqxvO6ZtaADe75E0RgZQ25zBy3MePEY="
-        crossorigin="anonymous")
-    script(
-        src="https://cdn.jsdelivr.net/npm/markdown-it-anchor@8.4.1/dist/markdownItAnchor.umd.js"
-        integrity="sha256-uKD1mikEp66Se29ktyjLPb4iuvBRttdg4XX2ZjpYT10="
-        crossorigin="anonymous")
+  script(
+    integrity="sha384-G4iZzF9Q1vvkqA9laXwSt2Ny6DcbB5aeNHFpuGFdmXKHLaQw73gnLC5VFSavZoof"
+    src="https://cdn.jsdelivr.net/npm/katex@0.14.1/dist/katex.min.js"
+    crossorigin="anonymous" defer)
+  script(
+    integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR"
+    src="https://cdn.jsdelivr.net/npm/katex@0.14.1/dist/contrib/auto-render.min.js"
+    crossorigin="anonymous" defer)
+  script(
+    src="https://cdn.jsdelivr.net/npm/markdown-it@12.2.0/dist/markdown-it.min.js"
+    integrity="sha256-DeiqnTRRpbSmNqxvO6ZtaADe75E0RgZQ25zBy3MePEY="
+    crossorigin="anonymous")
+  script(
+    src="https://cdn.jsdelivr.net/npm/markdown-it-anchor@8.4.1/dist/markdownItAnchor.umd.js"
+    integrity="sha256-uKD1mikEp66Se29ktyjLPb4iuvBRttdg4XX2ZjpYT10="
+    crossorigin="anonymous")

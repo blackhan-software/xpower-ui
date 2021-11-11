@@ -1,15 +1,15 @@
-@import "../colors.scss";
+@import "../theme/theme.scss";
 
 footer {
     nav {
-        border-top: 1px solid $powered;
-        border-bottom: 1px solid $powered;
+        border-top: 1px solid var(--xp-powered);
+        border-bottom: 1px solid var(--xp-powered);
     }
     a.nav-link {
         svg {
-            color: $powered;
+            color: var(--xp-powered);
         }
-        color: $powered;
+        color: var(--xp-powered);
     }
     a.nav-link.lower {
         position: relative;
@@ -44,6 +44,18 @@ footer {
             display: block;
         }
     }
+    a.discord {
+        svg:hover {
+            background-color: #5865f2;
+            border-radius: 2px;
+            color: white;
+            padding: 2px;
+        }
+        svg {
+            position: relative;
+            top: -1px;
+        }
+    }
     a.avalanche {
         img.red {
             display: none;
@@ -62,5 +74,5 @@ footer {
             color: #55acee;
         }
     }
-    color: $powered;
+    color: var(--xp-powered);
 }

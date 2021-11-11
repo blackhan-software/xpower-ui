@@ -1,5 +1,4 @@
 import cookieParser from 'cookie-parser';
-import createError from 'http-errors'
 import express from 'express';
 import logger from 'morgan';
 import path from 'path';
@@ -10,16 +9,24 @@ dotenv.config();
 
 import about from './routes/about';
 import home from './routes/home';
+import migrate from './routes/migrate';
 import ipfs from './routes/ifps';
-export const app = express();
+import error from './routes/error';
 
-// view engine setup
+import { Pig } from './source/engines';
+export const app = express();
+Pig.register(app);
+
+// setup view engine(s)
 app.set('views', [
   path.join(__dirname, 'public', 'views'),
   path.join(__dirname, 'views'),
 ]);
-app.set('view engine', 'pug');
 
+app.set('view engine', 'pug');
+app.set('view engine', 'pig');
+
+// register middleware
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -29,24 +36,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // register views
 app.use('/', home);
 app.use('/about', about);
+app.use('/migrate', migrate);
 app.use('/ipfs/*', ipfs);
+app.use(error);
 
-// catch 404 and forward to error handler
-app.use((req, res, next) => {
-  onError(createError(404), req, res, next);
-});
-
-// error handler
-import type { ErrorRequestHandler } from "express";
-const onError: ErrorRequestHandler = (e, req, res) => {
-  // set locals, only providing error in development
-  res.locals.status = e.status;
-  res.locals.message = e.message;
-  res.locals.error = req.app.get('env') === 'development' ? e : null;
-  // render the error page
-  res.status(e.status || 500);
-  res.render('error/error.pug');
-};
-
-app.use(onError);
 export default app;

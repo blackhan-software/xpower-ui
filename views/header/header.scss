@@ -1,8 +1,11 @@
-@import "../colors.scss";
+@import "../theme/theme.scss";
 
 header {
     nav#menu {
         @media (min-width: 576px) {
+            a:not(:first-of-type):not(:last-of-type) {
+                border-radius: 0;
+            }
             a:first-of-type {
                 border-start-end-radius: 0;
                 border-end-end-radius: 0;
@@ -13,6 +16,9 @@ header {
             }
         }
         @media (max-width: 576px) {
+            a:not(:first-of-type):not(:last-of-type) {
+                border-radius: 0;
+            }
             a:first-of-type {
                 border-end-start-radius: 0;
                 border-end-end-radius: 0;
@@ -23,12 +29,12 @@ header {
             }
         }
         a.active, a:hover {
-            background-color: $powered;
-            color: $dimgray;
+            background-color: var(--xp-powered);
+            color: var(--xp-dimgray);
         }
         a {
-            border: 1px solid $powered;
-            color: $powered;
+            border: 1px solid var(--xp-powered);
+            color: var(--xp-powered);
         }
     }
 }

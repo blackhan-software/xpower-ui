@@ -1,4 +1,4 @@
-@import "./colors.scss";
+@import "./theme/theme.scss";
 
 html {
   height: 100%;
@@ -13,8 +13,8 @@ body {
   width: 100%;
 }
 body {
-  background-color: $dimgray;
-  color: $powered;
+  background-color: var(--xp-dimgray);
+  color: var(--xp-powered);
 }
 body.container {
   margin-right: auto;
@@ -27,12 +27,16 @@ body.container {
   text-overflow: ellipsis;
 }
 .btn-outline-warning {
-  border-color: $powered;
-  color: $powered;
+  border-color: var(--xp-powered);
+  color: var(--xp-powered);
+}
+.btn-outline-warning.disabled,
+.btn-outline-warning:disabled {
+  color: var(--xp-powered-dark);
 }
 .btn-outline-warning:hover {
-  background-color: $powered;
-  border-color: $powered;
+  background-color: var(--xp-powered);
+  border-color: var(--xp-powered);
 }
 h1 {
   font-size: 22px;

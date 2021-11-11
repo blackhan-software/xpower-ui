@@ -7,6 +7,13 @@ declare const global: Global;
 import { Address } from '../redux/types';
 import { EventEmitter } from 'events';
 
+export type Connect = {
+    chainId: ChainId, address: Address
+};
+export type Reconnect = {
+    chainId: ChainId, address: Address
+};
+
 export type Token = {
     /** address that the token is at */
     address: Address,
@@ -17,7 +24,6 @@ export type Token = {
     /** string url of the token logo */
     image?: string
 };
-
 export class Blockchain extends EventEmitter {
     public static get me(): Blockchain {
         if (this._me === undefined) {
@@ -55,19 +61,27 @@ export class Blockchain extends EventEmitter {
         if (addresses.length <= index) {
             throw new Error('missing address');
         }
-        if (this.connect_emitted === undefined) {
-            this.connect_emitted = this.emit('connect', {
-                chainId: await this.chainId
-            });
-        }
-        return addresses[index];
-    }
-    public get selectedAddress(): Address {
-        const address = this.provider.selectedAddress;
+        const address = this.selectedAddress;
         if (!address) {
             throw new Error('missing selected-address');
         }
-        return address as Address;
+        if (this.connect_emitted === undefined) {
+            this.connect_emitted = this.emit('connect', {
+                chainId: await this.chainId, address
+            } as Connect);
+        } else {
+            this.connect_emitted = this.emit('reconnect', {
+                chainId: await this.chainId, address
+            } as Reconnect);
+        }
+        return addresses[index];
+    }
+    public get selectedAddress(): Address | undefined {
+        const address = this.provider.selectedAddress;
+        if (address) {
+            return address as Address;
+        }
+        return undefined;
     }
     public async isAvalanche(): Promise<boolean> {
         const id = await this.chainId;

@@ -1,5 +1,6 @@
 public/content/**/*.md
 public/views/**/*.pug
+public/views/**/*.pig
 node_modules/
 .env
 
@@ -12,3 +13,4 @@ node_modules/
 
 !jest.config.js
 !webpack.*.js
+.vscode
