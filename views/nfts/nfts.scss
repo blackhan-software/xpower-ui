@@ -1,0 +1,106 @@
+@import "../index.scss";
+@import "../header/header.scss";
+@import "../connector/connector.scss";
+@import "../footer/footer.scss";
+@import "./nfts-details.scss";
+
+form#minting {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+form#minter {
+  div.minter-address {
+    input#minter-address {
+      text-align: center;
+      width: calc(100% - 147px);
+      cursor: default;
+    }
+    input#balance {
+      text-align: center;
+      width: 105px;
+    }
+  }
+}
+form#selector {
+  div.selectors {
+    a.active,
+    a:hover {
+      background-color: var(--xp-powered);
+      color: var(--xp-dimgray);
+    }
+    a {
+      border: 1px solid var(--xp-powered);
+      color: var(--xp-powered);
+    }
+    width: 100%;
+  }
+}
+form#minting {
+  .nft-minter {
+    .btn-group {
+      .toggle {
+        width: 43px;
+      }
+      .toggle > i {
+        position: relative;
+        top: 1px;
+      }
+      .increase,
+      .decrease {
+        width: 43px;
+      }
+      .increase > svg,
+      .decrease > svg {
+        position: relative;
+        top: -1px;
+      }
+    }
+    .balance {
+      width: calc(25% - 126px);
+    }
+    .minter {
+      width: calc(50% - 126px);
+    }
+    .amount {
+      width: calc(25% - 126px);
+    }
+    margin-bottom: 1em;
+    width: 100%;
+  }
+  .nft-batch-minter {
+    #toggle-all {
+      width: 42px;
+    }
+    #toggle-all > i {
+      position: relative;
+      top: 1px;
+    }
+    #burn-approval {
+      span.spinner {
+        margin-top: 0.25em;
+      }
+      span.spinner {
+        height: 1em;
+        width: 1em;
+      }
+      width: calc(50% - 42px);
+    }
+    #batch-minter {
+      span.spinner {
+        margin-top: 0.25em;
+      }
+      span.spinner {
+        height: 1em;
+        width: 1em;
+      }
+      width: calc(50% - 42px);
+    }
+    #batch-minter.full {
+      width: calc(100% - 84px);
+    }
+    margin-bottom: 1em;
+    width: 100%;
+  }
+  margin-bottom: 0;
+  width: 100%;
+}

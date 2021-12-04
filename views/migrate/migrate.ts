@@ -5,7 +5,6 @@ import { Blockchain } from '../../source/blockchain';
 import { ChainId } from '../../source/blockchain';
 import { Token, TokenSymbolAlt } from '../../source/token';
 import { XPower } from '../../source/xpower';
-import { App } from '../../source/app';
 
 import { Alert } from '../../source/functions';
 import { alert } from '../../source/functions';
@@ -19,45 +18,9 @@ function XPowered(token: TokenSymbolAlt) {
     const instance = contract.connect();
     return instance;
 }
-$(window).on('load', async function checkBlockchain() {
-    const $connect = $('#connect-metamask');
-    if (Blockchain.me.isInstalled()) {
-        if (Blockchain.me.isConnected()) {
-            if (await Blockchain.me.isAvalanche()) {
-                $connect.text('Connect to Metamask');
-            } else {
-                $connect.text('Switch to Avalanche');
-            }
-        } else {
-            $connect.text('Connected to Metamask');
-            const $address = $('#minter-address');
-            $address.val(await Blockchain.me.connect());
-            App.me.refresh();
-        }
-    } else {
-        $connect.text('Install Metamask');
-        const $info = $connect.siblings('.info');
-        $info.prop('title', 'Install Metamask (and reload)');
-    }
-});
-$('#connect-metamask').on('click', async function connectBlockchain() {
-    if (Blockchain.me.isInstalled()) {
-        if (await Blockchain.me.isAvalanche()) {
-            const $address = $('#minter-address');
-            $address.val(await Blockchain.me.connect());
-            const $connect = $('#connect-metamask');
-            $connect.text('Connected to Metamask');
-            App.me.refresh();
-        } else {
-            Blockchain.me.switchTo(ChainId.AVALANCHE_MAINNET);
-        }
-    } else {
-        open('https://metamask.io/download.html');
-    }
-});
 $(window).on('load', function enableAllowanceButton() {
-    if (Blockchain.me.isInstalled()) {
-        Blockchain.me.on('connect', () => {
+    if (Blockchain.isInstalled()) {
+        Blockchain.onConnect(() => {
             const $approve = $('#approve-allowance');
             $approve.prop('disabled', false);
         });
@@ -175,54 +138,54 @@ $('#execute-migration').on('click', async () => {
     }
 });
 $('#add-xpow-cpu').on('click', async () => {
-    if (Blockchain.me.isInstalled()) {
-        if (await Blockchain.me.isAvalanche()) {
+    if (Blockchain.isInstalled()) {
+        if (await Blockchain.isAvalanche()) {
             const token = Token.symbolAlt(TokenSymbolAlt.CPU);
             const address = $(`#g-xpower-address-${token}`).data('value');
             const symbol = $(`#g-xpower-symbol-${token}`).data('value');
             const decimals = $(`#g-xpower-decimals-${token}`).data('value');
             const image = $(`#g-xpower-image-${token}`).data('value');
-            await Blockchain.me.addToken({
+            await Blockchain.addToken({
                 address, symbol, decimals, image
             });
         } else {
-            Blockchain.me.switchTo(ChainId.AVALANCHE_MAINNET);
+            Blockchain.switchTo(ChainId.AVALANCHE_MAINNET);
         }
     } else {
         open('https://metamask.io/download.html');
     }
 });
 $('#add-xpow-gpu').on('click', async () => {
-    if (Blockchain.me.isInstalled()) {
-        if (await Blockchain.me.isAvalanche()) {
+    if (Blockchain.isInstalled()) {
+        if (await Blockchain.isAvalanche()) {
             const token = Token.symbolAlt(TokenSymbolAlt.GPU);
             const address = $(`#g-xpower-address-${token}`).data('value');
             const symbol = $(`#g-xpower-symbol-${token}`).data('value');
             const decimals = $(`#g-xpower-decimals-${token}`).data('value');
             const image = $(`#g-xpower-image-${token}`).data('value');
-            await Blockchain.me.addToken({
+            await Blockchain.addToken({
                 address, symbol, decimals, image
             });
         } else {
-            Blockchain.me.switchTo(ChainId.AVALANCHE_MAINNET);
+            Blockchain.switchTo(ChainId.AVALANCHE_MAINNET);
         }
     } else {
         open('https://metamask.io/download.html');
     }
 });
 $('#add-xpow-asic').on('click', async () => {
-    if (Blockchain.me.isInstalled()) {
-        if (await Blockchain.me.isAvalanche()) {
+    if (Blockchain.isInstalled()) {
+        if (await Blockchain.isAvalanche()) {
             const token = Token.symbolAlt(TokenSymbolAlt.ASIC);
             const address = $(`#g-xpower-address-${token}`).data('value');
             const symbol = $(`#g-xpower-symbol-${token}`).data('value');
             const decimals = $(`#g-xpower-decimals-${token}`).data('value');
             const image = $(`#g-xpower-image-${token}`).data('value');
-            await Blockchain.me.addToken({
+            await Blockchain.addToken({
                 address, symbol, decimals, image
             });
         } else {
-            Blockchain.me.switchTo(ChainId.AVALANCHE_MAINNET);
+            Blockchain.switchTo(ChainId.AVALANCHE_MAINNET);
         }
     } else {
         open('https://metamask.io/download.html');

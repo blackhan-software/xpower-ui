@@ -1,5 +1,8 @@
 extends ../index
 
+block styles
+  include ../theme/theme.pug
+
 block globals
   span#g-xpower-address-XPOW_CPU(
     style="display:none" data-value=`${XPOWER_ADDRESS_CPU}`)

@@ -1,9 +1,7 @@
 extends ../index
 
 block styles
-  style
-    | --xp-powered: var({{XP_POWERED}}, --xp-yellow);
-    | --xp-powered-dark: var({{XP_POWERED_DARK}}, --xp-yellow-dark);
+  include ../theme/theme.pug
 
 block globals
   span#g-xpower-address-XPOW_OLD(
@@ -51,10 +49,13 @@ block content
     form#connect
       div.btn-group.connect-metamask(role="group")
         button#connect-metamask.btn.btn-outline-warning(type="button")
-          | &nbsp;
+          span.spinner.spinner-border.spinner-border-sm.float-start(
+            role="status" style="visibility: hidden"
+          )
+          span.text: | &nbsp;
         button.btn.btn-outline-warning.info(
           type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title="Authorize Metamask to connect"
+          title="Authorize your Metamask to be connected to"
         )
           include ../../public/images/pug/info-circle-fill.svg.pug
 
@@ -78,7 +79,7 @@ block content
           | Approve Allowance for XPOWs
         button.btn.btn-outline-warning.info(
           type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title="Approve allowance for old XPOW tokens (to the new XPOW.GPU contract)"
+          title="Approve allowance for old XPOW tokens (for the new XPOW.GPU contract)"
         )
           include ../../public/images/pug/info-circle-fill.svg.pug
 
@@ -100,7 +101,7 @@ block content
 
       div.btn-group.add-xpow-cpu(role="group")
         button#add-xpow-cpu.add-xpow.btn.btn-outline-warning(type="button" disabled)
-          | Add XPOW.CPU to Metamask <img class="float-end" src="/images/svg/lightning-fill-yellow.svg" height=20 width=20>
+          | Add XPOW.CPU to Metamask <img class="float-end" src="/images/svg/lightning-fill-cpu.svg" height=20 width=20>
         button.btn.btn-outline-warning.info(
           type="button" data-bs-toggle="tooltip" data-bs-placement="top"
           title="Add the new XPOW.CPU token to Metamask"
@@ -109,7 +110,7 @@ block content
 
       div.btn-group.add-xpow-gpu(role="group")
         button#add-xpow-gpu.add-xpow.btn.btn-outline-warning(type="button" disabled)
-          | Add XPOW.GPU to Metamask <img class="float-end" src="/images/svg/lightning-fill-lime.svg" height=20 width=20>
+          | Add XPOW.GPU to Metamask <img class="float-end" src="/images/svg/lightning-fill-gpu.svg" height=20 width=20>
         button.btn.btn-outline-warning.info(
           type="button" data-bs-toggle="tooltip" data-bs-placement="top"
           title="Add the new XPOW.GPU token to Metamask"
@@ -118,7 +119,7 @@ block content
 
       div.btn-group.add-xpow-asic(role="group")
         button#add-xpow-asic.add-xpow.btn.btn-outline-warning(type="button" disabled)
-          | Add XPOW.ASIC to Metamask <img class="float-end" src="/images/svg/lightning-fill-cyan.svg" height=20 width=20>
+          | Add XPOW.ASIC to Metamask <img class="float-end" src="/images/svg/lightning-fill-asic.svg" height=20 width=20>
         button.btn.btn-outline-warning.info(
           type="button" data-bs-toggle="tooltip" data-bs-placement="top"
           title="Add the new XPOW.ASIC token to Metamask"

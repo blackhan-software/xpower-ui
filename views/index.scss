@@ -21,10 +21,15 @@ body.container {
   margin-left: auto;
   max-width: 768px;
 }
-.btn {
+input, .btn, .ellipsis {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.no-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: initial;
 }
 .btn-outline-warning {
   border-color: var(--xp-powered);
@@ -42,4 +47,13 @@ h1 {
   font-size: 22px;
   font-weight: bold;
   text-align: center;
+}
+:not(span).info {
+  svg {
+    position: relative;
+    top: -1px;
+  }
+}
+.info {
+  width: 42px;
 }

@@ -6,7 +6,7 @@ describe('GET /ipfs', () => {
     beforeEach(() => {
         const path = '/ipfs/QmTvy3Vfnj4UNL5dpxDcA5fLLQpwzA2LMScsEpgsbYikLg';
         get = request(app).get(path);
-    })
+    });
     it('should return w/an HTTP code = 302 OK', async () => {
         await get.expect(302);
     });

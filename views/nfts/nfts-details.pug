@@ -1,0 +1,109 @@
+each year in YEARS.reverse()
+
+  div.row.year(
+    data-year=`${year}`
+  )
+    div.col-sm.nft-details-lhs
+      div.nft-image-wrap
+        span.spinner.spinner-border(
+          role="status"
+        )
+        img.img-fluid.nft-image(
+          data-bs-toggle="tooltip" data-bs-placement="top" loading="lazy"
+          title=`${kinds[index]} NFT (level ${index+1} out of 9 with ID:${100*year+3*index})`
+        )
+    div.col-sm.nft-details-rhs
+
+      label.form-label
+        | Year of Issuance
+      div.input-group.nft-issuance-year
+        input.form-control(
+          type="text" value=`${year}` readonly
+        )
+        span.input-group-text.info(
+          data-bs-toggle="tooltip" data-bs-placement="top"
+          title=`Year of issuance of these ${kinds[index]} NFTs`
+        )
+          include ../../public/images/pug/info-circle-fill.svg.pug
+
+      label.form-label
+        | Personal Balance
+      div.input-group.nft-balance
+        input.form-control(
+          type="text" placeholder="0" readonly
+        )
+        span.input-group-text.info(
+          data-bs-toggle="tooltip" data-bs-placement="top"
+          title=`Personal balance of ${kinds[index]} NFTs (for ${year})`
+        )
+          include ../../public/images/pug/info-circle-fill.svg.pug
+
+      label.form-label
+        | Total Supply
+      div.input-group.nft-total-supply
+        input.form-control(
+          type="text" placeholder="0" readonly
+        )
+        span.input-group-text.info(
+          data-bs-toggle="tooltip" data-bs-placement="top"
+          title=`Total supply of ${kinds[index]} NFTs minted so far (for ${year})`
+        )
+          include ../../public/images/pug/info-circle-fill.svg.pug
+
+      div.btn-group.nft-sender-expander.d-sm-none(
+        role="group" data-kind=`${kinds[index]}` style="margin-top: 1em; width: 100%"
+      )
+        button.btn.btn-outline-warning.sender-expander(
+          type="button"
+        )
+          i.bi-chevron-down
+        button.btn.btn-outline-warning.info(
+          type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+          title=`Show send to & amount` style="width: 43px"
+        )
+          include ../../public/images/pug/info-circle-fill.svg.pug
+
+      label.form-label.nft-transfer-to-label.d-none.d-sm-flex
+        | Send To
+      div.input-group.nft-transfer-to.d-none.d-sm-flex(
+        role="group"  data-kind=`${kinds[index]}`
+      )
+        input.form-control(
+          type="text" placeholder="0x…" disabled
+        )
+        span.input-group-text.info(
+          data-bs-toggle="tooltip" data-bs-placement="top"
+          title=`Address to send minted ${kinds[index]} NFTs to (for ${year})`
+        )
+          include ../../public/images/pug/info-circle-fill.svg.pug
+
+      label.form-label.nft-transfer-amount-label.d-none.d-sm-flex
+        | Send Amount
+      div.input-group.nft-transfer-amount.d-none.d-sm-flex(
+        role="group"  data-kind=`${kinds[index]}`
+      )
+        input.form-control(
+          type="number" placeholder="0" min="0"  disabled
+        )
+        span.input-group-text.info(
+          data-bs-toggle="tooltip" data-bs-placement="top"
+          title=`Amount of minted ${kinds[index]} NFTs to send (for ${year})`
+        )
+          include ../../public/images/pug/info-circle-fill.svg.pug
+
+      div.btn-group.nft-sender.d-none.d-sm-flex(
+        role="group" data-kind=`${kinds[index]}`
+      )
+        button.btn.btn-outline-warning.sender(
+          type="button" disabled
+        )
+          span.spinner.spinner-border.spinner-border-sm.float-start(
+            role="status" style="visibility: hidden"
+          )
+          span.text: | Send #{kinds[index]} NFTs
+        button.btn.btn-outline-warning.info(
+          type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+          title=`Send ${kinds[index]} NFTs to destination (for ${year})`
+        )
+          include ../../public/images/pug/info-circle-fill.svg.pug
+  hr.year

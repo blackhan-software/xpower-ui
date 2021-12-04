@@ -1,4 +1,6 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
+import { Global } from '../../source/types';
+declare const global: Global;
 import './home.scss';
 
 import { XPower } from '../../source/xpower';
@@ -6,16 +8,18 @@ import { OnInit, OnTransfer } from '../../source/xpower';
 
 import { IntervalManager } from '../../source/managers';
 import { HashManager } from '../../source/managers';
-import { Blockchain, ChainId } from '../../source/blockchain';
+import { Blockchain } from '../../source/blockchain';
 import { Connect, Reconnect } from '../../source/blockchain';
 import { Token, TokenSuffix } from '../../source/token';
 import { App } from '../../source/app';
 
 import { Alert } from '../../source/functions';
 import { alert } from '../../source/functions';
+import { delayed } from '../../source/functions';
 import { in_range } from '../../source/functions';
 import { Address } from '../../source/redux/types';
-import { BigNumber } from 'ethers';
+
+const { Tooltip } = global.bootstrap as any;
 
 function XPowered() {
     const token = Token.symbolAlt(App.me.params.get('token'));
@@ -27,61 +31,38 @@ function XPowered() {
     const instance = contract.connect();
     return instance;
 }
-$(window).on('load', async function checkBlockchain() {
-    const $connect = $('#connect-metamask');
-    if (Blockchain.me.isInstalled()) {
-        if (Blockchain.me.isConnected()) {
-            if (await Blockchain.me.isAvalanche()) {
-                $connect.text('Connect to Metamask');
-            } else {
-                $connect.text('Switch to Avalanche');
-            }
-        } else {
-            $connect.text('Connected to Metamask');
-            const $address = $('#miner-address');
-            $address.val(await Blockchain.me.connect());
-            App.me.refresh();
-        }
-    } else {
-        $connect.text('Install Metamask');
-        const $info = $connect.siblings('.info');
-        $info.prop('title', 'Install Metamask (and reload)');
-    }
-});
 $(window).on('load', function syncBalance() {
-    if (Blockchain.me.isInstalled()) {
-        Blockchain.me.once('connect', async ({ address }: Connect) => {
+    if (Blockchain.isInstalled()) {
+        Blockchain.onceConnect(async ({ address }: Connect) => {
             const on_transfer: OnTransfer = async (from, to, amount) => {
-                console.debug('[on:transfer]', from, to, amount.toHexString());
-                const current = BigNumber.from(
-                    parseInt($balance.val() as string) || 0
-                );
-                if (address.toLowerCase() === from.toLowerCase()) {
-                    $balance.val(current.sub(amount).toString());
-                }
-                if (address.toLowerCase() === to.toLowerCase()) {
-                    $balance.val(current.add(amount).toString());
+                console.debug('[on:transfer]', from, to, amount.toBigInt());
+                if (address.match(new RegExp(from, 'i')) ||
+                    address.match(new RegExp(to, 'i'))
+                ) {
+                    const balance = await xpower.balanceOf(address);
+                    $balance.trigger('changed', { balance });
+                    $balance.val(balance);
                 }
             };
             const xpower = XPowered();
-            xpower.on('Transfer', on_transfer);
+            xpower.on('Transfer', delayed(on_transfer, 600));
             const $balance = $('#balance');
             $balance.val(await xpower.balanceOf(address));
         });
     }
 });
 $(window).on('load', function forgetNonces() {
-    if (Blockchain.me.isInstalled()) {
+    if (Blockchain.isInstalled()) {
         const im = new IntervalManager({ start: true });
-        Blockchain.me.once('connect', () => {
+        Blockchain.onceConnect(() => {
             im.on('tick', () => App.me.remove());
         });
     }
 });
 $(window).on('load', function restartMining() {
-    if (Blockchain.me.isInstalled()) {
+    if (Blockchain.isInstalled()) {
         const im = new IntervalManager({ start: true });
-        Blockchain.me.once('connect', ({ address }: Connect) => {
+        Blockchain.onceConnect(({ address }: Connect) => {
             im.on('tick', () => {
                 const miner = App.me.miner(address);
                 const running = miner.running;
@@ -96,8 +77,8 @@ $(window).on('load', function restartMining() {
     }
 });
 $(window).on('load', async function refreshBlockHash() {
-    if (Blockchain.me.isInstalled()) {
-        Blockchain.me.once('connect', () => {
+    if (Blockchain.isInstalled()) {
+        Blockchain.onceConnect(() => {
             const on_init: OnInit = (block_hash, timestamp) => {
                 console.debug('[on:init]', block_hash, timestamp.toHexString());
                 const suffix = Token.suffix(App.me.params.get('token'));
@@ -110,23 +91,8 @@ $(window).on('load', async function refreshBlockHash() {
         });
     }
 });
-$('#connect-metamask').on('click', async function connectBlockchain() {
-    if (Blockchain.me.isInstalled()) {
-        if (await Blockchain.me.isAvalanche()) {
-            const $address = $('#miner-address');
-            $address.val(await Blockchain.me.connect());
-            const $connect = $('#connect-metamask');
-            $connect.text('Connected to Metamask');
-            App.me.refresh();
-        } else {
-            Blockchain.me.switchTo(ChainId.AVALANCHE_MAINNET);
-        }
-    } else {
-        open('https://metamask.io/download.html');
-    }
-});
 $('#toggle-mining').on('click', async function toggleMining() {
-    const address = Blockchain.me.selectedAddress;
+    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -194,9 +160,9 @@ $('#toggle-mining').on('click', async function toggleMining() {
     }
 });
 $(window).on('load', function resetMiningToggle() {
-    if (Blockchain.me.isInstalled()) {
-        Blockchain.me.on('connect', reset);
-        Blockchain.me.on('reconnect', ({ address }: Reconnect) => {
+    if (Blockchain.isInstalled()) {
+        Blockchain.onConnect(reset);
+        Blockchain.onReconnect(({ address }: Reconnect) => {
             if (!App.me.miner(address).running) {
                 reset();
             }
@@ -213,8 +179,8 @@ $(window).on('load', function resetMiningToggle() {
     }
 })
 $(window).on('load', function toggleInitSpinner() {
-    if (Blockchain.me.isInstalled()) {
-        Blockchain.me.on('connect', ({ address }: Connect) => {
+    if (Blockchain.isInstalled()) {
+        Blockchain.onConnect(({ address }: Connect) => {
             const $mine = $('#toggle-mining');
             const $text = $mine.find('.text');
             const $spinner = $mine.find('.spinner');
@@ -234,8 +200,8 @@ $(window).on('load', function toggleInitSpinner() {
     }
 });
 $(window).on('load', function toggleMiningSpinner() {
-    if (Blockchain.me.isInstalled()) {
-        Blockchain.me.on('connect', ({ address }: Connect) => {
+    if (Blockchain.isInstalled()) {
+        Blockchain.onConnect(({ address }: Connect) => {
             const $mine = $('#toggle-mining');
             const $text = $mine.find('.text');
             const $spinner = $mine.find('.spinner');
@@ -250,15 +216,15 @@ $(window).on('load', function toggleMiningSpinner() {
         });
     }
 });
-$('#decelerate').on('click', function decelerateMining() {
-    const address = Blockchain.me.selectedAddress;
+$('#decelerate').on('click', async function decelerateMining() {
+    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
     App.me.miner(address).decelerate();
 });
-$('#accelerate').on('click', function accelerateMining() {
-    const address = Blockchain.me.selectedAddress;
+$('#accelerate').on('click', async function accelerateMining() {
+    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -273,35 +239,44 @@ $(window).on('load', function initSpeed() {
         } else {
             $('#speed').addClass('with-indicator');
         }
-        $('#speed').parent('').attr(
-            'title', `Mining speed: ${speed_pct}`
-        );
+        const $progressor = $('#speed').parents('.progressor');
+        $progressor.attr('title', `Mining speed: ${speed_pct}`);
+        Tooltip.getInstance($progressor).dispose();
+        Tooltip.getOrCreateInstance($progressor);
     });
     $('#speed').trigger('change', App.me.speed);
 });
 $(window).on('load', function controlSpeed() {
-    if (Blockchain.me.isInstalled()) {
-        Blockchain.me.on('connect', () => {
+    if (Blockchain.isInstalled()) {
+        Blockchain.onConnect(() => {
             $('#decelerate').prop('disabled', false);
             $('#accelerate').prop('disabled', false);
         });
-        Blockchain.me.on('connect', ({ address }: Connect) => {
+        Blockchain.onConnect(({ address }: Connect) => {
             App.me.miner(address).on('accelerated', (ev) => {
                 const speed = ev.speed as number;
+                const $acc = $('#accelerate');
+                Tooltip.getInstance($acc)?.hide();
+                const $dec = $('#decelerate');
+                Tooltip.getInstance($dec)?.hide();
                 if (speed >= 1) {
-                    $('#accelerate').prop('disabled', true);
+                    $acc.prop('disabled', true);
                 }
                 if (speed >= 0) {
-                    $('#decelerate').prop('disabled', false);
+                    $dec.prop('disabled', false);
                 }
             });
             App.me.miner(address).on('decelerated', (ev) => {
                 const speed = ev.speed as number;
+                const $acc = $('#accelerate');
+                Tooltip.getInstance($acc)?.hide();
+                const $dec = $('#decelerate');
+                Tooltip.getInstance($dec)?.hide();
                 if (speed <= 1) {
-                    $('#accelerate').prop('disabled', false);
+                    $acc.prop('disabled', false);
                 }
                 if (speed <= 0) {
-                    $('#decelerate').prop('disabled', true);
+                    $dec.prop('disabled', true);
                 }
             });
             App.me.miner(address).on('accelerated', (ev) => {
@@ -326,7 +301,7 @@ $('.mint>button.lhs').on('click', async function mintTokens(
     const index = parseInt($mint.data('index'));
     const token = App.me.params.get('token');
     const amount = Token.amount(token, index);
-    const address = Blockchain.me.selectedAddress;
+    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -371,22 +346,24 @@ $('.mint>button.lhs').on('click', async function mintTokens(
         }
     }
 });
-$('.mint>button.rhs').on('click', function forgetNonces(
+$('.mint>button.rhs').on('click', async function forgetNonces(
     ev
 ) {
-    const $mint = $(ev.target).parent('.mint');
+    const $forget = $(ev.target);
+    const $mint = $forget.parent('.mint');
     const index = parseInt($mint.data('index'));
     const token = App.me.params.get('token');
     const amount = Token.amount(token, index);
-    const address = Blockchain.me.selectedAddress;
+    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
     App.me.removeNonceByAmount(address, amount);
+    Tooltip.getInstance($forget).hide();
 });
 $(window).on('load', function registerObservers() {
-    if (Blockchain.me.isInstalled()) {
-        Blockchain.me.once('connect', ({ address }: Connect) => {
+    if (Blockchain.isInstalled()) {
+        Blockchain.onceConnect(({ address }: Connect) => {
             const suffix = Token.suffix(App.me.params.get('token'));
             App.me.onNonceAdded(address, function updateTotalPerAmount(
                 nonce, { amount }, total

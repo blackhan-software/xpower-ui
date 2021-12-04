@@ -1,4 +1,5 @@
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import express from 'express';
 import logger from 'morgan';
 import path from 'path';
@@ -8,9 +9,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import about from './routes/about';
-import home from './routes/home';
-import ipfs from './routes/ifps';
 import error from './routes/error';
+import home from './routes/home';
+import nfts from './routes/nfts';
+import ipfs from './routes/ifps';
+import robots from './routes/robots';
+import staking from './routes/staking';
 
 import { Pig } from './source/engines';
 export const app = express();
@@ -27,6 +31,7 @@ app.set('view engine', 'pig');
 
 // register middleware
 app.use(logger('dev'));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -34,8 +39,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // register views
 app.use('/', home);
+app.use('/nfts', nfts);
+app.use('/staking', staking);
 app.use('/about', about);
 app.use('/ipfs/*', ipfs);
+app.use('/robots.txt', robots);
 app.use(error);
 
 export default app;

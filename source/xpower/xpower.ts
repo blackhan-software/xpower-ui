@@ -10,6 +10,9 @@ export type OnInit = (
 export type OnTransfer = (
     from: string, to: string, amount: BigNumber, ev: Event
 ) => void;
+export type OnApproval = (
+    owner: string, spender: string, value: BigNumber, ev: Event
+) => void;
 
 export class XPower {
     public constructor(
@@ -27,7 +30,7 @@ export class XPower {
     public connect(provider?: Web3Provider): Contract {
         if (provider == undefined) {
             provider = new Web3Provider(
-                Blockchain.me.provider
+                Blockchain.provider
             );
         }
         const signer = provider.getSigner();

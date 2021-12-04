@@ -2,31 +2,16 @@
 
 header {
     nav#menu {
-        @media (min-width: 576px) {
-            a:not(:first-of-type):not(:last-of-type) {
-                border-radius: 0;
-            }
-            a:first-of-type {
-                border-start-end-radius: 0;
-                border-end-end-radius: 0;
-            }
-            a:last-of-type {
-                border-start-start-radius: 0;
-                border-end-start-radius: 0;
-            }
+        a:not(:first-of-type):not(:last-of-type) {
+            border-radius: 0;
         }
-        @media (max-width: 576px) {
-            a:not(:first-of-type):not(:last-of-type) {
-                border-radius: 0;
-            }
-            a:first-of-type {
-                border-end-start-radius: 0;
-                border-end-end-radius: 0;
-            }
-            a:last-of-type {
-                border-start-start-radius: 0;
-                border-start-end-radius: 0;
-            }
+        a:first-of-type {
+            border-start-end-radius: 0;
+            border-end-end-radius: 0;
+        }
+        a:last-of-type {
+            border-start-start-radius: 0;
+            border-end-start-radius: 0;
         }
         a.active, a:hover {
             background-color: var(--xp-powered);

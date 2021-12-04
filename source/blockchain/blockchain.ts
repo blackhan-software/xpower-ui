@@ -25,7 +25,7 @@ export type Token = {
     image?: string
 };
 export class Blockchain extends EventEmitter {
-    public static get me(): Blockchain {
+    private static get me(): Blockchain {
         if (this._me === undefined) {
             this._me = new Blockchain();
         }
@@ -42,26 +42,35 @@ export class Blockchain extends EventEmitter {
             });
         }
     }
+    public static get provider(): any {
+        return this.me.provider;
+    }
     public get provider(): any {
         return global.ethereum;
+    }
+    public static isInstalled(): boolean {
+        return this.me.isInstalled();
     }
     public isInstalled(): boolean {
         return typeof this.provider !== 'undefined';
     }
+    public static isConnected(): boolean {
+        return this.me.isConnected();
+    }
     public isConnected(): boolean {
         return this.provider.isConnected();
     }
-    public async connect(index = 0): Promise<string> {
-        const addresses = await this.provider.request({
+    public static async connect(): Promise<string> {
+        return this.me.connect();
+    }
+    public async connect(): Promise<string> {
+        const accounts = await this.provider.request({
             method: 'eth_requestAccounts'
         });
-        if (!addresses.length) {
-            throw new Error('missing addresses');
+        if (!accounts?.length) {
+            throw new Error('missing accounts');
         }
-        if (addresses.length <= index) {
-            throw new Error('missing address');
-        }
-        const address = this.selectedAddress;
+        const address = await this.selectedAddress;
         if (!address) {
             throw new Error('missing selected-address');
         }
@@ -74,14 +83,17 @@ export class Blockchain extends EventEmitter {
                 chainId: await this.chainId, address
             } as Reconnect);
         }
-        return addresses[index];
+        return address;
     }
-    public get selectedAddress(): Address | undefined {
-        const address = this.provider.selectedAddress;
-        if (address) {
-            return address as Address;
-        }
-        return undefined;
+    public static get selectedAddress(): Promise<Address | undefined> {
+        return this.me.selectedAddress;
+    }
+    public get selectedAddress(): Promise<Address | undefined> {
+        const req = this.provider.request({ method: 'eth_accounts' });
+        return req.then((a: Address[]) => a.length > 0 ? a[0] : undefined);
+    }
+    public static async isAvalanche(): Promise<boolean> {
+        return this.me.isAvalanche();
     }
     public async isAvalanche(): Promise<boolean> {
         const id = await this.chainId;
@@ -96,6 +108,9 @@ export class Blockchain extends EventEmitter {
         }
         return false;
     }
+    public static async switchTo(id: ChainId): Promise<void> {
+        return this.me.switchTo(id);
+    }
     public async switchTo(id: ChainId): Promise<void> {
         const chain = new Chain(id);
         await this.provider.request({
@@ -109,6 +124,9 @@ export class Blockchain extends EventEmitter {
             }]
         });
     }
+    public static async addToken(token: Token): Promise<boolean> {
+        return this.me.addToken(token);
+    }
     public async addToken(token: Token): Promise<boolean> {
         try {
             return await this.provider.request({
@@ -120,6 +138,26 @@ export class Blockchain extends EventEmitter {
             console.error(ex);
         }
         return false;
+    }
+    public static onConnect(
+        listener: (options: Connect) => void
+    ) {
+        return this.me.on('connect', listener);
+    }
+    public static onceConnect(
+        listener: (options: Connect) => void
+    ) {
+        return this.me.once('connect', listener);
+    }
+    public static onReconnect(
+        listener: (options: Reconnect) => void
+    ) {
+        return this.me.on('reconnect', listener);
+    }
+    public static onceReconnect(
+        listener: (options: Reconnect) => void
+    ) {
+        return this.me.once('reconnect', listener);
     }
     private get chainId() {
         return new Promise<string | undefined>(async (resolve) => {

@@ -1,33 +1,16 @@
 @import "../index.scss";
 @import "../header/header.scss";
+@import "../connector/connector.scss";
 @import "../footer/footer.scss";
 
-form#connect,
 form#mining,
 form#minting {
   margin-top: 1em;
   margin-bottom: 1em;
 }
-
-form#connect {
-  div.connect-metamask {
-    button#connect-metamask {
-      width: calc(100% - 42px);
-    }
-    .info > svg {
-      position: relative;
-      top: -1px;
-    }
-    .info {
-      cursor: help;
-    }
-    width: 100%;
-  }
-}
-
 form#mining {
-  div.miner-address {
-    input#miner-address {
+  div.minter-address {
+    input#minter-address {
       text-align: center;
       width: calc(100% - 147px);
       cursor: default;
@@ -35,14 +18,6 @@ form#mining {
     input#balance {
       text-align: center;
       width: 105px;
-      cursor: help;
-    }
-    .info > svg {
-      position: relative;
-      top: 0.5px;
-    }
-    .info {
-      cursor: help;
     }
   }
   div.toggle-mining {
@@ -60,13 +35,6 @@ form#mining {
       border-right: none;
       border-radius: 0;
       width: 105px;
-    }
-    .info > svg {
-      position: relative;
-      top: -1px;
-    }
-    .info {
-      cursor: help;
     }
     width: 100%;
   }
@@ -103,7 +71,6 @@ form#mining {
     width: 100%;
   }
 }
-
 form#minting {
   div.btn-group.mint:not(:first-of-type) {
     display: none;
@@ -114,7 +81,6 @@ form#minting {
     }
     button.mid {
       width: 105px;
-      cursor: help;
     }
     button.rhs {
       width: 42px;

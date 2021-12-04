@@ -1,0 +1,14 @@
+form#connector
+  div.btn-group.connect-metamask(role="group")
+    button#connect-metamask.btn.btn-outline-warning(
+      type="button" autofocus disabled
+    )
+      span.spinner.spinner-grow.spinner-border.spinner-border-sm.float-start(
+        role="status"
+      )
+      span.text: | Connecting to Metamask…
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Authorize your Metamask to be connected to"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug

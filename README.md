@@ -102,4 +102,4 @@ http://localhost:3000?logger=true
 
 ## Copyright
 
- © 2021 [Kârūn The Lydian](https://github.com/karun-i-sfarda)
+ © 2021 [XPowerMine.com](https://www.xpowermine.com)

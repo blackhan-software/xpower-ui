@@ -1,9 +1,7 @@
 extends ../index
 
 block styles
-  style
-    | --xp-powered: var({{XP_POWERED}}, --xp-yellow);
-    | --xp-powered-dark: var({{XP_POWERED_DARK}}, --xp-yellow-dark);
+  include ../theme/theme.pug
 
 block globals
   span#g-xpower-address-XPOW_CPU(
@@ -45,33 +43,24 @@ block header
 block content
   content
     h1: | Mine & Mint Proof-of-Work Tokens on Avalanche <img src="/images/png/avalanche-icon/avalanche-64x64.png" height=24 width=24>
-
-    form#connect
-      div.btn-group.connect-metamask(role="group")
-        button#connect-metamask.btn.btn-outline-warning(type="button")
-          | &nbsp;
-        button.btn.btn-outline-warning.info(
-          type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title="Authorize Metamask to connect"
-        )
-          include ../../public/images/pug/info-circle-fill.svg.pug
+    include ../connector/connector.pug
 
     form#mining
-      label.form-label(for="miner-address")
+      label.form-label(for="minter-address")
         | Miner's Address and Balance
-      div.input-group.mb-3.miner-address
-        input#miner-address.form-control(
+      div.input-group.mb-3.minter-address
+        input#minter-address.form-control(
           type="text" placeholder="0x0000000000000000000000000000000000000000"
           readonly
         )
         input#balance.form-control(
           data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Balance of {{TOKEN}} tokens` readonly
+          title=`Balance of {{TOKEN}} proof-of-work tokens` readonly
           type="text" placeholder="0"
         )
         span.input-group-text.info(
           data-bs-toggle="tooltip" data-bs-placement="top"
-          title="Address XP0W tokens shall be mined (and minted) for"
+          title="Address XP0W tokens shall be mined for & balance"
         )
           include ../../public/images/pug/info-circle-fill.svg.pug
 
@@ -84,19 +73,21 @@ block content
           )
           span.text: | Start Mining
 
-        button.btn.btn-outline-warning#select-token.dropdown-toggle(
-          type="button" data-bs-toggle="dropdown"
+        span(
+          data-bs-toggle="tooltip" data-bs-placement="top"
           title="Select from one of three XPOW tokens to mine"
         )
-          | {{TOKEN_SUFFIX}}
-
-        ul.dropdown-menu
-          li: a.dropdown-item(href="/home?token=XPOW.CPU")
-            | XPOW.CPU: ideal for (in-browser) CPU miners
-          li: a.dropdown-item(href="/home?token=XPOW.GPU")
-            | XPOW.GPU: meant for dedicated GPU miners
-          li: a.dropdown-item(href="/home?token=XPOW.ASIC")
-            | XPOW.ASIC: choice of professional ASIC miners
+          button.btn.btn-outline-warning#select-token.dropdown-toggle(
+            type="button" data-bs-toggle="dropdown"
+          )
+            | {{TOKEN_SUFFIX}}
+          ul.dropdown-menu
+            li: a.dropdown-item(href="/home?token=XPOW.CPU")
+              | XPOW.CPU: ideal for (in-browser) CPU miners
+            li: a.dropdown-item(href="/home?token=XPOW.GPU")
+              | XPOW.GPU: meant for dedicated GPU miners
+            li: a.dropdown-item(href="/home?token=XPOW.ASIC")
+              | XPOW.ASIC: choice of professional ASIC miners
 
         button.btn.btn-outline-warning.info(
           type="button" data-bs-toggle="tooltip" data-bs-placement="top"
@@ -111,7 +102,10 @@ block content
             title="Decelerate mining speed" disabled
           )
             include ../../public/images/pug/dash-circle-fill.svg.pug
-        div.btn-group.progressor(role="group" title=`Mining speed: ${UI_MINING_SPEED}%`)
+        div.btn-group.progressor(
+          role="group" data-bs-toggle="tooltip" data-bs-placement="top"
+          title=`Mining speed: ${UI_MINING_SPEED}%`
+        )
           div.progress: div#speed.progress-bar.with-indicator(
             role="progressbar" style=`width: ${UI_MINING_SPEED}%`
           )
@@ -141,7 +135,7 @@ block content
           )
             | Mint {{LEVEL_#{index}}} {{TOKEN}}
           button.btn.btn-outline-warning.mid(
-            type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+            type="button" data-bs-toggle="tooltip" data-bs-placement="left"
             title=`Amount of {{LEVEL_${index}}} {{TOKEN}} tokens mined so far`
             disabled
           )

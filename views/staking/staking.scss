@@ -1,0 +1,38 @@
+@import "../index.scss";
+@import "../header/header.scss";
+@import "../footer/footer.scss";
+
+h1 {
+  text-align: center;
+}
+table.piggy {
+  @media (min-width: 576px) {
+    i.bi {
+      font-size: 20em;
+    }
+  }
+  @media (max-width: 576px) {
+    i.bi {
+      font-size: 16em;
+    }
+  }
+  width: 100%;
+}
+h2 {
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  span.hourglass {
+    animation: rotate 3s infinite;
+    display: inline-block;
+  }
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  margin: 0 0 1em 0;
+}

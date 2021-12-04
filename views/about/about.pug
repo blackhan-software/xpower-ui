@@ -1,9 +1,7 @@
 extends ../index
 
 block styles
-  style
-    | --xp-powered: var({{XP_POWERED}}, --xp-yellow);
-    | --xp-powered-dark: var({{XP_POWERED_DARK}}, --xp-yellow-dark);
+  include ../theme/theme.pug
   link(
     integrity="sha384-2zx8BdwKFuNSCN7GLgJQsaHE2O069/0DdWh3ijV8LXacwoIjXgZXc6GDcyPdiUTy"
     href="https://cdn.jsdelivr.net/npm/katex@0.14.1/dist/katex.min.css"

@@ -10,18 +10,18 @@ $(window).on('load', function setContractAddress() {
     $link.attr('href', `https://snowtrace.io/address/${address}`);
 });
 $('a.add-token').on('click', async function addToken() {
-    if (Blockchain.me.isInstalled()) {
-        if (await Blockchain.me.isAvalanche()) {
+    if (Blockchain.isInstalled()) {
+        if (await Blockchain.isAvalanche()) {
             const token = Token.symbolAlt(App.me.params.get('token'));
             const address = $(`#g-xpower-address-${token}`).data('value');
             const symbol = $(`#g-xpower-symbol-${token}`).data('value');
             const decimals = $(`#g-xpower-decimals-${token}`).data('value');
             const image = $(`#g-xpower-image-${token}`).data('value');
-            await Blockchain.me.addToken({
+            await Blockchain.addToken({
                 address, symbol, decimals, image
             });
         } else {
-            Blockchain.me.switchTo(ChainId.AVALANCHE_MAINNET);
+            Blockchain.switchTo(ChainId.AVALANCHE_MAINNET);
         }
     } else {
         open('https://metamask.io/download.html');

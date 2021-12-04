@@ -1,32 +1,52 @@
-const filters = require('./routes/pug-filters');
+const filters = require('./filters/pug-filters');
+const { Years } = require('./source/years');
 const env = require('./env');
 const pug = require('pug');
 
 const HTMLWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const { resolve } = require('path');
 const configuration = (options) => ({
     entry: {
         home: [
             './views/theme/theme.ts',
+            './views/connector/connector.ts',
+            './views/tooltips/tooltips.ts',
             './views/home/home.ts',
-            './views/footer/footer.ts'
+            './views/footer/footer.ts',
+        ],
+        nfts: [
+            './views/theme/theme.ts',
+            './views/connector/connector.ts',
+            './views/tooltips/tooltips.ts',
+            './views/nfts/nfts.ts',
+            './views/footer/footer.ts',
+        ],
+        nfts_migrate: [
+            './views/theme/theme.ts',
+            './views/connector/connector.ts',
+            './views/tooltips/tooltips.ts',
+            './views/nfts/nfts-migrate.ts',
+            './views/footer/footer.ts',
+        ],
+        staking: [
+            './views/theme/theme.ts',
+            './views/tooltips/tooltips.ts',
+            './views/staking/staking.ts',
+            './views/footer/footer.ts',
         ],
         about: [
             './views/theme/theme.ts',
+            './views/tooltips/tooltips.ts',
             './views/about/about.ts',
-            './views/footer/footer.ts'
-        ],
-        migrate: [
-            './views/theme/theme.ts',
-            './views/migrate/migrate.ts',
-            './views/footer/footer.ts'
+            './views/footer/footer.ts',
         ],
         error: [
             './views/theme/theme.ts',
+            './views/tooltips/tooltips.ts',
             './views/error/error.ts',
-            './views/footer/footer.ts'
+            './views/footer/footer.ts',
         ],
     },
     module: {
@@ -67,12 +87,30 @@ const configuration = (options) => ({
             chunks: ['home']
         }),
         new HTMLWebpackPlugin({
-            templateContent: pug.renderFile('./views/migrate/migrate.pug', {
-                ...env.default, filters, PAGE: 'migrate', TITLE: 'XPower: Migrate'
+            templateContent: pug.renderFile('./views/nfts/nfts.pug', {
+                ...env.default, filters, PAGE: 'nfts', TITLE: 'XPower: NFTs',
+                YEARS: Array.from(Years())
             }),
-            filename: '../views/migrate/migrate.pig',
+            filename: '../views/nfts/nfts.pig',
             minify: false, inject: 'body',
-            chunks: ['migrate']
+            chunks: ['nfts']
+        }),
+        new HTMLWebpackPlugin({
+            templateContent: pug.renderFile('./views/nfts/nfts-migrate.pug', {
+                ...env.default, filters, PAGE: 'nfts-migrate', TITLE: 'XPower: NFTs Migrate',
+                YEARS: Array.from(Years())
+            }),
+            filename: '../views/nfts/nfts-migrate.pig',
+            minify: false, inject: 'body',
+            chunks: ['nfts_migrate']
+        }),
+        new HTMLWebpackPlugin({
+            templateContent: pug.renderFile('./views/staking/staking.pug', {
+                ...env.default, filters, PAGE: 'staking', TITLE: 'XPower: Staking'
+            }),
+            filename: '../views/staking/staking.pig',
+            minify: false, inject: 'body',
+            chunks: ['staking']
         }),
         new HTMLWebpackPlugin({
             templateContent: pug.renderFile('./views/about/about.pug', {
@@ -95,7 +133,8 @@ const configuration = (options) => ({
         })
     ],
     resolve: {
-        extensions: ['.ts', '.tsx', '.js']
+        extensions: ['.ts', '.tsx', '.js'],
+        fallback: { 'buffer': require.resolve('buffer/') }
     },
     output: {
         path: resolve(__dirname, 'public', 'scripts'),

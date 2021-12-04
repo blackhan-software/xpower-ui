@@ -5,7 +5,7 @@ describe('GET /about', () => {
     let get: request.Test;
     beforeEach(() => {
         get = request(app).get('/about');
-    })
+    });
     it('should return w/an HTTP code = 200 OK', async () => {
         await get.expect(200);
     });

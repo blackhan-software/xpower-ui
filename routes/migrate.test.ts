@@ -5,7 +5,7 @@ describe('GET /migrate', () => {
     let get: request.Test;
     beforeEach(() => {
         get = request(app).get('/migrate');
-    })
+    });
     it('should return w/an HTTP code = 404 Not Found', async () => {
         await get.expect(404);
     });
