@@ -9,7 +9,6 @@ dotenv.config();
 
 import about from './routes/about';
 import home from './routes/home';
-import migrate from './routes/migrate';
 import ipfs from './routes/ifps';
 import error from './routes/error';
 
@@ -36,7 +35,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 // register views
 app.use('/', home);
 app.use('/about', about);
-app.use('/migrate', migrate);
 app.use('/ipfs/*', ipfs);
 app.use(error);
 

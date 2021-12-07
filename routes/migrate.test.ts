@@ -6,8 +6,8 @@ describe('GET /migrate', () => {
     beforeEach(() => {
         get = request(app).get('/migrate');
     })
-    it('should return w/an HTTP code = 200 OK', async () => {
-        await get.expect(200);
+    it('should return w/an HTTP code = 404 Not Found', async () => {
+        await get.expect(404);
     });
     it('should return w/a Content-Type ~ html', async () => {
         await get.expect('Content-Type', /html/)
