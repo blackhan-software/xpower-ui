@@ -5,13 +5,15 @@ import { Middleware } from 'redux';
 export const logger: Middleware = (store_api) => (next) => (action) => {
     if (action.type === 'nonce/add') {
         const add = action as AddNonce;
-        const { nonce, item: { address, amount } } = add.payload;
-        const { px, sx } = { px: nonce.slice(2, 6), sx: nonce.slice(-4) };
+        const { nonce, item: { amount } } = add.payload;
+        const xnonce = nonce.toString(16);
+        const { px, sx } = { px: xnonce.slice(0, 4), sx: xnonce.slice(-4) };
         console.log(`[${add.type}]`, `0x${px}...${sx}`, '=>', amount);
     } else if (action.type === 'nonce/remove') {
         const remove = action as RemoveNonce;
         const { nonce } = remove.payload;
-        const { px, sx } = { px: nonce.slice(2, 6), sx: nonce.slice(-4) };
+        const xnonce = nonce.toString(16);
+        const { px, sx } = { px: xnonce.slice(0, 4), sx: xnonce.slice(-4) };
         console.log(`[${remove.type}]`, `0x${px}...${sx}`);
     } else if (action.type === 'nonce/remove-by-amount') {
         const remove_by_amount = action as RemoveNonceByAmount;

@@ -1,0 +1,19 @@
+form#selector
+  div.btn-group.selectors(
+    role="group"
+  )
+    a.btn.btn-outline-warning.selector-cpu(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      href=`?token=XPOW.CPU` title="Use XPOW.CPU tokens"
+    )
+      | CPU
+    a.btn.btn-outline-warning.selector-gpu(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      href="?token=XPOW.GPU" title="Use XPOW.GPU tokens"
+    )
+      | GPU
+    a.btn.btn-outline-warning.selector-asic(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      href="?token=XPOW.ASIC" title="Use XPOW.ASIC tokens"
+    )
+      | ASIC

@@ -1,26 +1,10 @@
 @import "../index.scss";
 @import "../header/header.scss";
-@import "../footer/footer.scss";
 @import "../connector/connector.scss";
+@import "../footer/footer.scss";
 
-form#migration {
-  margin-top: 1em;
-  margin-bottom: 1em;
-}
-form#minter {
-  div.minter-address {
-    input#minter-address {
-      text-align: center;
-    }
-    .info > svg {
-      position: relative;
-      top: 0.5px;
-    }
-    .info {
-      cursor: help;
-    }
-    width: 100%;
-  }
+form#allowance {
+  margin-bottom: 0.5em;
 }
 form#allowance {
   div.approve-allowance {
@@ -37,6 +21,9 @@ form#allowance {
     }
     width: 100%;
   }
+}
+form#migration {
+  margin-bottom: 0.5em;
 }
 form#migration {
   div.execute-migration {

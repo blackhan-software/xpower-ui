@@ -1,42 +1,43 @@
 import { totalBy } from './total-by';
 
-describe('total', () => {
-    const address = '0xabcd';
+describe('total-by', () => {
+    const address = BigInt('0xabcd');
+    const block_hash = BigInt('0xb10c');
     it('should sum to 0', () => {
         const sum = totalBy({ items: {} }, {
-            address, amount: 0
+            address, block_hash, amount: 0n
         });
-        expect(sum).toEqual(0);
+        expect(sum).toEqual(0n);
     });
     it('should sum to 1', () => {
         const sum = totalBy({
-            items: { '0xffff': { address, amount: 1 } }
+            items: { 0xffff: { address, block_hash, amount: 1n } }
         }, {
-            address, amount: 1
+            address, block_hash, amount: 1n
         });
-        expect(sum).toEqual(1);
+        expect(sum).toEqual(1n);
     });
     it('should sum to 2', () => {
         const sum = totalBy({
             items: {
-                '0xffff': { address, amount: 1 },
-                '0xfff0': { address, amount: 2 }
+                0xffff: { address, block_hash, amount: 1n },
+                0xfff0: { address, block_hash, amount: 2n }
             }
         }, {
-            address, amount: 2
+            address, block_hash, amount: 2n
         });
-        expect(sum).toEqual(2);
+        expect(sum).toEqual(2n);
     });
     it('should sum to 3', () => {
         const sum = totalBy({
             items: {
-                '0xffff': { address, amount: 1 },
-                '0xfff0': { address, amount: 2 },
-                '0xff00': { address, amount: 3 }
+                0xffff: { address, block_hash, amount: 1n },
+                0xfff0: { address, block_hash, amount: 2n },
+                0xff00: { address, block_hash, amount: 3n }
             }
         }, {
-            address, amount: 3
+            address, block_hash, amount: 3n
         });
-        expect(sum).toEqual(3);
+        expect(sum).toEqual(3n);
     });
 });

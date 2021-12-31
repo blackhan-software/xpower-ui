@@ -1,0 +1,18 @@
+form#wallet
+  label.form-label(for="wallet-address")
+    | Wallet Address and Balance
+  div.input-group.wallet-address
+    input#wallet-address.form-control(
+      type="text" placeholder="0x0000000000000000000000000000000000000000"
+      readonly
+    )
+    input#wallet-balance.form-control(
+      data-bs-toggle="tooltip" data-bs-placement="top"
+      title=`Balance of {{TOKEN}} proof-of-work tokens` readonly
+      type="text" placeholder="0"
+    )
+    span.input-group-text.info(
+      data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Wallet address & balance of {{TOKEN}} tokens"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug

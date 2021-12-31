@@ -3,21 +3,13 @@ import './migrate.scss';
 
 import { Blockchain } from '../../source/blockchain';
 import { ChainId } from '../../source/blockchain';
-import { Token, TokenSymbolAlt } from '../../source/token';
-import { XPower } from '../../source/xpower';
-
 import { Alert } from '../../source/functions';
 import { alert } from '../../source/functions';
+import { hex_40 } from '../../source/functions';
+import { Tokenizer } from '../../source/token';
+import { TokenSymbolAlt } from '../../source/token';
+import { XPowerFactory } from '../../source/xpower';
 
-function XPowered(token: TokenSymbolAlt) {
-    const contract_address = $(`#g-xpower-address-${token}`).data('value');
-    if (!contract_address) {
-        throw new Error(`missing g-xpower-address-${token}`);
-    }
-    const contract = new XPower(contract_address);
-    const instance = contract.connect();
-    return instance;
-}
 $(window).on('load', function enableAllowanceButton() {
     if (Blockchain.isInstalled()) {
         Blockchain.onConnect(() => {
@@ -27,24 +19,24 @@ $(window).on('load', function enableAllowanceButton() {
     }
 });
 $('#approve-allowance').on('click', async () => {
-    const $approve = $('#approve-allowance')
-    const address = $('#minter-address').val();
-    if (typeof address !== 'string' || !address) {
-        throw new Error('missing minter\'s address');
+    const address = await Blockchain.selectedAddress;
+    if (!address) {
+        throw new Error('missing selected-address');
     }
-    const v1_xpower = XPowered(TokenSymbolAlt.OLD);
-    const v1_balance = await v1_xpower.balanceOf(address);
-    console.debug('[v1:balance]', v1_balance.toNumber());
+    const $approve = $('#approve-allowance');
+    const v1_xpower = XPowerFactory({ token: TokenSymbolAlt.OLD });
+    const v1_balance = await v1_xpower.balanceOf(hex_40(address));
+    console.debug('[v1:balance]', v1_balance.toBigInt());
     if (v1_balance.isZero()) {
         const $alert = $(alert('Old XPOW balance is zero; nothing to migrate here. Is your minter\'s address correct?', Alert.warning));
         $alert.insertAfter($approve.parent('div'));
         $alert.css('margin-top', '1em');
         return;
     }
-    const v2_xpower = XPowered(TokenSymbolAlt.GPU);
+    const v2_xpower = XPowerFactory({ token: TokenSymbolAlt.GPU });
     const v2_spender = v2_xpower.address;
-    const v1_allowance = await v1_xpower.allowance(address, v2_spender);
-    console.debug('[v1:allowance]', v1_allowance.toNumber());
+    const v1_allowance = await v1_xpower.allowance(hex_40(address), v2_spender);
+    console.debug('[v1:allowance]', v1_allowance.toBigInt());
     if (v1_allowance.gte(v1_balance)) {
         const $alert = $(alert('XPOW allowance has already been approved; you can migrate now.', Alert.info));
         $alert.insertAfter($approve.parent('div'));
@@ -81,24 +73,24 @@ $('#approve-allowance').on('click', async () => {
     }
 });
 $('#execute-migration').on('click', async () => {
-    const $execute = $('#execute-migration')
-    const address = $('#minter-address').val();
-    if (typeof address !== 'string' || !address) {
-        throw new Error('missing minter\'s address');
+    const address = await Blockchain.selectedAddress;
+    if (!address) {
+        throw new Error('missing selected-address');
     }
-    const v1_xpower = XPowered(TokenSymbolAlt.OLD);
-    const v1_balance = await v1_xpower.balanceOf(address);
-    console.debug('[v1:balance]', v1_balance.toNumber());
+    const $execute = $('#execute-migration');
+    const v1_xpower = XPowerFactory({ token: TokenSymbolAlt.OLD });
+    const v1_balance = await v1_xpower.balanceOf(hex_40(address));
+    console.debug('[v1:balance]', v1_balance.toBigInt());
     if (v1_balance.isZero()) {
         const $alert = $(alert('Old XPOW balance is zero; nothing to migrate.', Alert.warning));
         $alert.insertAfter($execute.parent('div'));
         $alert.css('margin-top', '1em');
         return;
     }
-    const v2_xpower = XPowered(TokenSymbolAlt.GPU);
+    const v2_xpower = XPowerFactory({ token: TokenSymbolAlt.GPU });
     const v2_spender = v2_xpower.address;
-    const v1_allowance = await v1_xpower.allowance(address, v2_spender);
-    console.debug('[v1:allowance]', v1_allowance.toNumber());
+    const v1_allowance = await v1_xpower.allowance(hex_40(address), v2_spender);
+    console.debug('[v1:allowance]', v1_allowance.toBigInt());
     if (v1_allowance.isZero()) {
         const $alert = $(alert('Old XPOW allowance is zero; approve allowance! Did your allowance transaction actually get confirmed? Wait a little bit and then retry.', Alert.warning));
         $alert.insertAfter($execute.parent('div'));
@@ -140,7 +132,7 @@ $('#execute-migration').on('click', async () => {
 $('#add-xpow-cpu').on('click', async () => {
     if (Blockchain.isInstalled()) {
         if (await Blockchain.isAvalanche()) {
-            const token = Token.symbolAlt(TokenSymbolAlt.CPU);
+            const token = Tokenizer.symbolAlt(TokenSymbolAlt.CPU);
             const address = $(`#g-xpower-address-${token}`).data('value');
             const symbol = $(`#g-xpower-symbol-${token}`).data('value');
             const decimals = $(`#g-xpower-decimals-${token}`).data('value');
@@ -158,7 +150,7 @@ $('#add-xpow-cpu').on('click', async () => {
 $('#add-xpow-gpu').on('click', async () => {
     if (Blockchain.isInstalled()) {
         if (await Blockchain.isAvalanche()) {
-            const token = Token.symbolAlt(TokenSymbolAlt.GPU);
+            const token = Tokenizer.symbolAlt(TokenSymbolAlt.GPU);
             const address = $(`#g-xpower-address-${token}`).data('value');
             const symbol = $(`#g-xpower-symbol-${token}`).data('value');
             const decimals = $(`#g-xpower-decimals-${token}`).data('value');
@@ -176,7 +168,7 @@ $('#add-xpow-gpu').on('click', async () => {
 $('#add-xpow-asic').on('click', async () => {
     if (Blockchain.isInstalled()) {
         if (await Blockchain.isAvalanche()) {
-            const token = Token.symbolAlt(TokenSymbolAlt.ASIC);
+            const token = Tokenizer.symbolAlt(TokenSymbolAlt.ASIC);
             const address = $(`#g-xpower-address-${token}`).data('value');
             const symbol = $(`#g-xpower-symbol-${token}`).data('value');
             const decimals = $(`#g-xpower-decimals-${token}`).data('value');

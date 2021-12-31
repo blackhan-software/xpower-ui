@@ -15,10 +15,10 @@ $(window).on('load', function toggleTooltips() {
     });
 });
 function hide(ev: JQuery.ClickEvent) {
-    Tooltip.getOrCreateInstance($tip($(ev.target)))?.hide();
+    Tooltip.getInstance($tip($(ev.target)))?.hide();
 }
 function show(ev: JQuery.ClickEvent) {
-    Tooltip.getOrCreateInstance($tip($(ev.target)))?.show();
+    Tooltip.getInstance($tip($(ev.target)))?.show();
 }
 function $tip($el: JQuery<HTMLElement>) {
     const $tt = $el.parents(`[data-bs-toggle="tooltip"]`);

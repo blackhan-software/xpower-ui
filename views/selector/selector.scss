@@ -1,0 +1,17 @@
+form#selector {
+  margin-bottom: 0.5em;
+}
+form#selector {
+    div.selectors {
+    a.active,
+    a:hover {
+      background-color: var(--xp-powered);
+      color: var(--xp-dimgray);
+    }
+    a {
+      border: 1px solid var(--xp-powered);
+      color: var(--xp-powered);
+    }
+    width: 100%;
+  }
+}

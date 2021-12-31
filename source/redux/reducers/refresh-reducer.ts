@@ -5,9 +5,9 @@ import { Refresh } from '../types';
 export function refreshReducer(
     refresh: Refresh = { date: null }, action: Action
 ): Refresh {
-    if (action.type === 'refresh') {
-        return { date: action.payload.date };
+    if (!action.type.startsWith('refresh')) {
+        return refresh;
     }
-    return refresh;
+    return { date: action.payload.date };
 }
 export default refreshReducer;

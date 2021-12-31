@@ -41,6 +41,7 @@ export class Blockchain extends EventEmitter {
                 window.location.reload();
             });
         }
+        this.setMaxListeners(20);
     }
     public static get provider(): any {
         return this.me.provider;
@@ -60,10 +61,10 @@ export class Blockchain extends EventEmitter {
     public isConnected(): boolean {
         return this.provider.isConnected();
     }
-    public static async connect(): Promise<string> {
+    public static async connect(): Promise<Address> {
         return this.me.connect();
     }
-    public async connect(): Promise<string> {
+    public async connect(): Promise<Address> {
         const accounts = await this.provider.request({
             method: 'eth_requestAccounts'
         });
@@ -89,8 +90,15 @@ export class Blockchain extends EventEmitter {
         return this.me.selectedAddress;
     }
     public get selectedAddress(): Promise<Address | undefined> {
-        const req = this.provider.request({ method: 'eth_accounts' });
-        return req.then((a: Address[]) => a.length > 0 ? a[0] : undefined);
+        if (this.provider) {
+            const req = this.provider.request({
+                method: 'eth_accounts'
+            });
+            return req.then((a: string[]) =>
+                a.length > 0 ? BigInt(a[0]) : undefined
+            );
+        }
+        return Promise.resolve(undefined);
     }
     public static async isAvalanche(): Promise<boolean> {
         return this.me.isAvalanche();
@@ -166,7 +174,7 @@ export class Blockchain extends EventEmitter {
                     method: 'eth_chainId'
                 });
                 if (chain_id && chain_id.length) {
-                    resolve(`0x${parseInt(chain_id).toString(16)}`);
+                    resolve(`0x${BigInt(chain_id).toString(16)}`);
                 } else {
                     resolve(undefined);
                 }

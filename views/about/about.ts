@@ -4,7 +4,7 @@ import { Global } from '../../source/types';
 declare const global: Global;
 import './about.scss';
 
-import { Token } from '../../source/token';
+import { Tokenizer } from '../../source/token';
 
 const markdownit = global.markdownit as (options: any) => {
     use: (plugin: any, options?: any) => void,
@@ -39,8 +39,8 @@ $(window).on('load', async function renderMarkdown() {
     function add_token(content: string) {
         const params = new URLSearchParams(location.search);
         const token = params.get('token');
-        const symbol = Token.symbol(token);
-        const suffix = Token.suffix(token);
+        const symbol = Tokenizer.symbol(token);
+        const suffix = Tokenizer.suffix(token);
         return content
             .replace(/{{TOKEN}}/g, symbol.toUpperCase())
             .replace(/{{TOKEN_SUFFIX}}/g, suffix.toUpperCase())

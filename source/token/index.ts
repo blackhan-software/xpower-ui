@@ -1,3 +1,5 @@
+import { Token } from "../redux/types";
+
 export enum TokenSymbolAlt {
     ASIC = 'XPOW_ASIC',
     GPU = 'XPOW_GPU',
@@ -16,11 +18,11 @@ export enum TokenSuffix {
     CPU = 'cpu',
     OLD = 'old'
 }
-export class Token {
-    public static symbolAlt(token: string | null): TokenSymbolAlt {
-        if (typeof token === 'string') {
-            const suffix = token.match(/^xpow[._]/i)
-                ? token.replace('.', '_').split('_')[1] : token;
+export class Tokenizer {
+    public static symbolAlt(value: string | null): TokenSymbolAlt {
+        if (typeof value === 'string') {
+            const suffix = value.match(/^xpow[._]/i)
+                ? value.replace('.', '_').split('_')[1] : value;
             switch (suffix.toLowerCase()) {
                 case 'asic':
                     return TokenSymbolAlt.ASIC;
@@ -34,10 +36,10 @@ export class Token {
         }
         return TokenSymbolAlt.CPU;
     }
-    public static symbol(token: string | null): TokenSymbol {
-        if (typeof token === 'string') {
-            const suffix = token.match(/^xpow[._]/i)
-                ? token.replace('.', '_').split('_')[1] : token;
+    public static symbol(value: string | null): TokenSymbol {
+        if (typeof value === 'string') {
+            const suffix = value.match(/^xpow[._]/i)
+                ? value.replace('.', '_').split('_')[1] : value;
             switch (suffix.toLowerCase()) {
                 case 'asic':
                     return TokenSymbol.ASIC;
@@ -51,10 +53,10 @@ export class Token {
         }
         return TokenSymbol.CPU;
     }
-    public static suffix(token: string | null): TokenSuffix {
-        if (typeof token === 'string') {
-            const suffix = token.match(/^xpow[._]/i)
-                ? token.replace('.', '_').split('_')[1] : token;
+    public static suffix(value: string | null): TokenSuffix {
+        if (typeof value === 'string') {
+            const suffix = value.match(/^xpow[._]/i)
+                ? value.replace('.', '_').split('_')[1] : value;
             switch (suffix.toLowerCase()) {
                 case 'asic':
                     return TokenSuffix.ASIC;
@@ -68,17 +70,34 @@ export class Token {
         }
         return TokenSuffix.CPU;
     }
-    public static amount(token: string | null, index: number): number {
+    public static token(value: string | null): Token {
+        if (typeof value === 'string') {
+            const suffix = value.match(/^xpow[._]/i)
+                ? value.replace('.', '_').split('_')[1] : value;
+            switch (suffix.toLowerCase()) {
+                case 'asic':
+                    return Token.ASIC;
+                case 'gpu':
+                    return Token.GPU;
+                case 'cpu':
+                    return Token.CPU;
+                default:
+                    return Token.CPU;
+            }
+        }
+        return Token.CPU;
+    }
+    public static amount(token: string | null, index: number) {
         switch (this.symbolAlt(token)) {
             case TokenSymbolAlt.ASIC:
-                return 16 ** index - 1;
+                return 16n ** BigInt(index) - 1n;
             case TokenSymbolAlt.GPU:
-                return 2 ** index - 1;
+                return 2n ** BigInt(index) - 1n;
             case TokenSymbolAlt.CPU:
-                return index;
+                return BigInt(index);
             case TokenSymbolAlt.OLD:
-                return 2 ** index - 1;
+                return 2n ** BigInt(index) - 1n;
         }
     }
 }
-export default Token;
+export default Tokenizer;

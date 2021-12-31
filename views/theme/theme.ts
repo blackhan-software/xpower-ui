@@ -1,10 +1,10 @@
 import { Theme, theme } from '../../source/theme';
-import { Token } from '../../source/token';
+import { Tokenizer } from '../../source/token';
 import { App } from '../../source/app/app';
 
 document.onreadystatechange = function () {
     if (document.readyState === 'complete') {
-        const symbol = Token.symbol(App.me.params.get('token'));
+        const symbol = Tokenizer.symbol(App.params.get('token'));
         adapt(theme(symbol));
     }
 };

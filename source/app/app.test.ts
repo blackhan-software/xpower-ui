@@ -18,6 +18,6 @@ afterEach(() => {
 });
 describe('Application', () => {
     it('should have a singleton', () => {
-        expect(App.me).toBeDefined();
+        expect(App['me']).toBeDefined();
     });
 });

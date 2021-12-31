@@ -45,31 +45,8 @@ block header
 block content
   content
     h1: | Migrate old XPOW tokens to new XPOW.GPU tokens
-
-    form#connect
-      div.btn-group.connect-metamask(role="group")
-        button#connect-metamask.btn.btn-outline-warning(type="button")
-          span.spinner.spinner-border.spinner-border-sm.float-start(
-            role="status" style="visibility: hidden"
-          )
-          span.text: | &nbsp;
-        button.btn.btn-outline-warning.info(
-          type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title="Authorize your Metamask to be connected to"
-        )
-          include ../../public/images/pug/info-circle-fill.svg.pug
-
-    form#minter
-      label.form-label(for="minter-address")
-        | Minter's Address
-      div.input-group.mb-3.minter-address
-        input#minter-address.form-control(
-          type="text" placeholder="0x0000000000000000000000000000000000000000" readonly)
-        span.input-group-text.info(
-          data-bs-toggle="tooltip" data-bs-placement="top"
-          title="Address old XP0W tokens shall be migrated for"
-        )
-          include ../../public/images/pug/info-circle-fill.svg.pug
+    include ../connector/connector.pug
+    include ../wallet/wallet.pug
 
     form#allowance
       label.form-label(for="approve-allowance")

@@ -14,7 +14,7 @@ describe('GET /about', () => {
     });
     it('should return w/a Content-Length > 0', async () => {
         await get.expect((res) => {
-            const length = parseInt(res.headers['content-length']);
+            const length = BigInt(res.headers['content-length']);
             expect(length).toBeGreaterThan(0);
         });
     });

@@ -1,0 +1,29 @@
+form#batch-minting
+  div.btn-group.nft-batch-minter(
+    role="group" data-level=`${levels[index]}`
+  )
+    button.btn.btn-outline-warning#toggle-all.no-ellipsis(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title=`Show all NFT levels` data-state="off"
+    )
+      i.bi-chevron-down
+    button.btn.btn-outline-warning#burn-approval(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Approve XPOWs to be burned (to enable minting)" disabled
+    )
+      span.spinner.spinner-border.spinner-border-sm.float-start(
+        role="status" style="visibility: hidden"
+      )
+      span.text: | Approve
+    button.btn.btn-outline-warning#batch-minter(
+      type="button" disabled
+    )
+      span.spinner.spinner-border.spinner-border-sm.float-start(
+        role="status" style="visibility: hidden"
+      )
+      span.text: | Batch Mint NFTs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="(Batch) mint stakeable {{TOKEN}} NFTs"
+    )
+      include ../../../public/images/pug/info-circle-fill.svg.pug

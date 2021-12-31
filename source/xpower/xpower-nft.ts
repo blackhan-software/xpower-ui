@@ -26,68 +26,12 @@ export type OnApprovalForAll = (
     approved: boolean,
     ev: Event
 ) => void;
-export type OnURI = (
-    value: string,
-    id: BigNumber,
-    ev: Event
-) => void;
-export enum Kind {
-    UNIT = 0,
-    KILO = 3,
-    MEGA = 6,
-    GIGA = 9,
-    TERA = 12,
-    PETA = 15,
-    EXA = 18,
-    ZETTA = 21,
-    YOTTA = 24,
-}
-export function* Kinds() {
-    for (const k in Kind) {
-        if (isNaN(Number(k))) {
-            continue;
-        }
-        yield Number(k) as Kind;
-    }
-}
 export type Meta = {
     name: string,
     description: string,
     image: string
 };
 export class XPowerNft {
-    public static kinds(
-        ids: BigNumber[], year: BigNumber
-    ) {
-        return ids.map((id) => this.kind(id, year));
-    }
-    public static kind(
-        id: BigNumber, year: BigNumber
-    ) {
-        return id.sub(year.mul(100)).toNumber() as Kind;
-    }
-    public static meta(
-        contract: Contract
-    ) {
-        return async (id: BigNumber) => {
-            let meta = XPowerNft._meta[id.toString()];
-            if (typeof meta === 'undefined') {
-                const nft_uri = await contract.uri(id);
-                const uri = nft_uri.replace(/{id}/g, id);
-                meta = await fetch(uri).then((res) => res.json());
-                XPowerNft._meta[id.toString()] = meta;
-            }
-            return meta;
-        };
-    }
-    public static year(
-        contract: Contract
-    ) {
-        return async (delta_years: BigNumber | number) => {
-            const nft_year = await contract.year();
-            return nft_year.add(delta_years);
-        }
-    }
     public constructor(
         address: string, abi = XPOWER_NFT_ABI
     ) {
@@ -126,6 +70,5 @@ export class XPowerNft {
     private _abi: typeof XPOWER_NFT_ABI;
     private _address: string;
     private _contract: Contract | undefined;
-    private static _meta: Record<string, Meta> = {};
 }
 export default XPowerNft;

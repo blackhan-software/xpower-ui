@@ -1,0 +1,38 @@
+form#batch-minting {
+  .nft-batch-minter {
+    #toggle-all {
+      min-width: 42px;
+      width: 42px;
+    }
+    #toggle-all > i {
+      position: relative;
+      top: 1px;
+    }
+    #burn-approval {
+      span.spinner {
+        margin-top: 0.25em;
+      }
+      span.spinner {
+        height: 1em;
+        width: 1em;
+      }
+      width: calc(50% - 42px);
+    }
+    #batch-minter {
+      span.spinner {
+        margin-top: 0.25em;
+      }
+      span.spinner {
+        height: 1em;
+        width: 1em;
+      }
+      width: calc(50% - 42px);
+    }
+    #batch-minter.full {
+      width: calc(100% - 84px);
+    }
+    margin-bottom: 1em;
+    width: 100%;
+  }
+  width: 100%;
+}

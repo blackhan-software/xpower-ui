@@ -1,21 +1,20 @@
-import { BigNumber } from 'ethers';
 /**
  * @returns [start...end)
  */
 export function* big_range(
-    start: BigNumber | number,
-    end?: BigNumber | number
+    start: bigint | number,
+    end?: bigint | number
 ) {
     if (typeof start === 'number') {
-        start = BigNumber.from(start);
+        start = BigInt(start);
     }
     if (typeof end === 'number') {
-        end = BigNumber.from(end);
+        end = BigInt(end);
     }
     if (typeof end === 'undefined') {
-        end = start; start = BigNumber.from(0);
+        end = start; start = 0n;
     }
-    for (let i = start; i.lt(end); i = i.add(1)) {
+    for (let i = start; i < end; i++) {
         yield i;
     }
 }

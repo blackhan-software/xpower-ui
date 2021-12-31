@@ -1,41 +1,36 @@
 import { defaultAbiCoder as abi } from 'ethers/lib/utils';
 import { keccak256 } from 'ethers/lib/utils';
-import { BigNumber } from 'ethers';
 import { EventEmitter } from 'events';
+
+import { Address } from '../redux/types';
+import { Amount } from '../redux/types';
+import { BlockHash } from '../redux/types';
+import { Interval } from '../redux/types';
+import { Nonce } from '../redux/types';
+
 import { IntervalManager } from '../managers';
 import { TokenSymbol } from '../token';
+import { hex_40, hex_64 } from '../functions';
 
 export type OnMined = (
-    nonce: BigNumber, amount: BigNumber
+    nonce: Nonce, amount: Amount
 ) => void;
 export class Miner extends EventEmitter {
     private static SPEED_DEFAULT = 0.5; // [0..1]
     private static FREQUENCY_DEFAULT = 10; // per ms
     public constructor(
-        /** xpow-token to mine for */
+        /** token to mine for */
         token: TokenSymbol,
         /** address to mine for */
-        address: string,
+        address: Address,
         /** initial speed of mining (in [0..1]) */
         speed = Miner.SPEED_DEFAULT,
         /** initial loops per millisecond (in [0..]) */
         frequency = Miner.FREQUENCY_DEFAULT,
     ) {
         super();
-        if (typeof address !== 'string') {
-            throw new Error('address not a string');
-        }
-        if (!address.match(/^0x/)) {
-            throw new Error('address prefix not 0x')
-        }
-        if (typeof speed !== 'number') {
-            throw new Error('speed not a number');
-        }
         if (speed !== minmax(speed, 0, 1)) {
             throw new Error('speed not in range [0..1]');
-        }
-        if (typeof frequency !== 'number') {
-            throw new Error('frequency not a number');
         }
         if (frequency < 0) {
             throw new Error('frequency not positive');
@@ -44,11 +39,12 @@ export class Miner extends EventEmitter {
         this._address = address;
         this._speed = speed;
         this._frequency = frequency;
+        this.setMaxListeners(20);
     }
     public get running(): boolean {
         return this.mining_iid !== undefined;
     }
-    public start(block_hash: string, callback: OnMined): void {
+    public start(block_hash: BlockHash, callback: OnMined): void {
         if (this.running) {
             return;
         }
@@ -105,18 +101,18 @@ export class Miner extends EventEmitter {
         return new_speed;
     }
     private mine(
-        frequency: number, block_hash: string, callback: OnMined
+        frequency: number, block_hash: BlockHash, callback: OnMined
     ) {
         for (let i = 0; i < Math.ceil(frequency * this.speed); i++) {
             const { nonce, amount, ms } = this.work_timed(block_hash);
             const new_frequency = ms > 0.0 ? 1 / ms : 0;
             frequency = (2 * frequency + new_frequency) / 3;
             frequency = Math.ceil(frequency); // >= 1.0
-            callback(nonce, amount);
+            setTimeout(() => callback(nonce, amount));
         }
         return frequency;
     }
-    private work_timed(block_hash: string) {
+    private work_timed(block_hash: BlockHash) {
         const start = performance.now();
         const { nonce, amount } = this.work(block_hash);
         const ended = performance.now();
@@ -124,7 +120,7 @@ export class Miner extends EventEmitter {
             nonce, amount, ms: ended - start
         };
     }
-    private work(block_hash: string) {
+    private work(block_hash: BlockHash) {
         const [nonce, address, interval] = [
             this.next_nonce, this.address, this.current_interval
         ];
@@ -133,13 +129,14 @@ export class Miner extends EventEmitter {
         ));
         return { nonce, amount };
     }
-    private get next_nonce(): BigNumber {
+    private get next_nonce() {
         if (this._nonce === undefined) {
             const bytes = new Uint8Array(32);
             crypto.getRandomValues(bytes);
-            this._nonce = BigNumber.from(bytes);
+            const view = new DataView(bytes.buffer);
+            this._nonce = view.getUint32(0);
         } else {
-            this._nonce = this._nonce.add(1);
+            this._nonce = this._nonce + 1;
         }
         return this._nonce;
     }
@@ -147,39 +144,45 @@ export class Miner extends EventEmitter {
         return this.interval_manager.interval;
     }
     private hash(
-        nonce: BigNumber, address: string,
-        interval: number, block_hash: string
+        nonce: Nonce,
+        address: Address,
+        interval: Interval,
+        block_hash: BlockHash
     ): string {
         return keccak256(abi.encode([
             'string', 'uint256', 'address', 'uint256', 'bytes32'
         ], [
-            this.token, nonce, address, interval, block_hash
+            this.token,
+            nonce,
+            hex_40(address),
+            interval,
+            hex_64(block_hash)
         ]));
     }
-    private amount(hash: string): BigNumber {
-        let amount: BigNumber;
-        switch(this.token) {
+    private amount(hash: string) {
+        let amount: bigint;
+        switch (this.token) {
             case TokenSymbol.ASIC:
-                amount = BigNumber.from(16 ** this.zeros(hash) - 1);
+                amount = 16n ** this.zeros(hash) - 1n;
                 break;
             case TokenSymbol.GPU:
-                amount = BigNumber.from(2 ** this.zeros(hash) - 1);
+                amount = 2n ** this.zeros(hash) - 1n;
                 break;
             case TokenSymbol.CPU:
-                amount = BigNumber.from(this.zeros(hash));
+                amount = this.zeros(hash);
                 break;
             default:
-                amount = BigNumber.from(0);
+                amount = 0n;
                 break;
         }
         return amount;
     }
-    private zeros(hash: string): number {
+    private zeros(hash: string): bigint {
         const match = hash.match(/^0x(?<zeros>0+)/);
         if (match && match.groups) {
-            return match.groups.zeros.length;
+            return BigInt(match.groups.zeros.length);
         }
-        return 0;
+        return 0n;
     }
     private get address() {
         return this._address;
@@ -213,11 +216,11 @@ export class Miner extends EventEmitter {
     private get token(): TokenSymbol {
         return this._token;
     }
-    private _address: string;
+    private _address: Address;
     private _frequency: number;
     private _interval_manager: IntervalManager | undefined;
     private _mining_iid: NodeJS.Timer | undefined;
-    private _nonce: BigNumber | undefined;
+    private _nonce: Nonce | undefined;
     private _speed: number; // [0..1]
     private _started = 0;
     private _stopped = 0;

@@ -2,7 +2,7 @@
 import express from 'express';
 export const router = express.Router();
 import createError from 'http-errors';
-import { Token } from '../source/token';
+import { Tokenizer } from '../source/token';
 
 /** CATCH 404 pages. */
 router.use((req, res) => {
@@ -16,8 +16,8 @@ router.use((req, res) => {
   // get current token (from request.query)
   const params = new URLSearchParams(req.query as any);
   const token = params.get('token');
-  const symbol = Token.symbol(token);
-  const suffix = Token.suffix(token);
+  const symbol = Tokenizer.symbol(token);
+  const suffix = Tokenizer.suffix(token);
   res.render('error/error.pig', {
     TOKEN_SUFFIX: suffix.toUpperCase(),
     TOKEN: symbol.toUpperCase(),

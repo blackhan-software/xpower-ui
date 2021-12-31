@@ -1,0 +1,47 @@
+{
+    "compounds": [
+        {
+            "name": "Debug Application",
+            "configurations": [
+                "Debug via NPM",
+                "Watch via NPM",
+                "Attach to Chrome"
+            ],
+        }
+    ],
+    "configurations": [
+        {
+            "name": "Debug via NPM",
+            "request": "launch",
+            "runtimeArgs": [
+                "run-script",
+                "debug"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "pwa-node",
+        },
+        {
+            "name": "Watch via NPM",
+            "request": "launch",
+            "runtimeArgs": [
+                "run-script",
+                "watch"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "pwa-node",
+        },
+        {
+            "name": "Attach to Chrome",
+            "port": 9222,
+            "request": "attach",
+            "type": "pwa-chrome",
+            "webRoot": "${workspaceFolder}"
+        },
+    ],
+}

@@ -44,26 +44,9 @@ block content
   content
     h1: | Mine & Mint Proof-of-Work Tokens on Avalanche <img src="/images/png/avalanche-icon/avalanche-64x64.png" height=24 width=24>
     include ../connector/connector.pug
+    include ../wallet/wallet.pug
 
     form#mining
-      label.form-label(for="minter-address")
-        | Miner's Address and Balance
-      div.input-group.mb-3.minter-address
-        input#minter-address.form-control(
-          type="text" placeholder="0x0000000000000000000000000000000000000000"
-          readonly
-        )
-        input#balance.form-control(
-          data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Balance of {{TOKEN}} proof-of-work tokens` readonly
-          type="text" placeholder="0"
-        )
-        span.input-group-text.info(
-          data-bs-toggle="tooltip" data-bs-placement="top"
-          title="Address XP0W tokens shall be mined for & balance"
-        )
-          include ../../public/images/pug/info-circle-fill.svg.pug
-
       div.btn-group.toggle-mining(role="group")
         button.btn.btn-outline-warning#toggle-mining(
           type="button" disabled
@@ -82,11 +65,11 @@ block content
           )
             | {{TOKEN_SUFFIX}}
           ul.dropdown-menu
-            li: a.dropdown-item(href="/home?token=XPOW.CPU")
+            li: a.dropdown-item(href="?token=XPOW.CPU")
               | XPOW.CPU: ideal for (in-browser) CPU miners
-            li: a.dropdown-item(href="/home?token=XPOW.GPU")
+            li: a.dropdown-item(href="?token=XPOW.GPU")
               | XPOW.GPU: meant for dedicated GPU miners
-            li: a.dropdown-item(href="/home?token=XPOW.ASIC")
+            li: a.dropdown-item(href="?token=XPOW.ASIC")
               | XPOW.ASIC: choice of professional ASIC miners
 
         button.btn.btn-outline-warning.info(
@@ -121,14 +104,14 @@ block content
         | Mined Amounts (not minted yet)
       - let index = 1
       while index <= 64
-        - let amount_asic = 16**index - 1
-        - let amount_gpu = 2**index - 1
-        - let amount_cpu = index
+        - let amount_asic = 16n ** BigInt(index) - 1n
+        - let amount_gpu = 2n ** BigInt(index) - 1n
+        - let amount_cpu = BigInt(index)
         div.btn-group.mint(
           role="group" data-index=`${index}`
-          data-amount-asic=`${amount_asic}`
-          data-amount-gpu=`${amount_gpu}`
-          data-amount-cpu=`${amount_cpu}`
+          data-amount-asic=`${amount_asic.toString()}`
+          data-amount-gpu=`${amount_gpu.toString()}`
+          data-amount-cpu=`${amount_cpu.toString()}`
         )
           button.btn.btn-outline-warning.lhs(
             type="button" disabled

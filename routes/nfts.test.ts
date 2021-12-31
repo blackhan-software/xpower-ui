@@ -14,25 +14,25 @@ describe('GET /nfts', () => {
     });
     it('should return w/a Content-Length > 0', async () => {
         await get.expect((res) => {
-            const length = parseInt(res.headers['content-length']);
+            const length = BigInt(res.headers['content-length']);
             expect(length).toBeGreaterThan(0);
         });
     });
 });
-describe('GET /nfts/migrate', () => {
+describe('GET /nfts/.migrate', () => {
     let get: request.Test;
     beforeEach(() => {
-        get = request(app).get('/nfts/migrate');
+        get = request(app).get('/nfts/.migrate');
     });
-    it('should return w/an HTTP code = 200 OK', async () => {
-        await get.expect(200);
+    it('should return w/an HTTP code = 500 OK', async () => {
+        await get.expect(500);
     });
     it('should return w/a Content-Type ~ html', async () => {
         await get.expect('Content-Type', /html/)
     });
     it('should return w/a Content-Length > 0', async () => {
         await get.expect((res) => {
-            const length = parseInt(res.headers['content-length']);
+            const length = BigInt(res.headers['content-length']);
             expect(length).toBeGreaterThan(0);
         });
     });
@@ -52,7 +52,7 @@ describe('GET /nfts/cpu/(0*)222200.json', () => {
     });
     it('should return w/a Content-Length > 0', async () => {
         await get.expect((res) => {
-            const length = parseInt(res.headers['content-length']);
+            const length = BigInt(res.headers['content-length']);
             expect(length).toBeGreaterThan(0);
         });
     });
@@ -107,7 +107,7 @@ describe('GET /nfts/gpu/(0*)202203.json', () => {
     });
     it('should return w/a Content-Length > 0', async () => {
         await get.expect((res) => {
-            const length = parseInt(res.headers['content-length']);
+            const length = BigInt(res.headers['content-length']);
             expect(length).toBeGreaterThan(0);
         });
     });
@@ -162,7 +162,7 @@ describe('GET /nfts/asic/(0*)202306.json', () => {
     });
     it('should return w/a Content-Length > 0', async () => {
         await get.expect((res) => {
-            const length = parseInt(res.headers['content-length']);
+            const length = BigInt(res.headers['content-length']);
             expect(length).toBeGreaterThan(0);
         });
     });

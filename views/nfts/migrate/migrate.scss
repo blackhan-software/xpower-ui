@@ -1,0 +1,45 @@
+@import "../../index.scss";
+@import "../../header/header.scss";
+@import "../../connector/connector.scss";
+@import "../../footer/footer.scss";
+
+form#wallet {
+  margin-bottom: 1.0em;
+}
+form#migration {
+  margin-bottom: 0.5em;
+}
+form#migration {
+  .nft-migrate {
+    #migrate-approval {
+      span.spinner {
+        margin-top: 0.25em;
+      }
+      span.spinner {
+        height: 1em;
+        width: 1em;
+      }
+      width: calc(50% - 21px);
+    }
+    #migrate {
+      span.spinner {
+        margin-top: 0.25em;
+      }
+      span.spinner {
+        height: 1em;
+        width: 1em;
+      }
+      i.bi {
+        position: relative;
+        top: 1px;
+      }
+      width: calc(50% - 21px);
+    }
+    #migrate.full {
+      width: calc(100% - 42px);
+    }
+    margin-top: 0.5em;
+    width: 100%;
+  }
+  width: 100%;
+}

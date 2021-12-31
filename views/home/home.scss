@@ -3,23 +3,13 @@
 @import "../connector/connector.scss";
 @import "../footer/footer.scss";
 
-form#mining,
-form#minting {
-  margin-top: 1em;
-  margin-bottom: 1em;
+form#wallet {
+  margin-bottom: 1.0em;
 }
 form#mining {
-  div.minter-address {
-    input#minter-address {
-      text-align: center;
-      width: calc(100% - 147px);
-      cursor: default;
-    }
-    input#balance {
-      text-align: center;
-      width: 105px;
-    }
-  }
+  margin-bottom: 0.5em;
+}
+form#mining {
   div.toggle-mining {
     button#toggle-mining {
       span.spinner {

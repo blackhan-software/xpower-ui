@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-explicit-any: [off] */
 import { State } from '../redux/types';
 
 export class StateDb {
@@ -18,13 +19,14 @@ export class StateDb {
             state.refresh = { date: null };
             delete state.nonces.more;
             delete state.nonces.less;
+            delete state.nfts.more;
+            delete state.nfts.less;
             return state;
         }
-        return { nonces: { items: {} } } as State;
+        return { nonces: { items: {} }, nfts: { items: {} } } as State;
     }
     public save(index: number, state: State): void {
-        const item = JSON.stringify(state);
-        this.storage.setItem(this.key(index), item);
+        this.storage.setItem(this.key(index), JSON.stringify(state));
     }
     private key(index: number) {
         return `state[${index}]`;

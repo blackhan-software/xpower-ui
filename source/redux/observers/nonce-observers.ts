@@ -1,7 +1,9 @@
 import { Store, Unsubscribe } from 'redux';
 import { observe } from './observe';
 
-import { Address, Amount, Nonce, Nonces, State } from '../types';
+import { Nonce, Nonces, State, Empty } from '../types';
+import { Address, Amount, BlockHash } from '../types';
+import { max, hex_40, hex } from '../../functions';
 import { Action } from '../actions';
 
 enum Sign {
@@ -9,37 +11,52 @@ enum Sign {
     negative = -1
 }
 const TOTAL = {} as {
-    [address: Address]: number;
+    [address: string]: bigint;
 };
 const inc_total = (sign: Sign, { address, amount }: {
     address: Address, amount: Amount
 }) => {
-    if (TOTAL[address] === undefined) {
-        TOTAL[address] = 0;
+    const x_address = hex_40(address);
+    if (TOTAL[x_address] === undefined) {
+        TOTAL[x_address] = 0n;
     }
-    return Math.max(0, TOTAL[address] += amount * sign);
+    if (sign > 0) {
+        return max(0n, TOTAL[x_address] += amount);
+    } else {
+        return max(0n, TOTAL[x_address] -= amount);
+    }
 };
 const TOTAL_BY = {} as {
-    [address: Address]: { [amount: Amount]: number; }
+    [address: string]: { [amount: string]: bigint; }
 };
 const inc_total_by = (sign: Sign, { address, amount }: {
     address: Address, amount: Amount
 }) => {
-    if (TOTAL_BY[address] === undefined) {
-        TOTAL_BY[address] = {};
+    const x_address = hex_40(address);
+    if (TOTAL_BY[x_address] === undefined) {
+        TOTAL_BY[x_address] = {};
     }
-    if (TOTAL_BY[address][amount] === undefined) {
-        TOTAL_BY[address][amount] = 0;
+    const x_amount = hex(amount);
+    if (TOTAL_BY[x_address][x_amount] === undefined) {
+        TOTAL_BY[x_address][x_amount] = 0n;
     }
-    return Math.max(0, TOTAL_BY[address][amount] += amount * sign);
+    if (sign > 0) {
+        return max(0n, TOTAL_BY[x_address][x_amount] += amount);
+    } else {
+        return max(0n, TOTAL_BY[x_address][x_amount] -= amount);
+    }
 };
 
 export type OnNonceAdded = (
-    nonce: Nonce, item: { address: Address, amount: Amount },
+    nonce: Nonce, item: {
+        address: Address, block_hash: BlockHash, amount: Amount
+    },
     total_by: Amount, total: Amount
 ) => void;
 export type OnNonceRemoved = (
-    nonce: Nonce, item: { address: Address, amount: Amount },
+    nonce: Nonce, item: {
+        address: Address, block_hash: BlockHash, amount: Amount
+    },
     total_by: Amount, total: Amount
 ) => void;
 
@@ -47,9 +64,9 @@ export function onNonceAdded(
     store: Store<State, Action>, handler: OnNonceAdded
 ): Unsubscribe {
     const selector = (state: State) => state.nonces;
-    const observer = observe<Nonces>(store)(selector, {
-        items: {}
-    });
+    const observer = observe<Nonces>(store)(
+        selector, Empty<Nonces>()
+    );
     return observer((next) => {
         const added = (n: Nonce) => {
             const total_by = inc_total_by(Sign.positive, next.items[n]);
@@ -59,7 +76,8 @@ export function onNonceAdded(
         if (next.more) {
             next.more.forEach(added);
         } else if (!next.less) {
-            Object.keys(next.items).forEach(added); // restore on:load
+            const nonces = Object.keys(next.items).map(Number);
+            nonces.forEach(added); // restore on:load
         }
     });
 }
@@ -67,9 +85,9 @@ export function onNonceRemoved(
     store: Store<State, Action>, handler: OnNonceRemoved
 ): Unsubscribe {
     const selector = (state: State) => state.nonces;
-    const observer = observe<Nonces>(store)(selector, {
-        items: {}
-    });
+    const observer = observe<Nonces>(store)(
+        selector, Empty<Nonces>()
+    );
     return observer((next, prev) => {
         const removed = (p: Nonce) => {
             const total_by = inc_total_by(Sign.negative, prev.items[p]);

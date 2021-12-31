@@ -1,16 +1,18 @@
 /* eslint @typescript-eslint/no-unused-vars: [off] */
 import { Action } from '../actions/nonce-actions';
-import { Nonce, Nonces } from '../types';
+import { Nonce, Nonces, Empty } from '../types';
 
 export function nonceReducer(
-    nonces: Nonces = { items: {} }, action: Action
+    nonces = Empty<Nonces>(), action: Action
 ): Nonces {
+    if (!action.type.startsWith('nonce')) {
+        return nonces;
+    }
     if (action.type === 'nonce/add') {
         const delta = [action.payload.nonce] as Nonce[];
         const items = {
             ...nonces.items, [action.payload.nonce]: {
-                address: action.payload.item.address,
-                amount: action.payload.item.amount
+                ...action.payload.item
             }
         };
         return { items, more: delta };
@@ -19,10 +21,11 @@ export function nonceReducer(
         const delta = [action.payload.nonce] as Nonce[];
         const items = Object.fromEntries(
             Object.entries(nonces.items).filter(([
-                nonce, { address, amount }
+                nonce, { address, block_hash }
             ]) => {
                 if (action.payload.item.address === address &&
-                    action.payload.nonce === nonce
+                    action.payload.item.block_hash === block_hash &&
+                    action.payload.nonce === Number(nonce)
                 ) {
                     return false;
                 }
@@ -40,7 +43,7 @@ export function nonceReducer(
                 if (action.payload.item.address === address &&
                     action.payload.item.amount === amount
                 ) {
-                    delta.push(nonce);
+                    delta.push(Number(nonce));
                     return false;
                 }
                 return true;
@@ -57,7 +60,7 @@ export function nonceReducer(
                 if (action.payload.item.address === address ||
                     action.payload.item.address === null
                 ) {
-                    delta.push(nonce);
+                    delta.push(Number(nonce));
                     return false;
                 }
                 return true;

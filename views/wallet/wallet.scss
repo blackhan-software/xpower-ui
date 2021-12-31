@@ -1,0 +1,16 @@
+form#wallet {
+  margin-bottom: 0.5em;
+}
+form#wallet {
+  div.wallet-address {
+    input#wallet-address {
+      cursor: default;
+      text-align: center;
+      width: calc(100% - 147px);
+    }
+    input#wallet-balance {
+      text-align: center;
+      width: 105px;
+    }
+  }
+}

@@ -18,7 +18,7 @@ app.set('port', port);
  * Determine how many processes to cluster & start:
  */
 const count = process.env.WEB_CONCURRENCY || '1';
-throng({ worker, count: parseInt(count) || 1 });
+throng({ worker, count: Number(count) || 1 });
 
 /**
 * Entry point for each newly clustered process:
@@ -37,7 +37,7 @@ function worker() {
 function normalizePort(
   value: string
 ) {
-  const port = parseInt(value, 10);
+  const port = Number(value);
   if (isNaN(port)) {
     return value; // named pipe
   }
