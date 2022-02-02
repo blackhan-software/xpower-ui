@@ -1,7 +1,6 @@
-import express from 'express';
 import env from '../env';
-
-export const router = express.Router();
+import express from 'express';
+const router = express.Router();
 
 /** GET ipfs page. */
 router.get('/', (req, res) => {

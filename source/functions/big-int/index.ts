@@ -11,26 +11,40 @@ export function min(
 export function hex(
     value: bigint | number
 ) {
-    const string = value.toString(16);
-    return '0x' + string;
+    return '0x' + value.toString(16);
 }
-export function hex_40(
+export function hex_pad(
+    value: bigint | number, min_length: number
+) {
+    const string = value.toString(16);
+    const length = min_length - string.length;
+    return `${'0'.repeat(length)}` + string;
+}
+export function x40(
     value: bigint | number, min_length = 40
 ) {
     const string = value.toString(16);
     const length = min_length - string.length;
-    if (length > 0) {
-        return `0x${'0'.repeat(length)}` + string;
-    }
-    return '0x' + string;
+    return `0x${'0'.repeat(length)}` + string;
 }
-export function hex_64(
+export function x40_pad(
+    value: bigint | number, min_length = 40
+) {
+    const string = value.toString(16);
+    const length = min_length - string.length;
+    return `${'0'.repeat(length)}` + string;
+}
+export function x64(
     value: bigint | number, min_length = 64
 ) {
     const string = value.toString(16);
     const length = min_length - string.length;
-    if (length > 0) {
-        return `0x${'0'.repeat(length)}` + string;
-    }
-    return '0x' + string;
+    return `0x${'0'.repeat(length)}` + string;
+}
+export function x64_pad(
+    value: bigint | number, min_length = 64
+) {
+    const string = value.toString(16);
+    const length = min_length - string.length;
+    return `${'0'.repeat(length)}` + string
 }

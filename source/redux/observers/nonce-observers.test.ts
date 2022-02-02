@@ -27,7 +27,7 @@ describe('onNonceAdded', () => {
             expect(t).toEqual(1n);
         });
         store.dispatch(addNonce(0xffff, {
-            address, block_hash, amount: 1n
+            address, block_hash, amount: 1n, worker: 0
         }));
     });
 });
@@ -51,7 +51,7 @@ describe('onNonceRemoved', () => {
             expect(t).toEqual(0n);
         });
         store.dispatch(addNonce(0xffff, {
-            address, block_hash, amount: 1n
+            address, block_hash, amount: 1n, worker: 0
         }));
         store.dispatch(removeNonce(0xffff, {
             address, block_hash
@@ -74,7 +74,7 @@ describe('onNonceRemoved', () => {
             expect(t).toEqual(0n);
         });
         store.dispatch(addNonce(0xffff, {
-            address, block_hash, amount: 1n
+            address, block_hash, amount: 1n, worker: 0
         }));
         store.dispatch(removeNonceByAmount({
             address, block_hash, amount: 1n

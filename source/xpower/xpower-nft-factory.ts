@@ -2,22 +2,18 @@
 import { App } from '../app';
 import { BigNumber, Contract } from 'ethers';
 import { Tokenizer } from '../token';
-import { TokenSuffix } from '../token';
-import { TokenSymbolAlt } from '../token';
-import { NftLevel } from '../../source/redux/types';
+import { NftLevel, Token } from '../../source/redux/types';
 import { MAX_YEAR } from '../../source/years';
 import { XPowerNft } from '.';
 
-export function XPowerNftFactory({ version, token }: {
-    version?: 'v1' | 'v2'; token?: TokenSymbolAlt;
+export function XPowerNftFactory({ token, version }: {
+    token?: Token, version?: 'v1' | 'v2'
 } = {}): Contract {
     if (version === undefined) {
         version = App.params.get('nft') === 'v1' ? 'v1' : 'v2';
     }
-    if (token === undefined) {
-        token = Tokenizer.symbolAlt(App.params.get('token'));
-    }
-    const element_id = `#g-xpower-nft-address-${version}-${token}`;
+    const symbol = Tokenizer.symbolAlt(token ?? App.token);
+    const element_id = `#g-xpower-nft-address-${version}-${symbol}`;
     const address = $(element_id).data('value');
     if (!address) {
         throw new Error(`missing ${element_id}`);
@@ -25,12 +21,10 @@ export function XPowerNftFactory({ version, token }: {
     const contract = new XPowerNft(address);
     return contract.connect(); // instance
 }
-export function XPowerNftMockFactory({ suffix }: {
-    suffix?: TokenSuffix
+export function XPowerNftMockFactory({ token }: {
+    token?: Token
 } = {}): Contract {
-    if (suffix === undefined) {
-        suffix = Tokenizer.suffix(App.params.get('token'));
-    }
+    const suffix = Tokenizer.suffix(token ?? App.token);
     const mock = {
         year: () => {
             return BigNumber.from(MAX_YEAR());

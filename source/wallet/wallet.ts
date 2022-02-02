@@ -1,4 +1,4 @@
-import { hex, hex_40, hex_64 } from '../functions';
+import { hex, x40, x64 } from '../functions';
 import { BigNumber, Contract, Transaction, Event } from 'ethers';
 import { Address, Allowance, Amount, Supply } from '../redux/types';
 import { Balance, BlockHash, Nonce, Timestamp } from '../redux/types';
@@ -22,7 +22,7 @@ export class Wallet {
         address: Address | string
     ) {
         if (typeof address === 'bigint') {
-            address = hex_40(address);
+            address = x40(address);
         }
         if (!address.match(/^0x/)) {
             throw new Error(`address prefix is not 0x`);
@@ -36,10 +36,10 @@ export class Wallet {
         address: Address | string, spender_address: Address | string
     ): Promise<Allowance> {
         if (typeof address === 'bigint') {
-            address = hex_40(address);
+            address = x40(address);
         }
         if (typeof spender_address === 'bigint') {
-            spender_address = hex_40(spender_address);
+            spender_address = x40(spender_address);
         }
         const allowance: BigNumber = await this.contract.allowance(
             address, spender_address
@@ -50,7 +50,7 @@ export class Wallet {
         spender_address: Address | string, allowance: Allowance
     ): Promise<Transaction> {
         if (typeof spender_address === 'bigint') {
-            spender_address = hex_40(spender_address);
+            spender_address = x40(spender_address);
         }
         return this.contract.increaseAllowance(
             spender_address, allowance
@@ -63,7 +63,7 @@ export class Wallet {
         nonce: Nonce, block_hash: BlockHash
     ): Promise<Transaction> {
         return this.contract.mint(
-            hex(nonce), hex_64(block_hash)
+            hex(nonce), x64(block_hash)
         );
     }
     onInit(

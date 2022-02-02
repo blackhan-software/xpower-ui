@@ -1,5 +1,5 @@
 import express from 'express';
-export const router = express.Router();
+const router = express.Router();
 
 /** GET robots.txt file. */
 router.get('/', (req, res) => {

@@ -3,13 +3,15 @@ import { Address, Amount, BlockHash, Nonce } from '../types';
 export type AddNonce = {
     type: 'nonce/add', payload: {
         nonce: Nonce, item: {
-            address: Address, block_hash: BlockHash, amount: Amount
+            address: Address, block_hash: BlockHash,
+            amount: Amount, worker: number
         }
     }
 };
 export const addNonce = (
     nonce: Nonce, item: {
-        address: Address, block_hash: BlockHash, amount: Amount
+        address: Address, block_hash: BlockHash,
+        amount: Amount, worker: number
     }
 ): AddNonce => ({
     type: 'nonce/add', payload: {
@@ -18,11 +20,15 @@ export const addNonce = (
 });
 export type RemoveNonce = {
     type: 'nonce/remove', payload: {
-        nonce: Nonce, item: { address: Address, block_hash: BlockHash }
+        nonce: Nonce, item: {
+            address: Address, block_hash: BlockHash
+        }
     }
 };
 export const removeNonce = (
-    nonce: Nonce, item: { address: Address, block_hash: BlockHash }
+    nonce: Nonce, item: {
+        address: Address, block_hash: BlockHash
+    }
 ): RemoveNonce => ({
     type: 'nonce/remove', payload: {
         nonce, item
@@ -30,11 +36,15 @@ export const removeNonce = (
 });
 export type RemoveNonceByAmount = {
     type: 'nonce/remove-by-amount', payload: {
-        item: { address: Address, block_hash: BlockHash, amount: Amount }
+        item: {
+            address: Address, block_hash: BlockHash, amount: Amount
+        }
     }
 };
 export const removeNonceByAmount = (
-    item: { address: Address, block_hash: BlockHash, amount: Amount }
+    item: {
+        address: Address, block_hash: BlockHash, amount: Amount
+    }
 ): RemoveNonceByAmount => ({
     type: 'nonce/remove-by-amount', payload: {
         item
@@ -42,7 +52,9 @@ export const removeNonceByAmount = (
 });
 export type RemoveNonces = {
     type: 'nonce/remove-all', payload: {
-        item: { address: Address | null }
+        item: {
+            address: Address | null
+        }
     }
 };
 export const removeNonces = (

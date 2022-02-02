@@ -2,7 +2,7 @@ import './migrate.scss';
 
 import { App } from '../../../source/app';
 import { Blockchain } from '../../../source/blockchain';
-import { hex_40 } from '../../../source/functions';
+import { x40 } from '../../../source/functions';
 import { BigNumber, Transaction } from 'ethers';
 import { Address } from '../../../source/redux/types';
 import { Amount } from '../../../source/redux/types';
@@ -19,7 +19,7 @@ $('#connect-metamask').on('connected', async function checkApproval(ev, {
     const nft_v1 = XPowerNftFactory({ version: 'v1' });
     const nft_v2 = XPowerNftFactory({ version: 'v2' });
     const is_approved = await nft_v1.isApprovedForAll(
-        hex_40(address), nft_v2.address
+        x40(address), nft_v2.address
     );
     const $approval = $('#migrate-approval');
     if (is_approved === true) {
@@ -46,7 +46,7 @@ $('#migrate-approval').on('click', async function setApproval() {
     const nft_v1 = XPowerNftFactory({ version: 'v1' });
     const nft_v2 = XPowerNftFactory({ version: 'v2' });
     const is_approved = await nft_v1.isApprovedForAll(
-        hex_40(address), nft_v2.address
+        x40(address), nft_v2.address
     );
     const $approval = $('#migrate-approval');
     if (is_approved === false) {
@@ -126,7 +126,7 @@ $('#migrate').on('click', async function migrateNfts() {
     const levels = Array.from(NftLevels());
     const year = Number(App.params.get('year') ?? '2021');
     const ids = await nft_v1.idsBy(year || 2021, levels);
-    const addresses = Array.from(NftLevels()).map(() => hex_40(address));
+    const addresses = Array.from(NftLevels()).map(() => x40(address));
     const balances: BigNumber[] = await nft_v1.balanceOfBatch(
         addresses, ids
     );

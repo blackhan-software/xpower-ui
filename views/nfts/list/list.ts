@@ -83,7 +83,7 @@ $('#toggle-all').on('click', function toggleList() {
         $('.nft-minter').show();
     } else {
         const token = Nft.token(
-            Tokenizer.suffix(App.params.get('token'))
+            Tokenizer.suffix(App.token)
         );
         $('.nft-minter').each((i, el) => {
             const $nft_minter = $(el);

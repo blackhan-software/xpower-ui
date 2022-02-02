@@ -2,7 +2,7 @@ import './wallet.scss';
 
 import { Address, Amount, Token } from '../../source/redux/types';
 import { OnTransfer, Wallet } from '../../source/wallet';
-import { hex_40 } from '../../source/functions';
+import { x40 } from '../../source/functions';
 import { Tokenizer } from '../../source/token';
 import { App } from '../../source/app';
 
@@ -18,7 +18,7 @@ $('#connect-metamask').on('connected', async function initWallet(ev, {
         supply: await wallet.supply
     });
     const $address = $('#wallet-address');
-    $address.val(hex_40(address));
+    $address.val(x40(address));
 });
 $('#connect-metamask').on('connected', async function onTransfer(ev, {
     address
@@ -26,7 +26,7 @@ $('#connect-metamask').on('connected', async function onTransfer(ev, {
     address: Address
 }) {
     const on_transfer: OnTransfer = async (from, to, amount) => {
-        console.debug('[on:transfer]', hex_40(from), hex_40(to), amount);
+        console.debug('[on:transfer]', x40(from), x40(to), amount);
         if (address === from || address === to) {
             App.setToken(token, {
                 amount: await wallet.balance,

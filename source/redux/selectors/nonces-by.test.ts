@@ -1,16 +1,16 @@
-import { nonceBy } from './nonce-by';
+import { noncesBy } from './nonces-by';
 
-describe('nonce-by', () => {
+describe('nonces-by', () => {
     const address = BigInt('0xabcd');
     const block_hash = BigInt('0xb10c');
-    it('should return nonce = undefined', () => {
-        const nonce = nonceBy({ items: {} }, {
+    it('should return nonces.length = 0', () => {
+        const nonces = noncesBy({ items: {} }, {
             address, block_hash, amount: 0n
         });
-        expect(nonce).not.toBeDefined();
+        expect(nonces.length).toEqual(0);
     });
-    it('should return nonce = 0xffff', () => {
-        const nonce = nonceBy({
+    it('should return nonces[0] = 0xffff', () => {
+        const nonces = noncesBy({
             items: {
                 0xffff: {
                     address, block_hash, amount: 1n
@@ -19,10 +19,11 @@ describe('nonce-by', () => {
         }, {
             address, block_hash, amount: 1n
         });
-        expect(nonce).toEqual(0xffff);
+        expect(nonces.length).toEqual(1);
+        expect(nonces[0]).toEqual(0xffff);
     });
-    it('should return nonce = 0xfff0', () => {
-        const nonce = nonceBy({
+    it('should return nonces[0] = 0xfff0', () => {
+        const nonces = noncesBy({
             items: {
                 0xffff: { address, block_hash, amount: 1n },
                 0xfff0: { address, block_hash, amount: 2n }
@@ -30,10 +31,11 @@ describe('nonce-by', () => {
         }, {
             address, block_hash, amount: 2n
         });
-        expect(nonce).toEqual(0xfff0);
+        expect(nonces.length).toEqual(1);
+        expect(nonces[0]).toEqual(0xfff0);
     });
-    it('should return nonce = 0xff00', () => {
-        const nonce = nonceBy({
+    it('should return nonces[2] = 0xff00', () => {
+        const nonces = noncesBy({
             items: {
                 0xffff: { address, block_hash, amount: 1n },
                 0xfff0: { address, block_hash, amount: 2n },
@@ -43,7 +45,7 @@ describe('nonce-by', () => {
             }
         }, {
             address, block_hash, amount: 3n
-        }, 2);
-        expect(nonce).toEqual(0xff00);
+        });
+        expect(nonces[2]).toEqual(0xff00);
     });
 });

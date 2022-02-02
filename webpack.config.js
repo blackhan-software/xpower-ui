@@ -48,7 +48,10 @@ const configuration = (options) => ({
             './views/tooltips/tooltips.ts',
             './views/error/error.ts',
             './views/footer/footer.ts',
-        ]
+        ],
+        worker: [
+            './source/miner/scripts/worker.ts',
+        ],
     },
     module: {
         rules: [{
@@ -121,16 +124,18 @@ const configuration = (options) => ({
             chunks: ['error']
         }),
         new MiniCssExtractPlugin({
-            filename: '../styles/[name].[chunkhash:8].css'
+            filename: '../styles/[name].[contenthash:8].css'
         })
     ],
     resolve: {
         extensions: ['.ts', '.tsx', '.js'],
-        fallback: { 'buffer': require.resolve('buffer/') }
+        fallback: {
+            buffer: false, fs: false, path: false
+        }
     },
     output: {
         path: resolve(__dirname, 'public', 'scripts'),
-        filename: '[name].[chunkhash:8].js',
+        filename: '[name].[contenthash:8].js',
         clean: true
     },
     mode: 'none', ...options

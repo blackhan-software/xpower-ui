@@ -4,7 +4,7 @@ import { Chain, ChainId } from './chain';
 import { Global } from '../types';
 declare const global: Global;
 
-import { Address } from '../redux/types';
+import { Address, TokenInfo } from '../redux/types';
 import { EventEmitter } from 'events';
 
 export type Connect = {
@@ -12,17 +12,6 @@ export type Connect = {
 };
 export type Reconnect = {
     chainId: ChainId, address: Address
-};
-
-export type Token = {
-    /** address that the token is at */
-    address: Address,
-    /** ticker symbol or shorthand, up to 5 chars */
-    symbol: string,
-    /** number of decimals in the token */
-    decimals: number,
-    /** string url of the token logo */
-    image?: string
 };
 export class Blockchain extends EventEmitter {
     private static get me(): Blockchain {
@@ -132,14 +121,14 @@ export class Blockchain extends EventEmitter {
             }]
         });
     }
-    public static async addToken(token: Token): Promise<boolean> {
-        return this.me.addToken(token);
+    public static async addToken(info: TokenInfo): Promise<boolean> {
+        return this.me.addToken(info);
     }
-    public async addToken(token: Token): Promise<boolean> {
+    public async addToken(info: TokenInfo): Promise<boolean> {
         try {
             return await this.provider.request({
                 method: 'wallet_watchAsset', params: {
-                    type: 'ERC20', options: token
+                    type: 'ERC20', options: info
                 }
             });
         } catch (ex) {
@@ -174,7 +163,7 @@ export class Blockchain extends EventEmitter {
                     method: 'eth_chainId'
                 });
                 if (chain_id && chain_id.length) {
-                    resolve(`0x${BigInt(chain_id).toString(16)}`);
+                    resolve(`0x${Number(chain_id).toString(16)}`);
                 } else {
                     resolve(undefined);
                 }

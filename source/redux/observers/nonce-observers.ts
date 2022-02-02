@@ -3,7 +3,7 @@ import { observe } from './observe';
 
 import { Nonce, Nonces, State, Empty } from '../types';
 import { Address, Amount, BlockHash } from '../types';
-import { max, hex_40, hex } from '../../functions';
+import { max, hex, x40 } from '../../functions';
 import { Action } from '../actions';
 
 enum Sign {
@@ -16,7 +16,7 @@ const TOTAL = {} as {
 const inc_total = (sign: Sign, { address, amount }: {
     address: Address, amount: Amount
 }) => {
-    const x_address = hex_40(address);
+    const x_address = x40(address);
     if (TOTAL[x_address] === undefined) {
         TOTAL[x_address] = 0n;
     }
@@ -32,7 +32,7 @@ const TOTAL_BY = {} as {
 const inc_total_by = (sign: Sign, { address, amount }: {
     address: Address, amount: Amount
 }) => {
-    const x_address = hex_40(address);
+    const x_address = x40(address);
     if (TOTAL_BY[x_address] === undefined) {
         TOTAL_BY[x_address] = {};
     }

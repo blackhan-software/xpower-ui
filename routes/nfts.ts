@@ -1,73 +1,41 @@
-/* eslint @typescript-eslint/no-explicit-any: [off] */
-import { NftLevel } from '../source/redux/types';
-import { theme } from '../source/theme';
-import { Tokenizer } from '../source/token';
-import { host } from './functions';
+import { Nft, NftLevel, NftToken } from '../source/redux/types';
+import { env_of, host } from './functions';
 
 import env from '../env';
 import express from 'express';
-export const router = express.Router();
-
-const TOKENS = new Set([
-  'cpu', 'gpu', 'asic'
-]);
+const router = express.Router();
 
 /** GET nfts page. */
 router.get('/', (req, res) => {
-  const params = new URLSearchParams(req.query as any);
-  const token = params.get('token');
-  const symbol = Tokenizer.symbol(token);
-  const suffix = Tokenizer.suffix(token);
-  res.render('nfts/nfts.pig', {
-    TOKEN_SUFFIX: suffix.toUpperCase(),
-    TOKEN: symbol.toUpperCase(),
-    token_suffix: suffix.toLowerCase(),
-    token: symbol.toLowerCase(),
-    ...theme(symbol),
-  });
-});
-/** GET nfts/.migrate page. */
-router.get('/.migrate', (req, res) => {
-  const params = new URLSearchParams(req.query as any);
-  const token = params.get('token');
-  const symbol = Tokenizer.symbol(token);
-  const suffix = Tokenizer.suffix(token);
-  res.render('nfts/migrate/migrate.pig', {
-    TOKEN_SUFFIX: suffix.toUpperCase(),
-    TOKEN: symbol.toUpperCase(),
-    token_suffix: suffix.toLowerCase(),
-    token: symbol.toLowerCase(),
-    ...theme(symbol),
-  });
+  res.render('nfts/nfts.pig', env_of(req));
 });
 /** GET nfts/{token}/{id}.json metadata. */
 router.get('/:token/:id.json', (req, res) => {
   const { token, id } = req.params;
-  if (!TOKENS.has(token)) {
-    throw new Error(`${token} token is unknown`);
-  }
-  const id_year = Number(id.slice(0, -2));
-  if (isNaN(id_year)) {
-    throw new Error(`${id} identifier starts w/non-number year`);
-  }
-  const id_level = Number(id.slice(-2));
-  if (isNaN(id_level)) {
-    throw new Error(`${id} identifier ends w/non-number level`);
-  }
-  const LEVEL = NftLevel[id_level];
-  if (!NftLevel[id_level]) {
-    throw new Error(`${id} identifier ends w/unknown level`);
-  }
-  const location = env.XPOWER_NFT_REDIRECT[`${token}/${id}.json`];
+  const nft = {
+    issue: Nft.issue(id),
+    level: Nft.level(id),
+    token: Nft.token(token)
+  };
+  const location = env.XPOWER_NFT_REDIRECT[
+    `${token}/${Nft.coreId(nft)}.json`
+  ];
   if (typeof location === 'string') {
     return res.redirect(location);
   }
-  const TOKEN = token.toUpperCase();
+  const TOKEN = NftToken[nft.token].toUpperCase();
+  const LEVEL = NftLevel[nft.level].toUpperCase();
   const level = LEVEL.toLowerCase();
   res.send({
     name: `XPOW.${TOKEN} ${LEVEL}`,
-    describe: `stakeable XPOW.${TOKEN} ${LEVEL} NFT bond`,
-    image: `${host(req)}/images/nft/${id_year}/xpow.${token}-${level}.png`
+    describe: `Stakeable XPOW.${TOKEN} ${LEVEL} NFT`,
+    image: `${host(req)}/images/nft/${nft.issue}/xpow.${token}-${level}.png`,
+    properties: {
+      issue: `${nft.issue}`,
+      label: LEVEL,
+      level: `${nft.level}`,
+      token: `XPOW.${TOKEN}`
+    }
   });
 });
 export default router;

@@ -12,10 +12,10 @@ describe('Store w/nonceReducer', () => {
     it('should add a nonce', () => {
         const state_0 = Empty<Nonces>();
         const state_1 = nonceReducer(state_0, addNonce(0xffff, {
-            address, block_hash, amount: 1n
+            address, block_hash, amount: 1n, worker: 0
         }));
         expect(state_1.items[0xffff]).toEqual({
-            address, block_hash, amount: 1n
+            address, block_hash, amount: 1n, worker: 0
         });
         expect(state_1.more).toEqual([0xffff]);
         expect(state_1.less).not.toBeDefined();
@@ -23,10 +23,10 @@ describe('Store w/nonceReducer', () => {
     it('should remove a nonce', () => {
         const state_0 = Empty<Nonces>();
         const state_1 = nonceReducer(state_0, addNonce(0xffff, {
-            address, block_hash, amount: 1n
+            address, block_hash, amount: 1n, worker: 0
         }));
         expect(state_1.items[0xffff]).toEqual({
-            address, block_hash, amount: 1n
+            address, block_hash, amount: 1n, worker: 0
         });
         expect(state_1.more).toEqual([0xffff]);
         expect(state_1.less).not.toBeDefined();
@@ -40,10 +40,10 @@ describe('Store w/nonceReducer', () => {
     it('should remove a nonce by amount', () => {
         const state_0 = Empty<Nonces>();
         const state_1 = nonceReducer(state_0, addNonce(0xffff, {
-            address, block_hash, amount: 1n
+            address, block_hash, amount: 1n, worker: 0
         }));
         expect(state_1.items[0xffff]).toEqual({
-            address, block_hash, amount: 1n
+            address, block_hash, amount: 1n, worker: 0
         });
         expect(state_1.more).toEqual([0xffff]);
         expect(state_1.less).not.toBeDefined();
@@ -57,18 +57,18 @@ describe('Store w/nonceReducer', () => {
     it('should remove all nonces', () => {
         const state_0 = Empty<Nonces>();
         const state_1 = nonceReducer(state_0, addNonce(0xffff1, {
-            address, block_hash, amount: 1n
+            address, block_hash, amount: 1n, worker: 0
         }));
         expect(state_1.items[0xffff1]).toEqual({
-            address, block_hash, amount: 1n
+            address, block_hash, amount: 1n, worker: 0
         });
         expect(state_1.more).toEqual([0xffff1]);
         expect(state_1.less).not.toBeDefined();
         const state_2 = nonceReducer(state_1, addNonce(0xffff2, {
-            address, block_hash, amount: 3n
+            address, block_hash, amount: 3n, worker: 0
         }));
         expect(state_2.items[0xffff2]).toEqual({
-            address, block_hash, amount: 3n
+            address, block_hash, amount: 3n, worker: 0
         });
         expect(state_2.more).toEqual([0xffff2]);
         expect(state_2.less).not.toBeDefined();
@@ -85,18 +85,18 @@ describe('Store w/nonceReducer', () => {
         const address_2 = BigInt('0xabcd2');
         const state_0 = Empty<Nonces>();
         const state_1 = nonceReducer(state_0, addNonce(0xffff1, {
-            address: address_1, block_hash, amount: 1n
+            address: address_1, block_hash, amount: 1n, worker: 0
         }));
         expect(state_1.items[0xffff1]).toEqual({
-            address: address_1, block_hash, amount: 1n
+            address: address_1, block_hash, amount: 1n, worker: 0
         });
         expect(state_1.more).toEqual([0xffff1]);
         expect(state_1.less).not.toBeDefined();
         const state_2 = nonceReducer(state_1, addNonce(0xffff2, {
-            address: address_2, block_hash, amount: 3n
+            address: address_2, block_hash, amount: 3n, worker: 0
         }));
         expect(state_2.items[0xffff2]).toEqual({
-            address: address_2, block_hash, amount: 3n
+            address: address_2, block_hash, amount: 3n, worker: 0
         });
         expect(state_2.more).toEqual([0xffff2]);
         expect(state_2.less).not.toBeDefined();

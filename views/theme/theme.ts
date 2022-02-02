@@ -1,11 +1,9 @@
 import { Theme, theme } from '../../source/theme';
-import { Tokenizer } from '../../source/token';
 import { App } from '../../source/app/app';
 
 document.onreadystatechange = function () {
     if (document.readyState === 'complete') {
-        const symbol = Tokenizer.symbol(App.params.get('token'));
-        adapt(theme(symbol));
+        adapt(theme(App.token));
     }
 };
 function adapt(theme: Theme): void {

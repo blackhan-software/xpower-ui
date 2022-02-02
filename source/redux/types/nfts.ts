@@ -15,8 +15,10 @@ export class Nft {
     }
     static issue(id: string): NftIssue {
         const [prefix, suffix] = id.split(':');
-        const core_id = suffix ?? prefix;
-        const issue = Number(core_id.slice(0, 4));
+        const long_id = suffix ?? prefix;
+        const m = long_id.match(/^0+(?<id>[1-9a-f][0-9a-f]+)$/);
+        const core_id = m && m.groups ? m.groups.id : long_id;
+        const issue = Number(this.decimalized(core_id).slice(0, 4));
         if (isNaN(issue)) {
             throw new Error(`unknown issue for "${id}"`);
         }
@@ -24,8 +26,10 @@ export class Nft {
     }
     static level(id: string): NftLevel {
         const [prefix, suffix] = id.split(':');
-        const core_id = suffix ?? prefix;
-        const level = Number(core_id.slice(-2));
+        const long_id = suffix ?? prefix;
+        const m = long_id.match(/^0+(?<id>[1-9a-f][0-9a-f]+)$/);
+        const core_id = m && m.groups ? m.groups.id : long_id;
+        const level = Number(this.decimalized(core_id).slice(-2));
         switch (level) {
             case NftLevel.UNIT:
                 return NftLevel.UNIT;
@@ -95,6 +99,13 @@ export class Nft {
             return `${token}:${issue}0${level}` as NftFullId;
         }
         return `${token}:${issue}${level}` as NftFullId;
+    }
+    private static decimalized(core_id: string) {
+        const radix = this.hexadecimal(core_id) ? 16 : 10;
+        return parseInt(core_id, radix).toString(10);
+    }
+    private static hexadecimal(core_id: string, minimum = '202100') {
+        return parseInt(core_id, 16) < parseInt(minimum, 16);
     }
 }
 export type NftFullId = `${NftToken}:${NftCoreId}`;

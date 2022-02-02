@@ -1,10 +1,10 @@
 import { BigNumber, Contract, Transaction, Event } from 'ethers';
-import { hex_40 } from '../functions';
 import { Address, Amount, Balance, Supply, Year } from '../redux/types';
 import { Nft, NftCoreId, NftIssue, NftLevel } from '../redux/types';
 import { Meta, XPowerNftFactory, XPowerNftMockFactory } from '../xpower';
 import { OnTransferBatch as on_transfer_batch } from '../xpower';
 import { OnTransferSingle as on_transfer_single } from '../xpower';
+import { x40 } from '../functions';
 
 export type OnTransferBatch = (
     operator: Address,
@@ -28,7 +28,7 @@ export class NftWallet {
         address: Address | string
     ) {
         if (typeof address === 'bigint') {
-            address = hex_40(address);
+            address = x40(address);
         }
         if (!address.match(/^0x/)) {
             throw new Error('address prefix is not 0x')
@@ -127,7 +127,7 @@ export class NftWallet {
         to_address: Address | string, id: NftCoreId, amount: Amount
     ): Promise<Transaction> {
         if (typeof to_address === 'bigint') {
-            to_address = hex_40(to_address);
+            to_address = x40(to_address);
         }
         return this.contract.safeTransferFrom(
             this._address, to_address, id, amount, []

@@ -8,33 +8,7 @@ block styles
     crossorigin="anonymous" rel="stylesheet")
 
 block globals
-  span#g-xpower-address-XPOW_CPU(
-    style="display:none" data-value=`${XPOWER_ADDRESS_CPU}`)
-  span#g-xpower-address-XPOW_GPU(
-    style="display:none" data-value=`${XPOWER_ADDRESS_GPU}`)
-  span#g-xpower-address-XPOW_ASIC(
-    style="display:none" data-value=`${XPOWER_ADDRESS_ASC}`)
-
-  span#g-xpower-symbol-XPOW_CPU(
-    style="display:none" data-value=`${XPOWER_SYMBOL_CPU}`)
-  span#g-xpower-symbol-XPOW_GPU(
-    style="display:none" data-value=`${XPOWER_SYMBOL_GPU}`)
-  span#g-xpower-symbol-XPOW_ASIC(
-    style="display:none" data-value=`${XPOWER_SYMBOL_ASC}`)
-
-  span#g-xpower-decimals-XPOW_CPU(
-    style="display:none" data-value=`${XPOWER_DECIMALS_CPU}`)
-  span#g-xpower-decimals-XPOW_GPU(
-    style="display:none" data-value=`${XPOWER_DECIMALS_GPU}`)
-  span#g-xpower-decimals-XPOW.ASIC(
-    style="display:none" data-value=`${XPOWER_DECIMALS_ASC}`)
-
-  span#g-xpower-image-XPOW_CPU(
-    style="display:none" data-value=`${XPOWER_IMAGE_CPU}`)
-  span#g-xpower-image-XPOW_GPU(
-    style="display:none" data-value=`${XPOWER_IMAGE_GPU}`)
-  span#g-xpower-image-XPOW_ASIC(
-    style="display:none" data-value=`${XPOWER_IMAGE_ASC}`)
+  include ../global/global.pug
 
   span#g-urls-about(
     style="display:none" data-value=`${MD_ABOUT_URL}`)

@@ -62,17 +62,20 @@ form#mining {
   }
 }
 form#minting {
-  div.btn-group.mint:not(:first-of-type) {
+  div.btn-group.mint {
     display: none;
   }
   div.btn-group.mint {
-    button.lhs {
+    button.minter {
       width: calc(100% - 147px);
     }
-    button.mid {
+    button.total {
+      span.value {
+        font-size: smaller;
+      }
       width: 105px;
     }
-    button.rhs {
+    button.forget {
       width: 42px;
     }
     margin-bottom: 1em;

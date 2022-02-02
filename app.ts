@@ -8,15 +8,16 @@ import path from 'path';
 import dotenv from 'dotenv';
 dotenv.config();
 
+// import routes
 import about from './routes/about';
 import error from './routes/error';
 import home from './routes/home';
-import migrate from './routes/migrate';
 import nfts from './routes/nfts';
-import ipfs from './routes/ifps';
+import ipfs from './routes/ipfs';
 import robots from './routes/robots';
 import staking from './routes/staking';
 
+// register view engine for pigs
 import { Pig } from './source/engines';
 export const app = express();
 Pig.register(app);
@@ -40,7 +41,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // register views
 app.use('/', home);
-app.use('/.migrate', migrate);
 app.use('/nfts', nfts);
 app.use('/staking', staking);
 app.use('/about', about);

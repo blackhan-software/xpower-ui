@@ -8,7 +8,7 @@ import { App } from '../../source/app';
 import { Years } from '../../source/years';
 import { Tokenizer } from '../../source/token';
 
-import { hex_40 } from '../../source/functions';
+import { x40 } from '../../source/functions';
 import { Address } from '../../source/redux/types';
 import { Nft, NftLevels } from '../../source/redux/types';
 
@@ -27,7 +27,9 @@ $('#connect-metamask').on('connected', async function setNfts(ev, {
     const wallet = new NftWallet(address);
     const balances = await wallet.balances({ issues, levels });
     const supplies = wallet.totalSupplies({ issues, levels });
-    const token = Nft.token(Tokenizer.suffix(App.params.get('token')));
+    const token = Nft.token(
+        Tokenizer.suffix(App.token)
+    );
     for (const issue of issues) {
         for (const level of levels) {
             const amount = balances[index];
@@ -50,12 +52,12 @@ $('#connect-metamask').on('connected', async function onBatchTransfers(ev, {
         op, from, to, ids, values, ev
     ) => {
         console.debug('[on:transfer-batch]',
-            hex_40(op), hex_40(from), hex_40(to),
+            x40(op), x40(from), x40(to),
             ids, values, ev
         );
-        const nft_token = Nft.token(Tokenizer.suffix(
-            App.params.get('token')
-        ));
+        const nft_token = Nft.token(
+            Tokenizer.suffix(App.token)
+        );
         for (let i = 0; i < ids.length; i++) {
             const nft_id = Nft.fullId({
                 issue: Nft.issue(ids[i]),
@@ -82,12 +84,12 @@ $('#connect-metamask').on('connected', async function onSingleTransfers(ev, {
         op, from, to, id, value, ev
     ) => {
         console.debug('[on:transfer-single]',
-            hex_40(op), hex_40(from), hex_40(to),
+            x40(op), x40(from), x40(to),
             id, value, ev
         );
-        const nft_token = Nft.token(Tokenizer.suffix(
-            App.params.get('token')
-        ));
+        const nft_token = Nft.token(
+            Tokenizer.suffix(App.token)
+        );
         const nft_id = Nft.fullId({
             issue: Nft.issue(id),
             level: Nft.level(id),

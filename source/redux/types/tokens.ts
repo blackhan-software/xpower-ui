@@ -1,5 +1,4 @@
-import { Amount } from './base';
-import { Supply } from './base';
+import { Address, Amount, Supply } from './base';
 
 export enum Token {
     ASIC = 'ASIC',
@@ -24,3 +23,13 @@ export type Tokens = {
     /** set for removed token(s) */
     less?: Token[]
 }
+export type TokenInfo = {
+    /** address the token is at */
+    address: Address,
+    /** ticker symbol or shorthand */
+    symbol: string,
+    /** number of decimals of the token */
+    decimals: number,
+    /** string url of the token logo */
+    image?: string
+};

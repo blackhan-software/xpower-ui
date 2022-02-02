@@ -21,13 +21,15 @@ form#single-minting {
         top: -1px;
       }
     }
-    .balance {
-      width: calc(25% - 126px);
-    }
     .minter {
       width: calc(50% - 126px);
     }
+    .balance {
+      font-size: smaller;
+      width: calc(25% - 126px);
+    }
     .amount {
+      font-size: smaller;
       width: calc(25% - 126px);
     }
     margin-bottom: 1em;

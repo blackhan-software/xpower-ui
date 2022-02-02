@@ -1,11 +1,11 @@
 /* eslint @typescript-eslint/no-unused-vars: [off] */
 import { Address, Amount, BlockHash, Nonce, Nonces } from '../types';
 
-export function nonceBy(
+export function noncesBy(
     nonces: Nonces, item?: {
         address?: Address, block_hash?: BlockHash, amount?: Amount
-    }, index = 0
-): Nonce | undefined {
+    }
+): Nonce[] {
     const filtered = Object.entries(nonces.items).filter(([n, i]) => {
         if (item !== undefined) {
             if (item.address !== undefined &&
@@ -27,6 +27,6 @@ export function nonceBy(
         return true;
     });
     const keys = filtered.map(([n, i]) => Number(n));
-    return keys[index];
+    return keys;
 }
-export default nonceBy;
+export default noncesBy;

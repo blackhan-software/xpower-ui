@@ -38,7 +38,7 @@ $(window).on('load', async function renderMarkdown() {
     }
     function add_token(content: string) {
         const params = new URLSearchParams(location.search);
-        const token = params.get('token');
+        const token = Tokenizer.token(params.get('token'));
         const symbol = Tokenizer.symbol(token);
         const suffix = Tokenizer.suffix(token);
         return content

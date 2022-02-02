@@ -20,6 +20,7 @@ import { removeNonce } from '../redux/actions';
 import { removeNonces } from '../redux/actions';
 import { removeNonceByAmount } from '../redux/actions';
 import { nonceReducer } from '../redux/reducers';
+import { noncesBy } from '../redux/selectors';
 import { nonceBy } from '../redux/selectors';
 
 import { setNft } from '../redux/actions';
@@ -78,25 +79,24 @@ export class App {
         });
     }
     public static addNonce(
-        address: Address, block_hash: BlockHash, nonce: Nonce, amount: Amount
+        nonce: Nonce, item: {
+            address: Address, block_hash: BlockHash,
+            amount: Amount, worker: number
+        }
     ) {
-        this.me.store.dispatch(addNonce(nonce, {
-            address, block_hash, amount
-        }));
+        this.me.store.dispatch(addNonce(nonce, item));
     }
     public static removeNonce(
-        address: Address, block_hash: BlockHash, nonce: Nonce
+        nonce: Nonce, item: {
+            address: Address, block_hash: BlockHash
+        }
     ) {
-        this.me.store.dispatch(removeNonce(nonce, {
-            address, block_hash
-        }));
+        this.me.store.dispatch(removeNonce(nonce, item));
     }
     public static removeNonceByAmount(
-        address: Address, block_hash: BlockHash, amount: Amount
+        item: { address: Address, block_hash: BlockHash, amount: Amount }
     ) {
-        this.me.store.dispatch(removeNonceByAmount({
-            address, block_hash, amount
-        }));
+        this.me.store.dispatch(removeNonceByAmount(item));
     }
     public static removeNonces() {
         this.me.store.dispatch(removeNonces({
@@ -132,13 +132,17 @@ export class App {
         const un_rem = this.onNonceRemoved(address, callback);
         return () => { un_add(); un_rem(); };
     }
-    public static getNonceBy(
-        address: Address, block_hash: BlockHash, amount: Amount, index = 0
-    ): Nonce | undefined {
+    public static getNonceBy(query?: {
+        address?: Address, block_hash?: BlockHash, amount?: Amount
+    },  index = 0): Nonce | undefined {
         const { nonces } = this.me.store.getState();
-        return nonceBy(
-            nonces, { address, block_hash, amount }, index
-        );
+        return nonceBy(nonces, query, index);
+    }
+    public static getNoncesBy(query?: {
+        address?: Address, block_hash?: BlockHash, amount?: Amount
+    }): Nonce[] {
+        const { nonces } = this.me.store.getState();
+        return noncesBy(nonces, query);
     }
     public static setNft(
         nft: NftFullId | {
@@ -255,8 +259,9 @@ export class App {
     }
     private miner(address: Address): Miner {
         if (this._miner === undefined) {
-            const symbol = Tokenizer.symbol(App.params.get('token'));
-            this._miner = new Miner(symbol, address, App.speed);
+            this._miner = new Miner(
+                App.token, address, App.level.min, App.speed
+            );
         }
         return this._miner;
     }
@@ -266,13 +271,26 @@ export class App {
         }
         return this._db;
     }
-    private static get clear(): boolean {
+    public static get amount(): { min: Amount, max: Amount } {
+        const min = Tokenizer.amount(App.token, App.level.min);
+        const max = Tokenizer.amount(App.token, App.level.max);
+        return { min, max };
+    }
+    public static get clear(): boolean {
         return Parser.boolean(this.params.get('clear'), false);
     }
-    private static get clearAll(): boolean {
+    public static get clearAll(): boolean {
         return Parser.boolean(this.params.get('clear-all'), false);
     }
-    private static get persist(): number {
+    public static get level(): { min: number, max: number } {
+        const min = Parser.number(this.params.get('min-level'), 5);
+        const max = Parser.number(this.params.get('max-level'), 64);
+        return { min, max };
+    }
+    public static get logger(): boolean {
+        return Parser.boolean(this.params.get('logger'), false);
+    }
+    public static get persist(): number {
         const element = document.getElementById('g-persistence');
         const fallback = Parser.number(element?.dataset.value, 0);
         return Parser.number(this.params.get('persist'), fallback);
@@ -283,19 +301,14 @@ export class App {
         const value = Parser.number(this.params.get('speed'), fallback);
         return Math.min(100, Math.max(0, value)) / 100;
     }
-    public static get range(): { min: number, max: number } {
-        const min = Parser.number(this.params.get('min-amount'), 1);
-        const max = Parser.number(this.params.get('max-amount'), Infinity);
-        return { min, max };
+    public static get token(): Token {
+        return Tokenizer.token(this.params.get('token'));
     }
     public static get params(): URLSearchParams {
         if (typeof document !== 'undefined') {
             return new URLSearchParams(document.location.search.substring(1));
         }
         return new URLSearchParams();
-    }
-    private static get logger(): boolean {
-        return Parser.boolean(this.params.get('logger'), false);
     }
     private get store(): Store<State, Action> {
         return this._store;

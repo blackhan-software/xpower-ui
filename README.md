@@ -61,17 +61,17 @@ Name | Type | Default | Description
 clear | boolean | false | flag to clear current persistence slot (as defined by persist flag)
 clear-all | boolean | false | flag to clear all persistence slots
 logger | boolean | false | flag to log nonces to console
-max-amount | number | Infinity | threshold where nonces with higher amounts are ignored
-min-amount | number | 1 | threshold where nonces with lower amounts are ignored
+min-level | number | 5 | threshold of nonces with lower corresponding amounts to be ignored
+max-level | number | 64 | threshold of nonces with higher corresponding amounts to be ignored
 persist | number | 0 | flag to persist nonces; each non-zero value is a separate persistence slot
 speed | number | 50 | speed percentage (w.r.t a single browser tab) between 0 and 100
 
 ### Examples
 
-To ignore (frequent and low-value) nonces with an amount less than 3 and mine with a speed of 100% use:
+To ignore (frequent & low-value) nonces with an amount less than 5 CPU tokens and mine with a speed of 100% use:
 
 ```
-http://localhost:3000?min-amount=3&speed=100
+http://localhost:3000?min-level=5&speed=100
 ```
 
 To persist nonces between reloads at 1st slot use (may impact mining performance):
