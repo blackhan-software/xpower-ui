@@ -3,7 +3,7 @@
 
 import { Interval, Level, Nonce, Token } from '../../redux/types';
 import { Address, Amount, BlockHash } from '../../redux/types';
-import { x40, x64, x64_pad } from '../../functions';
+import { x40, x64, x64_plain } from '../../functions';
 
 import { defaultAbiCoder as abi } from 'ethers/lib/utils';
 import { randomBytes } from 'ethers/lib/utils';
@@ -15,7 +15,6 @@ import { expose } from 'threads/worker';
 
 const keccak = require('js-keccak-tiny/dist/node-bundle');
 let keccak256: (array: Uint8Array) => string;
-
 let worker: Worker | undefined;
 let worker_id = 0;
 
@@ -23,15 +22,18 @@ export interface Miner extends Function {
     (context: Context, nonce: Nonce): string
 }
 export type Context = {
-    token: Token,
     address: Address,
+    block_hash: BlockHash,
+    callback?: (item: Item) => void,
     interval: Interval,
-    block_hash: BlockHash
+    token: Token,
 };
 export type IWorker = WorkerModule<keyof {
     identifier: WorkerFunction;
     init: WorkerFunction;
     start: WorkerFunction;
+    pause: WorkerFunction;
+    resume: WorkerFunction;
     stop: WorkerFunction;
     reset: WorkerFunction;
 }>;
@@ -53,7 +55,7 @@ expose({
             const { keccak256: hash } = await keccak();
             keccak256 = (a) => hash(a).toString('hex');
         }
-        worker = new Worker(token, address, level);
+        worker = new Worker(token, address, level, meta);
         worker_id = meta.id;
     },
     start(
@@ -65,6 +67,18 @@ expose({
         return new Observable<Item>((observer) => {
             worker?.start(block_hash, (i) => observer.next(i));
         });
+    },
+    pause() {
+        if (worker === undefined) {
+            throw new Error(`no worker`);
+        }
+        worker.pause();
+    },
+    resume() {
+        if (worker === undefined) {
+            throw new Error(`no worker`);
+        }
+        worker.resume();
     },
     stop() {
         if (worker === undefined) {
@@ -83,15 +97,16 @@ expose({
 });
 class Worker {
     public constructor(
-        token: Token, address: Address, level: Level
+        token: Token, address: Address, level: Level, meta: {
+            id: number
+        }
     ) {
         this._amount = amount(token, level);
         this._context = {
-            token, address, block_hash: 0n, interval: interval()
+            address, block_hash: 0n, interval: interval(), token
         };
         this._miner = miner(level);
-        this._nonce = nonce();
-        this._running = false;
+        this._nonce = nonce(meta.id);
     }
     public start(
         block_hash: BlockHash,
@@ -101,8 +116,34 @@ class Worker {
             throw new Error('already running');
         } else {
             this.context.block_hash = block_hash;
+            this.context.callback = callback;
             this.running = true;
         }
+        this.iid = this.loop(callback);
+    }
+    public pause() {
+        if (this.iid) {
+            clearInterval(this.iid);
+            this.iid = undefined;
+        }
+    }
+    public resume() {
+        if (this.context.callback &&
+            this.iid === undefined
+        ) {
+            this.iid = this.loop(
+                this.context.callback
+            );
+        }
+    }
+    public stop() {
+        this._running = false;
+    }
+    public reset(block_hash: BlockHash) {
+        this.context.interval = interval();
+        this.context.block_hash = block_hash;
+    }
+    private loop(callback: (item: Item) => void) {
         let khz = 100, dt = 1, dt_outer = 1, dt_inner = 0;
         const iid = setInterval(() => {
             dt_outer = performance.now() - dt_outer;
@@ -125,13 +166,7 @@ class Worker {
             }
             dt_outer = performance.now();
         });
-    }
-    public stop() {
-        this._running = false;
-    }
-    public reset(block_hash: BlockHash) {
-        this.context.interval = interval();
-        this.context.block_hash = block_hash;
+        return iid;
     }
     private work() {
         const nonce = this.next_nonce;
@@ -145,6 +180,12 @@ class Worker {
     }
     private get context() {
         return this._context;
+    }
+    private get iid() {
+        return this._iid;
+    }
+    private set iid(value: NodeJS.Timer | undefined) {
+        this._iid = value;
     }
     private get miner() {
         return this._miner;
@@ -160,18 +201,21 @@ class Worker {
     }
     private _amount: (hash: string) => Amount;
     private _context: Context;
-    private _nonce: Nonce;
+    private _iid?: NodeJS.Timer;
     private _miner: Miner;
-    private _running: boolean;
+    private _nonce: Nonce;
+    private _running = false;
 }
 function interval() {
     const time = new Date().getTime();
     return Math.floor(time / 3_600_000);
 }
-function nonce() {
+function nonce(
+    offset: number, length = 2 ** 48
+) {
     const bytes = randomBytes(4);
     const view = new DataView(bytes.buffer);
-    return view.getUint32(0);
+    return view.getUint32(0) + offset * length;
 }
 function amount(
     token: Token, level: Level
@@ -205,7 +249,9 @@ function amount(
             return (hash: string) => 0n;
     }
 }
-function zeros(hash: string) {
+function zeros(
+    hash: string
+) {
     const match = hash.match(/^(?<zeros>0+)/);
     if (match && match.groups) {
         return BigInt(match.groups.zeros.length);
@@ -230,20 +276,20 @@ function abi_encoder(
         let value = abi_encoded[interval];
         if (value === undefined) {
             const template = abi.encode([
-                'string', 'uint256', 'address', 'uint256', 'bytes32'
+                'string', 'address', 'uint256', 'bytes32', 'uint256'
             ], [
                 'XPOW.' + token,
-                0,
                 x40(address),
                 interval,
-                x64(block_hash)
+                x64(block_hash),
+                0
             ]);
             abi_encoded[interval] = value = arrayify(template.slice(2));
-            array_cache[level] = arrayify(x64_pad(nonce));
+            array_cache[level] = arrayify(x64_plain(nonce));
             nonce_cache[level] = nonce;
         }
-        const array = lazy_arrayify(nonce, x64_pad(nonce));
-        value.set(array, 32);
+        const array = lazy_arrayify(nonce, x64_plain(nonce));
+        value.set(array, 128);
         return value;
     };
 }

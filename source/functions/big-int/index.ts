@@ -13,7 +13,7 @@ export function hex(
 ) {
     return '0x' + value.toString(16);
 }
-export function hex_pad(
+export function hex_plain(
     value: bigint | number, min_length: number
 ) {
     const string = value.toString(16);
@@ -27,7 +27,7 @@ export function x40(
     const length = min_length - string.length;
     return `0x${'0'.repeat(length)}` + string;
 }
-export function x40_pad(
+export function x40_plain(
     value: bigint | number, min_length = 40
 ) {
     const string = value.toString(16);
@@ -41,7 +41,7 @@ export function x64(
     const length = min_length - string.length;
     return `0x${'0'.repeat(length)}` + string;
 }
-export function x64_pad(
+export function x64_plain(
     value: bigint | number, min_length = 64
 ) {
     const string = value.toString(16);

@@ -1,5 +1,5 @@
+import { BigNumber, Contract, Event, Signer } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
-import { BigNumber, Contract, Event } from 'ethers';
 import { Blockchain } from '../blockchain';
 
 import XPOWER_ABI from '../xpower-abi.json';
@@ -27,14 +27,12 @@ export class XPower {
         }
         this._abi = abi;
     }
-    public connect(provider?: Web3Provider): Contract {
-        if (provider == undefined) {
-            provider = new Web3Provider(
-                Blockchain.provider
-            );
+    public connect(pos?: Web3Provider | Signer): Contract {
+        if (pos == undefined) {
+            pos = new Web3Provider(Blockchain.provider);
+            return this.contract.connect(pos.getSigner());
         }
-        const signer = provider.getSigner();
-        return this.contract.connect(signer);
+        return this.contract.connect(pos);
     }
     private get contract(): Contract {
         if (this._contract === undefined) {

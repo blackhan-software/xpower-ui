@@ -298,14 +298,19 @@
     {
         "inputs": [
             {
-                "internalType": "uint256",
-                "name": "nonce",
-                "type": "uint256"
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
             },
             {
                 "internalType": "bytes32",
                 "name": "blockHash",
                 "type": "bytes32"
+            },
+            {
+                "internalType": "uint256",
+                "name": "nonce",
+                "type": "uint256"
             }
         ],
         "name": "mint",
@@ -383,7 +388,7 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "recipient",
+                "name": "to",
                 "type": "address"
             },
             {
@@ -407,12 +412,12 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "sender",
+                "name": "from",
                 "type": "address"
             },
             {
                 "internalType": "address",
-                "name": "recipient",
+                "name": "to",
                 "type": "address"
             },
             {

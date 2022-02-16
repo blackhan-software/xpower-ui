@@ -1,0 +1,56 @@
+form#mining {
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+form#mining {
+  div.toggle-mining {
+    button#toggle-mining {
+      span.spinner {
+        margin-top: 0.25em;
+      }
+      span.spinner {
+        height: 1em;
+        width: 1em;
+      }
+      width: calc(100% - 147px);
+    }
+    button#select-token {
+      border-right: none;
+      border-radius: 0;
+      width: 105px;
+    }
+    width: 100%;
+  }
+  div.tweak-mining {
+    div.accelerator,
+    div.decelerator {
+      button#accelerate,
+      button#decelerate  {
+        width: 43px;
+      }
+      button#accelerate > svg,
+      button#decelerate > svg {
+        position: relative;
+        top: -1px;
+      }
+    }
+    div.progressor {
+      div.progress {
+        div.progress-bar {
+          background-color: var(--xp-powered);
+        }
+        div.progress-bar.with-indicator {
+          border-right: 1px dotted var(--xp-dimgray);
+        }
+        border: 3px double var(--xp-dimgray);
+        margin: calc(1em - 2px) 1em;
+        width: 100%;
+      }
+      border-top: 1px solid var(--xp-powered);
+      border-bottom: 1px solid var(--xp-powered);
+      width: calc(100% - 82.5px);
+    }
+    margin-top: 1em;
+    width: 100%;
+  }
+}

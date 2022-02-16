@@ -396,7 +396,7 @@
             },
             {
                 "internalType": "uint256",
-                "name": "kind",
+                "name": "level",
                 "type": "uint256"
             }
         ],
@@ -420,7 +420,7 @@
             },
             {
                 "internalType": "uint256[]",
-                "name": "kinds",
+                "name": "levels",
                 "type": "uint256[]"
             }
         ],
@@ -498,8 +498,13 @@
     {
         "inputs": [
             {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
                 "internalType": "uint256",
-                "name": "kind",
+                "name": "level",
                 "type": "uint256"
             },
             {
@@ -516,8 +521,13 @@
     {
         "inputs": [
             {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
                 "internalType": "uint256[]",
-                "name": "kinds",
+                "name": "levels",
                 "type": "uint256[]"
             },
             {

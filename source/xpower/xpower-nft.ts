@@ -1,5 +1,5 @@
+import { BigNumber, Contract, Event, Signer } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
-import { BigNumber, Contract, Event } from 'ethers';
 import { Blockchain } from '../blockchain';
 
 import XPOWER_NFT_ABI from '../xpower-nft-abi.json';
@@ -26,11 +26,7 @@ export type OnApprovalForAll = (
     approved: boolean,
     ev: Event
 ) => void;
-export type Meta = {
-    name: string,
-    description: string,
-    image: string
-};
+
 export class XPowerNft {
     public constructor(
         address: string, abi = XPOWER_NFT_ABI
@@ -44,14 +40,12 @@ export class XPowerNft {
         }
         this._abi = abi;
     }
-    public connect(provider?: Web3Provider): Contract {
-        if (provider == undefined) {
-            provider = new Web3Provider(
-                Blockchain.provider
-            );
+    public connect(pos?: Web3Provider | Signer): Contract {
+        if (pos == undefined) {
+            pos = new Web3Provider(Blockchain.provider);
+            return this.contract.connect(pos.getSigner());
         }
-        const signer = provider.getSigner();
-        return this.contract.connect(signer);
+        return this.contract.connect(pos);
     }
     private get contract(): Contract {
         if (this._contract === undefined) {
@@ -71,4 +65,9 @@ export class XPowerNft {
     private _address: string;
     private _contract: Contract | undefined;
 }
+export type Meta = {
+    name: string,
+    description: string,
+    image: string
+};
 export default XPowerNft;

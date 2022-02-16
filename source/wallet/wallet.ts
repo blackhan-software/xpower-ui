@@ -1,11 +1,12 @@
-import { hex, x40, x64 } from '../functions';
 import { BigNumber, Contract, Transaction, Event } from 'ethers';
+import { x40, x64 } from '../functions';
+import { OtfWallet } from './otf-wallet';
 import { Address, Allowance, Amount, Supply } from '../redux/types';
 import { Balance, BlockHash, Nonce, Timestamp } from '../redux/types';
-import { XPowerFactory } from '../xpower';
-import { OnInit as on_init } from '../xpower';
 import { OnApproval as on_approval } from '../xpower';
+import { OnInit as on_init } from '../xpower';
 import { OnTransfer as on_transfer } from '../xpower';
+import { XPowerFactory } from '../xpower';
 
 export type OnInit = (
     block_hash: BlockHash, timestamp: Timestamp, ev: Event
@@ -56,17 +57,23 @@ export class Wallet {
             spender_address, allowance
         );
     }
-    init(): Promise<Transaction> {
-        return this.contract.init();
+    async init(): Promise<Transaction> {
+        const contract = await OtfWallet.connect(
+            this.contract
+        );
+        return contract.init();
     }
-    mint(
-        nonce: Nonce, block_hash: BlockHash
+    async mint(
+        block_hash: BlockHash, nonce: Nonce
     ): Promise<Transaction> {
-        return this.contract.mint(
-            hex(nonce), x64(block_hash)
+        const contract = await OtfWallet.connect(
+            this.contract
+        );
+        return contract.mint(
+            this._address, x64(block_hash), x64(nonce)
         );
     }
-    onInit(
+    async onInit(
         handler: OnInit, { once } = { once: false }
     ) {
         const on_init: on_init = (
@@ -74,11 +81,17 @@ export class Wallet {
         ) => {
             handler(BigInt(block_hash), timestamp.toBigInt(), ev);
         };
+        const contract = await OtfWallet.connect(
+            this.contract
+        );
         if (once) {
-            this.contract.once('Init', on_init);
+            contract.once('Init', on_init);
         } else {
-            this.contract.on('Init', on_init);
+            contract.on('Init', on_init);
         }
+    }
+    offInit(handler: OnInit) {
+        this.contract.off('Init', handler);
     }
     onApproval(
         handler: OnApproval, { once } = { once: false }
@@ -93,6 +106,9 @@ export class Wallet {
         } else {
             this.contract.on('Approval', on_approval);
         }
+    }
+    offApproval(handler: OnApproval) {
+        this.contract.off('Approval', handler);
     }
     onTransfer(
         handler: OnTransfer, { once } = { once: false }
@@ -112,7 +128,10 @@ export class Wallet {
             this.contract.on('Transfer', on_transfer);
         }
     }
-    get address(): Address | string {
+    offTransfer(handler: OnTransfer) {
+        this.contract.off('Transfer', handler);
+    }
+    get address(): Address {
         return BigInt(this._address);
     }
     get balance(): Promise<Balance> {
@@ -123,13 +142,13 @@ export class Wallet {
         const supply = this.contract.totalSupply();
         return supply.then((s: BigNumber) => s.toBigInt());
     }
-    get contract(): Contract {
-        if (this._xpower === undefined) {
-            this._xpower = XPowerFactory();
+    private get contract(): Contract {
+        if (this._contract === undefined) {
+            this._contract = XPowerFactory();
         }
-        return this._xpower;
+        return this._contract;
     }
-    protected _address: string;
-    protected _xpower: Contract | undefined;
+    protected readonly _address: string;
+    protected _contract: Contract | undefined;
 }
 export default Wallet;

@@ -290,6 +290,9 @@ export class App {
     public static get logger(): boolean {
         return Parser.boolean(this.params.get('logger'), false);
     }
+    public static get auto_mint(): number {
+        return Parser.number(this.params.get('auto-mint'), 3000);
+    }
     public static get persist(): number {
         const element = document.getElementById('g-persistence');
         const fallback = Parser.number(element?.dataset.value, 0);

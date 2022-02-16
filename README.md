@@ -58,6 +58,7 @@ Then visit `http://localhost:3000`, connect your Metamask and start mining for t
 
 Name | Type | Default | Description
 -----|------|---------|------------
+auto-mint | number | 3000 | auto-mint interval in milliseconds
 clear | boolean | false | flag to clear current persistence slot (as defined by persist flag)
 clear-all | boolean | false | flag to clear all persistence slots
 logger | boolean | false | flag to log nonces to console

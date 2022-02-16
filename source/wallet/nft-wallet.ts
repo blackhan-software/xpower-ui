@@ -1,10 +1,11 @@
 import { BigNumber, Contract, Transaction, Event } from 'ethers';
+import { x40 } from '../functions';
+import { OtfWallet } from './otf-wallet';
 import { Address, Amount, Balance, Supply, Year } from '../redux/types';
 import { Nft, NftCoreId, NftIssue, NftLevel } from '../redux/types';
 import { Meta, XPowerNftFactory, XPowerNftMockFactory } from '../xpower';
 import { OnTransferBatch as on_transfer_batch } from '../xpower';
 import { OnTransferSingle as on_transfer_single } from '../xpower';
-import { x40 } from '../functions';
 
 export type OnTransferBatch = (
     operator: Address,
@@ -74,10 +75,25 @@ export class NftWallet {
         }
         return meta;
     }
-    mintBatch(
+    async mint(
+        level: NftLevel, amount: Amount
+    ): Promise<Transaction> {
+        const contract = await OtfWallet.connect(
+            this.contract
+        );
+        return contract.mint(
+            this._address, level, amount
+        );
+    }
+    async mintBatch(
         levels: NftLevel[], amounts: Amount[]
     ): Promise<Transaction> {
-        return this.contract.mintBatch(levels, amounts);
+        const contract = await OtfWallet.connect(
+            this.contract
+        );
+        return contract.mintBatch(
+            this._address, levels, amounts
+        );
     }
     onTransferBatch(
         handler: OnTransferBatch, { once } = { once: false }
@@ -154,10 +170,7 @@ export class NftWallet {
         return year.sub(delta_years).toBigInt();
     }
     get address(): Address {
-        if (typeof this._address === 'string') {
-            return BigInt(this._address);
-        }
-        return this._address;
+        return BigInt(this._address);
     }
     get contract(): Contract {
         if (this._contract === undefined) {
@@ -165,7 +178,7 @@ export class NftWallet {
         }
         return this._contract;
     }
-    protected _address: string;
+    protected readonly _address: string;
     protected _contract: Contract | undefined;
     protected _meta: Record<string, Meta> = {};
 }

@@ -32,7 +32,7 @@ export class Miner extends EventEmitter {
     }
     public async start(block_hash: BlockHash, callback: OnMined) {
         if (this.running) {
-            return;
+            throw new Error(`miner is running`);
         }
         this.emit('starting', {
             running: false, now: performance.now()
@@ -49,17 +49,51 @@ export class Miner extends EventEmitter {
                 ...item, worker: i
             }));
         }
+        this._paused = false;
     }
-    public async stop() {
-        if (this.running === false) {
+    public async pause() {
+        if (this._paused === false) {
+            this._paused = true;
+        } else {
             return;
         }
+        this.emit('pausing', {
+            running: this.running, now: performance.now()
+        });
+        for (const worker of this.workers) {
+            await worker.pause();
+        }
+        this.emit('paused', {
+            running: this.running, now: performance.now()
+        });
+    }
+    public async resume() {
+        if (this._paused) {
+            this._paused = false;
+        } else {
+            return;
+        }
+        this.emit('resuming', {
+            running: this.running, now: performance.now()
+        });
+        for (const worker of this.workers) {
+            await worker.resume();
+        }
+        this.emit('resumed', {
+            running: this.running, now: performance.now()
+        });
+    }
+    public async stop() {
+        this.emit('stopping', {
+            running: this.running, now: performance.now()
+        });
         while (this.workers.length > 0) {
             await this.fire();
         }
         this.emit('stopped', {
             running: this.running, now: performance.now()
         });
+        this._paused = false;
     }
     public accelerate(by = 1 / Miner.WORKERS_MAX): number {
         const old_speed = this.speed;
@@ -118,6 +152,7 @@ export class Miner extends EventEmitter {
     }
     private _address: Address;
     private _level: Level;
+    private _paused = false;
     private _speed: number;
     private _token: Token;
     private _workers: ModuleThread<IWorker>[] = [];
