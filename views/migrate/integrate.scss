@@ -1,0 +1,24 @@
+form#integration {
+  div.add-xpow.cpu,
+  div.add-xpow.gpu,
+  div.add-xpow.asic {
+    button {
+      margin-bottom: 0.5em;
+    }
+    button.add-xpow.cpu,
+    button.add-xpow.gpu,
+    button.add-xpow.asic {
+      img {
+        margin-top: 2px;
+      }
+      text-align: center;
+      width: calc(100% - 42px);
+    }
+    .info > svg {
+      position: relative;
+      top: -1px;
+    }
+    margin-bottom: 0.5em;
+    width: 100%;
+  }
+}

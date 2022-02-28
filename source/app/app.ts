@@ -134,7 +134,7 @@ export class App {
     }
     public static getNonceBy(query?: {
         address?: Address, block_hash?: BlockHash, amount?: Amount
-    },  index = 0): Nonce | undefined {
+    }, index = 0): Nonce | undefined {
         const { nonces } = this.me.store.getState();
         return nonceBy(nonces, query, index);
     }
@@ -306,6 +306,12 @@ export class App {
     }
     public static get token(): Token {
         return Tokenizer.token(this.params.get('token'));
+    }
+    public static get version() {
+        switch (this.params.get('version')) {
+            case 'v2': return 'v2';
+            default: return 'v3';
+        }
     }
     public static get params(): URLSearchParams {
         if (typeof document !== 'undefined') {

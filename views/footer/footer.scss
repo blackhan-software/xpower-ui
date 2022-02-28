@@ -31,6 +31,19 @@ footer {
             display: block;
         }
     }
+    a.migrate {
+        i.bi-capslock {
+            display: none;
+        }
+    }
+    a.migrate:hover {
+        i.bi-capslock-fill {
+            display: none;
+        }
+        i.bi-capslock {
+            display: block;
+        }
+    }
     a.smart-contract {
         i.bi-cpu {
             display: none;

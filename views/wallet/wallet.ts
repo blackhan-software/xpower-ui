@@ -138,8 +138,8 @@ $('#connect-metamask').on('connected', async function toggleOtfTransfer() {
         if (otf_balance.gt(min_balance)) {
             $otf_transfer.removeClass('deposit');
             $otf_transfer.addClass('withdraw');
-            $otf_transfer_i.removeClass('bi-arrow-down-square');
-            $otf_transfer_i.addClass('bi-arrow-up-square');
+            $otf_transfer_i.removeClass('bi-patch-plus');
+            $otf_transfer_i.addClass('bi-patch-minus');
             $otf_transfer.attr(
                 'title', 'Withdraw AVAX from minter to wallet address'
             );
@@ -147,8 +147,8 @@ $('#connect-metamask').on('connected', async function toggleOtfTransfer() {
         } else {
             $otf_transfer.removeClass('withdraw');
             $otf_transfer.addClass('deposit');
-            $otf_transfer_i.removeClass('bi-arrow-up-square');
-            $otf_transfer_i.addClass('bi-arrow-down-square');
+            $otf_transfer_i.removeClass('bi-patch-minus');
+            $otf_transfer_i.addClass('bi-patch-plus');
             $otf_transfer.attr(
                 'title', 'Deposit AVAX from wallet to minter address'
             );
@@ -200,7 +200,7 @@ async function withdrawOtf() {
         gasLimit: gas_limit, gasPrice: gas_price,
         to: x40(address), value
     });
-    tx.wait(1).then((receipt) => {
+    tx.wait(1).then(() => {
         $otf_transfer.removeClass('processing');
     });
     const $otf_transfer = $('#otf-wallet-transfer');

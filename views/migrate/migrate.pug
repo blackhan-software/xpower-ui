@@ -1,0 +1,67 @@
+form#allowance
+  label.form-label
+    | Allowance Approval
+  div.btn-group.approve-allowance.cpu(role="group")
+    button.approve-allowance.cpu.btn.btn-outline-warning(
+      type="button" disabled
+    )
+      | Approve Allowance for XPOW.CPUs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Approve allowance for the old XPOW.CPU tokens"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.approve-allowance.gpu(role="group")
+    button.approve-allowance.gpu.btn.btn-outline-warning(
+      type="button" disabled
+    )
+      | Approve Allowance for XPOW.GPUs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Approve allowance for the old XPOW.GPU tokens"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.approve-allowance.asic(role="group")
+    button.approve-allowance.asic.btn.btn-outline-warning(
+      type="button" disabled
+    )
+      | Approve Allowance for XPOW.ASICs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Approve allowance for the old XPOW.ASIC tokens"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+
+form#migration
+  label.form-label
+    | Migration Execution
+  div.btn-group.execute-migration.cpu(role="group")
+    button.execute-migration.cpu.btn.btn-outline-warning(
+      type="button" disabled
+    )
+      | Execute Migration of XPOW.CPUs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Execute migration of the old XPOW.CPU tokens"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.execute-migration.gpu(role="group")
+    button.execute-migration.gpu.btn.btn-outline-warning(
+      type="button" disabled
+    )
+      | Execute Migration of XPOW.GPUs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Execute migration of the old XPOW.GPU tokens"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.execute-migration.asic(role="group")
+    button.execute-migration.asic.btn.btn-outline-warning(
+      type="button" disabled
+    )
+      | Execute Migration of XPOW.ASICs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Execute migration of the old XPOW.ASIC tokens"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug

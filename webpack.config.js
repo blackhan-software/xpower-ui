@@ -9,6 +9,20 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { resolve } = require('path');
 const configuration = (options) => ({
     entry: {
+        about: [
+            './library/index.ts',
+            './views/theme/theme.ts',
+            './views/tooltips/tooltips.ts',
+            './views/about/about.ts',
+            './views/footer/footer.ts',
+        ],
+        error: [
+            './library/index.ts',
+            './views/theme/theme.ts',
+            './views/tooltips/tooltips.ts',
+            './views/error/error.ts',
+            './views/footer/footer.ts',
+        ],
         home: [
             './library/index.ts',
             './views/theme/theme.ts',
@@ -16,6 +30,14 @@ const configuration = (options) => ({
             './views/connector/connector.ts',
             './views/wallet/wallet.ts',
             './views/home/home.ts',
+            './views/footer/footer.ts',
+        ],
+        migrate: [
+            './library/index.ts',
+            './views/theme/theme.ts',
+            './views/tooltips/tooltips.ts',
+            './views/connector/connector.ts',
+            './views/migrate/index.ts',
             './views/footer/footer.ts',
         ],
         nfts: [
@@ -33,20 +55,6 @@ const configuration = (options) => ({
             './views/theme/theme.ts',
             './views/tooltips/tooltips.ts',
             './views/staking/staking.ts',
-            './views/footer/footer.ts',
-        ],
-        about: [
-            './library/index.ts',
-            './views/theme/theme.ts',
-            './views/tooltips/tooltips.ts',
-            './views/about/about.ts',
-            './views/footer/footer.ts',
-        ],
-        error: [
-            './library/index.ts',
-            './views/theme/theme.ts',
-            './views/tooltips/tooltips.ts',
-            './views/error/error.ts',
             './views/footer/footer.ts',
         ],
         worker: [
@@ -81,6 +89,14 @@ const configuration = (options) => ({
     plugins: [
         new (require('eslint-webpack-plugin'))({
             extensions: ['ts']
+        }),
+        new HTMLWebpackPlugin({
+            templateContent: pug.renderFile('./views/migrate/index.pug', {
+                ...env.default, filters, PAGE: 'migrate', TITLE: 'XPower: Migrate'
+            }),
+            filename: '../views/migrate/index.pig',
+            minify: false, inject: 'body',
+            chunks: ['migrate']
         }),
         new HTMLWebpackPlugin({
             templateContent: pug.renderFile('./views/home/home.pug', {

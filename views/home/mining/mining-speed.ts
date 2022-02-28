@@ -55,40 +55,41 @@ $('#decelerate').on('click', async function decelerate() {
 $('#connect-metamask').on('connected', function handlers(
     ev, { address }: Connect
 ) {
+    const miner = App.miner(address);
     const $acc = $('#accelerate');
     const $dec = $('#decelerate');
-    App.miner(address).on('accelerated', () => {
+    miner.on('accelerated', () => {
         Tooltip.getInstance($acc)?.hide();
         Tooltip.getInstance($dec)?.hide();
     });
-    App.miner(address).on('decelerated', () => {
+    miner.on('decelerated', () => {
         Tooltip.getInstance($acc)?.hide();
         Tooltip.getInstance($dec)?.hide();
     });
-    App.miner(address).on('accelerated', (ev) => {
+    miner.on('accelerated', (ev) => {
         const speed = ev.speed as number;
         $acc.prop('disabled', speed > 0.999);
         $dec.prop('disabled', speed < 0.001);
     });
-    App.miner(address).on('decelerated', (ev) => {
+    miner.on('decelerated', (ev) => {
         const speed = ev.speed as number;
         $acc.prop('disabled', speed > 0.999);
         $dec.prop('disabled', speed < 0.001);
     });
-    App.miner(address).on('starting', () => {
+    miner.on('starting', () => {
         $acc.prop('disabled', true);
         $dec.prop('disabled', true);
     });
-    App.miner(address).on('stopped', () => {
+    miner.on('stopped', () => {
         $acc.prop('disabled', false);
         $dec.prop('disabled', false);
     });
-    App.miner(address).on('accelerated', (ev) => {
+    miner.on('accelerated', (ev) => {
         $('#speed').trigger('change', {
             speed: ev.speed as number
         });
     });
-    App.miner(address).on('decelerated', (ev) => {
+    miner.on('decelerated', (ev) => {
         $('#speed').trigger('change', {
             speed: ev.speed as number
         });

@@ -220,34 +220,53 @@ function nonce(
 function amount(
     token: Token, level: Level
 ) {
+    const n_difficulty = difficulty({
+        /** @todo: adjust timestamp w.r.t. deployment */
+        timestamp: Date.parse('2022-03-15T00:00:00.000Z')
+    });
+    const n_level = BigInt(level);
     switch (token) {
         case Token.ASIC:
             return (hash: string) => {
                 const lhs_zeros = zeros(hash);
-                if (lhs_zeros >= level) {
-                    return 16n ** lhs_zeros - 1n;
+                if (lhs_zeros >= n_level && lhs_zeros > n_difficulty) {
+                    return 16n ** (lhs_zeros - n_difficulty) - 1n;
                 }
                 return 0n;
             };
         case Token.GPU:
             return (hash: string) => {
                 const lhs_zeros = zeros(hash);
-                if (lhs_zeros >= level) {
-                    return 2n ** lhs_zeros - 1n;
+                if (lhs_zeros >= n_level && lhs_zeros > n_difficulty) {
+                    return 2n ** (lhs_zeros - n_difficulty) - 1n;
                 }
                 return 0n;
             };
         case Token.CPU:
             return (hash: string) => {
                 const lhs_zeros = zeros(hash);
-                if (lhs_zeros >= level) {
-                    return lhs_zeros;
+                if (lhs_zeros >= n_level && lhs_zeros > n_difficulty) {
+                    return (lhs_zeros - n_difficulty);
                 }
                 return 0n;
             };
         default:
             return (hash: string) => 0n;
     }
+}
+function difficulty({
+    timestamp, days = 86_400_000n
+}: {
+    timestamp: bigint | number, days?: bigint
+}) {
+    if (typeof timestamp === 'number') {
+        timestamp = BigInt(timestamp);
+    }
+    const now = BigInt(new Date().getTime());
+    if (now - timestamp > 0n) {
+        return 100n * (now - timestamp) / (4n * 365_25n * days);
+    }
+    return 0n;
 }
 function zeros(
     hash: string

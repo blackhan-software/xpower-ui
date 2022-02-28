@@ -1,0 +1,28 @@
+form#allowance-nft {
+  div.approve-allowance-nft {
+    button.approve-allowance-nft {
+      width: calc(100% - 42px);
+      text-align: center;
+    }
+    .info > svg {
+      position: relative;
+      top: -1px;
+    }
+    margin-bottom: 0.5em;
+    width: 100%;
+  }
+}
+form#migration-nft {
+  div.execute-migration-nft {
+    button.execute-migration-nft {
+      text-align: center;
+      width: calc(100% - 42px);
+    }
+    .info > svg {
+      position: relative;
+      top: -1px;
+    }
+    margin-bottom: 0.5em;
+    width: 100%;
+  }
+}

@@ -1,19 +1,21 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import { App } from '../app';
 import { BigNumber, Contract } from 'ethers';
-import { Tokenizer } from '../token';
 import { NftLevel, Token } from '../../source/redux/types';
 import { MAX_YEAR } from '../../source/years';
+import { Tokenizer } from '../token';
 import { XPowerNft } from '.';
 
-export function XPowerNftFactory({ token, version }: {
-    token?: Token, version?: 'v1' | 'v2'
+export function XPowerNftFactory({
+    version, token
+}: {
+    version?: 'v2' | 'v3', token?: Token
 } = {}): Contract {
     if (version === undefined) {
-        version = App.params.get('nft') === 'v1' ? 'v1' : 'v2';
+        version = App.version;
     }
     const symbol = Tokenizer.symbolAlt(token ?? App.token);
-    const element_id = `#g-xpower-nft-address-${version}-${symbol}`;
+    const element_id = `#g-xpower-nft-address-${symbol}-${version}`;
     const address = $(element_id).data('value');
     if (!address) {
         throw new Error(`missing ${element_id}`);

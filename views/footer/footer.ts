@@ -12,11 +12,12 @@ $(window).on('load', function setContractAddress() {
 $('a.add-token').on('click', async function addToken() {
     if (Blockchain.isInstalled()) {
         if (await Blockchain.isAvalanche()) {
-            const symbol_alt = Tokenizer.symbolAlt(App.token);
-            const address = $(`#g-xpower-address-${symbol_alt}`).data('value');
-            const symbol = $(`#g-xpower-symbol-${symbol_alt}`).data('value');
-            const decimals = $(`#g-xpower-decimals-${symbol_alt}`).data('value');
-            const image = $(`#g-xpower-image-${symbol_alt}`).data('value');
+            const version = App.version;
+            const alt = Tokenizer.symbolAlt(App.token);
+            const address = $(`#g-xpower-address-${alt}-${version}`).data('value');
+            const symbol = $(`#g-xpower-symbol-${alt}-${version}`).data('value');
+            const decimals = $(`#g-xpower-decimals-${alt}-${version}`).data('value');
+            const image = $(`#g-xpower-image-${alt}-${version}`).data('value');
             await Blockchain.addToken({
                 address, symbol, decimals, image
             });

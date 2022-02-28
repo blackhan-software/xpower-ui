@@ -12,6 +12,7 @@ dotenv.config();
 import about from './routes/about';
 import error from './routes/error';
 import home from './routes/home';
+import migrate from './routes/migrate';
 import nfts from './routes/nfts';
 import ipfs from './routes/ipfs';
 import robots from './routes/robots';
@@ -41,11 +42,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // register views
 app.use('/', home);
+app.use('/about', about);
+app.use('/migrate', migrate);
 app.use('/nfts', nfts);
 app.use('/staking', staking);
-app.use('/about', about);
-app.use('/ipfs/*', ipfs);
 app.use('/robots.txt', robots);
+app.use('/ipfs/*', ipfs);
 app.use(error);
 
 export default app;
