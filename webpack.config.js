@@ -51,9 +51,7 @@ const configuration = ({
             './views/wallet/wallet-ui.tsx',
             './views/selector/selector.tsx',
             './views/location/location.ts',
-            './views/nfts/nfts.ts',
-            './views/header/header.tsx',
-            './views/footer/footer.tsx',
+            './views/nfts/nfts.tsx',
             './views/connector/connector.tsx',
         ],
         staking: [

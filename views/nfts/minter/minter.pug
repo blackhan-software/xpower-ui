@@ -1,12 +1,12 @@
 form#batch-minting
   div.btn-group.nft-batch-minter(
-    role="group" data-level=`${levels[index]}`
+    role="group"
   )
     button.btn.btn-outline-warning#toggle-all.no-ellipsis(
       type="button" data-bs-toggle="tooltip" data-bs-placement="top"
       title=`Show all NFT levels` data-state="off"
     )
-      i.bi-chevron-down
+      i.bi-chevron-double-down
     button.btn.btn-outline-warning#burn-approval(
       type="button" data-bs-toggle="tooltip" data-bs-placement="top"
       title="Approve burning of {{TOKEN}}s to enable NFT minting" disabled
