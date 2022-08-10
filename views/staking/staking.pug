@@ -64,8 +64,9 @@ block content
     include ../connector/connector.pug
     include ../wallet/wallet.pug
     include ../selector/selector.pug
-    include ./list/list.pug
-    include ./minter/minter.pug
+    div#ppts
+      include ./list/list.pug
+      include ./minter/minter.pug
 
 block footer
   include ../footer/footer.pug
