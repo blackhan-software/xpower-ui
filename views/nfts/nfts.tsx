@@ -310,3 +310,4 @@ if (require.main === module) {
         token: App.token
     }));
 }
+export default UiNfts;

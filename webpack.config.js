@@ -16,9 +16,7 @@ const configuration = ({
             './library/index.ts',
             './views/theme/theme.ts',
             './views/tooltips/tooltips.ts',
-            './views/about/about.ts',
-            './views/header/header.tsx',
-            './views/footer/footer.tsx',
+            './views/about/about.tsx',
         ],
         error: [
             './library/index.ts',
