@@ -1,5 +1,6 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
+const { mkdir } = require('fs/promises');
 const { resolve } = require('path');
 const pug = require('pug');
 
@@ -175,7 +176,10 @@ const configuration = ({
     },
     mode, ...options
 });
-module.exports = (env, args) => {
+module.exports = async (env, args) => {
+    await mkdir(resolve(__dirname, 'public', 'scripts'), {
+        recursive: true
+    });
     switch (args.mode) {
         case 'none':
         case 'production':
