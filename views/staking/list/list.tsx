@@ -67,7 +67,7 @@ export class PptList extends React.Component<
                 ? 'block' : 'none'
         };
         return <React.Fragment key={nft_level}>
-            <div className='btn-group nft-minter'
+            <div className='btn-group ppt-minter'
                 data-level={nft_name} role='group'
                 style={{ display: show.minter }}
             >
@@ -178,7 +178,7 @@ export class PptList extends React.Component<
     }
     componentDidUpdate() {
         const $toggles = document.querySelectorAll(
-            `.nft-minter .toggle`
+            `.ppt-minter .toggle`
         );
         $toggles.forEach(delayed(($toggle: HTMLElement) => {
             Tooltip.getInstance($toggle)?.hide();

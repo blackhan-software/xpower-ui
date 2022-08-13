@@ -5,63 +5,37 @@ const { resolve } = require('path');
 const pug = require('pug');
 
 const filters = require('./filters/pug-filters');
-const { Years } = require('./source/years');
-const YEARS = Array.from(Years());
 const env = require('./env');
 
 const configuration = ({
     mode, ...options
 }) => ({
     entry: {
-        about: [
+        spa: [
             './library/index.ts',
             './views/theme/theme.ts',
+            './views/location/location.ts',
+            './views/header/header.tsx',
+            './views/spa/spa.tsx',
+            './views/footer/footer.tsx',
             './views/tooltips/tooltips.ts',
-            './views/about/about.tsx',
         ],
         error: [
             './library/index.ts',
             './views/theme/theme.ts',
-            './views/tooltips/tooltips.ts',
-            './views/error/error.ts',
             './views/header/header.tsx',
+            './views/error/error.ts',
             './views/footer/footer.tsx',
-        ],
-        home: [
-            './library/index.ts',
-            './views/theme/theme.ts',
             './views/tooltips/tooltips.ts',
-            './views/location/location.ts',
-            './views/home/home.tsx',
         ],
         migrate: [
             './library/index.ts',
             './views/theme/theme.ts',
-            './views/tooltips/tooltips.ts',
-            './views/migrate/index.ts',
             './views/header/header.tsx',
+            './views/connector/connector.tsx',
+            './views/migrate/index.ts',
             './views/footer/footer.tsx',
-            './views/connector/connector.tsx',
-        ],
-        nfts: [
-            './library/index.ts',
-            './views/theme/theme.ts',
             './views/tooltips/tooltips.ts',
-            './views/wallet/wallet-ui.tsx',
-            './views/selector/selector.tsx',
-            './views/location/location.ts',
-            './views/nfts/nfts.tsx',
-            './views/connector/connector.tsx',
-        ],
-        staking: [
-            './library/index.ts',
-            './views/theme/theme.ts',
-            './views/tooltips/tooltips.ts',
-            './views/wallet/wallet-ui.tsx',
-            './views/selector/selector.tsx',
-            './views/location/location.ts',
-            './views/staking/staking.tsx',
-            './views/connector/connector.tsx',
         ],
         worker: [
             './source/miner/scripts/worker.ts',
@@ -100,9 +74,15 @@ const configuration = ({
             extensions: ['ts', 'tsx']
         }),
         new HTMLWebpackPlugin({
+            templateContent: pug.renderFile('./views/error/error.pug', {
+                ...env.default, filters, mode
+            }),
+            filename: '../views/error/error.pig',
+            minify: false, inject: 'body',
+            chunks: ['error']
+        }),
+        new HTMLWebpackPlugin({
             templateContent: pug.renderFile('./views/migrate/index.pug', {
-                DESCRIPTION: 'Upgrade old XPower tokens to v4',
-                PAGE: 'migrate', TITLE: 'XPower: Migrate',
                 ...env.default, filters, mode
             }),
             filename: '../views/migrate/index.pig',
@@ -110,54 +90,12 @@ const configuration = ({
             chunks: ['migrate']
         }),
         new HTMLWebpackPlugin({
-            templateContent: pug.renderFile('./views/home/home.pug', {
-                DESCRIPTION: 'Mine & Mint Proof-of-Work Tokens on Avalanche',
-                PAGE: 'home', TITLE: 'XPower',
+            templateContent: pug.renderFile('./views/spa/spa.pug', {
                 ...env.default, filters, mode
             }),
-            filename: '../views/home/home.pig',
+            filename: '../views/spa/spa.pig',
             minify: false, inject: 'body',
-            chunks: ['home']
-        }),
-        new HTMLWebpackPlugin({
-            templateContent: pug.renderFile('./views/nfts/nfts.pug', {
-                DESCRIPTION: 'Mint stakeable XPower NFTs on Avalanche',
-                PAGE: 'nfts', TITLE: 'XPower: NFTs', YEARS,
-                ...env.default, filters, mode
-            }),
-            filename: '../views/nfts/nfts.pig',
-            minify: false, inject: 'body',
-            chunks: ['nfts']
-        }),
-        new HTMLWebpackPlugin({
-            templateContent: pug.renderFile('./views/staking/staking.pug', {
-                DESCRIPTION: 'Stake minted XPower NFTs on Avalanche',
-                PAGE: 'staking', TITLE: 'XPower: NFT Staking', YEARS,
-                ...env.default, filters, mode
-            }),
-            filename: '../views/staking/staking.pig',
-            minify: false, inject: 'body',
-            chunks: ['staking']
-        }),
-        new HTMLWebpackPlugin({
-            templateContent: pug.renderFile('./views/about/about.pug', {
-                DESCRIPTION: 'Mine & Mint Proof-of-Work Tokens on Avalanche',
-                PAGE: 'about', TITLE: 'XPower: About',
-                ...env.default, filters, mode
-            }),
-            filename: '../views/about/about.pig',
-            minify: false, inject: 'body',
-            chunks: ['about']
-        }),
-        new HTMLWebpackPlugin({
-            templateContent: pug.renderFile('./views/error/error.pug', {
-                DESCRIPTION: 'Oops, something bad happened!',
-                PAGE: 'error', TITLE: 'XPower: Error',
-                ...env.default, filters, mode
-            }),
-            filename: '../views/error/error.pig',
-            minify: false, inject: 'body',
-            chunks: ['error']
+            chunks: ['spa']
         }),
         new MiniCssExtractPlugin({
             filename: '../styles/[name].[contenthash:8].css'

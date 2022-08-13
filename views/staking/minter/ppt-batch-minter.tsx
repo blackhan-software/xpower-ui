@@ -60,7 +60,7 @@ export class PptBatchMinter extends React.Component<
         const text = minting(status)
             ? <>Staking<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
             : <>Stake<span className="d-none d-sm-inline">&nbsp;NFTs</span></>;
-        return <button type='button' id='batch-minter'
+        return <button type='button' id='ppt-batch-minter'
             className={classes.join(' ')} disabled={disabled()}
             onClick={this.batchMint.bind(
                 this, token, list, container

@@ -3,27 +3,24 @@ import './nfts.scss';
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { update, x40 } from '../../source/functions';
-import { Amount, Balance, NftFullId, Token } from '../../source/redux/types';
-import { Nfts, Nft } from '../../source/redux/types';
+import { Amount, Balance, Token } from '../../source/redux/types';
+import { Nft, Nfts, NftFullId } from '../../source/redux/types';
 import { NftLevel, NftLevels } from '../../source/redux/types';
 import { NftToken, NftTokens } from '../../source/redux/types';
-import { MoeWallet, NftWallet, OnTransfer } from '../../source/wallet';
+import { NftWallet } from '../../source/wallet';
 import { OnTransferBatch } from '../../source/wallet';
 import { OnTransferSingle } from '../../source/wallet';
 import { Years } from '../../source/years';
 
 import React, { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Header } from '../header/header';
 import { NftList } from './list/list';
 import { NftMinter } from './minter/minter';
-import { Footer } from '../footer/footer';
 
 type Props = {
     token: Token;
 }
 type State = {
-    token: Token;
     nfts: Nfts;
     list: List;
     matrix: Matrix;
@@ -32,11 +29,11 @@ type Matrix = Record<NftToken, Record<NftLevel, {
     amount: Amount;
     max: Amount;
     min: Amount;
-}>>;
+}>>
 type List = Record<NftLevel, {
     display: boolean;
     toggled: boolean;
-}>;
+}>
 function matrix(
     amount = 0n, max = 0n, min = 0n
 ) {
@@ -100,42 +97,32 @@ function split(
 export class UiNfts extends React.Component<
     Props, State
 > {
-    constructor(props: Props) {
+    constructor(
+        props: Props
+    ) {
         super(props);
-        const { token } = this.props;
         this.state = {
-            token,
-            nfts: App.getNfts({ token: Nft.token(token) }),
-            list: list(), matrix: matrix(),
+            nfts: App.getNfts({
+                token: Nft.token(this.props.token)
+            }),
+            list: list(),
+            matrix: matrix(),
         };
         this.events();
     }
     events() {
-        App.onTokenSwitch((token) => this.setState({
-            token
-        }));
-        App.onNftChanged(async/*sync-nfts*/() => {
-            const nft_token = Nft.token(this.state.token);
+        App.onNftChanged(/*sync-nfts*/() => {
+            const nft_token = Nft.token(
+                this.props.token
+            );
             this.setState({
                 nfts: App.getNfts({ token: nft_token })
             });
         });
-        Blockchain.onConnect(async/*init-list*/({
-            address, token
-        }) => {
-            const moe_wallet = new MoeWallet(address, token);
-            reset(Nft.token(token), await moe_wallet.balance);
-        });
-        Blockchain.onceConnect(async/*sync-list*/({
-            address, token
-        }) => {
-            const on_transfer: OnTransfer = async () => {
-                reset(Nft.token(token), await moe_wallet.balance);
-            };
-            const moe_wallet = new MoeWallet(address, token);
-            moe_wallet.onTransfer(on_transfer);
-        }, {
-            per: () => App.token
+        App.onTokenChanged(/*sync-balance*/(
+            token: Token, { amount: balance }
+        ) => {
+            reset(Nft.token(token), balance);
         });
         const reset = (
             nft_token: NftToken, balance: Balance
@@ -157,10 +144,11 @@ export class UiNfts extends React.Component<
         };
     }
     render() {
-        const { token, list, matrix } = this.state;
+        const { token } = this.props;
         const nft_token = Nft.token(token);
+        const { list, matrix } = this.state;
         return <React.Fragment>
-            <form id='single-minting'>
+            <div id='nft-single-minting'>
                 <NftList
                     onList={(list) => {
                         const { lhs, rhs } = split(list);
@@ -173,8 +161,8 @@ export class UiNfts extends React.Component<
                     )}
                     token={token}
                 />
-            </form>
-            <form id='batch-minting'>
+            </div>
+            <div id='nft-batch-minting'>
                 <NftMinter
                     onList={(list) => {
                         const { lhs, rhs } = split(list);
@@ -187,7 +175,7 @@ export class UiNfts extends React.Component<
                     )}
                     token={token}
                 />
-            </form>
+            </div>
         </React.Fragment>;
     }
 }
@@ -297,16 +285,8 @@ Blockchain.onceConnect(async function onNftBatchTransfers({
     per: () => App.token
 });
 if (require.main === module) {
-    const $header = document.querySelector('header');
-    createRoot($header!).render(createElement(Header, {
-        token: App.token, page: App.page
-    }));
-    const $nfts = document.querySelector('div#nfts');
+    const $nfts = document.querySelector('content');
     createRoot($nfts!).render(createElement(UiNfts, {
-        token: App.token
-    }));
-    const $footer = document.querySelector('footer');
-    createRoot($footer!).render(createElement(Footer, {
         token: App.token
     }));
 }

@@ -4,15 +4,13 @@ import { Global } from '../../source/types';
 declare const global: Global;
 import './about.scss';
 
-import { capitalize } from '../../routes/functions';
 import { App } from '../../source/app';
 import { Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
+import { capitalize } from '../../routes/functions';
 
 import React, { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Header } from '../header/header';
-import { Footer } from '../footer/footer';
 
 const markdownit = global.markdownit as (options: any) => {
     use: (plugin: any, options?: any) => void,
@@ -25,7 +23,7 @@ const anchor = global.markdownItAnchor as {
 };
 type Props = {
     token: Token;
-    url: URL;
+    url?: URL;
 }
 type State = {
     html: string;
@@ -57,8 +55,21 @@ export class About extends React.Component<
         this.setState({ html: this.renderMarkdown(md, token) });
     }
     async fetchMarkdown(
-        url: URL
+        url?: URL
     ) {
+        if (!url) {
+            const $about_url = document.querySelector<HTMLElement>(
+                '#g-urls-about'
+            );
+            if (!$about_url) {
+                throw new Error('#g-urls-about missing');
+            }
+            const about_url = $about_url.dataset.value;
+            if (!about_url) {
+                throw new Error('#g-urls-about[data-value] missing');
+            }
+            url = new URL(about_url, location.origin);
+        }
         const fetched = await fetch(url.toString());
         return await fetched.text();
     }
@@ -92,12 +103,12 @@ export class About extends React.Component<
         return html;
     }
     render() {
-        return <span dangerouslySetInnerHTML={{
+        return <div id='md-content' dangerouslySetInnerHTML={{
             __html: this.state.html
-        }}/>;
+        }} />;
     }
     componentDidUpdate() {
-        const $content = document.querySelector('content');
+        const $content = document.querySelector('#md-content');
         this.renderKatex($content!);
         const anchor = location.hash;
         this.scrollToAnchor(anchor);
@@ -125,26 +136,8 @@ export class About extends React.Component<
     }
 }
 if (require.main === module) {
-    const $about_url = document.querySelector<HTMLElement>(
-        '#g-urls-about'
-    );
-    if (!$about_url) {
-        throw new Error('#g-urls-about missing');
-    }
-    const about_url = $about_url.dataset.value;
-    if (!about_url) {
-        throw new Error('#g-urls-about[data-value] missing');
-    }
-    const $header = document.querySelector('header');
-    createRoot($header!).render(createElement(Header, {
-        token: App.token, page: App.page
-    }));
     const $content = document.querySelector('content');
     createRoot($content!).render(createElement(About, {
-        token: App.token, url: new URL(about_url, location.origin)
-    }));
-    const $footer = document.querySelector('footer');
-    createRoot($footer!).render(createElement(Footer, {
         token: App.token
     }));
 }

@@ -10,6 +10,9 @@ router.use((req, res) => {
   res.locals.message = e.message;
   res.locals.error = req.app.get('env') === 'development' ? e : null;
   res.status(e.status);
-  res.render('error/error.pig', env_of(req));
+  res.render('error/error.pig', {
+    DESCRIPTION: 'Oops, something bad happened!',
+    TITLE: 'XPower: Error', ...env_of(req)
+  });
 });
 export default router;

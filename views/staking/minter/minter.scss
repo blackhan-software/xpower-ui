@@ -1,5 +1,5 @@
-form#batch-minting {
-  .nft-batch-minter {
+div#ppt-batch-minting {
+  .ppt-batch-minter {
     #toggle-all {
       min-width: 42px;
       width: 42px;
@@ -8,7 +8,7 @@ form#batch-minting {
       position: relative;
       top: 1px;
     }
-    #burn-approval {
+    #ppt-burn-approval {
       span.spinner {
         margin-top: 0.25em;
       }
@@ -20,7 +20,7 @@ form#batch-minting {
       border-right: none;
       width: calc(100% - 84px);
     }
-    #batch-minter {
+    #ppt-batch-minter {
       span.spinner {
         margin-top: 0.25em;
       }
@@ -33,10 +33,10 @@ form#batch-minting {
       display: none;
       width: calc(50% - 41px);
     }
-    #batch-minter.show {
+    #ppt-batch-minter.show {
       display: inline-block
     }
-    #batch-burner {
+    #ppt-batch-burner {
       span.spinner {
         margin-top: 0.25em;
       }
@@ -47,10 +47,10 @@ form#batch-minting {
       border-right: none;
       width: calc(50% - 41px);
     }
-    #batch-burner {
+    #ppt-batch-burner {
       display: none;
     }
-    #batch-burner.show {
+    #ppt-batch-burner.show {
       display: inline-block
     }
     margin-bottom: 1em;

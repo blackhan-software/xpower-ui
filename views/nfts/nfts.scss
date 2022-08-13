@@ -1,12 +1,3 @@
-@import "../index.scss";
-@import "../header/header.scss";
-@import "../connector/connector.scss";
-@import "../footer/footer.scss";
-
-form#selector {
-    margin-top: 1em;
-}
-
 @import "./list/list.scss";
 @import "./details/details.scss";
 @import "./minter/minter.scss";

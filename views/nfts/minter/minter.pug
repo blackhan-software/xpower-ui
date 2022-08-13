@@ -1,4 +1,4 @@
-form#batch-minting
+div#nft-batch-minting
   div.btn-group.nft-batch-minter(
     role="group"
   )
@@ -7,7 +7,7 @@ form#batch-minting
       title=`Show all NFT levels` data-state="off"
     )
       i.bi-chevron-double-down
-    button.btn.btn-outline-warning#burn-approval(
+    button.btn.btn-outline-warning#nft-burn-approval(
       type="button" data-bs-toggle="tooltip" data-bs-placement="top"
       title="Approve burning of {{TOKEN}}s to enable NFT minting" disabled
     )
@@ -15,7 +15,7 @@ form#batch-minting
         role="status" style="visibility: hidden"
       )
       span.text: | Approve NFT Minting
-    button.btn.btn-outline-warning#batch-minter(
+    button.btn.btn-outline-warning#nft-batch-minter(
       type="button" disabled
     )
       span.spinner.spinner-border.spinner-border-sm.float-start(

@@ -1,3 +1,5 @@
+import './connector.scss';
+
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { ChainId } from '../../source/blockchain';

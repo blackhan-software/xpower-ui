@@ -160,7 +160,7 @@ export class NftMinter extends Referable(React.Component)<
         const text = approving
             ? 'Approving NFT Minting…'
             : 'Approve NFT Minting';
-        return <button type='button' id='burn-approval'
+        return <button type='button' id='nft-burn-approval'
             className='btn btn-outline-warning'
             data-bs-placement='top' data-bs-toggle='tooltip'
             disabled={approving || approved || approved === null}
@@ -226,7 +226,7 @@ export class NftMinter extends Referable(React.Component)<
         const text = minting(status)
             ? 'Minting NFTs…'
             : 'Mint NFTs';
-        return <button type='button' id='batch-minter'
+        return <button type='button' id='nft-batch-minter'
             className={classes.join(' ')}
             disabled={this.disabled}
             onClick={this.batchMint.bind(this, list)}
@@ -333,7 +333,7 @@ export class NftMinter extends Referable(React.Component)<
             }
         }
         const $approval = document.querySelector<HTMLElement>(
-            '#burn-approval'
+            '#nft-burn-approval'
         );
         if ($approval) {
             Tooltip.getInstance($approval)?.hide();

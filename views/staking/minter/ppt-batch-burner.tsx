@@ -60,7 +60,7 @@ export class PptBatchBurner extends React.Component<
         const text = burning(status)
             ? <>Unstaking<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
             : <>Unstake<span className="d-none d-sm-inline">&nbsp;NFTs</span></>;
-        return <button type='button' id='batch-burner'
+        return <button type='button' id='ppt-batch-burner'
             className={classes.join(' ')} disabled={disabled()}
             onClick={this.batchBurn.bind(
                 this, token, list, container

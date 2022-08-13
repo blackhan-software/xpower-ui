@@ -1,6 +1,7 @@
 import './selector.scss';
 
 import { App } from '../../source/app';
+import { buffered } from '../../source/functions';
 import { Tokenizer } from '../../source/token';
 import { Token } from '../../source/redux/types';
 import { Tooltip } from '../tooltips';
@@ -8,26 +9,31 @@ import { Tooltip } from '../tooltips';
 import React, { createElement, MouseEvent } from 'react';
 import { createRoot } from 'react-dom/client';
 
-export class Selector extends React.Component<{
-    token: Token
-}, {
-    token: Token, switching: boolean
-}> {
+type Props = {
+    token: Token;
+}
+type State = {
+    switching: boolean;
+}
+function state() {
+    return { switching: false };
+}
+export class Selector extends React.Component<
+    Props, State
+> {
     constructor(props: {
         token: Token
     }) {
         super(props);
-        this.state = {
-            switching: false, token: this.props.token
-        };
+        this.state = state();
         this.events();
     }
     events() {
-        App.onTokenSwitch((token) => {
-            this.setState({ switching: true, token });
+        App.onTokenSwitch(() => {
+            this.setState({ switching: true });
         });
-        App.onTokenSwitched((token) => {
-            this.setState({ switching: false, token });
+        App.onTokenSwitched(() => {
+            this.setState({ switching: false });
         });
     }
     render() {
@@ -43,7 +49,7 @@ export class Selector extends React.Component<{
         token: Token
     ) {
         const selector = `selector-${Tokenizer.lower(token)}`;
-        const active = this.state.token === token ? 'active' : '';
+        const active = this.props.token === token ? 'active' : '';
         const disabled = this.state.switching ? 'pseudo-disabled' : '';
         const classes = [
             'btn btn-outline-warning', selector, active, disabled
@@ -78,7 +84,7 @@ export class Selector extends React.Component<{
     $image(
         token: Token
     ) {
-        const token_lc = Tokenizer.lower(this.state.token);
+        const token_lc = Tokenizer.lower(this.props.token);
         const fixed_lc = Tokenizer.lower(token);
         const classes = [
             'float-sm-start', this.hide(token) ? 'd-none' : '', token_lc
@@ -98,24 +104,23 @@ export class Selector extends React.Component<{
     show(
         token: Token
     ) {
-        const eq = this.state.token === token;
+        const eq = this.props.token === token;
         return eq && this.state.switching;
     }
     hide(
         token: Token
     ) {
-        const eq = this.state.token === token;
+        const eq = this.props.token === token;
         return eq && this.state.switching;
     }
-    componentDidUpdate() {
-        const token_lc = Tokenizer.lower(this.state.token);
+    componentDidUpdate = buffered(() => {
         const $selectors = document.getElementsByClassName(
-            `selector-${token_lc}`
+            `selector-${Tokenizer.lower(this.props.token)}`
         );
         if ($selectors.length) {
             Tooltip.getInstance($selectors[0])?.disable();
         }
-    }
+    })
 }
 function Spinner(
     state: { show: boolean }

@@ -15,10 +15,11 @@ router.get('/', (req, res) => {
   const { ODIN_IMAGE_V4a } = env;
   assert(ODIN_IMAGE_V4a, 'missing ODIN_IMAGE_V4a');
   res.render('migrate/index.pig', {
+    DESCRIPTION: 'Upgrade old XPower tokens to v4',
+    TITLE: 'XPower: Migrate', ...env_of(req),
     THOR_IMAGE: THOR_IMAGE_V4a,
     LOKI_IMAGE: LOKI_IMAGE_V4a,
     ODIN_IMAGE: ODIN_IMAGE_V4a,
-    ...env_of(req),
   });
 });
 export default router;

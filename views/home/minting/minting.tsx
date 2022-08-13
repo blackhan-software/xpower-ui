@@ -347,7 +347,7 @@ Blockchain.onceConnect(function autoMint({
     per: () => App.token
 });
 if (require.main === module) {
-    const $minting = document.querySelector('form#minting');
+    const $minting = document.querySelector('div#minting');
     createRoot($minting!).render(createElement(Minting, {
         token: App.token
     }));

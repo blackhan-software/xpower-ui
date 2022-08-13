@@ -1,5 +1,5 @@
-form#batch-minting
-  div.btn-group.nft-batch-minter(
+div#ppt-batch-minting
+  div.btn-group.ppt-batch-minter(
     role="group" data-level=`${levels[index]}`
   )
     button.btn.btn-outline-warning#toggle-all.no-ellipsis(
@@ -7,7 +7,7 @@ form#batch-minting
       title=`Show all NFT levels` data-state="off"
     )
       i.bi-chevron-double-down
-    button.btn.btn-outline-warning#burn-approval(
+    button.btn.btn-outline-warning#ppt-burn-approval(
       type="button" data-bs-toggle="tooltip" data-bs-placement="top"
       title="Approve staking (and unstaking) of NFTs" disabled
     )
@@ -15,14 +15,14 @@ form#batch-minting
         role="status" style="visibility: hidden"
       )
       span.text: | Approve NFT Staking
-    button.btn.btn-outline-warning#batch-minter(
+    button.btn.btn-outline-warning#ppt-batch-minter(
       type="button" disabled
     )
       span.spinner.spinner-border.spinner-border-sm.float-start(
         role="status" style="visibility: hidden"
       )
       span.text: | Stake<span class="d-none d-sm-inline"> NFTs</span>
-    button.btn.btn-outline-warning#batch-burner(
+    button.btn.btn-outline-warning#ppt-batch-burner(
       type="button" disabled
     )
       span.spinner.spinner-border.spinner-border-sm.float-start(

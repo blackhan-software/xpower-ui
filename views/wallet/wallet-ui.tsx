@@ -12,25 +12,25 @@ import { AftWalletUi } from './aft-wallet-ui';
 import { OtfWalletUi } from './otf-wallet-ui';
 import { CSSTransition } from 'react-transition-group';
 
-export class WalletUi extends React.Component<{
-    token: Token
-}, {
-    token: Token, toggled: boolean
-}> {
-    constructor(props: {
-        token: Token
-    }) {
+type Props = {
+    token: Token;
+}
+type State = {
+    toggled: boolean;
+}
+export class WalletUi extends React.Component<
+    Props, State
+> {
+    constructor(
+        props: Props
+    ) {
         super(props);
         this.state = {
-            toggled: OtfWallet.enabled,
-            ...this.props
+            toggled: OtfWallet.enabled
         };
         this.events();
     }
     events() {
-        App.onTokenSwitch((token) =>
-            this.setState({ token })
-        );
         OtfWallet.onToggled(({ toggled }) => {
             this.setState({ toggled });
         });
@@ -39,7 +39,8 @@ export class WalletUi extends React.Component<{
         this.setState({ toggled });
     }
     render() {
-        const { token, toggled } = this.state;
+        const { token } = this.props;
+        const { toggled } = this.state;
         return <React.Fragment>
             <AftWalletUi
                 onToggled={this.onToggled.bind(this)}
@@ -76,7 +77,7 @@ Blockchain.onceConnect(async function resumeMiningIf({
     otf_wallet.provider?.on('block', on_block);
 });
 if (require.main === module) {
-    const $wallet = document.querySelector('div#wallet');
+    const $wallet = document.querySelector('form#wallet');
     createRoot($wallet!).render(createElement(WalletUi, {
         token: App.token
     }));

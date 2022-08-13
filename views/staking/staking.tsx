@@ -9,23 +9,19 @@ import { Amount, NftFullId, Token } from '../../source/redux/types';
 import { Nfts, Nft } from '../../source/redux/types';
 import { NftLevel, NftLevels } from '../../source/redux/types';
 import { NftToken, NftTokens } from '../../source/redux/types';
-import { NftWallet, PptWallet } from '../../source/wallet';
-import { OnTransferBatch } from '../../source/wallet';
-import { OnTransferSingle } from '../../source/wallet';
+import { OnTransferBatch, OnTransferSingle } from '../../source/wallet';
+import { PptWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
 
 import React, { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Header } from '../header/header';
 import { PptList } from './list/list';
 import { PptMinter } from './minter';
-import { Footer } from '../footer/footer';
 
 type Props = {
     token: Token;
 }
 type State = {
-    token: Token;
     nfts: Nfts;
     ppts: Nfts;
     list: List;
@@ -35,11 +31,11 @@ type Matrix = Record<NftToken, Record<NftLevel, {
     amount: Amount;
     max: Amount;
     min: Amount;
-}>>;
+}>>
 type List = Record<NftLevel, {
     display: boolean;
     toggled: boolean;
-}>;
+}>
 function matrix(
     amount = 0n, max = 0n, min = 0n
 ) {
@@ -108,7 +104,6 @@ export class UiPpts extends React.Component<
         const { token } = this.props;
         const nft_token = Nft.token(token);
         this.state = {
-            token,
             nfts: App.getNfts({ token: nft_token }),
             ppts: App.getPpts({ token: nft_token }),
             list: list(), matrix: matrix(),
@@ -116,18 +111,15 @@ export class UiPpts extends React.Component<
         this.events();
     }
     events() {
-        App.onTokenSwitch((token) => this.setState({
-            token
-        }));
         App.onNftChanged(async/*sync-nfts*/() => {
-            const nft_token = Nft.token(this.state.token);
+            const nft_token = Nft.token(this.props.token);
             await update<State>.bind(this)({
                 nfts: App.getNfts({ token: nft_token })
             });
             reset(nft_token);
         });
         App.onPptChanged(async/*sync-ppts*/() => {
-            const nft_token = Nft.token(this.state.token);
+            const nft_token = Nft.token(this.props.token);
             await update<State>.bind(this)({
                 ppts: App.getPpts({ token: nft_token })
             });
@@ -157,10 +149,11 @@ export class UiPpts extends React.Component<
         };
     }
     render() {
-        const { token, list, matrix } = this.state;
+        const { token } = this.props;
         const nft_token = Nft.token(token);
+        const { list, matrix } = this.state;
         return <React.Fragment>
-            <form id='single-minting'>
+            <div id='ppt-single-minting'>
                 <PptList
                     onList={(list) => {
                         const { lhs, rhs } = split(list);
@@ -173,8 +166,8 @@ export class UiPpts extends React.Component<
                     )}
                     token={token}
                 />
-            </form>
-            <form id='batch-minting'>
+            </div>
+            <div id='ppt-batch-minting'>
                 <PptMinter
                     onList={(list) => {
                         const { lhs, rhs } = split(list);
@@ -187,47 +180,10 @@ export class UiPpts extends React.Component<
                     )}
                     token={token}
                 />
-            </form>
+            </div>
         </React.Fragment>;
     }
 }
-Blockchain.onceConnect(async function initNfts({
-    address, token
-}) {
-    let index = 0;
-    const levels = Array.from(NftLevels());
-    const issues = Array.from(Years()).reverse();
-    const wallet = new NftWallet(address, token);
-    const balances = await wallet.balances({ issues, levels });
-    const supplies = wallet.totalSupplies({ issues, levels });
-    const nft_token = Nft.token(
-        token
-    );
-    for (const issue of issues) {
-        for (const level of levels) {
-            const amount = balances[index];
-            const supply = await supplies[index];
-            App.setNft({
-                issue, level, token: nft_token
-            }, {
-                amount, supply
-            });
-            index += 1;
-        }
-    }
-}, {
-    per: () => App.token
-});
-Blockchain.onConnect(function syncNfts({
-    token
-}) {
-    const nfts = App.getNfts({
-        token: Nft.token(token)
-    });
-    for (const [id, nft] of Object.entries(nfts.items)) {
-        App.setNft(id as NftFullId, nft);
-    }
-});
 Blockchain.onceConnect(async function initPpts({
     address, token
 }) {
@@ -265,38 +221,36 @@ Blockchain.onConnect(function syncPpts({
         App.setPpt(id as NftFullId, ppt);
     }
 });
-Blockchain.onceConnect(async function onNftBatchTransfers({
+Blockchain.onceConnect(async function onPptSingleTransfers({
     address, token
 }) {
-    const on_transfer: OnTransferBatch = async (
-        op, from, to, ids, values, ev
+    const on_transfer: OnTransferSingle = async (
+        op, from, to, id, value, ev
     ) => {
         if (App.token !== token) {
             return;
         }
-        console.debug('[on:transfer-batch]',
+        console.debug('[on:transfer-single]',
             x40(op), x40(from), x40(to),
-            ids, values, ev
+            id, value, ev
         );
         const nft_token = Nft.token(
             token
         );
-        for (let i = 0; i < ids.length; i++) {
-            const nft_id = Nft.fullId({
-                issue: Nft.issue(ids[i]),
-                level: Nft.level(ids[i]),
-                token: nft_token
-            });
-            if (address === from) {
-                App.removeNft(nft_id, { amount: values[i] });
-            }
-            if (address === to) {
-                App.addNft(nft_id, { amount: values[i] });
-            }
+        const nft_id = Nft.fullId({
+            issue: Nft.issue(id),
+            level: Nft.level(id),
+            token: nft_token
+        });
+        if (address === from) {
+            App.removePpt(nft_id, { amount: value });
+        }
+        if (address === to) {
+            App.addPpt(nft_id, { amount: value });
         }
     };
-    const nft_wallet = new NftWallet(address, token);
-    nft_wallet.onTransferBatch(on_transfer);
+    const ppt_wallet = new PptWallet(address, token);
+    ppt_wallet.onTransferSingle(on_transfer)
 }, {
     per: () => App.token
 });
@@ -335,83 +289,17 @@ Blockchain.onceConnect(async function onPptBatchTransfers({
 }, {
     per: () => App.token
 });
-Blockchain.onceConnect(async function onNftSingleTransfers({
-    address, token
-}) {
-    const on_transfer: OnTransferSingle = async (
-        op, from, to, id, value, ev
-    ) => {
-        if (App.token !== token) {
-            return;
-        }
-        console.debug('[on:transfer-single]',
-            x40(op), x40(from), x40(to),
-            id, value, ev
-        );
-        const nft_token = Nft.token(
-            token
-        );
-        const nft_id = Nft.fullId({
-            issue: Nft.issue(id),
-            level: Nft.level(id),
-            token: nft_token
-        });
-        if (address === from) {
-            App.removeNft(nft_id, { amount: value });
-        }
-        if (address === to) {
-            App.addNft(nft_id, { amount: value });
-        }
-    };
-    const nft_wallet = new NftWallet(address, token);
-    nft_wallet.onTransferSingle(on_transfer)
-}, {
-    per: () => App.token
-});
-Blockchain.onceConnect(async function onPptSingleTransfers({
-    address, token
-}) {
-    const on_transfer: OnTransferSingle = async (
-        op, from, to, id, value, ev
-    ) => {
-        if (App.token !== token) {
-            return;
-        }
-        console.debug('[on:transfer-single]',
-            x40(op), x40(from), x40(to),
-            id, value, ev
-        );
-        const nft_token = Nft.token(
-            token
-        );
-        const nft_id = Nft.fullId({
-            issue: Nft.issue(id),
-            level: Nft.level(id),
-            token: nft_token
-        });
-        if (address === from) {
-            App.removePpt(nft_id, { amount: value });
-        }
-        if (address === to) {
-            App.addPpt(nft_id, { amount: value });
-        }
-    };
-    const ppt_wallet = new PptWallet(address, token);
-    ppt_wallet.onTransferSingle(on_transfer)
-}, {
-    per: () => App.token
-});
 Blockchain.onceConnect(async function updateClaims() {
     const moe_treasury = await MoeTreasuryFactory({
         token: App.token
     });
     moe_treasury.provider.on('block', buffered(() => {
         const $toggles = document.querySelectorAll<HTMLElement>(
-            '.nft-minter .toggle[data-state="on"]'
+            '.ppt-minter .toggle[data-state="on"]'
         );
         $toggles.forEach(($toggle) => {
             const $minter_on = ancestor($toggle, ($el) => {
-                return $el.classList.contains('nft-minter');
+                return $el.classList.contains('ppt-minter');
             });
             const $details = next($minter_on, ($el) => {
                 return $el.classList.contains('nft-details');
@@ -426,16 +314,8 @@ Blockchain.onceConnect(async function updateClaims() {
     }));
 });
 if (require.main === module) {
-    const $header = document.querySelector('header');
-    createRoot($header!).render(createElement(Header, {
-        token: App.token, page: App.page
-    }));
-    const $ppts = document.querySelector('div#ppts');
+    const $ppts = document.querySelector('content');
     createRoot($ppts!).render(createElement(UiPpts, {
-        token: App.token
-    }));
-    const $footer = document.querySelector('footer');
-    createRoot($footer!).render(createElement(Footer, {
         token: App.token
     }));
 }

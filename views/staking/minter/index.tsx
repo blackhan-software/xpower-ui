@@ -82,7 +82,7 @@ export class PptMinter extends Referable(React.Component)<
         const { token, list } = this.props;
         const { approval, toggled } = this.state;
         return <div
-            className='btn-group nft-batch-minter'
+            className='btn-group ppt-batch-minter'
             ref={this.ref('ppt-batch-minter')}
             role='group'
         >
@@ -146,7 +146,7 @@ export class PptMinter extends Referable(React.Component)<
         const text = approving
             ? 'Approving NFT Minting…'
             : 'Approve NFT Minting';
-        return <button type='button' id='burn-approval'
+        return <button type='button' id='ppt-burn-approval'
             className='btn btn-outline-warning'
             data-bs-placement='top' data-bs-toggle='tooltip'
             disabled={approving || approved || approved === null}
@@ -243,7 +243,7 @@ export class PptMinter extends Referable(React.Component)<
                 ex.message = `${ex.message} [${ex.data.message}]`;
             }
             const $ref = this.ref<HTMLElement>(
-                'nft-batch-minter'
+                'ppt-batch-minter'
             );
             alert(ex.message, Alert.warning, {
                 style: { margin: '-0.5em 0 0.5em 0' },
@@ -265,7 +265,7 @@ export class PptMinter extends Referable(React.Component)<
             }
         }
         const $approval = document.querySelector<HTMLElement>(
-            '#burn-approval'
+            '#ppt-burn-approval'
         );
         if ($approval) {
             Tooltip.getInstance($approval)?.hide();

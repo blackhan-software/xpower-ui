@@ -50,29 +50,29 @@ export class NftAmount extends Referable(
     startDecrease(
         e: MouseEvent | TouchEvent
     ) {
-        if (global.TID_DECREASE) {
-            clearTimeout(global.TID_DECREASE);
-            delete global.TID_DECREASE;
+        if (global.NFT_TID_DECREASE) {
+            clearTimeout(global.NFT_TID_DECREASE);
+            delete global.NFT_TID_DECREASE;
         }
-        global.TID_DECREASE = setTimeout(() => {
-            if (global.IID_DECREASE) {
-                clearTimeout(global.IID_DECREASE);
-                delete global.IID_DECREASE;
+        global.NFT_TID_DECREASE = setTimeout(() => {
+            if (global.NFT_IID_DECREASE) {
+                clearTimeout(global.NFT_IID_DECREASE);
+                delete global.NFT_IID_DECREASE;
             }
-            global.IID_DECREASE = setInterval(() => {
+            global.NFT_IID_DECREASE = setInterval(() => {
                 this.decrease(e);
             }, 10);
         }, 600);
         this.decrease(e);
     }
     stopDecrease() {
-        if (global.TID_DECREASE) {
-            clearTimeout(global.TID_DECREASE);
-            delete global.TID_DECREASE;
+        if (global.NFT_TID_DECREASE) {
+            clearTimeout(global.NFT_TID_DECREASE);
+            delete global.NFT_TID_DECREASE;
         }
-        if (global.IID_DECREASE) {
-            clearTimeout(global.IID_DECREASE);
-            delete global.IID_DECREASE;
+        if (global.NFT_IID_DECREASE) {
+            clearTimeout(global.NFT_IID_DECREASE);
+            delete global.NFT_IID_DECREASE;
         }
     }
     decrease(
@@ -149,29 +149,29 @@ export class NftAmount extends Referable(
     startIncrease(
         e: MouseEvent | TouchEvent
     ) {
-        if (global.TID_INCREASE) {
-            clearTimeout(global.TID_INCREASE);
-            delete global.TID_INCREASE;
+        if (global.NFT_TID_INCREASE) {
+            clearTimeout(global.NFT_TID_INCREASE);
+            delete global.NFT_TID_INCREASE;
         }
-        global.TID_INCREASE = setTimeout(() => {
-            if (global.IID_INCREASE) {
-                clearTimeout(global.IID_INCREASE);
-                delete global.IID_INCREASE;
+        global.NFT_TID_INCREASE = setTimeout(() => {
+            if (global.NFT_IID_INCREASE) {
+                clearTimeout(global.NFT_IID_INCREASE);
+                delete global.NFT_IID_INCREASE;
             }
-            global.IID_INCREASE = setInterval(() => {
+            global.NFT_IID_INCREASE = setInterval(() => {
                 this.increase(e);
             }, 10);
         }, 600);
         this.increase(e);
     }
     stopIncrease() {
-        if (global.TID_INCREASE) {
-            clearTimeout(global.TID_INCREASE);
-            delete global.TID_INCREASE;
+        if (global.NFT_TID_INCREASE) {
+            clearTimeout(global.NFT_TID_INCREASE);
+            delete global.NFT_TID_INCREASE;
         }
-        if (global.IID_INCREASE) {
-            clearTimeout(global.IID_INCREASE);
-            delete global.IID_INCREASE;
+        if (global.NFT_IID_INCREASE) {
+            clearTimeout(global.NFT_IID_INCREASE);
+            delete global.NFT_IID_INCREASE;
         }
     }
     increase(

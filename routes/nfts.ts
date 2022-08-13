@@ -1,15 +1,11 @@
 import { Nft, NftLevel, NftToken } from '../source/redux/types';
-import { capitalize, env_of, host } from './functions';
+import { capitalize, host } from './functions';
 import { join } from 'path';
 
 import env from '../env';
 import express from 'express';
 const router = express.Router();
 
-/** GET nfts page. */
-router.get('/', (req, res) => {
-  res.render('nfts/nfts.pig', env_of(req));
-});
 /** GET nfts/{token}/{id}.json metadata. */
 router.get('/:token/:id.json', (req, res) => {
   const { token, id } = req.params;

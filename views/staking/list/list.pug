@@ -1,10 +1,10 @@
-form#single-minting
+div#ppt-single-minting
   label.form-label(for="minting")
     | Stake & Manage {{TOKEN}} NFTs
   - let levels = ["UNIT", "KILO", "MEGA", "GIGA", "TERA", "PETA", "EXA", "ZETTA", "YOTTA", "1E27"]
   - let index = 0
   while index < 9
-    div.btn-group.nft-minter(
+    div.btn-group.ppt-minter(
       role="group" data-level=`${levels[index]}` style="display: none"
     )
       div.btn-group(role="group")

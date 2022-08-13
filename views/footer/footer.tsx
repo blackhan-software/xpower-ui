@@ -1,3 +1,5 @@
+import './footer.scss';
+
 import { App } from '../../source/app/app';
 import { Blockchain } from '../../source/blockchain';
 import { ChainId } from '../../source/blockchain';
@@ -40,9 +42,12 @@ export class Footer extends React.Component<{
         const host = Footer.host;
         const token = this.state.token;
         const year = new Date().getFullYear();
-        return <nav
-            className='navbar px-2 py-0'
-        >
+        const classes = [
+            'navbar', 'px-2 py-0'
+        ];
+        return <nav className={
+            classes.join(' ')
+        }>
             <ul className='navbar-nav'>
                 <li className='nav-item'>
                     <span>&copy;</span>

@@ -1,116 +1,76 @@
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
-import { x40 } from '../../source/functions';
-import { Address, Amount, Token } from '../../source/redux/types';
+import { nice } from '../../filters';
+import { buffered, update, x40 } from '../../source/functions';
+import { Address, Amount, Token, Tokens } from '../../source/redux/types';
 import { MoeWallet, OnTransfer } from '../../source/wallet';
 import { Tooltip } from '../tooltips';
 
 import React from 'react';
 import { InfoCircle } from '../../public/images/tsx';
 
-export class AftWalletUi extends React.Component<{
-    onToggled: (toggled: boolean) => void,
-    toggled: boolean,
-    token: Token,
-}, {
-    address: Address | null,
-    amount: Amount | null,
-    token: Token,
-}> {
-    constructor(props: {
-        onToggled: (toggled: boolean) => void,
-        toggled: boolean,
-        token: Token,
-    }) {
+type Props = {
+    onToggled: (toggled: boolean) => void;
+    toggled: boolean;
+    token: Token;
+}
+type State = {
+    address: Address | null;
+    balance: Record<Token, Amount | null>;
+}
+function state() {
+    return { address: null, balance: balance() };
+}
+function balance() {
+    const balance = {} as State['balance'];
+    for (const token of Tokens()) {
+        balance[token] = null;
+    }
+    return balance;
+}
+export class AftWalletUi extends React.Component<
+    Props, State
+> {
+    constructor(
+        props: Props
+    ) {
         super(props);
-        this.state = {
-            address: null, amount: null, ...this.props
-        };
+        this.state = state();
         this.events();
     }
     events() {
-        Blockchain.onceConnect(function onTransfer({
-            address, token
-        }) {
-            const on_transfer: OnTransfer = async (
-                from, to, amount
-            ) => {
-                if (App.token !== token) {
-                    return;
-                }
-                console.debug(
-                    '[on:transfer]', x40(from), x40(to), amount
-                );
-                if (address === from || address === to) {
-                    const [amount, supply] = await Promise.all([
-                        moe_wallet.balance, moe_wallet.supply
-                    ]);
-                    App.setToken(token, { amount, supply });
-                }
-            };
-            const moe_wallet = new MoeWallet(address, token);
-            moe_wallet.onTransfer(on_transfer);
-        }, {
-            per: () => App.token
-        });
-        Blockchain.onceConnect(async function initialize({
-            address, token
-        }) {
-            const moe_wallet = new MoeWallet(address, token);
-            const [amount, supply] = await Promise.all([
-                moe_wallet.balance, moe_wallet.supply
-            ]);
-            App.setToken(token, { amount, supply });
-        }, {
-            per: () => App.token
-        });
-        Blockchain.onConnect(function synchronize({
-            token
-        }) {
-            const tokens = App.getTokens(token);
-            const item = tokens.items[token];
-            if (item) {
-                App.setToken(token, item);
-            }
-        });
         Blockchain.onceConnect(({ address }) =>
             this.setState({ address })
         );
-        App.onTokenSwitch((token) =>
-            this.setState({ token })
-        );
         App.onTokenChanged((token: Token, {
-            amount
+            amount: balance
         }) => {
-            if (token === this.state.token) {
-                this.setState({ amount });
-            }
+            update<State>.bind(this)({
+                balance: { [token]: balance }
+            })
         });
     }
     render() {
-        const { address, amount, token } = this.state;
-        const { toggled } = this.props;
-        return <form
-            id='aft-wallet' onSubmit={(e) => e.preventDefault()}
-        >
+        const { toggled, token } = this.props;
+        const { address, balance } = this.state;
+        return <div id='aft-wallet'>
             <label className='form-label'>
                 Wallet Address and {token} Balance
             </label>
             <div className='input-group wallet-address'>
                 {this.$toggle(toggled)}
                 {this.$address(address)}
-                {this.$balance(amount, token)}
+                {this.$balance(balance[token], token)}
                 {this.$info(token)}
             </div>
-        </form>;
+        </div>;
     }
     $toggle(
         toggled: boolean
     ) {
-        return <button
+        return <button id='otf-wallet-toggle'
             className='form-control input-group-text'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            id='otf-wallet-toggle'
             onClick={this.toggle.bind(this, toggled)}
             role='button'
             title={this.title(toggled)}
@@ -153,30 +113,73 @@ export class AftWalletUi extends React.Component<{
         return <input readOnly
             className='form-control' id='aft-wallet-balance'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            type='text' value={(amount ?? 0n).toString()}
+            type='text' value={nice(amount ?? 0n)}
             title={`Balance of proof-of-work ${token} tokens`}
         />;
     }
     $info(
         token: Token
     ) {
-        return <button
+        return <button role='tooltip'
             className='form-control input-group-text info'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            role='tooltip'
             title={`Wallet address & balance of ${token} tokens`}
         >
             {InfoCircle({ fill: true })}
         </button>;
     }
-    componentDidUpdate() {
+    componentDidUpdate = buffered(() => {
         const $otf_toggle = document.getElementById(
             'otf-wallet-toggle'
         );
-        if ($otf_toggle) setTimeout(() => {
+        if ($otf_toggle) {
             Tooltip.getInstance($otf_toggle)?.dispose();
             Tooltip.getOrCreateInstance($otf_toggle);
-        }, 200);
-    }
+        }
+    })
 }
+Blockchain.onceConnect(async function initialize({
+    address, token
+}) {
+    const moe_wallet = new MoeWallet(address, token);
+    const [amount, supply] = await Promise.all([
+        moe_wallet.balance, moe_wallet.supply
+    ]);
+    App.setToken(token, { amount, supply });
+}, {
+    per: () => App.token
+});
+Blockchain.onConnect(function synchronize({
+    token
+}) {
+    const tokens = App.getTokens(token);
+    const item = tokens.items[token];
+    if (item) {
+        App.setToken(token, item);
+    }
+});
+Blockchain.onceConnect(function onTransfer({
+    address, token
+}) {
+    const on_transfer: OnTransfer = async (
+        from, to, amount
+    ) => {
+        if (App.token !== token) {
+            return;
+        }
+        console.debug(
+            '[on:transfer]', x40(from), x40(to), amount
+        );
+        if (address === from || address === to) {
+            const [amount, supply] = await Promise.all([
+                moe_wallet.balance, moe_wallet.supply
+            ]);
+            App.setToken(token, { amount, supply });
+        }
+    };
+    const moe_wallet = new MoeWallet(address, token);
+    moe_wallet.onTransfer(on_transfer);
+}, {
+    per: () => App.token
+});
 export default AftWalletUi;

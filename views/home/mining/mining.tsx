@@ -97,7 +97,7 @@ Blockchain.onceConnect(function benchmarkMining({
     per: () => App.token
 });
 if (require.main === module) {
-    const $mining = document.querySelector('form#mining');
+    const $mining = document.querySelector('div#mining');
     createRoot($mining!).render(createElement(Mining, {
         token: App.token, speed: App.speed
     }));

@@ -1,33 +1,43 @@
-/* eslint @typescript-eslint/no-explicit-any: [off] */
-import { Tokenizer } from '../source/token';
 import { env_of } from './functions';
-import express from 'express';
-const router = express.Router();
+import { Router } from 'express';
+const router = Router();
 
 import { readdir } from 'fs/promises';
 import { join, sep } from 'path';
 
 function routes(
-  home_env: Record<string, string>
+  spa_env: Record<string, string>
 ) {
   /** REDIRECT to home page. */
   router.get('/', (req, res) => {
     res.redirect('/home');
   });
   /** GET home page. */
-  router.get('/home', async (req, res) => {
-    const params = new URLSearchParams(req.query as any);
-    const token = Tokenizer.token(params.get('token'));
-    const amounts: Record<string, bigint> = {};
-    const levels: Record<string, number> = {};
-    for (let i = 1; i <= 64; i++) {
-      amounts[`AMOUNT_${i}`] = Tokenizer.amount(
-        token, i
-      );
-      levels[`LEVEL_${i}`] = i;
-    }
-    res.render('home/home.pig', {
-      ...env_of(req), ...home_env, ...amounts, ...levels
+  router.get('/home', (req, res) => {
+    res.render('spa/spa.pig', {
+      DESCRIPTION: 'Mine & Mint Proof-of-Work Tokens on Avalanche',
+      TITLE: 'XPower', ...env_of(req), ...spa_env
+    });
+  });
+  /** GET nfts page. */
+  router.get('/nfts', (req, res) => {
+    res.render('spa/spa.pig', {
+      DESCRIPTION: 'Mint stakeable XPower NFTs on Avalanche',
+      TITLE: 'XPower: NFTs', ...env_of(req), ...spa_env
+    });
+  });
+  /** GET staking page. */
+  router.get('/staking', (req, res) => {
+    res.render('spa/spa.pig', {
+      DESCRIPTION: 'Stake minted XPower NFTs on Avalanche',
+      TITLE: 'XPower: Staking', ...env_of(req), ...spa_env
+    });
+  });
+  /** GET about page. */
+  router.get('/about', (req, res) => {
+    res.render('spa/spa.pig', {
+      DESCRIPTION: 'Mine & Mint Proof-of-Work Tokens on Avalanche',
+      TITLE: 'XPower: About', ...env_of(req), ...spa_env
     });
   });
 }

@@ -2,10 +2,25 @@ extends ../index
 
 block styles
   include ../theme/theme.pug
+  link(
+    href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"
+    integrity="sha256-uik/hNqHWZldXh/0K35nqOSCff9F61/ZOFReqNOBgB0="
+    crossorigin="anonymous" rel="stylesheet")
 
 block globals
   include ../global/global.pug
-
+  //-
+  //- Home:
+  //-
+  span#g-mining-speed(
+    style="display:none" data-value=`${UI_MINING_SPEED}`)
+  span#g-persistence(
+    style="display:none" data-value=`${UI_PERSISTENCE}`)
+  span#g-worker-path(
+    style="display:none" data-value="{{UI_WORKER_PATH}}")
+  //-
+  //- Nfts:
+  //-
   span#g-THOR_NFT_v2a(
     style="display:none" data-value=`${THOR_NFT_V2a}`)
   span#g-LOKI_NFT_v2a(
@@ -33,7 +48,9 @@ block globals
     style="display:none" data-value=`${LOKI_NFT_V4a}`)
   span#g-ODIN_NFT_v4a(
     style="display:none" data-value=`${ODIN_NFT_V4a}`)
-
+  //-
+  //- Ppts:
+  //-
   span#g-THOR_PPT_v4a(
     style="display:none" data-value=`${THOR_PPT_V4a}`)
   span#g-LOKI_PPT_v4a(
@@ -54,18 +71,35 @@ block globals
     style="display:none" data-value=`${LOKI_MOE_TREASURY_V4a}`)
   span#g-ODIN_MOE_TREASURY_v4a(
     style="display:none" data-value=`${ODIN_MOE_TREASURY_V4a}`)
+  //-
+  //- About:
+  //-
+  span#g-urls-about(
+    style="display:none" data-value=`${MD_ABOUT_URL}`)
 
 block header
   include ../header/header.pug
 
 block content
   content
-    h1: | #{DESCRIPTION} <img src="/images/png/avalanche-icon/avalanche-64x64.png" height="24" width="24" />
-    include ../connector/connector.pug
-    include ../wallet/wallet.pug
-    include ../selector/selector.pug
-    include ./list/list.pug
-    include ./minter/minter.pug
 
 block footer
   include ../footer/footer.pug
+
+block scripts
+  script(
+    src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"
+    integrity="sha256-6xggdIcWFnTnFwh8MX2xSsGmLa2uzMuAJJnOFzv+tzk="
+    crossorigin="anonymous" defer)
+  script(
+    src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"
+    integrity="sha256-y39Mpg7V3D4lhBX4x6O0bUqTV4pSrfgwEfGKfxkOdgI="
+    crossorigin="anonymous" defer)
+  script(
+    src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"
+    integrity="sha256-hNyljag6giCsjv/yKmxK8/VeHzvMDvc5u8AzmRvm1BI="
+    crossorigin="anonymous")
+  script(
+    src="https://cdn.jsdelivr.net/npm/markdown-it-anchor@8.6.4/dist/markdownItAnchor.umd.js"
+    integrity="sha256-is0GToRxOcbAVq2XJvDAs5V0jnjYaKezgbMHdjB2r+E="
+    crossorigin="anonymous")

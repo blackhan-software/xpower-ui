@@ -1,4 +1,4 @@
-form#batch-minting {
+div#nft-batch-minting {
   .nft-batch-minter {
     #toggle-all {
       min-width: 42px;
@@ -8,7 +8,7 @@ form#batch-minting {
       position: relative;
       top: 1px;
     }
-    #burn-approval {
+    #nft-burn-approval {
       span.spinner {
         margin-top: 0.25em;
       }
@@ -20,7 +20,7 @@ form#batch-minting {
       border-right: none;
       width: calc(100% - 84px);
     }
-    #batch-minter {
+    #nft-batch-minter {
       span.spinner {
         margin-top: 0.25em;
       }
@@ -33,7 +33,7 @@ form#batch-minting {
       display: none;
       width: calc(100% - 84px);
     }
-    #batch-minter.show {
+    #nft-batch-minter.show {
       display: inline-block;
     }
     margin-bottom: 1em;

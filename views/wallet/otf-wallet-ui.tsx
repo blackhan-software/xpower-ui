@@ -1,5 +1,5 @@
 import { Blockchain } from '../../source/blockchain';
-import { x40 } from '../../source/functions';
+import { buffered, x40 } from '../../source/functions';
 import { Address, Amount } from '../../source/redux/types';
 import { OtfWallet } from '../../source/wallet';
 
@@ -11,28 +11,33 @@ import { Tooltip } from '../tooltips';
 import React from 'react';
 import { InfoCircle } from '../../public/images/tsx';
 
-export class OtfWalletUi extends React.Component<{
-    toggled: boolean,
-}, {
-    address: Address | null,
-    amount: Amount | null,
-    processing: boolean,
-}> {
+type Props = {
+    toggled: boolean;
+}
+type State = {
+    address: Address | null;
+    amount: Amount | null;
+    processing: boolean;
+}
+export class OtfWalletUi extends React.Component<
+    Props, State
+> {
     get threshold() {
         return OtfWallet.threshold;
     }
-    constructor(props: {
-        toggled: boolean
-    }) {
+    constructor(
+        props: Props
+    ) {
         super(props);
         this.state = {
-            address: null, amount: null,
-            processing: false, ...this.props
+            address: null,
+            amount: null,
+            processing: false,
         };
         this.events();
     }
     events() {
-        Blockchain.onceConnect(async /*initialize*/() => {
+        Blockchain.onceConnect(async/*initialize*/() => {
             const otf_wallet = await OtfWallet.init();
             const [otf_address, otf_balance] = await Promise.all([
                 otf_wallet.getAddress(), otf_wallet.getBalance()
@@ -42,22 +47,23 @@ export class OtfWalletUi extends React.Component<{
                 amount: otf_balance.toBigInt()
             });
         });
-        Blockchain.onceConnect(async /*synchronize*/() => {
+        Blockchain.onceConnect(async/*synchronize*/() => {
             const on_block = async () => {
                 const otf_balance = await otf_wallet.getBalance();
                 this.setState({ amount: otf_balance.toBigInt() });
             };
             const otf_wallet = await OtfWallet.init();
-            otf_wallet.provider?.on('block', on_block);
+            otf_wallet.provider?.on('block', () => {
+                if (this.props.toggled) on_block();
+            });
         });
     }
     render() {
-        const { address, amount, processing } = this.state;
         const { toggled } = this.props;
-        return <form
-            className={this.display(toggled)}
-            id='otf-wallet' onSubmit={(e) => e.preventDefault()}
-        >
+        const { address, amount, processing } = this.state;
+        return <div id='otf-wallet' className={
+            this.display(toggled)
+        }>
             <label className='form-label'>
                 Minter Address and AVAX Balance
             </label>
@@ -67,7 +73,7 @@ export class OtfWalletUi extends React.Component<{
                 {this.$balance(amount)}
                 {this.$info()}
             </div>
-        </form>;
+        </div>;
     }
     display(
         toggled: boolean
@@ -85,10 +91,9 @@ export class OtfWalletUi extends React.Component<{
             'spinner spinner-border spinner-border-sm',
             'float-start'
         ];
-        return <button
+        return <button id='otf-wallet-transfer'
             className={outer_classes.join(' ')}
             data-bs-toggle='tooltip' data-bs-placement='top'
-            id='otf-wallet-transfer'
             onClick={this.transact.bind(this, amount, processing)}
             title={this.title(amount)}
         >
@@ -179,7 +184,7 @@ export class OtfWalletUi extends React.Component<{
             {InfoCircle({ fill: true })}
         </button>;
     }
-    componentDidUpdate() {
+    componentDidUpdate = buffered(() => {
         const $otf_transfer = document.getElementById(
             'otf-wallet-transfer'
         );
@@ -187,7 +192,7 @@ export class OtfWalletUi extends React.Component<{
             Tooltip.getInstance($otf_transfer)?.dispose();
             Tooltip.getOrCreateInstance($otf_transfer);
         }
-    }
+    })
 }
 async function depositOtf(
     this: OtfWalletUi, processing: boolean
