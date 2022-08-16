@@ -16,6 +16,7 @@ body {
 body {
   background-color: var(--xp-dimgray);
   color: var(--xp-powered);
+  overflow-y: scroll;
 }
 body.container {
   margin-right: auto;
