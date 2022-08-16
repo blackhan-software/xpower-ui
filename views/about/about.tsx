@@ -108,7 +108,9 @@ export class About extends React.Component<
         }} />;
     }
     componentDidUpdate() {
-        const $content = document.querySelector('#md-content');
+        const $content = document.querySelector(
+            '#md-content'
+        );
         this.renderKatex($content!);
         const anchor = location.hash;
         this.scrollToAnchor(anchor);

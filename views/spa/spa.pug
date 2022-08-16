@@ -5,7 +5,7 @@ block styles
   link(
     href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"
     integrity="sha256-uik/hNqHWZldXh/0K35nqOSCff9F61/ZOFReqNOBgB0="
-    crossorigin="anonymous" rel="stylesheet")
+    crossorigin="anonymous" rel="stylesheet" defer)
 
 block globals
   include ../global/global.pug
@@ -98,8 +98,8 @@ block scripts
   script(
     src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"
     integrity="sha256-hNyljag6giCsjv/yKmxK8/VeHzvMDvc5u8AzmRvm1BI="
-    crossorigin="anonymous")
+    crossorigin="anonymous" defer)
   script(
     src="https://cdn.jsdelivr.net/npm/markdown-it-anchor@8.6.4/dist/markdownItAnchor.umd.js"
     integrity="sha256-is0GToRxOcbAVq2XJvDAs5V0jnjYaKezgbMHdjB2r+E="
-    crossorigin="anonymous")
+    crossorigin="anonymous" defer)
