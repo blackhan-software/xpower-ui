@@ -296,5 +296,8 @@ export class NftDetails extends Referable(React.Component)<
             toggled={toggled}
         />;
     }
+    componentDidMount = () => {
+        global.dispatchEvent(new Event('refresh-tips'));
+    }
 }
 export default NftDetails;

@@ -308,7 +308,7 @@ Blockchain.onceConnect(async function updateClaims() {
                 '.row.year[data-state="on"]'
             );
             $rows_on?.forEach(($el) => {
-                $el.dispatchEvent(new Event('refresh'));
+                $el.dispatchEvent(new Event('refresh-claims'));
             });
         });
     }));

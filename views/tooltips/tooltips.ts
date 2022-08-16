@@ -20,7 +20,12 @@ App.onTokenSwitched(function retitleTips(
         }
     })
 });
-global.addEventListener('load', delayed(function tooltips() {
+global.addEventListener('load', delayed(() => {
+    global.dispatchEvent(new Event('refresh-tips'))
+}), {
+    once: true
+});
+global.addEventListener('refresh-tips', () => {
     const $tips = document.querySelectorAll<HTMLElement>(
         '[data-bs-toggle=tooltip]'
     );
@@ -44,9 +49,7 @@ global.addEventListener('load', delayed(function tooltips() {
                 once: true
             });
         });
-    })
-}), {
-    once: true
+    });
 });
 function show(e: Event) {
     const $tip = $tooltip(e.target as HTMLElement | null);

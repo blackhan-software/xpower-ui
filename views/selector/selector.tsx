@@ -1,7 +1,6 @@
 import './selector.scss';
 
 import { App } from '../../source/app';
-import { buffered } from '../../source/functions';
 import { Tokenizer } from '../../source/token';
 import { Token } from '../../source/redux/types';
 import { Tooltip } from '../tooltips';
@@ -54,11 +53,14 @@ export class Selector extends React.Component<
         const classes = [
             'btn btn-outline-warning', selector, active, disabled
         ];
-        return <a
-            data-bs-toggle='tooltip' data-bs-placement='top' data-bs-fixed='true'
-            href={`?token=${token}`} type='button' title={`XPower ${token}`}
-            onClick={(e) => this.switch(e, token)} onMouseLeave={on_leave}
+        return <a type='button'
             className={classes.join(' ')}
+            data-bs-toggle='tooltip'
+            data-bs-placement='top'
+            data-bs-fixed='true'
+            href={`?token=${token}`}
+            onClick={(e) => this.switch(e, token)}
+            onMouseLeave={on_leave}
         >
             {this.$spinner(token)}
             {this.$image(token)}
@@ -90,7 +92,6 @@ export class Selector extends React.Component<
             'float-sm-start', this.hide(token) ? 'd-none' : '', token_lc
         ];
         return <img
-            alt={token}
             height={24} width={24}
             className={classes.join(' ')}
             src={`/images/svg/${fixed_lc}-black.svg`}
@@ -113,14 +114,6 @@ export class Selector extends React.Component<
         const eq = this.props.token === token;
         return eq && this.state.switching;
     }
-    componentDidUpdate = buffered(() => {
-        const $selectors = document.getElementsByClassName(
-            `selector-${Tokenizer.lower(this.props.token)}`
-        );
-        if ($selectors.length) {
-            Tooltip.getInstance($selectors[0])?.disable();
-        }
-    })
 }
 function Spinner(
     state: { show: boolean }

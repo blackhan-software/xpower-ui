@@ -7,6 +7,7 @@ import { Tooltip } from '../../tooltips';
 import React from 'react';
 import { DashCircle } from '../../../public/images/tsx';
 import { PlusCircle } from '../../../public/images/tsx';
+import { buffered } from '../../../source/functions';
 
 export class MiningSpeed extends React.Component<{
     token: Token, speed: number
@@ -191,7 +192,7 @@ export class MiningSpeed extends React.Component<{
             passive: false
         });
     }
-    componentDidUpdate() {
+    componentDidUpdate = buffered(() => {
         const $progressor = document.querySelector<HTMLElement>(
             '.progressor'
         );
@@ -203,6 +204,6 @@ export class MiningSpeed extends React.Component<{
         if ($inc) Tooltip.getInstance($inc)?.hide();
         const $dec = document.getElementById('decrease');
         if ($dec) Tooltip.getInstance($dec)?.hide();
-    }
+    })
 }
 export default MiningSpeed;

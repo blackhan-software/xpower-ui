@@ -2,7 +2,7 @@ import './list.scss';
 import './amount';
 
 import { App } from '../../../source/app';
-import { delayed } from '../../../source/functions';
+import { buffered, delayed } from '../../../source/functions';
 import { Amount, Supply, Token } from '../../../source/redux/types';
 import { Nft, NftLevel, NftLevels } from '../../../source/redux/types';
 import { Tooltip } from '../../tooltips';
@@ -201,17 +201,17 @@ export class NftList extends React.Component<
             }</span>
         </button>;
     }
-    componentDidUpdate() {
+    componentDidUpdate = buffered(() => {
         const $toggles = document.querySelectorAll(
             `.nft-minter .toggle`
         );
-        $toggles.forEach(delayed(($toggle: HTMLElement) => {
+        $toggles.forEach(($toggle) => {
             Tooltip.getInstance($toggle)?.hide();
-        }));
-        $toggles.forEach((delayed(($toggle: HTMLElement) => {
+        });
+        $toggles.forEach((delayed(($toggle: Element) => {
             Tooltip.getInstance($toggle)?.dispose();
             Tooltip.getOrCreateInstance($toggle);
         })));
-    }
+    })
 }
 export default NftList;

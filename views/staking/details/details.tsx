@@ -64,7 +64,7 @@ export class PptDetails extends Referable(React.Component)<
             const ref = this.global_ref<HTMLElement>(
                 `ppt:${core_id}`
             );
-            ref.current?.addEventListener('refresh', () => {
+            ref.current?.addEventListener('refresh-claims', () => {
                 const { token, level } = this.props;
                 const nft_token = Nft.token(token);
                 reset(nft_token, level, issue);
@@ -357,6 +357,9 @@ export class PptDetails extends Referable(React.Component)<
             }}
             toggled={toggled}
         />;
+    }
+    componentDidMount = () => {
+        global.dispatchEvent(new Event('refresh-tips'));
     }
 }
 export default PptDetails;
