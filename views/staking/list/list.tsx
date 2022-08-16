@@ -2,7 +2,7 @@ import './list.scss';
 import './amount';
 
 import { App } from '../../../source/app';
-import { delayed } from '../../../source/functions';
+import { buffered, delayed } from '../../../source/functions';
 import { Amount, Supply, Token } from '../../../source/redux/types';
 import { Nft, NftLevel, NftLevels } from '../../../source/redux/types';
 import { Tooltip } from '../../tooltips';
@@ -56,45 +56,70 @@ export class PptList extends React.Component<
         by_level: { amount: Amount, supply: Supply },
         { amount, max, min, display, toggled }: List[NftLevel],
     ) {
-        const nft_name = Nft.nameOf(nft_level);
+        return <React.Fragment key={nft_level}>
+            {this.$amount(token, nft_level, by_level, by_token, {
+                amount, max, min, display, toggled
+            })}
+            {this.$details(token, nft_level, by_level, {
+                amount, max, min, display, toggled
+            })}
+        </React.Fragment>;
+    }
+    $amount(
+        token: Token, nft_level: NftLevel,
+        by_level: { amount: Amount, supply: Supply },
+        by_token: { amount: Amount, supply: Supply },
+        { amount, max, min, display, toggled }: List[NftLevel],
+    ) {
         const any_filter = [
             by_level.supply, by_level.amount, amount, max, min
         ];
-        const show = {
-            minter: (display || any_filter.some((v) => v))
+        const style = {
+            display: (display || any_filter.some((v) => v))
                 ? 'inline-flex' : 'none',
-            detail: (display || any_filter.some((v) => v)) && toggled
+        };
+        return <div role='group'
+            className='btn-group ppt-minter'
+            data-level={Nft.nameOf(nft_level)}
+            style={style}
+        >
+            {this.$toggle(nft_level, toggled)}
+            {this.$minter(nft_level, token)}
+            {this.$balance(nft_level, by_token)}
+            <PptAmount
+                amount={amount}
+                level={nft_level}
+                max={max} min={min}
+                onUpdate={({ amount }) => {
+                    this.props.onList({
+                        [nft_level]: { amount }
+                    });
+                }} />
+        </div>;
+    }
+    $details(
+        token: Token, nft_level: NftLevel,
+        by_level: { amount: Amount, supply: Supply },
+        { amount, max, min, display, toggled }: List[NftLevel],
+    ) {
+        const any_filter = [
+            by_level.supply, by_level.amount, amount, max, min
+        ];
+        const style = {
+            display: (display || any_filter.some((v) => v)) && toggled
                 ? 'block' : 'none'
         };
-        return <React.Fragment key={nft_level}>
-            <div className='btn-group ppt-minter'
-                data-level={nft_name} role='group'
-                style={{ display: show.minter }}
-            >
-                {this.$toggle(nft_level, toggled)}
-                {this.$minter(nft_level, token)}
-                {this.$balance(nft_level, by_token)}
-                <PptAmount
-                    amount={amount}
-                    level={nft_level}
-                    max={max} min={min}
-                    onUpdate={({ amount }) => {
-                        this.props.onList({
-                            [nft_level]: { amount }
-                        });
-                    }}
-                />
-            </div>
-            <div className='nft-details'
-                data-level={Nft.nameOf(nft_level)} role='group'
-                style={{ display: show.detail }}
+        if (style.display === 'block') {
+            return <div role='group'
+                className='nft-details'
+                data-level={Nft.nameOf(nft_level)}
+                style={style}
             >
                 <PptDetails
                     token={token}
-                    level={nft_level}
-                />
-            </div>
-        </React.Fragment>;
+                    level={nft_level} />
+            </div>;
+        }
     }
     $toggle(
         nft_level: NftLevel, toggled: boolean
@@ -176,17 +201,17 @@ export class PptList extends React.Component<
             }</span>
         </button>;
     }
-    componentDidUpdate() {
+    componentDidUpdate = buffered(() => {
         const $toggles = document.querySelectorAll(
             `.ppt-minter .toggle`
         );
-        $toggles.forEach(delayed(($toggle: HTMLElement) => {
+        $toggles.forEach(($toggle) => {
             Tooltip.getInstance($toggle)?.hide();
-        }));
-        $toggles.forEach((delayed(($toggle: HTMLElement) => {
+        });
+        $toggles.forEach(delayed(($toggle: Element) => {
             Tooltip.getInstance($toggle)?.dispose();
             Tooltip.getOrCreateInstance($toggle);
-        })));
-    }
+        }));
+    })
 }
 export default PptList;

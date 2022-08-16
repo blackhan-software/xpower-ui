@@ -1,8 +1,11 @@
 import { App } from '../../../source/app';
 import { Blockchain } from '../../../source/blockchain';
-import { Nft, Token } from '../../../source/redux/types';
-import { NftIssue, NftLevel } from '../../../source/redux/types';
-import { NftWallet, NftWalletMock } from '../../../source/wallet';
+import { Referable, buffered } from '../../../source/functions';
+import { Page, Token } from '../../../source/redux/types';
+import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
+import { NftWallet } from '../../../source/wallet';
+import { NftImageMeta } from './nft-image-meta';
+import { Tooltip } from '../../tooltips';
 
 import React from 'react';
 
@@ -17,19 +20,22 @@ type State = {
     image: string,
     loading: boolean
 }
-export class NftImage extends React.Component<
+function state() {
+    return { image: '', loading: false };
+}
+export class NftImage extends Referable(React.Component)<
     Props, State
 > {
     constructor(props: Props) {
         super(props);
-        this.state = {
-            image: '',
-            loading: false
-        }
+        this.state = state();
         this.events();
     }
     events() {
         App.onTokenSwitch((token) => {
+            reset({ ...this.props, token });
+        });
+        const reset = ({ level, issue, token }: Props) => {
             this.setState({ image: '', loading: true }, () => {
                 meta(level, issue, token).then(({ image }) => {
                     this.setState({ image });
@@ -42,16 +48,28 @@ export class NftImage extends React.Component<
                     });
                 });
             });
+        };
+        App.onPageSwitch((page) => {
+            if (page === Page.Nfts) {
+                init(this.props);
+            }
         });
-        const { level, issue, token } = this.props;
-        meta(level, issue, token).then(({ image }) => {
-            this.setState({ image, loading: true });
-        });
-        href(level, issue, token).then((href) => {
-            if (href) this.setState({
-                href: href.toString()
+        const init = ({ level, issue, token }: Props) => {
+            meta(level, issue, token).then(({ image }) => {
+                this.setState({ image, loading: true });
             });
-        });
+            href(level, issue, token).then((href) => {
+                if (href) this.setState({
+                    href: href.toString()
+                });
+            });
+        };
+        /**
+         * @todo: decouple from App.page!
+         */
+        if (App.page === Page.Nfts) {
+            init(this.props);
+        }
     }
     render() {
         const { level, issue } = this.props;
@@ -72,7 +90,8 @@ export class NftImage extends React.Component<
             className='spinner spinner-border'
             role='status' style={{
                 color: 'var(--xp-powered)',
-                display: loading ? 'block' : 'none'
+                display: loading ? 'block' : 'none',
+                zIndex: loading ? -1 : undefined
             }}
         />;
     }
@@ -85,9 +104,9 @@ export class NftImage extends React.Component<
             level: nft_level, issue: nft_issue
         });
         const cursor = href ? 'pointer' : 'default';
-        const display = toggled ? 'block' : 'none';
+        const display = image && toggled ? 'block' : 'none';
         const title = this.title(nft_level, nft_issue);
-        return <img
+        return <img ref={this.ref('img')}
             className='img-fluid nft-image'
             data-bs-placement='top'
             data-bs-toggle='tooltip'
@@ -110,20 +129,21 @@ export class NftImage extends React.Component<
         const id = Nft.coreId({ level: nft_level, issue: nft_issue });
         return `Trade ${name} NFTs (level ${rank}/9 & ID #${id})`;
     }
+    componentDidMount = buffered(() => {
+        const $image = this.ref<HTMLElement>('img');
+        if ($image.current) {
+            Tooltip.getInstance($image.current)?.dispose();
+            Tooltip.getOrCreateInstance($image.current);
+        }
+    })
 }
 async function meta(
     level: NftLevel, issue: NftIssue, token: Token
 ) {
     const address = await Blockchain.selectedAddress;
-    if (address) {
-        return get_meta(new NftWallet(address, token));
-    } else {
-        return get_meta(new NftWalletMock(0n, token));
-    }
-    async function get_meta(nft_wallet: NftWallet) {
-        const nft_id = await nft_wallet.idBy(issue, level);
-        return nft_wallet.meta(nft_id);
-    }
+    return await NftImageMeta.get(address, {
+        level, issue, token
+    });
 }
 async function href(
     nft_level: NftLevel, nft_issue: NftIssue, token: Token
