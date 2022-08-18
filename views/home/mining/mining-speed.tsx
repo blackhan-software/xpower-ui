@@ -1,5 +1,6 @@
 import { App } from '../../../source/app';
 import { Blockchain } from '../../../source/blockchain';
+import { buffered } from '../../../source/functions';
 import { MiningManager } from '../../../source/managers';
 import { Token } from '../../../source/redux/types';
 import { Tooltip } from '../../tooltips';
@@ -7,7 +8,6 @@ import { Tooltip } from '../../tooltips';
 import React from 'react';
 import { DashCircle } from '../../../public/images/tsx';
 import { PlusCircle } from '../../../public/images/tsx';
-import { buffered } from '../../../source/functions';
 
 export class MiningSpeed extends React.Component<{
     token: Token, speed: number
@@ -78,7 +78,6 @@ export class MiningSpeed extends React.Component<{
                 data-bs-toggle='tooltip' data-bs-placement='top'
                 disabled={!this.increasable(speed, disabled)}
                 onClick={this.increase.bind(this, token, speed, disabled)}
-                title='Increase mining speed'
             >
                 {PlusCircle({ fill: true })}
             </button>
@@ -115,7 +114,6 @@ export class MiningSpeed extends React.Component<{
                 data-bs-toggle='tooltip' data-bs-placement='top'
                 disabled={!this.decreasable(speed, disabled)}
                 onClick={this.decrease.bind(this, token, speed, disabled)}
-                title='Decrease mining speed'
             >
                 {DashCircle({ fill: true })}
             </button>
@@ -178,12 +176,13 @@ export class MiningSpeed extends React.Component<{
         }
         return false;
     }
-    componentDidMount() {
-        if (document.body.clientWidth <= 576) {
-            const $inc = document.getElementById('increase');
-            if ($inc) Tooltip.getInstance($inc)?.disable();
-            const $dec = document.getElementById('decrease');
-            if ($dec) Tooltip.getInstance($dec)?.disable();
+    componentDidMount = () => {
+        if (document.body.clientWidth > 576) {
+            const $inc = document.querySelector('#increase');
+            $inc?.setAttribute('title', 'Increase mining speed');
+            const $dec = document.querySelector('#decrease');
+            $dec?.setAttribute('title', 'Decrease mining speed');
+            global.dispatchEvent(new Event('refresh-tips'));
         }
         const $progressor = document.querySelector<HTMLElement>(
             '.progressor'
