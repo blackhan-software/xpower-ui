@@ -9,7 +9,7 @@ import { Token } from '../../source/redux/types';
 import React, { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 
-export class Footer extends React.Component<{
+export class UiFooter extends React.Component<{
     token: Token
 }, {
     token: Token
@@ -39,7 +39,7 @@ export class Footer extends React.Component<{
         }));
     }
     render() {
-        const host = Footer.host;
+        const host = UiFooter.host;
         const token = this.state.token;
         const year = new Date().getFullYear();
         const classes = [
@@ -185,8 +185,8 @@ export class Footer extends React.Component<{
 }
 if (require.main === module) {
     const $footer = document.querySelector('footer');
-    createRoot($footer!).render(createElement(Footer, {
+    createRoot($footer!).render(createElement(UiFooter, {
         token: App.token
     }));
 }
-export default Footer;
+export default UiFooter;

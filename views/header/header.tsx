@@ -12,7 +12,7 @@ type Props = {
 type State = {
     token: Token, page: Page
 }
-export class Header extends React.Component<
+export class UiHeader extends React.Component<
     Props, State
 > {
     constructor(props: {
@@ -59,19 +59,21 @@ export class Header extends React.Component<
         return <a
             className={classes.join(' ')}
             href={`/${page}?token=${this.state.token}`}
-            onClick={(ev) => this.onClick(ev, page)}
+            onClick={(e) => this.onClick(e, page)}
         >
             {this.$icon(page)}
             {this.$label(page)}
         </a>;
     }
     onClick(
-        ev: MouseEvent, page: Page
+        e: MouseEvent, page: Page
     ) {
-        if (Page.None !== this.state.page) {
-            ev.preventDefault();
+        if (e.ctrlKey === false) {
+            if (Page.None !== this.state.page) {
+                e.preventDefault();
+            }
+            App.switchPage(page);
         }
-        App.switchPage(page);
     }
     $icon(
         page: Page
@@ -105,8 +107,8 @@ export class Header extends React.Component<
 }
 if (require.main === module) {
     const $header = document.querySelector('header');
-    createRoot($header!).render(createElement(Header, {
+    createRoot($header!).render(createElement(UiHeader, {
         token: App.token, page: App.page
     }));
 }
-export default Header;
+export default UiHeader;
