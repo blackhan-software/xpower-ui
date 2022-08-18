@@ -19,10 +19,15 @@ import { NftMinter } from './minter/minter';
 
 type Props = {
     token: Token;
+    list: List;
+    onList?(list: List): void;
 }
+type List = Record<NftLevel, {
+    display: boolean;
+    toggled: boolean;
+}>
 type State = {
     nfts: Nfts;
-    list: List;
     matrix: Matrix;
 }
 type Matrix = Record<NftToken, Record<NftLevel, {
@@ -30,10 +35,6 @@ type Matrix = Record<NftToken, Record<NftLevel, {
     max: Amount;
     min: Amount;
 }>>
-type List = Record<NftLevel, {
-    display: boolean;
-    toggled: boolean;
-}>
 function matrix(
     amount = 0n, max = 0n, min = 0n
 ) {
@@ -101,12 +102,11 @@ export class UiNfts extends React.Component<
         props: Props
     ) {
         super(props);
+        const { token } = this.props;
+        const nft_token = Nft.token(token);
         this.state = {
-            nfts: App.getNfts({
-                token: Nft.token(this.props.token)
-            }),
-            list: list(),
             matrix: matrix(),
+            nfts: App.getNfts({ token: nft_token }),
         };
         this.events();
     }
@@ -144,17 +144,19 @@ export class UiNfts extends React.Component<
         };
     }
     render() {
-        const { token } = this.props;
+        const { list, token } = this.props;
         const nft_token = Nft.token(token);
-        const { list, matrix } = this.state;
+        const { matrix } = this.state;
         return <React.Fragment>
             <div id='nft-single-minting'>
                 <NftList
                     onList={(list) => {
                         const { lhs, rhs } = split(list);
                         update<State>.bind(this)({
-                            list: lhs, matrix: { [nft_token]: rhs }
+                            matrix: { [nft_token]: rhs }
                         });
+                        const { onList } = this.props;
+                        if (onList) onList(lhs);
                     }}
                     list={join(
                         list, matrix[nft_token]
@@ -167,8 +169,10 @@ export class UiNfts extends React.Component<
                     onList={(list) => {
                         const { lhs, rhs } = split(list);
                         update<State>.bind(this)({
-                            list: lhs, matrix: { [nft_token]: rhs }
+                            matrix: { [nft_token]: rhs }
                         });
+                        const { onList } = this.props;
+                        if (onList) onList(lhs);
                     }}
                     list={join(
                         list, matrix[nft_token]
@@ -287,7 +291,7 @@ Blockchain.onceConnect(async function onNftBatchTransfers({
 if (require.main === module) {
     const $nfts = document.querySelector('content');
     createRoot($nfts!).render(createElement(UiNfts, {
-        token: App.token
+        token: App.token, list: list()
     }));
 }
 export default UiNfts;

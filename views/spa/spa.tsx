@@ -2,6 +2,7 @@ import './spa.scss';
 
 import { App } from '../../source/app';
 import { Page, Token } from '../../source/redux/types';
+import { NftLevel, NftLevels } from '../../source/redux/types';
 
 import React, { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -13,12 +14,29 @@ import { UiNfts } from '../nfts/nfts';
 import { UiPpts } from '../staking/staking';
 import { About } from '../about/about';
 import { Avalanche } from '../../public/images/tsx';
+import { update } from '../../source/functions';
 
 type Props = {
     page: Page; token: Token; speed: number;
 }
 type State = {
-    page: Page; token: Token;
+    page: Page; token: Token; list: List;
+}
+type List = Record<NftLevel, {
+    display: boolean;
+    toggled: boolean;
+}>
+function list(
+    display = false, toggled = false
+) {
+    const entries = Object.fromEntries(
+        Array.from(NftLevels()).map(
+            (nft_level) => [nft_level, {
+                display, toggled
+            }]
+        )
+    );
+    return entries as List;
 }
 export class SPA extends React.Component<
     Props, State
@@ -26,7 +44,9 @@ export class SPA extends React.Component<
     constructor(props: Props) {
         super(props);
         this.state = {
-            ...this.props
+            page: props.page,
+            token: props.token,
+            list: list()
         };
         this.events();
     }
@@ -39,7 +59,7 @@ export class SPA extends React.Component<
         }));
     }
     render() {
-        const { page, token } = this.state;
+        const { list, page, token } = this.state;
         const { speed } = this.props;
         return <React.Fragment>
             {this.$h1(page)}
@@ -47,8 +67,8 @@ export class SPA extends React.Component<
             {this.$wallet(page, token)}
             {this.$selector(page, token)}
             {this.$home(page, token, speed)}
-            {this.$nfts(page, token)}
-            {this.$ppts(page, token)}
+            {this.$nfts(page, token, list)}
+            {this.$ppts(page, token, list)}
             {this.$about(page, token)}
         </React.Fragment>;
     }
@@ -106,23 +126,27 @@ export class SPA extends React.Component<
         </form>;
     }
     $nfts(
-        page: Page, token: Token
+        page: Page, token: Token, list: List
     ) {
         return <form id='nfts'
             className={page !== Page.Nfts ? 'd-none' : ''}
             onSubmit={(e) => e.preventDefault()}
         >
-            <UiNfts token={token} />
+            <UiNfts token={token} list={list} onList={(list) => {
+                update<State>.bind(this)({ list })
+            }}/>
         </form>;
     }
     $ppts(
-        page: Page, token: Token
+        page: Page, token: Token, list: List
     ) {
         return <form id='ppts'
             className={page !== Page.Staking ? 'd-none' : ''}
             onSubmit={(e) => e.preventDefault()}
         >
-            <UiPpts token={token} />
+            <UiPpts token={token} list={list} onList={(list) => {
+                update<State>.bind(this)({ list })
+            }}/>
         </form>;
     }
     $about(

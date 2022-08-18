@@ -10,15 +10,15 @@ import { Tooltip } from '../../tooltips';
 import React from 'react';
 
 type Props = {
-    token: Token,
-    issue: NftIssue,
-    level: NftLevel,
-    toggled: boolean
+    token: Token;
+    issue: NftIssue;
+    level: NftLevel;
+    toggled: boolean;
 }
 type State = {
-    href?: string,
-    image: string,
-    loading: boolean
+    href?: string;
+    image: string;
+    loading: boolean;
 }
 function state() {
     return { image: '', loading: false };

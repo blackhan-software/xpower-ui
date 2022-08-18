@@ -20,11 +20,16 @@ import { PptMinter } from './minter';
 
 type Props = {
     token: Token;
+    list: List;
+    onList?(list: List): void;
 }
+type List = Record<NftLevel, {
+    display: boolean;
+    toggled: boolean;
+}>
 type State = {
     nfts: Nfts;
     ppts: Nfts;
-    list: List;
     matrix: Matrix;
 }
 type Matrix = Record<NftToken, Record<NftLevel, {
@@ -32,10 +37,6 @@ type Matrix = Record<NftToken, Record<NftLevel, {
     max: Amount;
     min: Amount;
 }>>
-type List = Record<NftLevel, {
-    display: boolean;
-    toggled: boolean;
-}>
 function matrix(
     amount = 0n, max = 0n, min = 0n
 ) {
@@ -104,9 +105,9 @@ export class UiPpts extends React.Component<
         const { token } = this.props;
         const nft_token = Nft.token(token);
         this.state = {
+            matrix: matrix(),
             nfts: App.getNfts({ token: nft_token }),
             ppts: App.getPpts({ token: nft_token }),
-            list: list(), matrix: matrix(),
         };
         this.events();
     }
@@ -149,17 +150,19 @@ export class UiPpts extends React.Component<
         };
     }
     render() {
-        const { token } = this.props;
+        const { list, token } = this.props;
         const nft_token = Nft.token(token);
-        const { list, matrix } = this.state;
+        const { matrix } = this.state;
         return <React.Fragment>
             <div id='ppt-single-minting'>
                 <PptList
                     onList={(list) => {
                         const { lhs, rhs } = split(list);
                         update<State>.bind(this)({
-                            list: lhs, matrix: { [nft_token]: rhs }
+                            matrix: { [nft_token]: rhs }
                         });
+                        const { onList } = this.props;
+                        if (onList) onList(lhs);
                     }}
                     list={join(
                         list, matrix[nft_token]
@@ -172,8 +175,10 @@ export class UiPpts extends React.Component<
                     onList={(list) => {
                         const { lhs, rhs } = split(list);
                         update<State>.bind(this)({
-                            list: lhs, matrix: { [nft_token]: rhs }
+                            matrix: { [nft_token]: rhs }
                         });
+                        const { onList } = this.props;
+                        if (onList) onList(lhs);
                     }}
                     list={join(
                         list, matrix[nft_token]
@@ -316,7 +321,7 @@ Blockchain.onceConnect(async function updateClaims() {
 if (require.main === module) {
     const $ppts = document.querySelector('content');
     createRoot($ppts!).render(createElement(UiPpts, {
-        token: App.token
+        token: App.token, list: list()
     }));
 }
 export default UiPpts;

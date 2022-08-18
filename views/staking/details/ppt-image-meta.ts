@@ -41,7 +41,9 @@ export class PptImageMeta {
             ? await get_meta(new PptWallet(address, nft.token))
             : await get_meta(new PptWalletMock(0n, nft.token)));
         async function get_meta(wallet: PptWallet) {
-            const core_id = await wallet.idBy(nft.issue, nft.level);
+            const core_id = await wallet.idBy(
+                nft.issue, nft.level
+            );
             return wallet.meta(core_id);
         }
     }
