@@ -75,8 +75,10 @@ export class Selector extends React.Component<
     switch(
         e: MouseEvent<HTMLAnchorElement>, token: Token
     ) {
-        App.switchToken(token);
-        e.preventDefault();
+        if (e.ctrlKey === false) {
+            e.preventDefault();
+            App.switchToken(token);
+        }
     }
     $spinner(
         token: Token
