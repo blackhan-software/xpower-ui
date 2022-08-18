@@ -3,14 +3,18 @@ import './connector.scss';
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { ChainId } from '../../source/blockchain';
-import { delayed } from '../../source/functions';
-import { siblings } from '../../source/functions';
+import { buffered, delayed } from '../../source/functions';
+import { sibling } from '../../source/functions';
 import { Tooltip } from '../tooltips';
 
 import React, { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import { InfoCircle } from '../../public/images/tsx';
 
+type Props = Record<string, never>;
+type State = {
+    chain: Chain;
+}
 enum Chain {
     UNAVAILABLE,
     WRONG_ID,
@@ -18,11 +22,11 @@ enum Chain {
     CONNECTING,
     CONNECTED,
 }
-export class Connector extends React.Component<Record<string, never>, {
-    chain: Chain
-}> {
+export class Connector extends React.Component<
+    Props, State
+> {
     constructor(
-        props: Record<string, never>
+        props: Props
     ) {
         super(props);
         this.state = {
@@ -131,23 +135,25 @@ export class Connector extends React.Component<Record<string, never>, {
     }
     get tooltip() {
         if (this.state.chain === Chain.UNAVAILABLE) {
-            return 'Install Metamask (and then reload to application)';
+            return 'Install Metamask (and then reload the application)';
         }
         return 'Authorize your Metamask to be connected to';
     }
-    componentDidUpdate() {
+    componentDidUpdate = buffered(() => {
         if (this.state.chain !== Chain.UNAVAILABLE) {
             return;
         }
-        const $connect = document.getElementById('connect-metamask');
-        const $info = siblings($connect, (e) => {
-            return e.classList.contains('info');
+        const $connect = document.getElementById(
+            'connect-metamask'
+        );
+        const $info = sibling($connect, ($el) => {
+            return $el.classList.contains('info');
         });
-        if ($info.length) {
-            Tooltip.getInstance($info[0])?.dispose();
-            Tooltip.getOrCreateInstance($info[0]);
+        if ($info) {
+            Tooltip.getInstance($info)?.dispose();
+            Tooltip.getOrCreateInstance($info);
         }
-    }
+    })
 }
 function Spinner(
     state: { show: boolean, grow?: boolean }
