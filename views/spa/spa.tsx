@@ -1,6 +1,7 @@
 import './spa.scss';
 
 import { App } from '../../source/app';
+import { update } from '../../source/functions';
 import { Page, Token } from '../../source/redux/types';
 import { NftLevel, NftLevels } from '../../source/redux/types';
 
@@ -9,18 +10,22 @@ import { createRoot } from 'react-dom/client';
 import { Connector } from '../connector/connector';
 import { WalletUi } from '../wallet/wallet-ui';
 import { Selector } from '../selector/selector';
-import { Home } from '../home/home';
+import { UiHome } from '../home/home';
 import { UiNfts } from '../nfts/nfts';
 import { UiPpts } from '../staking/staking';
-import { About } from '../about/about';
+import { UiAbout } from '../about/about';
 import { Avalanche } from '../../public/images/tsx';
-import { update } from '../../source/functions';
 
 type Props = {
-    page: Page; token: Token; speed: number;
+    page: Page;
+    token: Token;
+    speed: number;
 }
 type State = {
-    page: Page; token: Token; list: List; toggled: boolean
+    page: Page;
+    token: Token;
+    list: List;
+    toggled: boolean;
 }
 type List = Record<NftLevel, {
     display: boolean;
@@ -123,7 +128,7 @@ export class SPA extends React.Component<
             className={page !== Page.Home ? 'd-none' : ''}
             onSubmit={(e) => e.preventDefault()}
         >
-            <Home token={token} speed={speed} />
+            <UiHome token={token} speed={speed} />
         </form>;
     }
     $nfts(
@@ -173,7 +178,7 @@ export class SPA extends React.Component<
             return <form id='about'
                 onSubmit={(e) => e.preventDefault()}
             >
-                <About token={token} />
+                <UiAbout token={token} />
             </form>;
         }
         return null;

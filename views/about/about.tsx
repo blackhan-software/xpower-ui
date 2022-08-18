@@ -28,7 +28,7 @@ type Props = {
 type State = {
     html: string;
 }
-export class About extends React.Component<
+export class UiAbout extends React.Component<
     Props, State
 > {
     constructor(props: Props) {
@@ -139,8 +139,8 @@ export class About extends React.Component<
 }
 if (require.main === module) {
     const $content = document.querySelector('content');
-    createRoot($content!).render(createElement(About, {
+    createRoot($content!).render(createElement(UiAbout, {
         token: App.token
     }));
 }
-export default About;
+export default UiAbout;

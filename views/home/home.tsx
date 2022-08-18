@@ -12,7 +12,7 @@ type Props = {
     token: Token;
     speed: number;
 }
-export class Home extends React.Component<
+export class UiHome extends React.Component<
     Props
 > {
     render() {
@@ -29,8 +29,8 @@ export class Home extends React.Component<
 }
 if (require.main === module) {
     const $content = document.querySelector('content');
-    createRoot($content!).render(createElement(Home, {
+    createRoot($content!).render(createElement(UiHome, {
         token: App.token, speed: App.speed
     }));
 }
-export default Home;
+export default UiHome;
