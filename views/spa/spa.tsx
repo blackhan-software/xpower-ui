@@ -20,7 +20,7 @@ type Props = {
     page: Page; token: Token; speed: number;
 }
 type State = {
-    page: Page; token: Token; list: List;
+    page: Page; token: Token; list: List; toggled: boolean
 }
 type List = Record<NftLevel, {
     display: boolean;
@@ -46,7 +46,8 @@ export class SPA extends React.Component<
         this.state = {
             page: props.page,
             token: props.token,
-            list: list()
+            list: list(),
+            toggled: false
         };
         this.events();
     }
@@ -59,7 +60,7 @@ export class SPA extends React.Component<
         }));
     }
     render() {
-        const { list, page, token } = this.state;
+        const { list, page, toggled, token } = this.state;
         const { speed } = this.props;
         return <React.Fragment>
             {this.$h1(page)}
@@ -67,8 +68,8 @@ export class SPA extends React.Component<
             {this.$wallet(page, token)}
             {this.$selector(page, token)}
             {this.$home(page, token, speed)}
-            {this.$nfts(page, token, list)}
-            {this.$ppts(page, token, list)}
+            {this.$nfts(page, token, list, toggled)}
+            {this.$ppts(page, token, list, toggled)}
             {this.$about(page, token)}
         </React.Fragment>;
     }
@@ -126,27 +127,43 @@ export class SPA extends React.Component<
         </form>;
     }
     $nfts(
-        page: Page, token: Token, list: List
+        page: Page, token: Token, list: List, toggled: boolean
     ) {
         return <form id='nfts'
             className={page !== Page.Nfts ? 'd-none' : ''}
             onSubmit={(e) => e.preventDefault()}
         >
-            <UiNfts token={token} list={list} onList={(list) => {
-                update<State>.bind(this)({ list })
-            }}/>
+            <UiNfts
+                onList={(list) => {
+                    update<State>.bind(this)({ list })
+                }}
+                list={list}
+                onToggled={(toggled) => {
+                    this.setState({ toggled });
+                }}
+                toggled={toggled}
+                token={token}
+            />
         </form>;
     }
     $ppts(
-        page: Page, token: Token, list: List
+        page: Page, token: Token, list: List, toggled: boolean
     ) {
         return <form id='ppts'
             className={page !== Page.Staking ? 'd-none' : ''}
             onSubmit={(e) => e.preventDefault()}
         >
-            <UiPpts token={token} list={list} onList={(list) => {
-                update<State>.bind(this)({ list })
-            }}/>
+            <UiPpts
+                onList={(list) => {
+                    update<State>.bind(this)({ list })
+                }}
+                list={list}
+                onToggled={(toggled) => {
+                    this.setState({ toggled });
+                }}
+                toggled={toggled}
+                token={token}
+            />
         </form>;
     }
     $about(

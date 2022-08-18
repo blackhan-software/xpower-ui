@@ -21,7 +21,9 @@ import { PptMinter } from './minter';
 type Props = {
     token: Token;
     list: List;
-    onList?(list: List): void;
+    onList?: (list: List) => void;
+    toggled: boolean;
+    onToggled?: (toggled: boolean) => void;
 }
 type List = Record<NftLevel, {
     display: boolean;
@@ -150,7 +152,7 @@ export class UiPpts extends React.Component<
         };
     }
     render() {
-        const { list, token } = this.props;
+        const { list, toggled, token } = this.props;
         const nft_token = Nft.token(token);
         const { matrix } = this.state;
         return <React.Fragment>
@@ -183,6 +185,11 @@ export class UiPpts extends React.Component<
                     list={join(
                         list, matrix[nft_token]
                     )}
+                    onToggled={(toggled) => {
+                        const { onToggled } = this.props;
+                        if (onToggled) onToggled(toggled);
+                    }}
+                    toggled={toggled}
                     token={token}
                 />
             </div>
@@ -321,7 +328,7 @@ Blockchain.onceConnect(async function updateClaims() {
 if (require.main === module) {
     const $ppts = document.querySelector('content');
     createRoot($ppts!).render(createElement(UiPpts, {
-        token: App.token, list: list()
+        list: list(), toggled: false, token: App.token
     }));
 }
 export default UiPpts;

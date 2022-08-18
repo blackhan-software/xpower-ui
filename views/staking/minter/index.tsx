@@ -2,8 +2,8 @@
 import { Blockchain } from '../../../source/blockchain';
 import { Transaction } from 'ethers';
 import { PptTreasuryFactory } from '../../../source/contract';
-import { Alert, alert, buffered } from '../../../source/functions';
-import { Referable } from '../../../source/functions';
+import { Alert, alert } from '../../../source/functions';
+import { buffered, Referable } from '../../../source/functions';
 import { Amount, Token } from '../../../source/redux/types';
 import { NftLevel, NftLevels } from '../../../source/redux/types';
 import { NftWallet, OnApprovalForAll } from '../../../source/wallet';
@@ -20,7 +20,9 @@ import { InfoCircle } from '../../../public/images/tsx';
 type Props = {
     token: Token;
     list: List;
-    onList: (list: Partial<List>) => void;
+    onList?: (list: Partial<List>) => void;
+    toggled: boolean;
+    onToggled?: (toggled: boolean) => void;
 }
 export type List = Record<NftLevel, {
     amount: Amount;
@@ -31,7 +33,6 @@ export type List = Record<NftLevel, {
 }>
 type State = {
     approval: Approval | null;
-    toggled: boolean;
 }
 enum Approval {
     approving = 'approving',
@@ -51,14 +52,12 @@ function approving(
 export class PptMinter extends Referable(React.Component)<
     Props, State
 > {
-    constructor(props: {
-        token: Token, list: List,
-        onList: (list: Partial<List>) => void
-    }) {
+    constructor(
+        props: Props
+    ) {
         super(props);
         this.state = {
-            approval: null,
-            toggled: false
+            approval: null
         };
         this.events();
     }
@@ -79,8 +78,8 @@ export class PptMinter extends Referable(React.Component)<
         });
     }
     render() {
-        const { token, list } = this.props;
-        const { approval, toggled } = this.state;
+        const { list, toggled, token } = this.props;
+        const { approval } = this.state;
         return <div
             className='btn-group ppt-batch-minter'
             ref={this.ref('ppt-batch-minter')}
@@ -131,12 +130,12 @@ export class PptMinter extends Referable(React.Component)<
         ] => ([
             nft_level, { display: !toggled }
         ]));
-        this.props.onList(Object.fromEntries(
-            entries
-        ));
-        this.setState({
-            toggled: !toggled
-        });
+        const { onList } = this.props;
+        if (onList) onList(
+            Object.fromEntries(entries)
+        );
+        const { onToggled } = this.props;
+        if (onToggled) onToggled(!toggled);
     }
     $burnApproval(
         token: Token,
@@ -257,7 +256,7 @@ export class PptMinter extends Referable(React.Component)<
             '#toggle-all'
         );
         if ($toggle) {
-            const title = this.title(this.state.toggled);
+            const title = this.title(this.props.toggled);
             if (title !== $toggle.dataset.bsOriginalTitle) {
                 $toggle.dataset.bsOriginalTitle = title;
                 Tooltip.getInstance($toggle)?.dispose();
@@ -284,3 +283,4 @@ export function Spinner(
         style={{ visibility: show ? 'visible' : 'hidden' }}
     />;
 }
+export default PptMinter;

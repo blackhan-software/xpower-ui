@@ -19,7 +19,9 @@ import { InfoCircle } from '../../../public/images/tsx';
 type Props = {
     token: Token;
     list: List;
-    onList: (list: Partial<List>) => void;
+    onList?: (list: Partial<List>) => void;
+    toggled: boolean;
+    onToggled?: (toggled: boolean) => void;
 }
 type List = Record<NftLevel, {
     amount: Amount;
@@ -31,7 +33,6 @@ type List = Record<NftLevel, {
 type State = {
     approval: Approval | null;
     status: Status | null;
-    toggled: boolean;
 }
 enum Approval {
     approving = 'approving',
@@ -63,15 +64,13 @@ function minting(
 export class NftMinter extends Referable(React.Component)<
     Props, State
 > {
-    constructor(props: {
-        token: Token, list: List,
-        onList: (list: Partial<List>) => void
-    }) {
+    constructor(
+        props: Props
+    ) {
         super(props);
         this.state = {
             approval: null,
-            status: null,
-            toggled: false
+            status: null
         };
         this.events();
     }
@@ -96,8 +95,8 @@ export class NftMinter extends Referable(React.Component)<
         });
     }
     render() {
-        const { token, list } = this.props;
-        const { approval, toggled } = this.state;
+        const { list, toggled, token } = this.props;
+        const { approval } = this.state;
         return <div
             className='btn-group nft-batch-minter'
             ref={this.ref('nft-batch-minter')}
@@ -145,12 +144,12 @@ export class NftMinter extends Referable(React.Component)<
         ] => ([
             nft_level, { display: !toggled }
         ]));
-        this.props.onList(Object.fromEntries(
-            entries
-        ));
-        this.setState({
-            toggled: !toggled
-        });
+        const { onList } = this.props;
+        if (onList) onList(
+            Object.fromEntries(entries)
+        );
+        const { onToggled } = this.props;
+        if (onToggled) onToggled(!toggled);
     }
     $burnApproval(
         token: Token,
@@ -325,7 +324,7 @@ export class NftMinter extends Referable(React.Component)<
             '#toggle-all'
         );
         if ($toggle) {
-            const title = this.title(this.state.toggled);
+            const title = this.title(this.props.toggled);
             if (title !== $toggle.dataset.bsOriginalTitle) {
                 $toggle.dataset.bsOriginalTitle = title;
                 Tooltip.getInstance($toggle)?.dispose();
