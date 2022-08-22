@@ -9,7 +9,7 @@ import { Nft, NftFullId, NftIssue, NftLevel } from '../../../source/redux/types'
 import { OtfWallet } from '../../../source/wallet';
 
 import React from 'react';
-import { NftUiToggle } from './ui-toggle';
+import { PptUiToggle } from './ui-toggle';
 import { InfoCircle } from '../../../public/images/tsx';
 
 type Props = {
@@ -58,7 +58,7 @@ export class PptClaimer extends Referable(React.Component)<
             className='btn-group nft-claimer d-none d-sm-flex'
             data-id={core_id} data-level={Nft.nameOf(nft_level)}
         >
-            <NftUiToggle
+            <PptUiToggle
                 toggled={this.props.toggled}
                 onToggle={this.props.onToggle}
             />

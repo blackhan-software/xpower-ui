@@ -59,7 +59,12 @@ import { Global } from '../types';
 import { delayed } from '../functions';
 declare const global: Global;
 
+import mitt from 'mitt';
+
 export class App {
+    public static get event() {
+        return this.me._event;
+    }
     private static get me(): App {
         if (global.APP === undefined) {
             global.APP = new App();
@@ -486,6 +491,11 @@ export class App {
     private get store(): Store<State, Action> {
         return this._store;
     }
+    private _event = mitt<{
+        'toggle-issue': {
+            level?: NftLevel; issue?: NftIssue; flag: boolean;
+        }
+    }>();
     private _db: StateDb | undefined;
     private _store: Store<State, Action>;
 }

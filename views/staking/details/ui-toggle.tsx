@@ -6,7 +6,7 @@ type Props = {
     toggled: boolean;
     onToggle: (toggled: boolean) => void;
 }
-export class NftUiToggle extends React.Component<
+export class PptUiToggle extends React.Component<
     Props
 > {
     render() {
@@ -50,4 +50,4 @@ export class NftUiToggle extends React.Component<
         }));
     }
 }
-export default NftUiToggle;
+export default PptUiToggle;

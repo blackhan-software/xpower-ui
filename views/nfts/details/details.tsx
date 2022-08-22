@@ -50,6 +50,27 @@ export class NftDetails extends Referable(React.Component)<
     constructor(props: Props) {
         super(props);
         this.state = state();
+        this.events();
+    }
+    events() {
+        App.event.on('toggle-issue', ({
+            level, issue, flag
+        }) => {
+            const levels = level !== undefined
+                ? [level] : Array.from(NftLevels());
+            const issues = issue !== undefined
+                ? [issue] : Array.from(Years());
+            const state = Object.fromEntries(
+                levels.map((l) => [
+                    l, Object.fromEntries(
+                        issues.map((i) => [
+                            i, { toggled: !flag }
+                        ])
+                    )
+                ])
+            );
+            update<State>.bind(this)(state);
+        });
     }
     render() {
         const years = Array.from(Years()).reverse();
@@ -284,13 +305,8 @@ export class NftDetails extends Referable(React.Component)<
                 });
             }}
             onToggle={(flag) => {
-                const issues = Array.from(Years());
-                update<State>.bind(this)({
-                    [nft_level]: Object.fromEntries(
-                        issues.map((issue) => [issue, {
-                            toggled: !flag
-                        }])
-                    )
+                App.event.emit('toggle-issue', {
+                    level: nft_level, flag
                 });
             }}
             toggled={toggled}
