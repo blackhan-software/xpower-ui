@@ -53,6 +53,9 @@ h1 {
 h1:first-of-type {
   margin-bottom: 0.5em;
 }
+label {
+  user-select: none;
+}
 :not(span).info {
   svg {
     position: relative;
