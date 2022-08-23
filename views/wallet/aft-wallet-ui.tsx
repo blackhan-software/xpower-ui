@@ -1,6 +1,6 @@
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
-import { nice } from '../../filters';
+import { nice, nice_si } from '../../filters';
 import { buffered, update, x40 } from '../../source/functions';
 import { Address, Amount, Token, Tokens } from '../../source/redux/types';
 import { MoeWallet, OnTransfer } from '../../source/wallet';
@@ -113,8 +113,8 @@ export class AftWalletUi extends React.Component<
         return <input readOnly
             className='form-control' id='aft-wallet-balance'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            type='text' value={nice(amount ?? 0n)}
-            title={`Balance of proof-of-work ${token} tokens`}
+            type='text' value={nice_si(amount ?? 0n)}
+            title={`${nice(amount ?? 0n)} ${token}`}
         />;
     }
     $info(
@@ -135,6 +135,13 @@ export class AftWalletUi extends React.Component<
         if ($otf_toggle) {
             Tooltip.getInstance($otf_toggle)?.dispose();
             Tooltip.getOrCreateInstance($otf_toggle);
+        }
+        const $aft_balance = document.getElementById(
+            'aft-wallet-balance'
+        );
+        if ($aft_balance) {
+            Tooltip.getInstance($aft_balance)?.dispose();
+            Tooltip.getOrCreateInstance($aft_balance);
         }
     })
 }

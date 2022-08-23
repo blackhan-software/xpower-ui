@@ -4,12 +4,12 @@ import { Address, Amount } from '../../source/redux/types';
 import { OtfWallet } from '../../source/wallet';
 
 import { Web3Provider } from '@ethersproject/providers';
-import { formatUnits } from '@ethersproject/units';
 import { parseUnits } from '@ethersproject/units';
 import { Tooltip } from '../tooltips';
 
 import React from 'react';
 import { InfoCircle } from '../../public/images/tsx';
+import { nice_si } from '../../filters';
 
 type Props = {
     toggled: boolean;
@@ -172,7 +172,7 @@ export class OtfWalletUi extends React.Component<
             data-bs-toggle='tooltip' data-bs-placement='top'
             id='otf-wallet-balance' readOnly
             title='AVAX balance to auto-pay for transaction fees'
-            type='text' value={formatUnits(amount ?? 0n)}
+            type='text' value={nice_si(amount ? amount : 0n, { base: 1e18 })}
         />;
     }
     $info() {
