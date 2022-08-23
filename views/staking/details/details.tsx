@@ -372,7 +372,7 @@ export class PptDetails extends Referable(React.Component)<
         />;
     }
     componentDidMount = () => {
-        global.dispatchEvent(new Event('refresh-tips'));
+        App.event.emit('refresh-tips');
     }
 }
 export default PptDetails;

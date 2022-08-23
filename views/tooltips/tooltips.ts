@@ -21,11 +21,11 @@ App.onTokenSwitched(function retitleTips(
     })
 });
 global.addEventListener('load', delayed(() => {
-    global.dispatchEvent(new Event('refresh-tips'))
+    App.event.emit('refresh-tips');
 }), {
     once: true
 });
-global.addEventListener('refresh-tips', () => {
+App.event.on('refresh-tips', () => {
     const $tips = document.querySelectorAll<HTMLElement>(
         '[data-bs-toggle=tooltip]'
     );

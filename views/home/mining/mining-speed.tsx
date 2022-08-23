@@ -182,7 +182,7 @@ export class MiningSpeed extends React.Component<{
             $inc?.setAttribute('title', 'Increase mining speed');
             const $dec = document.querySelector('#decrease');
             $dec?.setAttribute('title', 'Decrease mining speed');
-            global.dispatchEvent(new Event('refresh-tips'));
+            App.event.emit('refresh-tips');
         }
         const $progressor = document.querySelector<HTMLElement>(
             '.progressor'

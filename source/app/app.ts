@@ -492,9 +492,10 @@ export class App {
         return this._store;
     }
     private _event = mitt<{
+        'refresh-tips': undefined;
         'toggle-issue': {
             level?: NftLevel; issue?: NftIssue; flag: boolean;
-        }
+        };
     }>();
     private _db: StateDb | undefined;
     private _store: Store<State, Action>;
