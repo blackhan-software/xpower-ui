@@ -143,8 +143,8 @@ export class PptMinter extends Referable(React.Component)<
         approving: boolean | null
     ) {
         const text = approving
-            ? 'Approving NFT Minting…'
-            : 'Approve NFT Minting';
+            ? 'Approving NFT Staking…'
+            : 'Approve NFT Staking';
         return <button type='button' id='ppt-burn-approval'
             className='btn btn-outline-warning'
             data-bs-placement='top' data-bs-toggle='tooltip'
