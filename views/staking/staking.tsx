@@ -13,8 +13,7 @@ import { OnTransferBatch, OnTransferSingle } from '../../source/wallet';
 import { PptWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
 
-import React, { createElement } from 'react';
-import { createRoot } from 'react-dom/client';
+import React from 'react';
 import { PptList } from './list/list';
 import { PptMinter } from './minter';
 
@@ -54,18 +53,6 @@ function matrix(
         )
     );
     return entries as Matrix;
-}
-function list(
-    display = false, toggled = false
-) {
-    const entries = Object.fromEntries(
-        Array.from(NftLevels()).map(
-            (nft_level) => [nft_level, {
-                display, toggled
-            }]
-        )
-    );
-    return entries as List;
 }
 function join(
     lhs: List, rhs: Matrix[NftToken]
@@ -325,10 +312,4 @@ Blockchain.onceConnect(async function updateClaims() {
         });
     }));
 });
-if (require.main === module) {
-    const $ppts = document.querySelector('content');
-    createRoot($ppts!).render(createElement(UiPpts, {
-        list: list(), toggled: false, token: App.token
-    }));
-}
 export default UiPpts;

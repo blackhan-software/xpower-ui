@@ -10,7 +10,7 @@ type Props = {
     token: Token;
 }
 type State = {
-    status: Status;
+    status: Status | null;
     disabled: boolean;
 }
 enum Status {
@@ -23,8 +23,7 @@ enum Status {
     pausing,
     paused,
     resuming,
-    resumed,
-    idle
+    resumed
 }
 export class MiningToggle extends React.Component<
     Props, State
@@ -34,12 +33,12 @@ export class MiningToggle extends React.Component<
     }) {
         super(props);
         this.state = {
-            status: Status.idle, disabled: false
+            status: null, disabled: false
         };
         this.events();
     }
-    events() {
-        Blockchain.onConnect(/*init*/({
+    async events() {
+        Blockchain.onConnect(({
             address, token
         }) => {
             const miner = MiningManager.miner(address, {
@@ -48,8 +47,11 @@ export class MiningToggle extends React.Component<
             if (!miner.running) {
                 this.setState({ status: Status.stopped });
             }
+            this.setState({
+                disabled: miner.speed < 0.001
+            });
         });
-        Blockchain.onceConnect(/*sync*/({
+        Blockchain.onceConnect(({
             address, token
         }) => {
             const miner = MiningManager.miner(address, {
@@ -85,23 +87,6 @@ export class MiningToggle extends React.Component<
             miner.on('resumed', () => {
                 this.setState({ status: Status.resumed });
             });
-        }, {
-            per: () => App.token
-        });
-        Blockchain.onConnect(/*initialize*/({
-            address, token
-        }) => {
-            const miner = MiningManager.miner(address, {
-                token
-            });
-            this.setState({ disabled: miner.speed < 0.001 });
-        });
-        Blockchain.onceConnect(/*synchronize*/({
-            address, token
-        }) => {
-            const miner = MiningManager.miner(address, {
-                token
-            });
             miner.on('increased', (ev) => {
                 this.setState({ disabled: ev.speed < 0.001 });
             });
@@ -123,7 +108,7 @@ export class MiningToggle extends React.Component<
         </div>;
     }
     $toggle(
-        token: Token, status: Status, disabled: boolean
+        token: Token, status: Status | null, disabled: boolean
     ) {
         return <button type='button' id='toggle-mining'
             className='btn btn-outline-warning'
@@ -144,7 +129,7 @@ export class MiningToggle extends React.Component<
         MiningManager.toggle(address, { token });
     }
     disabled(
-        status: Status, disabled: boolean
+        status: Status | null, disabled: boolean
     ) {
         if (disabled) {
             return true;
@@ -160,14 +145,14 @@ export class MiningToggle extends React.Component<
         return true;
     }
     $text(
-        status: Status
+        status: Status | null
     ) {
         return <span className='text'>
             {this.text(status)}
         </span>;
     }
     text(
-        status: Status
+        status: Status | null
     ) {
         switch (status) {
             case Status.initializing:
@@ -203,9 +188,9 @@ export class MiningToggle extends React.Component<
     }
 }
 function Spinner(
-    status: Status
+    status: Status | null
 ) {
-    const visible = (status: Status) => {
+    const visible = (status: Status | null) => {
         switch (status) {
             case Status.initializing:
             case Status.starting:
@@ -220,7 +205,7 @@ function Spinner(
         }
         return 'hidden';
     };
-    const grow = (status: Status) => {
+    const grow = (status: Status | null) => {
         switch (status) {
             case Status.initializing:
             case Status.starting:

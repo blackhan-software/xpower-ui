@@ -7,8 +7,7 @@ import { buffered, delayed } from '../../source/functions';
 import { sibling } from '../../source/functions';
 import { Tooltip } from '../tooltips';
 
-import React, { createElement } from 'react';
-import { createRoot } from 'react-dom/client';
+import React from 'react';
 import { InfoCircle } from '../../public/images/tsx';
 
 type Props = Record<string, never>;
@@ -196,9 +195,5 @@ function reload(
     } else {
         location.search = `?ms=${delta_ms}`;
     }
-}
-if (require.main === module) {
-    const $connector = document.querySelector('form#connector');
-    createRoot($connector!).render(createElement(Connector));
 }
 export default Connector;

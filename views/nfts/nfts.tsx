@@ -12,8 +12,7 @@ import { OnTransferBatch } from '../../source/wallet';
 import { OnTransferSingle } from '../../source/wallet';
 import { Years } from '../../source/years';
 
-import React, { createElement } from 'react';
-import { createRoot } from 'react-dom/client';
+import React from 'react';
 import { NftList } from './list/list';
 import { NftMinter } from './minter/minter';
 
@@ -52,18 +51,6 @@ function matrix(
         )
     );
     return entries as Matrix;
-}
-function list(
-    display = false, toggled = false
-) {
-    const entries = Object.fromEntries(
-        Array.from(NftLevels()).map(
-            (nft_level) => [nft_level, {
-                display, toggled
-            }]
-        )
-    );
-    return entries as List;
 }
 function join(
     lhs: List, rhs: Matrix[NftToken]
@@ -112,7 +99,7 @@ export class UiNfts extends React.Component<
         };
         this.events();
     }
-    events() {
+    async events() {
         App.onNftChanged(/*sync-nfts*/() => {
             const nft_token = Nft.token(
                 this.props.token
@@ -295,10 +282,4 @@ Blockchain.onceConnect(async function onNftBatchTransfers({
 }, {
     per: () => App.token
 });
-if (require.main === module) {
-    const $nfts = document.querySelector('content');
-    createRoot($nfts!).render(createElement(UiNfts, {
-        list: list(), toggled: false, token: App.token
-    }));
-}
 export default UiNfts;

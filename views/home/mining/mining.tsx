@@ -24,6 +24,15 @@ export class Mining extends React.Component<{
         </React.Fragment>;
     }
 }
+App.onPageSwitch(async function stopMining() {
+    const address = await Blockchain.selectedAddress;
+    if (address) {
+        const miner = MiningManager.miner(address, {
+            token: App.token
+        });
+        miner.stop();
+    }
+});
 Blockchain.onceConnect(function refreshBlockHash({
     address, token
 }) {

@@ -1,10 +1,7 @@
 import './home.scss';
-
-import { App } from '../../source/app';
 import { Token } from '../../source/redux/types';
 
-import React, { createElement } from 'react';
-import { createRoot } from 'react-dom/client';
+import React from 'react';
 import { Mining } from './mining/mining';
 import { Minting } from './minting/minting';
 
@@ -26,11 +23,5 @@ export class UiHome extends React.Component<
             </div>
         </React.Fragment>;
     }
-}
-if (require.main === module) {
-    const $content = document.querySelector('content');
-    createRoot($content!).render(createElement(UiHome, {
-        token: App.token, speed: App.speed
-    }));
 }
 export default UiHome;

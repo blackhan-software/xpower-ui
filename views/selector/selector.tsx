@@ -5,8 +5,7 @@ import { Tokenizer } from '../../source/token';
 import { Token } from '../../source/redux/types';
 import { Tooltip } from '../tooltips';
 
-import React, { createElement, MouseEvent } from 'react';
-import { createRoot } from 'react-dom/client';
+import React, { MouseEvent } from 'react';
 
 type Props = {
     token: Token;
@@ -127,11 +126,5 @@ function Spinner(
     return <span
         className={classes.join(' ')} role='status'
     />;
-}
-if (require.main === module) {
-    const $selector = document.querySelector('form#selector');
-    createRoot($selector!).render(createElement(Selector, {
-        token: App.token
-    }));
 }
 export default Selector;

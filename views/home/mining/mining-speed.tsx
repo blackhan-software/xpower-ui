@@ -28,7 +28,7 @@ export class MiningSpeed extends React.Component<
         this.events();
     }
     events() {
-        Blockchain.onConnect(/*initialize*/({
+        Blockchain.onConnect(({
             address, token
         }) => {
             const miner = MiningManager.miner(address, {
@@ -36,7 +36,7 @@ export class MiningSpeed extends React.Component<
             });
             this.setState({ speed: miner.speed });
         });
-        Blockchain.onceConnect(/*synchronize*/({
+        Blockchain.onceConnect(({
             address, token
         }) => {
             const miner = MiningManager.miner(address, {

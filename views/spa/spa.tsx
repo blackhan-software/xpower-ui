@@ -90,6 +90,7 @@ export class SPA extends React.Component<
         if (page === Page.Staking) {
             return <h1>Stake minted XPower NFTs on Avalanche <Avalanche /></h1>;
         }
+        return null;
     }
     $connector(
         page: Page

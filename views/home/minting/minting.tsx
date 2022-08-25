@@ -14,21 +14,24 @@ import { Tokenizer } from '../../../source/token';
 import { Level, Token } from '../../../source/redux/types';
 import { MoeWallet, OnTransfer, OtfWallet } from '../../../source/wallet';
 
-import React, { createElement } from 'react';
-import { createRoot } from 'react-dom/client';
+import React from 'react';
 import { nice } from '../../../filters';
 
+type Props = {
+    token: Token
+}
+type State = {
+    rows: Row[]
+}
 type Row = {
     disabled: boolean,
     display: boolean,
     nn_counter: number,
     tx_counter: number
 };
-export class Minting extends React.Component<{
-    token: Token
-}, {
-    token: Token, rows: Row[]
-}> {
+export class Minting extends React.Component<
+    Props, State
+> {
     static get levels() {
         return Array.from(range(1, 65)) as Level[];
     }
@@ -50,9 +53,9 @@ export class Minting extends React.Component<{
             ...row
         };
     }
-    constructor(props: {
-        token: Token
-    }) {
+    constructor(
+        props: Props
+    ) {
         super(props);
         this.state = {
             ...Minting.rows, ...props
@@ -78,16 +81,16 @@ export class Minting extends React.Component<{
         );
     }
     events() {
-        App.onTokenSwitch(/*initialize*/(token) => {
-            this.setState({ ...Minting.rows, token });
+        App.onTokenSwitch(() => {
+            this.setState({ ...Minting.rows });
         });
-        Blockchain.onceConnect(/*synchronize*/({
+        Blockchain.onceConnect(({
             address
         }) => {
             App.onNonceChanged(address, (
                 nonce, { amount, token }, total
             ) => {
-                if (token !== this.state.token) {
+                if (token !== this.props.token) {
                     return;
                 }
                 const amount_min = Tokenizer.amount(
@@ -104,7 +107,8 @@ export class Minting extends React.Component<{
         });
     }
     render() {
-        const { token, rows } = this.state;
+        const { token } = this.props;
+        const { rows } = this.state;
         return <React.Fragment>
             <label className='form-label'>
                 Mined Amounts (not minted yet)
@@ -171,7 +175,7 @@ export class Minting extends React.Component<{
                     return;
                 }
                 moe_wallet.offTransfer(on_transfer);
-                if (token !== this.state.token) {
+                if (token !== this.props.token) {
                     return;
                 }
                 const { tx_counter } = this.getRow(level - 1);
@@ -301,6 +305,9 @@ export class Minting extends React.Component<{
         });
     }
 }
+App.onPageSwitched(function forgetNonce() {
+    App.removeNonces();
+});
 App.onTokenSwitched(function forgetNonces() {
     App.removeNonces();
 });
@@ -346,10 +353,4 @@ Blockchain.onceConnect(function autoMint({
 }, {
     per: () => App.token
 });
-if (require.main === module) {
-    const $minting = document.querySelector('div#minting');
-    createRoot($minting!).render(createElement(Minting, {
-        token: App.token
-    }));
-}
 export default Minting;

@@ -55,21 +55,6 @@ export class PptDetails extends Referable(React.Component)<
         this.events();
     }
     async events() {
-        Array.from(Years()).forEach(delayed((
-            issue: NftIssue
-        ) => {
-            const core_id = Nft.coreId({
-                level: this.props.level, issue
-            });
-            const ref = this.global_ref<HTMLElement>(
-                `ppt:${core_id}`
-            );
-            ref.current?.addEventListener('refresh-claims', () => {
-                const { token, level } = this.props;
-                const nft_token = Nft.token(token);
-                reset(nft_token, level, issue);
-            });
-        }));
         App.onPptChanged(async/*reset-claims*/(
             full_id: NftFullId
         ) => {
@@ -89,6 +74,24 @@ export class PptDetails extends Referable(React.Component)<
             }
             reset(nft_token, nft_level, nft_issue);
         });
+        Array.from(Years()).forEach(delayed((
+            issue: NftIssue
+        ) => {
+            const core_id = Nft.coreId({
+                level: this.props.level, issue
+            });
+            const ref = this.global_ref<HTMLElement>(
+                `ppt:${core_id}`
+            );
+            ref.current?.addEventListener('refresh-claims', () => {
+                const { token, level } = this.props;
+                const nft_token = Nft.token(token);
+                reset(nft_token, level, issue);
+            });
+            const { token, level } = this.props;
+            const nft_token = Nft.token(token);
+            reset(nft_token, level, issue);
+        }));
         const reset = async (
             nft_token: NftToken,
             nft_level: NftLevel,

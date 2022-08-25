@@ -6,8 +6,7 @@ import { MiningManager } from '../../source/managers';
 import { Token } from '../../source/redux/types';
 import { OtfWallet } from '../../source/wallet';
 
-import React, { createElement } from 'react';
-import { createRoot } from 'react-dom/client';
+import React from 'react';
 import { AftWalletUi } from './aft-wallet-ui';
 import { OtfWalletUi } from './otf-wallet-ui';
 import { CSSTransition } from 'react-transition-group';
@@ -76,10 +75,4 @@ Blockchain.onceConnect(async function resumeMiningIf({
     const otf_wallet = await OtfWallet.init();
     otf_wallet.provider?.on('block', on_block);
 });
-if (require.main === module) {
-    const $wallet = document.querySelector('form#wallet');
-    createRoot($wallet!).render(createElement(WalletUi, {
-        token: App.token
-    }));
-}
 export default WalletUi;

@@ -4,14 +4,12 @@ import { Global } from '../../source/types';
 declare const global: Global;
 import './about.scss';
 
-import { App } from '../../source/app';
 import { Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { capitalize } from '../../routes/functions';
 import { link, script } from '../../source/functions';
 
-import React, { createElement } from 'react';
-import { createRoot } from 'react-dom/client';
+import React from 'react';
 
 type markdownIt = (options: any) => {
     use: (plugin: any, options?: any) => void;
@@ -190,11 +188,5 @@ function Spinner(
             width: '2rem',
         }}
     />;
-}
-if (require.main === module) {
-    const $content = document.querySelector('content');
-    createRoot($content!).render(createElement(UiAbout, {
-        token: App.token
-    }));
 }
 export default UiAbout;
