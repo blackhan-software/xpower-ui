@@ -80,7 +80,7 @@ export class MiningManager {
                     style: { margin: '0.5em 0 -0.5em 0' },
                     after: $toggle?.parentElement
                 });
-        }
+            }
             HashManager.me.removeAllListeners('block-hash');
             miner.emit('initialized', { block_hash: null });
             console.error(ex);

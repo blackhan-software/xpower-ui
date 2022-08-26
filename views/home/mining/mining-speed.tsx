@@ -9,11 +9,15 @@ import React from 'react';
 import { DashCircle } from '../../../public/images/tsx';
 import { PlusCircle } from '../../../public/images/tsx';
 
-export class MiningSpeed extends React.Component<{
-    token: Token, speed: number
-}, {
-    token: Token, speed: number, disabled: boolean
-}> {
+type Props = {
+    token: Token; speed: number;
+}
+type State = {
+    speed: number; disabled: boolean;
+}
+export class MiningSpeed extends React.Component<
+    Props, State
+> {
     constructor(props: {
         token: Token, speed: number
     }) {
@@ -24,9 +28,6 @@ export class MiningSpeed extends React.Component<{
         this.events();
     }
     events() {
-        App.onTokenSwitch((token) => {
-            this.setState({ token });
-        });
         Blockchain.onConnect(/*initialize*/({
             address, token
         }) => {
@@ -58,7 +59,8 @@ export class MiningSpeed extends React.Component<{
         });
     }
     render() {
-        const { token, speed, disabled } = this.state;
+        const { token } = this.props;
+        const { speed, disabled } = this.state;
         return <div
             className='btn-group tweak-mining' role='group'
         >
@@ -167,11 +169,13 @@ export class MiningSpeed extends React.Component<{
         e.preventDefault();
         e.stopPropagation();
         if (e.deltaY < 0) {
-            const { token, speed, disabled } = this.state;
+            const { token } = this.props;
+            const { speed, disabled } = this.state;
             this.increase(token, speed, disabled);
         }
         if (e.deltaY > 0) {
-            const { token, speed, disabled } = this.state;
+            const { token } = this.props;
+            const { speed, disabled } = this.state;
             this.decrease(token, speed, disabled);
         }
         return false;

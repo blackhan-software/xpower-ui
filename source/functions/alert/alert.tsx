@@ -1,5 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { capitalize } from '../../../routes/functions';
 
 export enum Alert {
     primary = 'primary',
@@ -78,9 +79,10 @@ export class Alerts {
             className={`alert alert-${type} alert-dismissible align-items-center d-flex`}
             data-id={`'${options.id}'`} role='alert' style={options.style}
         >
-            <i className={`bi bi-${options.icon} flex-shrink-0 me-3`} />{
-                message
-            }
+            <i className={`bi bi-${options.icon} flex-shrink-0 me-3`} />
+            <div className='text-truncate' title={capitalize(message)}>
+                {capitalize(message)}
+            </div>
             <button className='btn-sm btn-close' data-bs-dismiss='alert'
                 type='button'
             />

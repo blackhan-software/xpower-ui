@@ -6,6 +6,13 @@ import { Token } from '../../../source/redux/types';
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 
+type Props = {
+    token: Token;
+}
+type State = {
+    status: Status;
+    disabled: boolean;
+}
 enum Status {
     initializing,
     initialized,
@@ -19,25 +26,20 @@ enum Status {
     resumed,
     idle
 }
-export class MiningToggle extends React.Component<{
-    token: Token
-}, {
-    token: Token, status: Status, disabled: boolean
-}> {
+export class MiningToggle extends React.Component<
+    Props, State
+> {
     constructor(props: {
         token: Token
     }) {
         super(props);
         this.state = {
-            status: Status.idle, disabled: false, ...this.props
+            status: Status.idle, disabled: false
         };
         this.events();
     }
     events() {
-        App.onTokenSwitch((token) => {
-            this.setState({ token });
-        });
-        Blockchain.onConnect(/*initialize*/({
+        Blockchain.onConnect(/*init*/({
             address, token
         }) => {
             const miner = MiningManager.miner(address, {
@@ -47,7 +49,7 @@ export class MiningToggle extends React.Component<{
                 this.setState({ status: Status.stopped });
             }
         });
-        Blockchain.onceConnect(/*synchronize*/({
+        Blockchain.onceConnect(/*sync*/({
             address, token
         }) => {
             const miner = MiningManager.miner(address, {
@@ -111,7 +113,8 @@ export class MiningToggle extends React.Component<{
         });
     }
     render() {
-        const { token, status, disabled } = this.state;
+        const { token } = this.props;
+        const { status, disabled } = this.state;
         return <div
             className='btn-group toggle-mining' role='group'
         >
