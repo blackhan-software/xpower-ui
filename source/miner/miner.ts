@@ -8,8 +8,8 @@ export type OnMined = ({ nonce, amount, worker }: {
 }) => void;
 
 export class Miner extends EventEmitter {
-    private static SPEED_DEFAULT = 0.5; // [0..1]
-    private static WORKERS_MAX = logical_cpus();
+    public static SPEED_DEFAULT = 0.5; // [0..1]
+    public static WORKERS_MAX = logical_cpus();
     public constructor(
         /** token to mine for */
         token: Token,

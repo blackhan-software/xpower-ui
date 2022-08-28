@@ -16,14 +16,27 @@ export function* DeltaYears(
         yield dy;
     }
 }
-export function* Years(
-    min = MIN_YEAR(), max?: Year
-) {
+export function* Years({
+    min, max, reverse
+}: {
+    min?: number, max?: number, reverse: boolean
+} = {
+    min: undefined, max: undefined, reverse: false
+}) {
+    if (typeof min !== 'number') {
+        min = MIN_YEAR();
+    }
     if (typeof max !== 'number') {
         max = MAX_YEAR({ inclusive: true })
     }
-    for (let y = min; y < max; y++) {
-        yield y;
+    if (reverse) {
+        for (let y = max; y > min; y--) {
+            yield y - 1;
+        }
+    } else {
+        for (let y = min; y < max; y++) {
+            yield y;
+        }
     }
 }
 export default Years;

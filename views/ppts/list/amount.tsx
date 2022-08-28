@@ -16,9 +16,9 @@ type Props = {
 type OnUpdate = (args: Omit<Props, 'onUpdate'> & {
     callback?: () => void
 }) => void;
-export class PptAmount extends Referable(
-    React.Component<Props>
-) {
+export class UiPptAmount extends Referable(React.Component)<
+    Props
+> {
     render() {
         const { amount, max, min, level } = this.props;
         return <React.Fragment>
@@ -222,4 +222,4 @@ export class PptAmount extends Referable(
         );
     }
 }
-export default PptAmount;
+export default UiPptAmount;

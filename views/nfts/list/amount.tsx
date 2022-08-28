@@ -16,9 +16,9 @@ type Props = {
 type OnUpdate = (args: Omit<Props, 'onUpdate'> & {
     callback?: () => void
 }) => void;
-export class NftAmount extends Referable(
-    React.Component<Props>
-) {
+export class UiNftAmount extends Referable(React.Component)<
+    Props
+> {
     render() {
         const { amount, max, min, level } = this.props;
         return <React.Fragment>
@@ -198,17 +198,17 @@ export class NftAmount extends Referable(
         }
     }
     componentDidMount() {
-        const $amount = this.ref<HTMLElement>('amount').current;
-        $amount?.addEventListener(
+        const $amount = this.ref<HTMLElement>('amount');
+        $amount.current?.addEventListener(
             'wheel', this.decreaseByWheel.bind(this), {
                 passive: false
             }
         );
-        $amount?.addEventListener(
+        $amount.current?.addEventListener(
             'wheel', this.increaseByWheel.bind(this), {
                 passive: false
             }
         );
     }
 }
-export default NftAmount;
+export default UiNftAmount;

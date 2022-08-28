@@ -4,26 +4,51 @@ import './amount';
 import { App } from '../../../source/app';
 import { buffered, delayed } from '../../../source/functions';
 import { Amount, Supply, Token } from '../../../source/redux/types';
-import { Nft, NftLevel, NftLevels } from '../../../source/redux/types';
+import { Nft, NftIssue, NftLevel, NftLevels } from '../../../source/redux/types';
 import { Tooltip } from '../../tooltips';
 
 import React from 'react';
-import { NftAmount } from './amount';
-import { NftDetails } from '../details/details';
+import { UiNftAmount } from './amount';
+import { UiNftDetails, NftDetails } from '../details/details';
 
 type Props = {
     token: Token;
-    list: List;
-    onList: (list: Partial<List>) => void;
+    list: NftList;
+    onNftList?: (
+        list: Partial<NftList>
+    ) => void;
+    details: NftDetails;
+    onNftImageLoaded?: (
+        issue: NftIssue,
+        level: NftLevel
+    ) => void;
+    onNftSenderExpanded?: (
+        issues: NftIssue[],
+        level: NftLevel,
+        toggled: boolean
+    ) => void;
+    onNftTargetChanged?: (
+        issue: NftIssue,
+        level: NftLevel,
+        value: Amount | null,
+        valid: boolean | null
+    ) => void;
+    onNftAmountChanged?: (
+        issue: NftIssue,
+        level: NftLevel,
+        value: Amount | null,
+        valid: boolean | null
+    ) => void;
+    onNftTransfer?: (
+        issue: NftIssue,
+        level: NftLevel
+    ) => void;
 }
-type List = Record<NftLevel, {
-    amount: Amount;
-    max: Amount;
-    min: Amount;
-    display: boolean;
-    toggled: boolean;
+export type NftList = Record<NftLevel, {
+    amount: Amount; max: Amount; min: Amount;
+    display: boolean; toggled: boolean;
 }>;
-export class NftList extends React.Component<
+export class UiNftList extends React.Component<
     Props
 > {
     render() {
@@ -54,7 +79,7 @@ export class NftList extends React.Component<
         token: Token, nft_level: NftLevel,
         by_token: { amount: Amount, supply: Supply },
         by_level: { amount: Amount, supply: Supply },
-        { amount, max, min, display, toggled }: List[NftLevel],
+        { amount, max, min, display, toggled }: NftList[NftLevel],
     ) {
         return <React.Fragment key={nft_level}>
             {this.$amount(token, nft_level, by_level, by_token, {
@@ -69,7 +94,7 @@ export class NftList extends React.Component<
         token: Token, nft_level: NftLevel,
         by_level: { amount: Amount, supply: Supply },
         by_token: { amount: Amount, supply: Supply },
-        { amount, max, min, display, toggled }: List[NftLevel],
+        { amount, max, min, display, toggled }: NftList[NftLevel],
     ) {
         const any_filter = [
             by_level.supply, by_level.amount, amount, max, min
@@ -86,21 +111,23 @@ export class NftList extends React.Component<
             {this.$toggle(nft_level, toggled)}
             {this.$minter(nft_level, token)}
             {this.$balance(nft_level, by_token)}
-            <NftAmount
+            <UiNftAmount
                 amount={amount}
                 level={nft_level}
                 max={max} min={min}
                 onUpdate={({ amount }) => {
-                    this.props.onList({
-                        [nft_level]: { amount }
-                    });
-                } } />
+                    if (this.props.onNftList) {
+                        this.props.onNftList({
+                            [nft_level]: { amount }
+                        });
+                    }
+                }} />
         </div>;
     }
     $details(
         token: Token, nft_level: NftLevel,
         by_level: { amount: Amount, supply: Supply },
-        { amount, max, min, display, toggled }: List[NftLevel],
+        { amount, max, min, display, toggled }: NftList[NftLevel],
     ) {
         const any_filter = [
             by_level.supply, by_level.amount, amount, max, min
@@ -115,9 +142,28 @@ export class NftList extends React.Component<
                 data-level={Nft.nameOf(nft_level)}
                 style={style}
             >
-                <NftDetails
+                <UiNftDetails
                     token={token}
-                    level={nft_level} />
+                    level={nft_level}
+                    details={
+                        this.props.details
+                    }
+                    onNftImageLoaded={
+                        this.props.onNftImageLoaded?.bind(this)
+                    }
+                    onNftSenderExpanded={
+                        this.props.onNftSenderExpanded?.bind(this)
+                    }
+                    onNftTargetChanged={
+                        this.props.onNftTargetChanged?.bind(this)
+                    }
+                    onNftAmountChanged={
+                        this.props.onNftAmountChanged?.bind(this)
+                    }
+                    onNftTransfer={
+                        this.props.onNftTransfer?.bind(this)
+                    }
+                />
             </div>;
         }
     }
@@ -146,9 +192,11 @@ export class NftList extends React.Component<
     toggle(
         nft_level: NftLevel, toggled: boolean
     ) {
-        this.props.onList({
-            [nft_level]: { toggled: !toggled }
-        });
+        if (this.props.onNftList) {
+            this.props.onNftList({
+                [nft_level]: { toggled: !toggled }
+            });
+        }
     }
     $minter(
         nft_level: NftLevel, token: Token
@@ -214,4 +262,4 @@ export class NftList extends React.Component<
         })));
     })
 }
-export default NftList;
+export default UiNftList;

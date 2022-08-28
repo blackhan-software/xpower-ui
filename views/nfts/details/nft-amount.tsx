@@ -10,12 +10,12 @@ type Props = {
     balance: Amount;
     value: Amount | null;
     valid: boolean | null;
-    onChange: (
+    onAmountChanged: (
         value: Amount | null,
         valid: boolean | null
     ) => void;
 }
-export class NftAmount extends React.Component<
+export class UiNftAmount extends React.Component<
     Props
 > {
     render() {
@@ -72,7 +72,7 @@ export class NftAmount extends React.Component<
     onChange(
         e: ChangeEvent<HTMLInputElement> | FormEvent<HTMLInputElement>
     ) {
-        if (typeof this.props.onChange !== 'function') {
+        if (typeof this.props.onAmountChanged !== 'function') {
             return;
         }
         const $target = e.target as HTMLInputElement;
@@ -87,14 +87,14 @@ export class NftAmount extends React.Component<
             value = null;
         }
         if (value === null || !$target.value) {
-            this.props.onChange(value, null);
+            this.props.onAmountChanged(value, null);
         } else if (
             value > 0 && value <= this.props.balance
         ) {
-            this.props.onChange(value, true);
+            this.props.onAmountChanged(value, true);
         } else {
-            this.props.onChange(value, false);
+            this.props.onAmountChanged(value, false);
         }
     }
 }
-export default NftAmount;
+export default UiNftAmount;

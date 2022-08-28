@@ -9,9 +9,9 @@ type Props = {
     issue: NftIssue;
     level: NftLevel;
     toggled: boolean;
-    onToggle: (toggled: boolean) => void;
+    onToggled: (toggled: boolean) => void;
 }
-export class PptExpander extends Referable(React.Component)<
+export class UiPptExpander extends Referable(React.Component)<
     Props
 > {
     render() {
@@ -64,7 +64,7 @@ export class PptExpander extends Referable(React.Component)<
     toggle(
         toggled: boolean
     ) {
-        this.props.onToggle(toggled);
+        this.props.onToggled(toggled);
     }
     expand(
         nft_issue: NftIssue, nft_level: NftLevel
@@ -134,4 +134,4 @@ export class PptExpander extends Referable(React.Component)<
         }));
     }
 }
-export default PptExpander;
+export default UiPptExpander;

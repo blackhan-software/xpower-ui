@@ -24,7 +24,7 @@ App.onPageSwitch(function syncLocationTitle(page, prev) {
         [Page.None]: 'XPower',
         [Page.Home]: 'XPower',
         [Page.Nfts]: 'XPower: NFTs',
-        [Page.Staking]: 'XPower: Staking',
+        [Page.Ppts]: 'XPower: Staking',
         [Page.About]: 'XPower: About',
     };
     const title = document.title = titles[page];
@@ -39,7 +39,7 @@ App.onPageSwitch(function syncLocationDescription(page) {
         [Page.None]: 'Mine & Mint Proof-of-Work Tokens on Avalanche',
         [Page.Home]: 'Mine & Mint Proof-of-Work Tokens on Avalanche',
         [Page.Nfts]: 'Mint stakeable XPower NFTs on Avalanche',
-        [Page.Staking]: 'Stake minted XPower NFTs on Avalanche',
+        [Page.Ppts]: 'Stake minted XPower NFTs on Avalanche',
         [Page.About]: 'Mine & Mint Proof-of-Work Tokens on Avalanche',
     };
     if ($meta) {

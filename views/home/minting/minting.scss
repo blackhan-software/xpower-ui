@@ -4,6 +4,13 @@ div#minting {
   }
   div.btn-group.mint {
     button.minter {
+      span.spinner {
+        margin-top: 0.25em;
+      }
+      span.spinner {
+        height: 1em;
+        width: 1em;
+      }
       border-right: none;
       width: calc(100% - 150px);
     }

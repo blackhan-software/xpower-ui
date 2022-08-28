@@ -10,7 +10,7 @@ type Props = {
     token: Token;
     value: Amount | null;
 }
-export class PptClaimable extends React.Component<
+export class UiPptClaimed extends React.Component<
     Props
 > {
     render() {
@@ -22,10 +22,10 @@ export class PptClaimable extends React.Component<
         token: Token, value: Amount | null
     ) {
         return <React.Fragment>
-            <label className='form-label nft-claimable-label d-none d-sm-flex'>
-                Claimable Amount
+            <label className='form-label nft-claimed-label d-none d-sm-flex'>
+                Claimed Amount
             </label>
-            <div className='input-group nft-claimable d-none d-sm-flex'
+            <div className='input-group nft-claimed d-none d-sm-flex'
                 data-level={Nft.nameOf(nft_level)} role='group'
             >
                 <input type='number'
@@ -35,7 +35,7 @@ export class PptClaimable extends React.Component<
                 />
                 <span className='input-group-text info'
                     data-bs-placement='top' data-bs-toggle='tooltip'
-                    title={`Min. amount of claimable ${token} rewards (for ${nft_issue})`}
+                    title={`Amount of claimed ${token} rewards so far (for ${nft_issue})`}
                 >
                     <InfoCircle fill={true} />
                 </span>
@@ -43,4 +43,4 @@ export class PptClaimable extends React.Component<
         </React.Fragment>;
     }
 }
-export default PptClaimable;
+export default UiPptClaimed;

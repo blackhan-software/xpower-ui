@@ -42,7 +42,7 @@ export class UiHeader extends React.Component<
         }>
             {this.$anchor(Page.Home)}
             {this.$anchor(Page.Nfts)}
-            {this.$anchor(Page.Staking)}
+            {this.$anchor(Page.Ppts)}
             {this.$anchor(Page.About)}
         </nav>;
     }
@@ -93,14 +93,14 @@ export class UiHeader extends React.Component<
     icons: Record<Page, string> = {
         [Page.Home]: 'bi-lightning-charge-fill',
         [Page.Nfts]: 'bi-image-fill',
-        [Page.Staking]: 'bi-cash-stack',
+        [Page.Ppts]: 'bi-cash-stack',
         [Page.About]: 'bi-lightbulb-fill',
         [Page.None]: '',
     }
     labels: Record<Page, string> = {
         [Page.Home]: 'XPower',
         [Page.Nfts]: 'NFTs',
-        [Page.Staking]: 'Staking',
+        [Page.Ppts]: 'Staking',
         [Page.About]: 'About',
         [Page.None]: '',
     }

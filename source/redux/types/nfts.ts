@@ -4,6 +4,9 @@ export class Nft {
     static nameOf(level: NftLevel) {
         return NftLevel[level] as NftName | undefined;
     }
+    static rankOf(level: NftLevel) {
+        return level / 3 + 1;
+    }
     static token(id: string): NftToken {
         const [prefix] = id.split(':');
         switch (prefix.toLowerCase()) {

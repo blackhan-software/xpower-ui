@@ -1,19 +1,12 @@
-import { App } from '../../../source/app';
-import { Blockchain } from '../../../source/blockchain';
-import { MiningManager } from '../../../source/managers';
-import { Token } from '../../../source/redux/types';
-
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 
 type Props = {
-    token: Token;
-}
-type State = {
-    status: Status | null;
+    status: MinerStatus | null;
+    onToggle?: () => void;
     disabled: boolean;
 }
-enum Status {
+export enum MinerStatus {
     initializing,
     initialized,
     starting,
@@ -26,153 +19,82 @@ enum Status {
     resumed
 }
 export class MiningToggle extends React.Component<
-    Props, State
+    Props
 > {
-    constructor(props: {
-        token: Token
-    }) {
-        super(props);
-        this.state = {
-            status: null, disabled: false
-        };
-        this.events();
-    }
-    async events() {
-        Blockchain.onConnect(({
-            address, token
-        }) => {
-            const miner = MiningManager.miner(address, {
-                token
-            });
-            if (!miner.running) {
-                this.setState({ status: Status.stopped });
-            }
-            this.setState({
-                disabled: miner.speed < 0.001
-            });
-        });
-        Blockchain.onceConnect(({
-            address, token
-        }) => {
-            const miner = MiningManager.miner(address, {
-                token
-            });
-            miner.on('initializing', () => {
-                this.setState({ status: Status.initializing });
-            });
-            miner.on('initialized', () => {
-                this.setState({ status: Status.initialized });
-            });
-            miner.on('starting', () => {
-                this.setState({ status: Status.starting });
-            });
-            miner.on('started', () => {
-                this.setState({ status: Status.started });
-            });
-            miner.on('stopping', () => {
-                this.setState({ status: Status.stopping });
-            });
-            miner.on('stopped', () => {
-                this.setState({ status: Status.stopped });
-            });
-            miner.on('pausing', () => {
-                this.setState({ status: Status.pausing });
-            });
-            miner.on('paused', () => {
-                this.setState({ status: Status.paused });
-            });
-            miner.on('resuming', () => {
-                this.setState({ status: Status.resuming });
-            });
-            miner.on('resumed', () => {
-                this.setState({ status: Status.resumed });
-            });
-            miner.on('increased', (ev) => {
-                this.setState({ disabled: ev.speed < 0.001 });
-            });
-            miner.on('decreased', (ev) => {
-                this.setState({ disabled: ev.speed < 0.001 });
-            });
-        }, {
-            per: () => App.token
-        });
-    }
     render() {
-        const { token } = this.props;
-        const { status, disabled } = this.state;
+        const { status, disabled } = this.props;
         return <div
             className='btn-group toggle-mining' role='group'
         >
-            {this.$toggle(token, status, disabled)}
+            {this.$toggle(status, disabled)}
             {this.$info()}
         </div>;
     }
     $toggle(
-        token: Token, status: Status | null, disabled: boolean
+        status: MinerStatus | null, disabled: boolean
     ) {
         return <button type='button' id='toggle-mining'
             className='btn btn-outline-warning'
             disabled={this.disabled(status, disabled)}
-            onClick={this.toggle.bind(this, token)}
+            onClick={this.toggle.bind(this)}
         >
             {Spinner(status)}
             {this.$text(status)}
         </button>
     }
-    async toggle(
-        token: Token
-    ) {
-        const address = await Blockchain.selectedAddress;
-        if (!address) {
-            throw new Error('missing selected-address');
+    toggle() {
+        if (this.props.onToggle) {
+            this.props.onToggle();
         }
-        MiningManager.toggle(address, { token });
     }
     disabled(
-        status: Status | null, disabled: boolean
+        status: MinerStatus | null, disabled: boolean
     ) {
         if (disabled) {
             return true;
         }
+        if (status === null) {
+            return false;
+        }
         switch (status) {
-            case Status.initialized:
-            case Status.started:
-            case Status.stopped:
-            case Status.paused:
-            case Status.resumed:
+            case MinerStatus.initialized:
+            case MinerStatus.started:
+            case MinerStatus.stopped:
+            case MinerStatus.paused:
+            case MinerStatus.resumed:
                 return false;
         }
         return true;
     }
     $text(
-        status: Status | null
+        status: MinerStatus | null
     ) {
         return <span className='text'>
             {this.text(status)}
         </span>;
     }
     text(
-        status: Status | null
+        status: MinerStatus | null
     ) {
         switch (status) {
-            case Status.initializing:
+            case MinerStatus.initializing:
                 return 'Initializing Mining…';
-            case Status.initialized:
+            case MinerStatus.initialized:
                 return 'Start Mining';
-            case Status.starting:
+            case MinerStatus.starting:
                 return 'Starting Mining…';
-            case Status.started:
+            case MinerStatus.started:
                 return 'Stop Mining';
-            case Status.stopping:
-            case Status.stopped:
+            case MinerStatus.stopping:
+            case MinerStatus.stopped:
                 return 'Start Mining';
-            case Status.pausing:
+            case MinerStatus.pausing:
                 return 'Pausing Mining…';
-            case Status.paused:
+            case MinerStatus.paused:
                 return 'Resume Mining';
-            case Status.resuming:
+            case MinerStatus.resuming:
                 return 'Resuming Mining…';
-            case Status.resumed:
+            case MinerStatus.resumed:
                 return 'Stop Mining';
         }
         return 'Start Mining';
@@ -188,30 +110,30 @@ export class MiningToggle extends React.Component<
     }
 }
 function Spinner(
-    status: Status | null
+    status: MinerStatus | null
 ) {
-    const visible = (status: Status | null) => {
+    const visible = (status: MinerStatus | null) => {
         switch (status) {
-            case Status.initializing:
-            case Status.starting:
-            case Status.stopping:
-            case Status.pausing:
-            case Status.resuming:
+            case MinerStatus.initializing:
+            case MinerStatus.starting:
+            case MinerStatus.stopping:
+            case MinerStatus.pausing:
+            case MinerStatus.resuming:
                 return 'visible';
         }
         switch (status) {
-            case Status.started:
+            case MinerStatus.started:
                 return 'visible';
         }
         return 'hidden';
     };
-    const grow = (status: Status | null) => {
+    const grow = (status: MinerStatus | null) => {
         switch (status) {
-            case Status.initializing:
-            case Status.starting:
-            case Status.stopping:
-            case Status.pausing:
-            case Status.resuming:
+            case MinerStatus.initializing:
+            case MinerStatus.starting:
+            case MinerStatus.stopping:
+            case MinerStatus.pausing:
+            case MinerStatus.resuming:
                 return 'spinner-grow';
         }
         return '';

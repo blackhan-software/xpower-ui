@@ -1,12 +1,12 @@
-import { delayed } from '../../../source/functions';
+import { buffered, delayed } from '../../../source/functions';
 import { Tooltip } from '../../tooltips';
 
 import React from 'react';
 type Props = {
     toggled: boolean;
-    onToggle: (toggled: boolean) => void;
+    onToggled?: (toggled: boolean) => void;
 }
-export class NftUiToggle extends React.Component<
+export class UiNftToggle extends React.Component<
     Props
 > {
     render() {
@@ -20,7 +20,7 @@ export class NftUiToggle extends React.Component<
             className='btn btn-outline-warning toggle-old no-ellipsis'
             data-bs-placement='top' data-bs-toggle='tooltip'
             data-state={toggled ? 'on' : 'off' }
-            onClick={this.toggle.bind(this, toggled)}
+            onClick={this.props.onToggled?.bind(this, toggled)}
             title={this.title(toggled)}
         >
             <i className={
@@ -35,12 +35,7 @@ export class NftUiToggle extends React.Component<
             ? 'Hide older NFTs'
             : 'Show older NFTs';
     }
-    toggle(
-        toggled: boolean
-    ) {
-        this.props.onToggle(toggled);
-    }
-    componentDidUpdate() {
+    componentDidUpdate = buffered(() => {
         const $toggles = document.querySelectorAll<HTMLElement>(
             '.toggle-old'
         );
@@ -48,6 +43,6 @@ export class NftUiToggle extends React.Component<
             Tooltip.getInstance($el)?.dispose();
             Tooltip.getOrCreateInstance($el);
         }));
-    }
+    })
 }
-export default NftUiToggle;
+export default UiNftToggle;

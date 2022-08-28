@@ -1,51 +1,44 @@
-/* eslint @typescript-eslint/no-explicit-any: [off] */
-import { Global } from '../../../source/types';
-declare const global: Global;
-
-import { App } from '../../../source/app';
-import { Blockchain } from '../../../source/blockchain';
-import { Alerts, Alert, alert } from '../../../source/functions';
-import { range } from '../../../source/functions';
-import { HashManager } from '../../../source/managers';
-import { IntervalManager } from '../../../source/managers';
-import { MiningManager } from '../../../source/managers';
-import { Tooltip } from '../../tooltips';
-import { Tokenizer } from '../../../source/token';
+import { buffered, range } from '../../../source/functions';
 import { Level, Token } from '../../../source/redux/types';
-import { MoeWallet, OnTransfer, OtfWallet } from '../../../source/wallet';
-
-import React from 'react';
+import { Tokenizer } from '../../../source/token';
+import { Tooltip } from '../../tooltips';
 import { nice } from '../../../filters';
 
+import React from 'react';
+
 type Props = {
-    token: Token
+    level: Level; rows: MinterRow[]; token: Token;
+    onMint?: (token: Token, level: Level) => void;
+    onForget?: (token: Token, level: Level) => void;
 }
-type State = {
-    rows: Row[]
-}
-type Row = {
-    disabled: boolean,
-    display: boolean,
-    nn_counter: number,
-    tx_counter: number
+export type MinterRow = {
+    status: MinterStatus | null;
+    disabled: boolean;
+    display: boolean;
+    nn_counter: number;
+    tx_counter: number;
 };
+export enum MinterStatus {
+    minting = 'minting',
+    minted = 'minted',
+    error = 'error'
+}
 export class Minting extends React.Component<
-    Props, State
+    Props
 > {
     static get levels() {
         return Array.from(range(1, 65)) as Level[];
     }
-    static get rows() {
-        return {
-            rows: this.levels.map((level) => this.empty({
-                display: level === App.level.min
-            }))
-        };
+    static rows(min_level: Level) {
+        return this.levels.map((level) => this.empty({
+            display: level === min_level
+        }));
     }
     static empty(
-        row: Partial<Row> = {}
+        row: Partial<MinterRow> = {}
     ) {
         return {
+            status: null,
             disabled: true,
             display: false,
             nn_counter: 0,
@@ -53,73 +46,34 @@ export class Minting extends React.Component<
             ...row
         };
     }
-    constructor(
-        props: Props
+    static getRow(
+        rows: MinterRow[], index: number
     ) {
-        super(props);
-        this.state = {
-            ...Minting.rows, ...props
-        };
-        this.events();
-    }
-    getRow(
-        index: number
-    ) {
-        if (index >= this.state.rows.length) {
+        if (index >= rows.length) {
             throw new Error('index out-of-range');
         }
-        return this.state.rows[index];
+        return rows[index];
     }
-    setRow(
-        index: number, new_row: Partial<Row>
+    static setRow(
+        rows: MinterRow[], index: number, new_row: Partial<MinterRow>
     ) {
-        const rows = this.state.rows.map((row, i) =>
+        return rows.map((row, i) =>
             (index !== i) ? { ...row } : { ...row, ...new_row }
         );
-        return new Promise<void>(
-            (resolve) => this.setState({ rows }, resolve)
-        );
-    }
-    events() {
-        App.onTokenSwitch(() => {
-            this.setState({ ...Minting.rows });
-        });
-        Blockchain.onceConnect(({
-            address
-        }) => {
-            App.onNonceChanged(address, (
-                nonce, { amount, token }, total
-            ) => {
-                if (token !== this.props.token) {
-                    return;
-                }
-                const amount_min = Tokenizer.amount(
-                    token, App.level.min
-                );
-                const level = Tokenizer.level(token, amount);
-                const { tx_counter } = this.getRow(level - 1);
-                this.setRow(level - 1, {
-                    disabled: !total,
-                    display: amount === amount_min || total > 0n || tx_counter > 0n,
-                    nn_counter: Number(total / amount),
-                });
-            });
-        });
     }
     render() {
-        const { token } = this.props;
-        const { rows } = this.state;
+        const { rows, token } = this.props;
         return <React.Fragment>
             <label className='form-label'>
                 Mined Amounts (not minted yet)
             </label>
-            {rows.map(
+            {(rows).map(
                 (row, i) => this.$mint(token, i + 1, row)
             )}
         </React.Fragment>;
     }
     $mint(
-        token: Token, level: Level, row: Row
+        token: Token, level: Level, row: MinterRow
     ) {
         return <div
             className='btn-group mint' key={level - 1} role='group'
@@ -132,114 +86,29 @@ export class Minting extends React.Component<
         </div>;
     }
     $minter(
-        token: Token, level: Level, { disabled }: Row
+        token: Token, level: Level, { disabled, status }: MinterRow
     ) {
         const amount = nice(Tokenizer.amount(token, level));
+        const minting = status === MinterStatus.minting;
+        const text = minting
+            ? <>Minting {amount} <span className='d-none d-sm-inline'>{token}</span>…</>
+            : <>Mint {amount} <span className='d-none d-sm-inline'>{token}</span></>;
         return <button className='btn btn-outline-warning minter'
             onClick={this.mint.bind(this, token, level)}
-            type='button' disabled={disabled}
+            type='button' disabled={disabled || minting}
         >
-            {`Mint ${amount}`} <span className='d-none d-sm-inline'>{
-                token
-            }</span>
+            {Spinner({ show: minting, grow: true })}{text}
         </button>;
     }
-    async mint(
+    mint(
         token: Token, level: Level
     ) {
-        const address = await Blockchain.selectedAddress;
-        if (!address) {
-            throw new Error('missing selected-address');
-        } else {
-            Alerts.hide();
-        }
-        const amount = Tokenizer.amount(token, level);
-        const block_hash = HashManager.latestHash({
-            slot: Tokenizer.lower(token)
-        });
-        if (!block_hash) {
-            throw new Error('missing block-hash');
-        }
-        const { nonce } = App.getNonceBy({
-            address, amount, block_hash, token
-        });
-        if (!nonce) {
-            throw new Error(`missing nonce for amount=${amount}`);
-        }
-        const moe_wallet = new MoeWallet(address, token);
-        try {
-            const on_transfer: OnTransfer = async (
-                from, to, amount, ev
-            ) => {
-                if (ev.transactionHash !== mint.hash) {
-                    return;
-                }
-                moe_wallet.offTransfer(on_transfer);
-                if (token !== this.props.token) {
-                    return;
-                }
-                const { tx_counter } = this.getRow(level - 1);
-                if (tx_counter > 0) this.setRow(level - 1, {
-                    tx_counter: tx_counter - 1
-                });
-            };
-            const mint = await moe_wallet.mint(
-                block_hash, nonce
-            );
-            console.debug('[mint]', mint);
-            moe_wallet.onTransfer(on_transfer);
-            const { tx_counter } = this.getRow(level - 1);
-            const inc = this.setRow(level - 1, {
-                tx_counter: tx_counter + 1
-            });
-            inc.then(() => App.removeNonce(nonce, {
-                address, block_hash, token
-            }));
-        } catch (ex: any) {
-            /* eslint no-ex-assign: [off] */
-            if (ex.error) {
-                ex = ex.error;
-            }
-            if (ex.message && ex.message.match(
-                /internal JSON-RPC error/i
-            )) {
-                if (ex.data && ex.data.message && ex.data.message.match(
-                    /gas required exceeds allowance/i
-                )) {
-                    if (OtfWallet.enabled) {
-                        const miner = MiningManager.miner(address, {
-                            token
-                        });
-                        if (miner.running) {
-                            miner.pause();
-                        }
-                    }
-                }
-                if (ex.data && ex.data.message && ex.data.message.match(
-                    /empty nonce-hash/i
-                )) {
-                    App.removeNonce(nonce, {
-                        address, block_hash, token
-                    });
-                }
-            }
-            if (ex.message) {
-                if (ex.data && ex.data.message) {
-                    ex.message = `${ex.message} [${ex.data.message}]`;
-                }
-                const $mints = document.querySelectorAll<HTMLElement>(
-                    '.mint'
-                );
-                alert(ex.message, Alert.warning, {
-                    id: `${nonce}`, style: { margin: '-0.5em 0 0.5em 0' },
-                    after: $mints[level - 1]
-                });
-            }
-            console.error(ex);
+        if (this.props.onMint) {
+            this.props.onMint(token, level);
         }
     }
     $nn_counter(
-        token: Token, level: Level, { disabled, nn_counter }: Row
+        token: Token, level: Level, { disabled, nn_counter }: MinterRow
     ) {
         return <span
             className='d-inline-block'
@@ -253,7 +122,7 @@ export class Minting extends React.Component<
         </span>;
     }
     $tx_counter(
-        token: Token, level: Level, { disabled, tx_counter }: Row
+        token: Token, level: Level, { disabled, tx_counter }: MinterRow
     ) {
         return <span
             className='d-inline-block'
@@ -267,7 +136,7 @@ export class Minting extends React.Component<
         </span>;
     }
     $forget(
-        token: Token, level: Level, { disabled }: Row
+        token: Token, level: Level, { disabled }: MinterRow
     ) {
         return <span
             className='d-inline-block'
@@ -281,21 +150,14 @@ export class Minting extends React.Component<
             >&times;</button>
         </span>;
     }
-    async forget(
+    forget(
         token: Token, level: Level
     ) {
-        const address = await Blockchain.selectedAddress;
-        if (!address) {
-            throw new Error('missing selected-address');
-        }
-        const result = App.getNoncesBy({
-            address, amount: Tokenizer.amount(token, level), token
-        });
-        for (const { item } of result) {
-            App.removeNonceByAmount(item);
+        if (this.props.onForget) {
+            this.props.onForget(token, level);
         }
     }
-    componentDidUpdate() {
+    componentDidUpdate = buffered(() => {
         const $forget = document.querySelectorAll<HTMLElement>(
             '.mint button.forget'
         );
@@ -303,54 +165,18 @@ export class Minting extends React.Component<
             const $tip = $el.parentElement;
             if ($tip) Tooltip.getInstance($tip)?.hide();
         });
-    }
+    })
 }
-App.onPageSwitched(function forgetNonce() {
-    App.removeNonces();
-});
-App.onTokenSwitched(function forgetNonces() {
-    App.removeNonces();
-});
-Blockchain.onceConnect(function forgetNonces() {
-    const im = new IntervalManager({ start: true });
-    im.on('tick', () => App.removeNonces());
-});
-Blockchain.onceConnect(function autoMint({
-    address, token
-}) {
-    const miner = MiningManager.miner(address, {
-        token
-    });
-    miner.on('stopping', () => {
-        if (global.MINTER_IID) {
-            clearInterval(global.MINTER_IID);
-            delete global.MINTER_IID;
-        }
-    });
-    miner.on('started', ({ running }: {
-        running: boolean;
-    }) => {
-        if (global.MINTER_IID) {
-            clearInterval(global.MINTER_IID);
-            delete global.MINTER_IID;
-        }
-        if (running && App.auto_mint > 0) {
-            global.MINTER_IID = setInterval(on_tick, App.auto_mint);
-        }
-    });
-    function on_tick() {
-        if (OtfWallet.enabled) {
-            const $minters = document.querySelectorAll<HTMLButtonElement>(
-                '.minter'
-            );
-            for (const $minter of $minters) {
-                if ($minter.getAttribute('disabled') === null) {
-                    $minter.click();
-                }
-            }
-        }
-    }
-}, {
-    per: () => App.token
-});
+function Spinner(
+    { show, grow }: { show: boolean, grow?: boolean }
+) {
+    const classes = [
+        'spinner spinner-border spinner-border-sm',
+        'float-start', grow ? 'spinner-grow' : ''
+    ];
+    return <span
+        className={classes.join(' ')} role='status'
+        style={{ visibility: show ? 'visible' : 'hidden' }}
+    />;
+}
 export default Minting;

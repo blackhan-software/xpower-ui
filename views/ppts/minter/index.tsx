@@ -1,73 +1,77 @@
-import { buffered } from '../../../source/functions';
+import { buffered, Referable } from '../../../source/functions';
 import { Amount, Token } from '../../../source/redux/types';
 import { NftLevel, NftLevels } from '../../../source/redux/types';
 import { Tooltip } from '../../tooltips';
+
+import { UiPptBatchMinter, PptMinterStatus } from './ppt-batch-minter';
+export { UiPptBatchMinter, PptMinterStatus };
+import { UiPptBatchBurner, PptBurnerStatus } from './ppt-batch-burner';
+export { UiPptBatchBurner, PptBurnerStatus };
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 
 type Props = {
-    approval: NftMinterApproval | null;
+    approval: PptMinterApproval | null;
     onApproval?: (token: Token) => void;
-    status: NftMinterStatus | null;
-    onBatchMint?: (token: Token, list: NftMinterList) => void;
-    list: NftMinterList;
-    onList?: (list: Partial<NftMinterList>) => void;
+    burner_status: PptBurnerStatus | null;
+    onBatchBurn?: (token: Token, list: PptMinterList) => void;
+    minter_status: PptMinterStatus | null;
+    onBatchMint?: (token: Token, list: PptMinterList) => void;
+    list: PptMinterList;
+    onList?: (list: Partial<PptMinterList>) => void;
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
     token: Token;
 }
-export type NftMinterList = Record<NftLevel, {
+export type PptMinterList = Record<NftLevel, {
     amount: Amount; max: Amount; min: Amount;
     display: boolean; toggled: boolean;
 }>
-export type NftMinter = {
-    approval: NftMinterApproval | null;
-    status: NftMinterStatus | null;
+export type PptMinter = {
+    approval: PptMinterApproval | null;
+    minter_status: PptMinterStatus | null;
+    burner_status: PptBurnerStatus | null;
 }
-export function nft_minter() {
-    return { approval: null, status: null };
+export function ppt_minter() {
+    return { approval: null, minter_status: null, burner_status: null };
 }
-export enum NftMinterApproval {
+export enum PptMinterApproval {
     approving = 'approving',
     approved = 'approved',
     error = 'error'
 }
 function approved(
-    approval: NftMinterApproval | null
+    approval: PptMinterApproval | null
 ): boolean {
-    return approval === NftMinterApproval.approved;
+    return approval === PptMinterApproval.approved;
 }
 function approving(
-    approval: NftMinterApproval | null
+    approval: PptMinterApproval | null
 ): boolean {
-    return approval === NftMinterApproval.approving;
+    return approval === PptMinterApproval.approving;
 }
-export enum NftMinterStatus {
-    minting = 'minting',
-    minted = 'minted',
-    error = 'error'
-}
-function minting(
-    status: NftMinterStatus | null
-): boolean | null {
-    return status === NftMinterStatus.minting;
-}
-export class UiNftMinter extends React.Component<
+export class UiPptMinter extends Referable(React.Component)<
     Props
 > {
     render() {
-        const { approval, list, toggled, token } = this.props;
+        const { minter_status, burner_status } = this.props;
+        const { list, toggled, token } = this.props;
+        const { approval } = this.props;
         return <div
-            className='btn-group nft-batch-minter'
+            className='btn-group ppt-batch-minter'
+            ref={this.global_ref('ppt-batch-minter')}
             role='group'
         >
             {this.$toggleAll(toggled)}
             {this.$burnApproval(
                 token, approved(approval), approving(approval)
             )}
-            {this.$batchMinter(
-                token, approved(approval), list
+            {this.$pptBatchMinter(
+                token, list, approved(approval), minter_status
+            )}
+            {this.$pptBatchBurner(
+                token, list, approved(approval), burner_status
             )}
             {this.$info(token)}
         </div>;
@@ -100,7 +104,7 @@ export class UiNftMinter extends React.Component<
     ) {
         const nft_levels = Array.from(NftLevels());
         const entries = nft_levels.map((nft_level): [
-            NftLevel, Partial<NftMinterList[NftLevel]>
+            NftLevel, Partial<PptMinterList[NftLevel]>
         ] => ([
             nft_level, { display: !toggled }
         ]));
@@ -117,15 +121,15 @@ export class UiNftMinter extends React.Component<
         approving: boolean | null
     ) {
         const text = approving
-            ? 'Approving NFT Minting…'
-            : 'Approve NFT Minting';
-        return <button type='button' id='nft-burn-approval'
+            ? 'Approving NFT Staking…'
+            : 'Approve NFT Staking';
+        return <button type='button' id='ppt-burn-approval'
             className='btn btn-outline-warning'
             data-bs-placement='top' data-bs-toggle='tooltip'
             disabled={approving || approved || approved === null}
             onClick={this.props.onApproval?.bind(this, token)}
             style={{ display: !approved ? 'block' : 'none' }}
-            title={`Approve burning of ${token}s to enable NFT minting`}
+            title={`Approve staking (and unstaking) of NFTs`}
         >
             {Spinner({
                 show: !!approving, grow: true
@@ -133,37 +137,23 @@ export class UiNftMinter extends React.Component<
             <span className='text'>{text}</span>
         </button>;
     }
-    $batchMinter(
-        token: Token, approved: boolean | null, list: NftMinterList
+    $pptBatchMinter(
+        token: Token, list: PptMinterList,
+        approved: boolean | null, status: PptMinterStatus | null
     ) {
-        const { status } = this.props;
-        const classes = [
-            'btn btn-outline-warning',
-            approved ? 'show' : ''
-        ];
-        const text = minting(status)
-            ? 'Minting NFTs…'
-            : 'Mint NFTs';
-        return <button type='button' id='nft-batch-minter'
-            className={classes.join(' ')} disabled={this.disabled}
-            onClick={this.props.onBatchMint?.bind(this, token, list)}
-        >
-            {Spinner({
-                show: !!minting(status), grow: true
-            })}
-            <span className='text'>{text}</span>
-        </button>;
+        return <UiPptBatchMinter
+            approved={approved} list={list} token={token} status={status}
+            onBatchMint={this.props.onBatchMint?.bind(this, token, list)}
+        />;
     }
-    get disabled() {
-        const { status } = this.props;
-        if (minting(status)) {
-            return true;
-        }
-        const { list } = this.props;
-        if (!positives(list)) {
-            return true;
-        }
-        return false;
+    $pptBatchBurner(
+        token: Token, list: PptMinterList,
+        approved: boolean | null, status: PptBurnerStatus | null
+    ) {
+        return <UiPptBatchBurner
+            approved={approved} list={list} token={token} status={status}
+            onBatchBurn={this.props.onBatchBurn?.bind(this, token, list)}
+        />;
     }
     $info(
         token: Token
@@ -171,7 +161,7 @@ export class UiNftMinter extends React.Component<
         return <button type='button'
             className='btn btn-outline-warning info'
             data-bs-placement='top' data-bs-toggle='tooltip'
-            title={`(Batch) mint stakeable ${token} NFTs`}
+            title={`(Batch) stake or unstake ${token} NFTs`}
         >
             <InfoCircle fill={true} />
         </button>;
@@ -189,14 +179,14 @@ export class UiNftMinter extends React.Component<
             }
         }
         const $approval = document.querySelector<HTMLElement>(
-            '#nft-burn-approval'
+            '#ppt-burn-approval'
         );
         if ($approval) {
             Tooltip.getInstance($approval)?.hide();
         }
     })
 }
-function Spinner(
+export function Spinner(
     { show, grow }: { show: boolean, grow?: boolean }
 ) {
     const classes = [
@@ -208,15 +198,4 @@ function Spinner(
         style={{ visibility: show ? 'visible' : 'hidden' }}
     />;
 }
-function positives(
-    list: NftMinterList
-) {
-    const amounts = Object.values(list).map(
-        ({ amount }) => amount
-    );
-    const positives = amounts.filter(
-        (amount) => amount > 0n
-    );
-    return positives.length > 0;
-}
-export default UiNftMinter;
+export default UiPptMinter;

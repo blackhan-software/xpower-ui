@@ -1,11 +1,11 @@
 import { Blockchain } from '../../../source/blockchain';
 import { Referable } from '../../../source/functions';
-import { Token } from '../../../source/redux/types';
 import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
-import { NftWallet } from '../../../source/wallet';
-import { NftImageMeta } from './nft-image-meta';
+import { Token } from '../../../source/redux/types';
+import { PptWallet } from '../../../source/wallet';
 import { Tooltip } from '../../tooltips';
 
+import { PptImageMeta } from './ppt-image-meta';
 import React from 'react';
 
 type Props = {
@@ -20,7 +20,7 @@ type Props = {
 } & {
     onLoaded?: () => void;
 }
-export class UiNftImage extends Referable(React.Component)<
+export class UiPptImage extends Referable(React.Component)<
     Props
 > {
     render() {
@@ -83,7 +83,7 @@ function Spinner(
     const style = {
         color: 'var(--xp-powered)',
         display: loading ? 'block' : 'none',
-        filter: 'invert(0)',
+        filter: 'invert(1)',
         zIndex: loading ? -1 : undefined
     };
     return <span
@@ -91,29 +91,29 @@ function Spinner(
         role='status' style={style}
     />;
 }
-export async function nft_meta({ level, issue, token }: {
+export async function ppt_meta({ level, issue, token }: {
     level: NftLevel, issue: NftIssue, token: Token
 }) {
     const address = await Blockchain.selectedAddress;
-    return await NftImageMeta.get(address, {
+    return await PptImageMeta.get(address, {
         level, issue, token
     });
 }
-export async function nft_href({ level, issue, token }: {
+export async function ppt_href({ level, issue, token }: {
     level: NftLevel, issue: NftIssue, token: Token
 }) {
     const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
-    const nft_wallet = new NftWallet(address, token);
-    const nft_id = Nft.coreId({ level, issue });
-    const supply = await nft_wallet.totalSupply(nft_id);
+    const ppt_wallet = new PptWallet(address, token);
+    const ppt_id = Nft.coreId({ level, issue });
+    const supply = await ppt_wallet.totalSupply(ppt_id);
     if (supply > 0) {
-        const nft_contract = await nft_wallet.contract;
+        const ppt_contract = await ppt_wallet.contract;
         const market = 'https://nftrade.com/assets/avalanche';
-        return new URL(`${market}/${nft_contract.address}/${nft_id}`);
+        return new URL(`${market}/${ppt_contract.address}/${ppt_id}`);
     }
     return null;
 }
-export default UiNftImage;
+export default UiPptImage;

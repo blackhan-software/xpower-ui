@@ -15,11 +15,11 @@ describe('Store w/page-reducer', () => {
     });
     it('should switch to staking page', () => {
         const state_0 = Page.Nfts;
-        const state_1 = pageReducer(state_0, switchPage(Page.Staking));
-        expect(state_1).toEqual(Page.Staking);
+        const state_1 = pageReducer(state_0, switchPage(Page.Ppts));
+        expect(state_1).toEqual(Page.Ppts);
     });
     it('should switch to about page', () => {
-        const state_0 = Page.Staking;
+        const state_0 = Page.Ppts;
         const state_1 = pageReducer(state_0, switchPage(Page.About));
         expect(state_1).toEqual(Page.About);
     });

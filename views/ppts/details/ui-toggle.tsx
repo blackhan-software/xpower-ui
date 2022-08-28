@@ -1,12 +1,13 @@
-import { delayed } from '../../../source/functions';
+import { buffered, delayed } from '../../../source/functions';
 import { Tooltip } from '../../tooltips';
 
 import React from 'react';
+
 type Props = {
     toggled: boolean;
-    onToggle: (toggled: boolean) => void;
+    onToggled?: (toggled: boolean) => void;
 }
-export class PptUiToggle extends React.Component<
+export class UiPptToggle extends React.Component<
     Props
 > {
     render() {
@@ -38,9 +39,11 @@ export class PptUiToggle extends React.Component<
     toggle(
         toggled: boolean
     ) {
-        this.props.onToggle(toggled);
+        if (this.props.onToggled) {
+            this.props.onToggled(toggled);
+        }
     }
-    componentDidUpdate() {
+    componentDidUpdate = buffered(() => {
         const $toggles = document.querySelectorAll<HTMLElement>(
             '.toggle-old'
         );
@@ -48,6 +51,6 @@ export class PptUiToggle extends React.Component<
             Tooltip.getInstance($el)?.dispose();
             Tooltip.getOrCreateInstance($el);
         }));
-    }
+    })
 }
-export default PptUiToggle;
+export default UiPptToggle;

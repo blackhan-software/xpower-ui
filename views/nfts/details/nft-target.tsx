@@ -12,12 +12,12 @@ type Props = {
     balance: Amount;
     value: Address | null;
     valid: boolean | null;
-    onChange: (
+    onTargetChanged: (
         value: Address | null,
         valid: boolean | null
     ) => void;
 }
-export class NftTarget extends React.Component<
+export class UiNftTarget extends React.Component<
     Props
 > {
     render() {
@@ -73,7 +73,7 @@ export class NftTarget extends React.Component<
     async onChange(
         e: ChangeEvent<HTMLInputElement> | FormEvent<HTMLInputElement>
     ) {
-        if (typeof this.props.onChange !== 'function') {
+        if (typeof this.props.onTargetChanged !== 'function') {
             return;
         }
         const address = await Blockchain.selectedAddress;
@@ -92,14 +92,14 @@ export class NftTarget extends React.Component<
             value = null;
         }
         if (value === null || !$target.value) {
-            this.props.onChange(value, null);
+            this.props.onTargetChanged(value, null);
         } else if (
             $target.value.match(/^0x([0-9a-f]{40})/i) &&
             !$target.value.match(new RegExp(x40(address), 'i'))
         ) {
-            this.props.onChange(value, true);
+            this.props.onTargetChanged(value, true);
         } else {
-            this.props.onChange(value, false);
+            this.props.onTargetChanged(value, false);
         }
     }
     /**
@@ -116,4 +116,4 @@ export class NftTarget extends React.Component<
     }
     private _key?: string;
 }
-export default NftTarget;
+export default UiNftTarget;

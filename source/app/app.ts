@@ -128,7 +128,7 @@ export class App {
         return onTokenSwitch(this.me.store, callback);
     }
     public static onTokenSwitched(
-        callback: OnTokenSwitch, ms = 600
+        callback: OnTokenSwitch, ms = 900
     ) {
         return onTokenSwitch(this.me.store, delayed(callback, ms));
     }
@@ -168,32 +168,28 @@ export class App {
         }));
     }
     public static onNonceAdded(
-        address: Address, callback: OnNonceAdded
+        callback: OnNonceAdded
     ) {
         return onNonceAdded(this.me.store, (
             (nonce, item, total_by, total) => {
-                if (item.address === address) {
-                    callback(nonce, item, total_by, total);
-                }
+                callback(nonce, item, total_by, total);
             }
         ));
     }
     public static onNonceRemoved(
-        address: Address, callback: OnNonceRemoved
+        callback: OnNonceRemoved
     ) {
         return onNonceRemoved(this.me.store, (
             (nonce, item, total_by, total) => {
-                if (item.address === address) {
-                    callback(nonce, item, total_by, total);
-                }
+                callback(nonce, item, total_by, total);
             }
         ));
     }
     public static onNonceChanged(
-        address: Address, callback: OnNonceAdded | OnNonceRemoved
+        callback: OnNonceAdded | OnNonceRemoved
     ): Unsubscribe {
-        const un_add = this.onNonceAdded(address, callback);
-        const un_rem = this.onNonceRemoved(address, callback);
+        const un_add = this.onNonceAdded(callback);
+        const un_rem = this.onNonceRemoved(callback);
         return () => { un_add(); un_rem(); };
     }
     public static getNonceBy(query?: {

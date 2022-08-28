@@ -1,8 +1,6 @@
 import { App } from '../../../source/app';
-import { Blockchain } from '../../../source/blockchain';
 import { buffered } from '../../../source/functions';
-import { MiningManager } from '../../../source/managers';
-import { Token } from '../../../source/redux/types';
+import { Miner } from '../../../source/miner';
 import { Tooltip } from '../../tooltips';
 
 import React from 'react';
@@ -10,103 +8,55 @@ import { DashCircle } from '../../../public/images/tsx';
 import { PlusCircle } from '../../../public/images/tsx';
 
 type Props = {
-    token: Token; speed: number;
-}
-type State = {
-    speed: number; disabled: boolean;
+    disabled: boolean; speed: number;
+    onSpeed?: (by: number) => void;
 }
 export class MiningSpeed extends React.Component<
-    Props, State
+    Props
 > {
-    constructor(props: {
-        token: Token, speed: number
-    }) {
-        super(props);
-        this.state = {
-            disabled: false, ...props
-        };
-        this.events();
-    }
-    events() {
-        Blockchain.onConnect(({
-            address, token
-        }) => {
-            const miner = MiningManager.miner(address, {
-                token
-            });
-            this.setState({ speed: miner.speed });
-        });
-        Blockchain.onceConnect(({
-            address, token
-        }) => {
-            const miner = MiningManager.miner(address, {
-                token
-            });
-            miner.on('increased', (ev) => {
-                this.setState({ speed: ev.speed });
-            });
-            miner.on('decreased', (ev) => {
-                this.setState({ speed: ev.speed });
-            });
-            miner.on('starting', () => {
-                this.setState({ disabled: true });
-            });
-            miner.on('stopped', () => {
-                this.setState({ disabled: false });
-            });
-        }, {
-            per: () => App.token
-        });
-    }
     render() {
-        const { token } = this.props;
-        const { speed, disabled } = this.state;
+        const { disabled, speed } = this.props;
         return <div
             className='btn-group tweak-mining' role='group'
         >
-            {this.$decreaser(token, speed, disabled)}
+            {this.$decreaser(speed, disabled)}
             {this.$progressor(speed)}
-            {this.$increaser(token, speed, disabled)}
+            {this.$increaser(speed, disabled)}
         </div>;
     }
-    private $increaser(
-        token: Token, speed: number, disabled: boolean
+    $increaser(
+        speed: number, disabled: boolean
     ) {
         return <div
             className='btn-group increaser' role='group'
         >
             <button type='button' id='increase'
                 className='btn btn-outline-warning'
-                data-bs-toggle='tooltip' data-bs-placement='top'
+                data-bs-placement='top' data-bs-toggle='tooltip'
                 disabled={!this.increasable(speed, disabled)}
-                onClick={this.increase.bind(this, token, speed, disabled)}
+                onClick={this.increase.bind(this, speed, disabled)}
             >
                 {PlusCircle({ fill: true })}
             </button>
         </div>;
     }
-    private increasable(
+    increasable(
         speed: number, disabled: boolean
     ) {
         return !disabled && speed <= 0.999;
     }
-    async increase(
-        token: Token, speed: number, disabled: boolean
+    increase(
+        speed: number, disabled: boolean
     ) {
         if (!this.increasable(speed, disabled)) {
             return;
         }
-        const address = await Blockchain.selectedAddress;
-        if (!address) {
-            throw new Error('missing selected-address');
+        if (this.props.onSpeed) {
+            this.props.onSpeed(+1 / Miner.WORKERS_MAX);
         }
-        const miner = MiningManager.miner(address, {
-            token
-        });
-        miner.increase();
     }
-    private $decreaser(
-        token: Token, speed: number, disabled: boolean
+    $decreaser(
+        speed: number, disabled: boolean
     ) {
         return <div
             className='btn-group decreaser' role='group'
@@ -115,33 +65,28 @@ export class MiningSpeed extends React.Component<
                 className='btn btn-outline-warning'
                 data-bs-toggle='tooltip' data-bs-placement='top'
                 disabled={!this.decreasable(speed, disabled)}
-                onClick={this.decrease.bind(this, token, speed, disabled)}
+                onClick={this.decrease.bind(this, speed, disabled)}
             >
                 {DashCircle({ fill: true })}
             </button>
         </div>;
     }
-    private decreasable(
+    decreasable(
         speed: number, disabled: boolean
     ) {
         return !disabled && speed >= 0.001;
     }
-    async decrease(
-        token: Token, speed: number, disabled: boolean
+    decrease(
+        speed: number, disabled: boolean
     ) {
         if (!this.decreasable(speed, disabled)) {
             return;
         }
-        const address = await Blockchain.selectedAddress;
-        if (!address) {
-            throw new Error('missing selected-address');
+        if (this.props.onSpeed) {
+            this.props.onSpeed(-1 / Miner.WORKERS_MAX);
         }
-        const miner = MiningManager.miner(address, {
-            token
-        });
-        miner.decrease();
     }
-    private $progressor(
+    $progressor(
         speed: number
     ) {
         return <div
@@ -169,14 +114,12 @@ export class MiningSpeed extends React.Component<
         e.preventDefault();
         e.stopPropagation();
         if (e.deltaY < 0) {
-            const { token } = this.props;
-            const { speed, disabled } = this.state;
-            this.increase(token, speed, disabled);
+            const { speed, disabled } = this.props;
+            this.increase(speed, disabled);
         }
         if (e.deltaY > 0) {
-            const { token } = this.props;
-            const { speed, disabled } = this.state;
-            this.decrease(token, speed, disabled);
+            const { speed, disabled } = this.props;
+            this.decrease(speed, disabled);
         }
         return false;
     }

@@ -1,80 +1,133 @@
 import './nfts.scss';
 
-import { App } from '../../source/app';
-import { Blockchain } from '../../source/blockchain';
-import { update, x40 } from '../../source/functions';
-import { Amount, Balance, Token } from '../../source/redux/types';
-import { Nft, Nfts, NftFullId } from '../../source/redux/types';
+import { Amount, Token } from '../../source/redux/types';
 import { NftLevel, NftLevels } from '../../source/redux/types';
-import { NftToken, NftTokens } from '../../source/redux/types';
-import { NftWallet } from '../../source/wallet';
-import { OnTransferBatch } from '../../source/wallet';
-import { OnTransferSingle } from '../../source/wallet';
-import { Years } from '../../source/years';
+import { Nft, NftIssue, NftToken } from '../../source/redux/types';
 
 import React from 'react';
-import { NftList } from './list/list';
-import { NftMinter } from './minter/minter';
+import { UiNftList } from './list/list';
+export { UiNftList };
+
+import { UiNftDetails } from './details/details';
+export { UiNftDetails };
+import { UiNftImage, nft_meta, nft_href } from './details/details';
+export { UiNftImage, nft_meta, nft_href };
+import { NftDetails, nft_details } from './details/details';
+export { NftDetails, nft_details };
+import { NftSenderStatus } from './details/details';
+export { NftSenderStatus };
+
+import { UiNftMinter } from './minter/minter';
+export { UiNftMinter };
+import { NftMinter, nft_minter } from './minter/minter';
+export { NftMinter, nft_minter };
+import { NftMinterApproval } from './minter/minter';
+export { NftMinterApproval };
+import { NftMinterStatus } from './minter/minter';
+export { NftMinterStatus };
+import { NftMinterList } from './minter/minter';
+export { NftMinterList };
 
 type Props = {
     token: Token;
-    list: List;
-    onList?: (list: List) => void;
+    matrix: NftMatrix;
+    details: Record<NftToken, NftDetails>;
+    minter: Record<NftToken, NftMinter>;
+    list: NftList;
+    onNftList?: (
+        list: NftList,
+        matrix: NftMatrix[NftToken]
+    ) => void;
+    /**
+     * nft-list:
+     */
+    onNftImageLoaded?: (
+        issue: NftIssue,
+        level: NftLevel
+    ) => void;
+    onNftSenderExpanded?: (
+        issues: NftIssue[],
+        level: NftLevel,
+        toggled: boolean
+    ) => void;
+    onNftTargetChanged?: (
+        issue: NftIssue,
+        level: NftLevel,
+        value: Amount | null,
+        valid: boolean | null
+    ) => void;
+    onNftAmountChanged?: (
+        issue: NftIssue,
+        level: NftLevel,
+        value: Amount | null,
+        valid: boolean | null
+    ) => void;
+    onNftTransfer?: (
+        issue: NftIssue,
+        level: NftLevel
+    ) => void;
+    /**
+     * nft-minter:
+     */
+    onNftMinterApproval?: (
+        token: Token
+    ) => void
+    onNftMinterBatchMint?: (
+        token: Token, list: NftMinterList
+    ) => void;
+    onNftMinterList?: (
+        list: NftList,
+        matrix: NftMatrix[NftToken]
+    ) => void;
+    onNftMinterToggled?: (
+        toggled: boolean
+    ) => void;
     toggled: boolean;
-    onToggled?: (toggled: boolean) => void;
 }
-type List = Record<NftLevel, {
-    display: boolean;
-    toggled: boolean;
+export type NftList = Record<NftLevel, {
+    display: boolean; toggled: boolean;
 }>
-type State = {
-    nfts: Nfts;
-    matrix: Matrix;
-}
-type Matrix = Record<NftToken, Record<NftLevel, {
-    amount: Amount;
-    max: Amount;
-    min: Amount;
-}>>
-function matrix(
-    amount = 0n, max = 0n, min = 0n
+export function nft_list(
+    display = false, toggled = false
 ) {
     const entries = Object.fromEntries(
-        Array.from(NftTokens()).map(
-            (nft_token) => [nft_token, Object.fromEntries(
-                Array.from(NftLevels()).map(
-                    (nft_level) => [nft_level, {
-                        amount, max, min
-                    }]
-                )
-            )]
+        Array.from(NftLevels()).map(
+            (nft_level) => [nft_level, {
+                display, toggled
+            }]
         )
     );
-    return entries as Matrix;
+    return entries as NftList;
+}
+export type NftMatrix = Record<NftToken, Record<NftLevel, {
+    amount: Amount; max: Amount; min: Amount;
+}>>
+export function nft_matrix(
+    amount = 0n, max = 0n, min = 0n
+) {
+    return Object.fromEntries(
+        Array.from(NftLevels()).map(
+            (nft_level) => [nft_level, {
+                amount, max, min
+            }]
+        )
+    );
 }
 function join(
-    lhs: List, rhs: Matrix[NftToken]
+    lhs: NftList, rhs: NftMatrix[NftToken]
 ) {
-    const result = {} as Record<
-        NftLevel, Matrix[NftToken][NftLevel] & List[NftLevel]
-    >;
+    const union = {} as NftList & NftMatrix[NftToken];
     for (const [key, value] of Object.entries(rhs)) {
         const nft_level = key as unknown as NftLevel;
-        result[nft_level] = { ...value, ...lhs[nft_level] };
+        union[nft_level] = { ...value, ...lhs[nft_level] };
     }
-    return result;
+    return union;
 }
 function split(
-    union: Partial<Record<
-        NftLevel, Matrix[NftToken][NftLevel] & List[NftLevel]
-    >>
+    union: Partial<NftList & NftMatrix[NftToken]>
 ) {
-    const lhs = {} as Record<
-        NftLevel, List[NftLevel]
-    >;
-    const rhs = {} as Record<
-        NftLevel, Matrix[NftToken][NftLevel]
-    >;
+    const lhs = {} as NftList;
+    const rhs = {} as NftMatrix[NftToken];
     for (const [key, value] of Object.entries(union)) {
         const nft_level = key as unknown as NftLevel;
         const { display, toggled } = value;
@@ -85,201 +138,73 @@ function split(
     return { lhs, rhs };
 }
 export class UiNfts extends React.Component<
-    Props, State
+    Props
 > {
-    constructor(
-        props: Props
-    ) {
-        super(props);
+    render() {
         const { token } = this.props;
         const nft_token = Nft.token(token);
-        this.state = {
-            matrix: matrix(),
-            nfts: App.getNfts({ token: nft_token }),
-        };
-        this.events();
-    }
-    async events() {
-        App.onNftChanged(/*sync-nfts*/() => {
-            const nft_token = Nft.token(
-                this.props.token
-            );
-            this.setState({
-                nfts: App.getNfts({ token: nft_token })
-            });
-        });
-        App.onTokenChanged(/*sync-balance*/(
-            token: Token, { amount: balance }
-        ) => {
-            reset(Nft.token(token), balance);
-        });
-        const reset = (
-            nft_token: NftToken, balance: Balance
-        ) => {
-            const entries = Array.from(NftLevels()).map((nft_level): [
-                NftLevel, Matrix[NftToken][NftLevel]
-            ] => {
-                const remainder = balance % 10n ** (BigInt(nft_level) + 3n);
-                const amount = remainder / 10n ** BigInt(nft_level);
-                return [nft_level, {
-                    amount, max: amount, min: 0n
-                }];
-            });
-            update<State>.bind(this)({
-                matrix: Object.assign(matrix(), {
-                    [nft_token]: Object.fromEntries(entries)
-                })
-            });
-        };
-    }
-    render() {
-        const { list, toggled, token } = this.props;
-        const nft_token = Nft.token(token);
-        const { matrix } = this.state;
+        const { list, toggled } = this.props;
+        const { matrix, minter } = this.props;
         return <React.Fragment>
             <div id='nft-single-minting'>
-                <NftList
-                    onList={(list) => {
+                <UiNftList
+                    list={
+                        join(list, matrix[nft_token])
+                    }
+                    onNftList={(
+                        list
+                    ) => {
                         const { lhs, rhs } = split(list);
-                        update<State>.bind(this)({
-                            matrix: { [nft_token]: rhs }
-                        });
-                        const { onList } = this.props;
-                        if (onList) onList(lhs);
+                        const { onNftList } = this.props;
+                        if (onNftList) onNftList(lhs, rhs);
                     }}
-                    list={join(
-                        list, matrix[nft_token]
-                    )}
+                    details={
+                        this.props.details[nft_token]
+                    }
+                    onNftImageLoaded={
+                        this.props.onNftImageLoaded?.bind(this)
+                    }
+                    onNftSenderExpanded={
+                        this.props.onNftSenderExpanded?.bind(this)
+                    }
+                    onNftAmountChanged={
+                        this.props.onNftAmountChanged?.bind(this)
+                    }
+                    onNftTargetChanged={
+                        this.props.onNftTargetChanged?.bind(this)
+                    }
+                    onNftTransfer={
+                        this.props.onNftTransfer?.bind(this)
+                    }
                     token={token}
                 />
             </div>
             <div id='nft-batch-minting'>
-                <NftMinter
+                <UiNftMinter
+                    approval={minter[nft_token].approval}
+                    onApproval={
+                        this.props.onNftMinterApproval?.bind(this)
+                    }
+                    list={join(list, matrix[nft_token])}
                     onList={(list) => {
                         const { lhs, rhs } = split(list);
-                        update<State>.bind(this)({
-                            matrix: { [nft_token]: rhs }
-                        });
-                        const { onList } = this.props;
-                        if (onList) onList(lhs);
+                        const { onNftMinterList } = this.props;
+                        if (onNftMinterList) onNftMinterList(
+                            lhs, rhs
+                        );
                     }}
-                    list={join(
-                        list, matrix[nft_token]
-                    )}
-                    onToggled={(toggled) => {
-                        const { onToggled } = this.props;
-                        if (onToggled) onToggled(toggled);
-                    }}
+                    status={minter[nft_token].status}
+                    onBatchMint={
+                        this.props.onNftMinterBatchMint?.bind(this)
+                    }
                     toggled={toggled}
+                    onToggled={
+                        this.props.onNftMinterToggled?.bind(this)
+                    }
                     token={token}
                 />
             </div>
         </React.Fragment>;
     }
 }
-Blockchain.onceConnect(async function initNfts({
-    address, token
-}) {
-    let index = 0;
-    const levels = Array.from(NftLevels());
-    const issues = Array.from(Years()).reverse();
-    const wallet = new NftWallet(address, token);
-    const balances = await wallet.balances({ issues, levels });
-    const supplies = wallet.totalSupplies({ issues, levels });
-    const nft_token = Nft.token(
-        token
-    );
-    for (const issue of issues) {
-        for (const level of levels) {
-            const amount = balances[index];
-            const supply = await supplies[index];
-            App.setNft({
-                issue, level, token: nft_token
-            }, {
-                amount, supply
-            });
-            index += 1;
-        }
-    }
-}, {
-    per: () => App.token
-});
-Blockchain.onConnect(function syncNfts({
-    token
-}) {
-    const nfts = App.getNfts({
-        token: Nft.token(token)
-    });
-    for (const [id, nft] of Object.entries(nfts.items)) {
-        App.setNft(id as NftFullId, nft);
-    }
-});
-Blockchain.onceConnect(async function onNftSingleTransfers({
-    address, token
-}) {
-    const on_transfer: OnTransferSingle = async (
-        op, from, to, id, value, ev
-    ) => {
-        if (App.token !== token) {
-            return;
-        }
-        console.debug('[on:transfer-single]',
-            x40(op), x40(from), x40(to),
-            id, value, ev
-        );
-        const nft_token = Nft.token(
-            token
-        );
-        const nft_id = Nft.fullId({
-            issue: Nft.issue(id),
-            level: Nft.level(id),
-            token: nft_token
-        });
-        if (address === from) {
-            App.removeNft(nft_id, { amount: value });
-        }
-        if (address === to) {
-            App.addNft(nft_id, { amount: value });
-        }
-    };
-    const nft_wallet = new NftWallet(address, token);
-    nft_wallet.onTransferSingle(on_transfer)
-}, {
-    per: () => App.token
-});
-Blockchain.onceConnect(async function onNftBatchTransfers({
-    address, token
-}) {
-    const on_transfer: OnTransferBatch = async (
-        op, from, to, ids, values, ev
-    ) => {
-        if (App.token !== token) {
-            return;
-        }
-        console.debug('[on:transfer-batch]',
-            x40(op), x40(from), x40(to),
-            ids, values, ev
-        );
-        const nft_token = Nft.token(
-            token
-        );
-        for (let i = 0; i < ids.length; i++) {
-            const nft_id = Nft.fullId({
-                issue: Nft.issue(ids[i]),
-                level: Nft.level(ids[i]),
-                token: nft_token
-            });
-            if (address === from) {
-                App.removeNft(nft_id, { amount: values[i] });
-            }
-            if (address === to) {
-                App.addNft(nft_id, { amount: values[i] });
-            }
-        }
-    };
-    const nft_wallet = new NftWallet(address, token);
-    nft_wallet.onTransferBatch(on_transfer);
-}, {
-    per: () => App.token
-});
 export default UiNfts;
