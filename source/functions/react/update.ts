@@ -4,17 +4,18 @@ import { DeepPartial } from 'redux';
 export function update<S>(
     this: Component,
     next_state: DeepPartial<S>,
-    callback?: () => void
+    callback?: () => Promise<void>
 ) {
-    return new Promise<void>(
-        (resolve) => this.setState(
-            $.extend(true, {}, this.state, next_state), () => {
-                if (typeof callback === 'function') {
-                    callback();
-                }
-                resolve();
+    return new Promise<void>((resolve) => {
+        const state = $.extend(
+            true, {}, this.state, next_state
+        );
+        this.setState(state, async () => {
+            if (typeof callback === 'function') {
+                await callback();
             }
-        )
-    );
+            resolve();
+        });
+    });
 }
 export default update;
