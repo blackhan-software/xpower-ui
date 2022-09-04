@@ -1,6 +1,8 @@
 {
     "rules": {
-        "@typescript-eslint/no-non-null-assertion": ["off"]
+        "@typescript-eslint/no-non-null-assertion": ["off"],
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn"
     },
     "extends": [
         "eslint:recommended",
@@ -8,7 +10,7 @@
         "plugin:@typescript-eslint/recommended"
     ],
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint", "react-hooks"
     ],
     "parser": "@typescript-eslint/parser"
 }
