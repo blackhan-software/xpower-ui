@@ -1,7 +1,7 @@
 import { App } from '../../../source/app';
 import { Blockchain } from '../../../source/blockchain';
 import { MoeTreasuryFactory } from '../../../source/contract';
-import { Referable, buffered, update, x40 } from '../../../source/functions';
+import { Referable, update, x40 } from '../../../source/functions';
 import { Address, Amount, Supply, Token } from '../../../source/redux/types';
 import { NftToken, NftTokens } from '../../../source/redux/types';
 import { NftLevel, NftLevels } from '../../../source/redux/types';
@@ -134,10 +134,9 @@ export class UiPptDetails extends Referable(React.Component)<
     constructor(props: Props) {
         super(props);
         this.state = state();
-        this.events();
     }
-    async events() {
-        this.un = App.onPptChanged(buffered((
+    async componentDidMount() {
+        this.unPptChanged = App.onPptChanged((
             full_id: NftFullId
         ) => {
             const ppt_token = Nft.token(full_id);
@@ -157,7 +156,7 @@ export class UiPptDetails extends Referable(React.Component)<
             this.reset(
                 ppt_token, ppt_level, ppt_issue
             );
-        }));
+        });
         Array.from(Years()).forEach((
             issue: NftIssue
         ) => {
@@ -174,6 +173,12 @@ export class UiPptDetails extends Referable(React.Component)<
             const { token, level } = this.props;
             this.reset(Nft.token(token), level, issue);
         });
+        App.event.emit('refresh-tips');
+    }
+    componentWillUnmount() {
+        if (this.unPptChanged) {
+            this.unPptChanged();
+        }
     }
     async reset(
         ppt_token: NftToken,
@@ -433,12 +438,6 @@ export class UiPptDetails extends Referable(React.Component)<
             token={token}
         />;
     }
-    componentDidMount() {
-        App.event.emit('refresh-tips');
-    }
-    componentWillUnmount() {
-        if (this.un) this.un();
-    }
-    un: Unsubscribe | undefined;
+    unPptChanged: Unsubscribe | undefined;
 }
 export default UiPptDetails;

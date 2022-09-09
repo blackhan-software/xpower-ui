@@ -34,7 +34,13 @@ export class OtfWallet extends EventEmitter {
     public static onToggled(
         listener: ({ toggled }: { toggled: boolean }) => void
     ) {
+        // this.me.removeAllListeners('toggled');
         this.me.on('toggled', listener);
+    }
+    public static unToggled(
+        listener: ({ toggled }: { toggled: boolean }) => void
+    ) {
+        this.me.removeListener('toggled', listener);
     }
     public static async init(
         key = 'otf-wallet'

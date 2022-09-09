@@ -1,5 +1,5 @@
 import { Blockchain } from '../../source/blockchain';
-import { buffered, x40 } from '../../source/functions';
+import { buffered, Referable, x40 } from '../../source/functions';
 import { Address, Amount } from '../../source/redux/types';
 import { OtfWallet } from '../../source/wallet';
 
@@ -19,7 +19,7 @@ type State = {
     amount: Amount | null;
     processing: boolean;
 }
-export class OtfWalletUi extends React.Component<
+export class OtfWalletUi extends Referable(React.Component)<
     Props, State
 > {
     get threshold() {
@@ -34,10 +34,9 @@ export class OtfWalletUi extends React.Component<
             amount: null,
             processing: false,
         };
-        this.events();
     }
-    events() {
-        Blockchain.onceConnect(async/*initialize*/() => {
+    componentDidMount() {
+        Blockchain.onceConnect(async/*init*/() => {
             const otf_wallet = await OtfWallet.init();
             const [otf_address, otf_balance] = await Promise.all([
                 otf_wallet.getAddress(), otf_wallet.getBalance()
@@ -47,7 +46,7 @@ export class OtfWalletUi extends React.Component<
                 amount: otf_balance.toBigInt()
             });
         });
-        Blockchain.onceConnect(async/*synchronize*/() => {
+        Blockchain.onceConnect(async/*sync*/() => {
             const on_block = async () => {
                 const otf_balance = await otf_wallet.getBalance();
                 this.setState({ amount: otf_balance.toBigInt() });
@@ -61,9 +60,10 @@ export class OtfWalletUi extends React.Component<
     render() {
         const { toggled } = this.props;
         const { address, amount, processing } = this.state;
-        return <div id='otf-wallet' className={
-            this.display(toggled)
-        }>
+        return <div id='otf-wallet'
+            ref={this.global_ref('otf-wallet')}
+            className={this.display(toggled)}
+        >
             <label className='form-label'>
                 Minter Address and AVAX Balance
             </label>

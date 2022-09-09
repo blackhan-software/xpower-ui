@@ -160,9 +160,8 @@ export class SPA extends Referable(React.Component)<
             token: props.token,
             page: props.page,
         };
-        this.events();
     }
-    events() {
+    componentDidMount() {
         App.onPageSwitch((page) => this.setState({
             page
         }));
@@ -275,7 +274,7 @@ export class SPA extends Referable(React.Component)<
             if (address !== await Blockchain.selectedAddress) {
                 return;
             }
-            if (token !== this.props.token) {
+            if (token !== this.state.token) {
                 return;
             }
             const amount_min = Tokenizer.amount(
@@ -332,13 +331,13 @@ export class SPA extends Referable(React.Component)<
          * ppts:
          */
         App.onNftChanged(buffered(() => {
-            const nft_token = Nft.token(this.props.token);
+            const nft_token = Nft.token(this.state.token);
             update<State>.bind(this)({
                 ...ppt_amounts(nft_token)
             });
         }));
         App.onPptChanged(buffered(() => {
-            const nft_token = Nft.token(this.props.token);
+            const nft_token = Nft.token(this.state.token);
             update<State>.bind(this)({
                 ...ppt_amounts(nft_token)
             });
@@ -510,12 +509,14 @@ export class SPA extends Referable(React.Component)<
         };
     }
     render() {
-        console.count('[render]')
+        if (App.debug) {
+            console.count('[app.render]');
+        }
         const { page, token } = this.state;
         const { nfts, nfts_toggled } = this.state;
         const { ppts, ppts_toggled } = this.state;
         const { speed } = this.props;
-        return <React.Fragment>
+        return <React.StrictMode>
             {this.$h1(page)}
             {this.$connector(page)}
             {this.$wallet(page, token)}
@@ -524,7 +525,7 @@ export class SPA extends Referable(React.Component)<
             {this.$nfts(page, token, nfts.list, nfts_toggled)}
             {this.$ppts(page, token, ppts.list, ppts_toggled)}
             {this.$about(page, token)}
-        </React.Fragment>;
+        </React.StrictMode>;
     }
     $h1(
         page: Page
@@ -895,7 +896,7 @@ export class SPA extends Referable(React.Component)<
                     return;
                 }
                 moe_wallet.offTransfer(on_transfer);
-                if (token !== this.props.token) {
+                if (token !== this.state.token) {
                     return;
                 }
                 const { tx_counter } = Minting.getRow(
@@ -1011,7 +1012,7 @@ export class SPA extends Referable(React.Component)<
             throw new Error('missing selected-address');
         }
         const nft_token = Nft.token(
-            this.props.token
+            this.state.token
         );
         const core_id = Nft.coreId({
             issue: nft_issue, level: nft_level
@@ -1022,7 +1023,7 @@ export class SPA extends Referable(React.Component)<
         const target = by_issue.target.value as Address;
         const amount = by_issue.amount.value as Amount;
         const nft_wallet = new NftWallet(
-            address, this.props.token
+            address, this.state.token
         );
         const on_single_tx: OnTransferSingle = async (
             op, from, to, id, value, ev
@@ -1240,13 +1241,13 @@ export class SPA extends Referable(React.Component)<
             throw new Error('missing selected-address');
         }
         const ppt_token = Nft.token(
-            this.props.token
+            this.state.token
         );
         const core_id = Nft.coreId({
             issue: ppt_issue, level: ppt_level
         });
         const moe_treasury = MoeTreasuryFactory({
-            token: this.props.token
+            token: this.state.token
         });
         const on_claim_tx: OnClaim = async (
             acc, id, amount, ev

@@ -432,6 +432,9 @@ export class App {
     public static get clearAll(): boolean {
         return Parser.boolean(this.params.get('clear-all'), false);
     }
+    public static get debug(): boolean {
+        return Parser.boolean(this.params.get('debug'), false);
+    }
     public static get level(): { min: number, max: number } {
         const min = Parser.number(this.params.get('min-level'), 5);
         const max = Parser.number(this.params.get('max-level'), 64);

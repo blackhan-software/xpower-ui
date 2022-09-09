@@ -36,12 +36,16 @@ export class AftWalletUi extends React.Component<
     ) {
         super(props);
         this.state = state();
-        this.events();
     }
-    events() {
-        Blockchain.onceConnect(({ address }) =>
+    async componentDidMount() {
+        const address = await Blockchain.selectedAddress;
+        if (address) {
             this.setState({ address })
-        );
+        } else {
+            Blockchain.onceConnect(({ address }) =>
+                this.setState({ address })
+            );
+        }
         App.onTokenChanged((token: Token, {
             amount: balance
         }) => {

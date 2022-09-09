@@ -3,11 +3,12 @@ import './connector.scss';
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { ChainId } from '../../source/blockchain';
-import { buffered, delayed } from '../../source/functions';
+import { buffered } from '../../source/functions';
 import { sibling } from '../../source/functions';
 import { Tooltip } from '../tooltips';
 
 import React from 'react';
+import { Unsubscribe } from 'redux';
 import { InfoCircle } from '../../public/images/tsx';
 
 type Props = Record<string, never>;
@@ -31,10 +32,18 @@ export class Connector extends React.Component<
         this.state = {
             chain: Chain.CONNECTING
         };
-        this.initialize();
-        this.events();
     }
-    initialize = delayed(async () => {
+    componentDidMount = buffered(async () => {
+        this.unTokenSwitch = App.onTokenSwitch(async () => {
+            try {
+                await Blockchain.connect();
+                this.setState({
+                    chain: Chain.CONNECTED
+                });
+            } catch (ex) {
+                console.error(ex);
+            }
+        });
         if (!await Blockchain.isInstalled()) {
             return this.setState({ chain: Chain.UNAVAILABLE });
         }
@@ -54,17 +63,10 @@ export class Connector extends React.Component<
             console.error(ex);
         }
     }, ms())
-    events() {
-        App.onTokenSwitch(async () => {
-            try {
-                await Blockchain.connect();
-                this.setState({
-                    chain: Chain.CONNECTED
-                });
-            } catch (ex) {
-                console.error(ex);
-            }
-        });
+    componentWillUnmount() {
+        if (this.unTokenSwitch) {
+            this.unTokenSwitch();
+        }
     }
     render() {
         return <div
@@ -153,6 +155,7 @@ export class Connector extends React.Component<
             Tooltip.getOrCreateInstance($info);
         }
     })
+    unTokenSwitch?: Unsubscribe;
 }
 function Spinner(
     state: { show: boolean, grow?: boolean }

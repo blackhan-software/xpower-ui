@@ -6,6 +6,7 @@ import { Token } from '../../source/redux/types';
 import { Tooltip } from '../tooltips';
 
 import React, { MouseEvent } from 'react';
+import { Unsubscribe } from 'redux';
 
 type Props = {
     token: Token;
@@ -24,15 +25,19 @@ export class Selector extends React.Component<
     }) {
         super(props);
         this.state = state();
-        this.events();
     }
-    events() {
-        App.onTokenSwitch(() => {
+    componentDidMount() {
+        this.unTokenSwitch = App.onTokenSwitch(() => {
             this.setState({ switching: true });
         });
-        App.onTokenSwitched(() => {
+        this.unTokenSwitched = App.onTokenSwitched(() => {
             this.setState({ switching: false });
         });
+    }
+    componentWillUnmount() {
+        if (this.unTokenSwitch) {
+            this.unTokenSwitch();
+        }
     }
     render() {
         return <div
@@ -115,6 +120,8 @@ export class Selector extends React.Component<
         const eq = this.props.token === token;
         return eq && this.state.switching;
     }
+    unTokenSwitch?: Unsubscribe;
+    unTokenSwitched?: Unsubscribe;
 }
 function Spinner(
     state: { show: boolean }

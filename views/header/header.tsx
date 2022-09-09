@@ -5,6 +5,7 @@ import { Page, Token } from '../../source/redux/types';
 
 import React, { createElement, MouseEvent } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Unsubscribe } from 'redux';
 
 type Props = {
     token: Token, page: Page
@@ -23,28 +24,37 @@ export class UiHeader extends React.Component<
         this.state = {
             ...props
         };
-        this.events();
     }
-    events() {
-        App.onPageSwitch((page) => this.setState({
-            page
-        }));
-        App.onTokenSwitch((token) => this.setState({
-            token
-        }));
+    componentDidMount() {
+        this.unPageSwitch = App.onPageSwitch(
+            (page) => this.setState({ page })
+        );
+        this.unTokenSwitch = App.onTokenSwitch(
+            (token) => this.setState({ token})
+        );
+    }
+    componentWillUnmount() {
+        if (this.unPageSwitch) {
+            this.unPageSwitch();
+        }
+        if (this.unTokenSwitch) {
+            this.unTokenSwitch();
+        }
     }
     render() {
-        const classes=[
+        const classes = [
             'nav nav-pills nav-justified', 'mb-3'
         ];
-        return <nav id='menu' className={
-            classes.join(' ')
-        }>
-            {this.$anchor(Page.Home)}
-            {this.$anchor(Page.Nfts)}
-            {this.$anchor(Page.Ppts)}
-            {this.$anchor(Page.About)}
-        </nav>;
+        return <React.StrictMode>
+            <nav id='menu' className={
+                classes.join(' ')
+            }>
+                {this.$anchor(Page.Home)}
+                {this.$anchor(Page.Nfts)}
+                {this.$anchor(Page.Ppts)}
+                {this.$anchor(Page.About)}
+            </nav>
+        </React.StrictMode>;
     }
     $anchor(
         page: Page
@@ -104,6 +114,8 @@ export class UiHeader extends React.Component<
         [Page.About]: 'About',
         [Page.None]: '',
     }
+    unPageSwitch?: Unsubscribe;
+    unTokenSwitch?: Unsubscribe;
 }
 if (require.main === module) {
     const $header = document.querySelector('header');

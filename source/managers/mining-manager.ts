@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import { App } from '../app';
 import { Tokenizer } from '../token';
-import { alert, Alert } from '../functions';
+import { alert, Alert, Alerts } from '../functions';
 import { HashManager } from '.';
 import { IntervalManager } from '.';
 import { Address, Amount, Token } from '../redux/types';
@@ -63,6 +63,7 @@ export class MiningManager {
             mine(address, block_hash);
         });
         const moe_wallet = new MoeWallet(address, token);
+        Alerts.hide();
         try {
             const init = await moe_wallet.init();
             console.debug('[init]', init);
