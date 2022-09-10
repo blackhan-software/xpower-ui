@@ -25,6 +25,9 @@ export async function XPowerNftMockFactory({ token }: {
 }): Promise<Contract> {
     const token_lc = Tokenizer.lower(token);
     const mock = {
+        totalSupply: (/*id:string*/) => {
+            return BigNumber.from(0);
+        },
         year: () => {
             return BigNumber.from(MAX_YEAR());
         },

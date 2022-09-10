@@ -2,7 +2,7 @@ import { Blockchain } from '../../../source/blockchain';
 import { Referable } from '../../../source/functions';
 import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
 import { Token } from '../../../source/redux/types';
-import { PptWallet } from '../../../source/wallet';
+import { PptWallet, PptWalletMock } from '../../../source/wallet';
 import { Tooltip } from '../../tooltips';
 
 import { PptImageMeta } from './ppt-image-meta';
@@ -103,10 +103,9 @@ export async function ppt_href({ level, issue, token }: {
     level: NftLevel, issue: NftIssue, token: Token
 }) {
     const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
-    }
-    const ppt_wallet = new PptWallet(address, token);
+    const ppt_wallet = address
+        ? new PptWallet(address, token)
+        : new PptWalletMock(address, token);
     const ppt_id = Nft.coreId({ level, issue });
     const supply = await ppt_wallet.totalSupply(ppt_id);
     if (supply > 0) {

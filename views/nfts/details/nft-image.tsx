@@ -2,7 +2,7 @@ import { Blockchain } from '../../../source/blockchain';
 import { Referable } from '../../../source/functions';
 import { Token } from '../../../source/redux/types';
 import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
-import { NftWallet } from '../../../source/wallet';
+import { NftWallet, NftWalletMock } from '../../../source/wallet';
 import { NftImageMeta } from './nft-image-meta';
 import { Tooltip } from '../../tooltips';
 
@@ -103,10 +103,9 @@ export async function nft_href({ level, issue, token }: {
     level: NftLevel, issue: NftIssue, token: Token
 }) {
     const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
-    }
-    const nft_wallet = new NftWallet(address, token);
+    const nft_wallet = address
+        ? new NftWallet(address, token)
+        : new NftWalletMock(address, token);
     const nft_id = Nft.coreId({ level, issue });
     const supply = await nft_wallet.totalSupply(nft_id);
     if (supply > 0) {

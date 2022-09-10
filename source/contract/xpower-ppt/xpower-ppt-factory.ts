@@ -27,6 +27,9 @@ export async function XPowerPptMockFactory({
 }): Promise<Contract> {
     const token_lc = Tokenizer.lower(token);
     const mock = {
+        totalSupply: (/*id:string*/) => {
+            return BigNumber.from(0);
+        },
         year: () => {
             return BigNumber.from(MAX_YEAR());
         },

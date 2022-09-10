@@ -161,7 +161,7 @@ export class SPA extends Referable(Updatable(
             page: props.page,
         };
     }
-    componentDidMount() {
+    async componentDidMount() {
         App.onPageSwitch((page) => this.setState({
             page
         }));
@@ -507,6 +507,30 @@ export class SPA extends Referable(Updatable(
                 }
             };
         };
+        /**
+         * fallback: if no chain is installed
+         */
+        Blockchain.isInstalled().then(async (installed) => {
+            const get_images = async (token: Token) => {
+                const images = [];
+                for (const level of NftLevels()) {
+                    for (const issue of Years({ reverse: true })) {
+                        images.push(nft_image(level, issue, token));
+                        images.push(ppt_image(level, issue, token));
+                    }
+                }
+                const details = await Promise.all([
+                    ...images
+                ]);
+                await this.update(details.reduce(
+                    (lhs, rhs) => $.extend(true, lhs, rhs)
+                ));
+            };
+            if (!installed) {
+                App.onTokenSwitch(get_images);
+                get_images(this.state.token);
+            }
+        });
     }
     render() {
         if (App.debug) {
