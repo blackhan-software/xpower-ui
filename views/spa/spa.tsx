@@ -5,7 +5,7 @@ import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { MoeTreasuryFactory, PptTreasuryFactory } from '../../source/contract';
 import { OnClaim, OnStakeBatch, OnUnstakeBatch } from '../../source/contract';
-import { buffered, update, x40 } from '../../source/functions';
+import { Updatable, buffered, x40 } from '../../source/functions';
 import { Alerts, Alert, alert } from '../../source/functions';
 import { Referable, ancestor } from '../../source/functions';
 import { HashManager, MiningManager } from '../../source/managers';
@@ -130,9 +130,9 @@ function get_nft_list() {
 function get_ppt_list() {
     return ppt_list() as PptList;
 }
-export class SPA extends Referable(React.Component)<
-    Props, State
-> {
+export class SPA extends Referable(Updatable(
+    React.Component<Props, State>
+))  {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -165,7 +165,7 @@ export class SPA extends Referable(React.Component)<
         App.onPageSwitch((page) => this.setState({
             page
         }));
-        App.onTokenSwitch((token) => update<State>.bind(this)({
+        App.onTokenSwitch((token) => this.update({
             token, minting: { rows: Minting.rows(App.level.min) }
         }));
         /**
@@ -176,14 +176,14 @@ export class SPA extends Referable(React.Component)<
                 token
             });
             if (miner.running) {
-                await update<State>.bind(this)({
+                await this.update({
                     mining: {
                         speed: miner.speed,
                         togglable: miner.speed > 0,
                     }
                 });
             } else {
-                await update<State>.bind(this)({
+                await this.update({
                     mining: {
                         speed: miner.speed,
                         status: MinerStatus.stopped,
@@ -199,64 +199,64 @@ export class SPA extends Referable(React.Component)<
                 token
             });
             miner.on('initializing', () => {
-                update<State>.bind(this)({
+                this.update({
                     mining: { status: MinerStatus.initializing }
                 });
             });
             miner.on('initialized', () => {
-                update<State>.bind(this)({
+                this.update({
                     mining: { status: MinerStatus.initialized }
                 });
             });
             miner.on('starting', () => {
-                update<State>.bind(this)({
+                this.update({
                     mining: { status: MinerStatus.starting, speedable: false }
                 });
             });
             miner.on('started', () => {
-                update<State>.bind(this)({
+                this.update({
                     mining: { status: MinerStatus.started }
                 });
             });
             miner.on('stopping', () => {
-                update<State>.bind(this)({
+                this.update({
                     mining: { status: MinerStatus.stopping }
                 });
             });
             miner.on('stopped', () => {
-                update<State>.bind(this)({
+                this.update({
                     mining: { status: MinerStatus.stopped, speedable: true }
                 });
             });
             miner.on('pausing', () => {
-                update<State>.bind(this)({
+                this.update({
                     mining: { status: MinerStatus.pausing }
                 });
             });
             miner.on('paused', () => {
-                update<State>.bind(this)({
+                this.update({
                     mining: { status: MinerStatus.paused }
                 });
             });
             miner.on('resuming', () => {
-                update<State>.bind(this)({
+                this.update({
                     mining: { status: MinerStatus.resuming }
                 });
             });
             miner.on('resumed', () => {
-                update<State>.bind(this)({
+                this.update({
                     mining: { status: MinerStatus.resumed }
                 });
             });
             miner.on('increased', (ev) => {
-                update<State>.bind(this)({
+                this.update({
                     mining: {
                         togglable: ev.speed > 0, speed: ev.speed
                     }
                 });
             });
             miner.on('decreased', (ev) => {
-                update<State>.bind(this)({
+                this.update({
                     mining: {
                         togglable: ev.speed > 0, speed: ev.speed
                     }
@@ -292,7 +292,7 @@ export class SPA extends Referable(React.Component)<
             const rows = Minting.setRow(
                 this.state.minting.rows, level - 1, row
             );
-            await update<State>.bind(this)({
+            await this.update({
                 minting: { rows }
             });
         });
@@ -302,7 +302,7 @@ export class SPA extends Referable(React.Component)<
         App.onTokenChanged(buffered((
             token: Token, { amount: balance }: { amount: Amount }
         ) => {
-            update<State>.bind(this)({
+            this.update({
                 ...nft_amounts(token, balance)
             });
         }));
@@ -332,13 +332,13 @@ export class SPA extends Referable(React.Component)<
          */
         App.onNftChanged(buffered(() => {
             const nft_token = Nft.token(this.state.token);
-            update<State>.bind(this)({
+            this.update({
                 ...ppt_amounts(nft_token)
             });
         }));
         App.onPptChanged(buffered(() => {
             const nft_token = Nft.token(this.state.token);
-            update<State>.bind(this)({
+            this.update({
                 ...ppt_amounts(nft_token)
             });
         }));
@@ -389,7 +389,7 @@ export class SPA extends Referable(React.Component)<
                     )]
                 )
             );
-            await update<State>.bind(this)({
+            await this.update({
                 nfts: { details },
                 ppts: { details },
             });
@@ -412,7 +412,7 @@ export class SPA extends Referable(React.Component)<
                 ppt_approval(address, token),
                 ...images
             ]);
-            await update<State>.bind(this)(details.reduce(
+            await this.update(details.reduce(
                 (lhs, rhs) => $.extend(true, lhs, rhs)
             ));
         }, {
@@ -613,7 +613,7 @@ export class SPA extends Referable(React.Component)<
                 minter={this.state.nfts.minter}
                 list={list}
                 onNftList={(lhs, rhs) => {
-                    update<State>.bind(this)({
+                    this.update({
                         nfts: { list: lhs, matrix: { [nft_token]: rhs } },
                         ppts: { list: lhs }
                     })
@@ -621,7 +621,7 @@ export class SPA extends Referable(React.Component)<
                 onNftImageLoaded={(
                     nft_issue, nft_level
                 ) => {
-                    update<State>.bind(this)({
+                    this.update({
                         nfts: {
                             details: {
                                 [nft_token]: {
@@ -638,7 +638,7 @@ export class SPA extends Referable(React.Component)<
                 onNftSenderExpanded={(
                     nft_issues, nft_level, toggled
                 ) => {
-                    update<State>.bind(this)({
+                    this.update({
                         nfts: {
                             details: {
                                 [nft_token]: {
@@ -655,7 +655,7 @@ export class SPA extends Referable(React.Component)<
                 onNftAmountChanged={(
                     nft_issue, nft_level, value, valid
                 ) => {
-                    update<State>.bind(this)({
+                    this.update({
                         nfts: {
                             details: {
                                 [nft_token]: {
@@ -672,7 +672,7 @@ export class SPA extends Referable(React.Component)<
                 onNftTargetChanged={(
                     nft_issue, nft_level, value, valid
                 ) => {
-                    update<State>.bind(this)({
+                    this.update({
                         nfts: {
                             details: {
                                 [nft_token]: {
@@ -696,7 +696,7 @@ export class SPA extends Referable(React.Component)<
                     this.nftBatchMint.bind(this)
                 }
                 onNftMinterList={(lhs, rhs) => {
-                    update<State>.bind(this)({
+                    this.update({
                         nfts: { list: lhs, matrix: { [nft_token]: rhs } }
                     });
                 }}
@@ -724,7 +724,7 @@ export class SPA extends Referable(React.Component)<
                 minter={this.state.ppts.minter}
                 list={list}
                 onPptList={(lhs, rhs) => {
-                    update<State>.bind(this)({
+                    this.update({
                         nfts: { list: lhs },
                         ppts: { list: lhs, matrix: { [nft_token]: rhs } }
                     })
@@ -732,7 +732,7 @@ export class SPA extends Referable(React.Component)<
                 onPptImageLoaded={(
                     ppt_issue, ppt_level
                 ) => {
-                    update<State>.bind(this)({
+                    this.update({
                         ppts: {
                             details: {
                                 [nft_token]: {
@@ -749,7 +749,7 @@ export class SPA extends Referable(React.Component)<
                 onPptClaimerExpanded={(
                     ppt_issues, ppt_level, toggled
                 ) => {
-                    update<State>.bind(this)({
+                    this.update({
                         ppts: {
                             details: {
                                 [nft_token]: {
@@ -766,7 +766,7 @@ export class SPA extends Referable(React.Component)<
                 onPptAmountChanged={(
                     nft_issue, nft_level, value, valid
                 ) => {
-                    update<State>.bind(this)({
+                    this.update({
                         ppts: {
                             details: {
                                 [nft_token]: {
@@ -783,7 +783,7 @@ export class SPA extends Referable(React.Component)<
                 onPptTargetChanged={(
                     nft_issue, nft_level, value, valid
                 ) => {
-                    update<State>.bind(this)({
+                    this.update({
                         ppts: {
                             details: {
                                 [nft_token]: {
@@ -810,7 +810,7 @@ export class SPA extends Referable(React.Component)<
                     this.pptBatchBurn.bind(this)
                 }
                 onPptMinterList={(lhs, rhs) => {
-                    update<State>.bind(this)({
+                    this.update({
                         ppts: { list: lhs, matrix: { [nft_token]: rhs } }
                     });
                 }}
@@ -907,12 +907,12 @@ export class SPA extends Referable(React.Component)<
                         this.state.minting.rows, level - 1, {
                         tx_counter: tx_counter - 1
                     });
-                    update<State>.bind(this)({
+                    this.update({
                         minting: { rows }
                     });
                 }
             };
-            await update<State>.bind(this)({
+            await this.update({
                 minting: {
                     rows: Minting.setRow(
                         this.state.minting.rows, level - 1, {
@@ -928,7 +928,7 @@ export class SPA extends Referable(React.Component)<
             const { tx_counter } = Minting.getRow(
                 this.state.minting.rows, level - 1
             );
-            await update<State>.bind(this)({
+            await this.update({
                 minting: {
                     rows: Minting.setRow(
                         this.state.minting.rows, level - 1, {
@@ -941,7 +941,7 @@ export class SPA extends Referable(React.Component)<
                 address, block_hash, token
             });
         } catch (ex: any) {
-            update<State>.bind(this)({
+            this.update({
                 minting: {
                     rows: Minting.setRow(
                         this.state.minting.rows, level - 1, {
@@ -1031,7 +1031,7 @@ export class SPA extends Referable(React.Component)<
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            update<State>.bind(this)({
+            this.update({
                 nfts: {
                     details: {
                         [nft_token]: {
@@ -1049,7 +1049,7 @@ export class SPA extends Referable(React.Component)<
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
-            update<State>.bind(this)({
+            this.update({
                 nfts: {
                     details: {
                         [nft_token]: {
@@ -1086,7 +1086,7 @@ export class SPA extends Referable(React.Component)<
                     after: $sender_row
                 });
             }
-            update<State>.bind(this)({
+            this.update({
                 nfts: {
                     details: {
                         [nft_token]: {
@@ -1124,7 +1124,7 @@ export class SPA extends Referable(React.Component)<
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            update<State>.bind(this)({
+            this.update({
                 nfts: {
                     minter: {
                         [Nft.token(token)]: {
@@ -1137,7 +1137,7 @@ export class SPA extends Referable(React.Component)<
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
-            update<State>.bind(this)({
+            this.update({
                 nfts: {
                     minter: {
                         [Nft.token(token)]: {
@@ -1152,7 +1152,7 @@ export class SPA extends Referable(React.Component)<
                 nft_contract.address, MAX_UINT256 - old_allowance
             );
         } catch (ex) {
-            update<State>.bind(this)({
+            this.update({
                 nfts: {
                     minter: {
                         [Nft.token(token)]: {
@@ -1189,7 +1189,7 @@ export class SPA extends Referable(React.Component)<
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            update<State>.bind(this)({
+            this.update({
                 nfts: {
                     minter: {
                         [Nft.token(token)]: {
@@ -1203,7 +1203,7 @@ export class SPA extends Referable(React.Component)<
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
-            update<State>.bind(this)({
+            this.update({
                 nfts: {
                     minter: {
                         [Nft.token(token)]: {
@@ -1215,7 +1215,7 @@ export class SPA extends Referable(React.Component)<
             nft_wallet.onTransferBatch(on_batch_tx);
             tx = await nft_wallet.mintBatch(levels, amounts);
         } catch (ex) {
-            update<State>.bind(this)({
+            this.update({
                 nfts: {
                     minter: {
                         [Nft.token(token)]: {
@@ -1255,7 +1255,7 @@ export class SPA extends Referable(React.Component)<
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            update<State>.bind(this)({
+            this.update({
                 ppts: {
                     details: {
                         [ppt_token]: {
@@ -1274,7 +1274,7 @@ export class SPA extends Referable(React.Component)<
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
-            update<State>.bind(this)({
+            this.update({
                 ppts: {
                     details: {
                         [ppt_token]: {
@@ -1299,7 +1299,7 @@ export class SPA extends Referable(React.Component)<
                 x40(address), core_id
             );
         } catch (ex: any) {
-            update<State>.bind(this)({
+            this.update({
                 ppts: {
                     details: {
                         [ppt_token]: {
@@ -1344,7 +1344,7 @@ export class SPA extends Referable(React.Component)<
             address
         );
         if (approved) {
-            update<State>.bind(this)({
+            this.update({
                 ppts: {
                     minter: {
                         [Nft.token(token)]: {
@@ -1360,7 +1360,7 @@ export class SPA extends Referable(React.Component)<
                 if (ev.transactionHash !== tx?.hash) {
                     return;
                 }
-                update<State>.bind(this)({
+                this.update({
                     ppts: {
                         minter: {
                             [Nft.token(token)]: {
@@ -1373,7 +1373,7 @@ export class SPA extends Referable(React.Component)<
             let tx: Transaction | undefined;
             Alerts.hide();
             try {
-                update<State>.bind(this)({
+                this.update({
                     ppts: {
                         minter: {
                             [Nft.token(token)]: {
@@ -1387,7 +1387,7 @@ export class SPA extends Referable(React.Component)<
                     await ppt_treasury.then((c) => c.address), true
                 );
             } catch (ex) {
-                update<State>.bind(this)({
+                this.update({
                     ppts: {
                         minter: {
                             [Nft.token(token)]: {
@@ -1450,7 +1450,7 @@ export class SPA extends Referable(React.Component)<
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            update<State>.bind(this)({
+            this.update({
                 ppts: {
                     minter: {
                         [Nft.token(token)]: {
@@ -1466,7 +1466,7 @@ export class SPA extends Referable(React.Component)<
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
-            update<State>.bind(this)({
+            this.update({
                 ppts: {
                     minter: {
                         [Nft.token(token)]: {
@@ -1485,7 +1485,7 @@ export class SPA extends Referable(React.Component)<
                 x40(address), ppt_ids, amounts
             );
         } catch (ex: any) {
-            update<State>.bind(this)({
+            this.update({
                 ppts: {
                     minter: {
                         [Nft.token(token)]: {
@@ -1547,7 +1547,7 @@ export class SPA extends Referable(React.Component)<
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            update<State>.bind(this)({
+            this.update({
                 ppts: {
                     minter: {
                         [Nft.token(token)]: {
@@ -1563,7 +1563,7 @@ export class SPA extends Referable(React.Component)<
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
-            update<State>.bind(this)({
+            this.update({
                 ppts: {
                     minter: {
                         [Nft.token(token)]: {
@@ -1582,7 +1582,7 @@ export class SPA extends Referable(React.Component)<
                 x40(address), ppt_ids, amounts
             );
         } catch (ex: any) {
-            update<State>.bind(this)({
+            this.update({
                 ppts: {
                     minter: {
                         [Nft.token(token)]: {

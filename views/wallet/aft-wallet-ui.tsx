@@ -1,7 +1,7 @@
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { nice, nice_si } from '../../filters';
-import { buffered, update, x40 } from '../../source/functions';
+import { Updatable, buffered, x40 } from '../../source/functions';
 import { Address, Amount, Token, Tokens } from '../../source/redux/types';
 import { MoeWallet, OnTransfer } from '../../source/wallet';
 import { Tooltip } from '../tooltips';
@@ -28,9 +28,9 @@ function balance() {
     }
     return balance;
 }
-export class AftWalletUi extends React.Component<
-    Props, State
-> {
+export class AftWalletUi extends Updatable(
+    React.Component<Props, State>
+) {
     constructor(
         props: Props
     ) {
@@ -49,9 +49,9 @@ export class AftWalletUi extends React.Component<
         App.onTokenChanged((token: Token, {
             amount: balance
         }) => {
-            update<State>.bind(this)({
+            this.update({
                 balance: { [token]: balance }
-            })
+            });
         });
     }
     render() {

@@ -1,7 +1,7 @@
 import { App } from '../../../source/app';
 import { Blockchain } from '../../../source/blockchain';
 import { MoeTreasuryFactory } from '../../../source/contract';
-import { Referable, update, x40 } from '../../../source/functions';
+import { Referable, Updatable, x40 } from '../../../source/functions';
 import { Address, Amount, Supply, Token } from '../../../source/redux/types';
 import { NftToken, NftTokens } from '../../../source/redux/types';
 import { NftLevel, NftLevels } from '../../../source/redux/types';
@@ -128,9 +128,9 @@ function state(
     );
     return state as State;
 }
-export class UiPptDetails extends Referable(React.Component)<
-    Props, State
-> {
+export class UiPptDetails extends Referable(Updatable(
+    React.Component<Props, State>
+)) {
     constructor(props: Props) {
         super(props);
         this.state = state();
@@ -203,7 +203,7 @@ export class UiPptDetails extends Referable(React.Component)<
                 (c) => c.claimableFor(x40(address), core_id)
             )
         ]);
-        await update<State>.bind(this)({
+        await this.update({
             [ppt_level]: {
                 [ppt_issue]: {
                     claimable: {
@@ -373,7 +373,7 @@ export class UiPptDetails extends Referable(React.Component)<
             level={ppt_level}
             onToggled={(flag) => {
                 const issues = Array.from(Years());
-                update<PptDetails>.bind(this)({
+                this.update({
                     [ppt_level]: Object.fromEntries(
                         issues.map((issue) => [issue, {
                             toggled: !flag

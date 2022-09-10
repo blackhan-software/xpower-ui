@@ -5,7 +5,7 @@ import React, { RefObject } from 'react';
  */
 let global_refs: Record<string, RefObject<unknown>> | undefined;
 /**
- * @returns mixin w/`[global_]ref` methods
+ * @returns mixin with `[global_]ref` methods
  */
 export function Referable<
     TBase extends Constructor<React.Component>,
