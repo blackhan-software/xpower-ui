@@ -3,6 +3,7 @@ import './connector.scss';
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { ChainId } from '../../source/blockchain';
+import { Referable } from '../../source/functions';
 import { buffered } from '../../source/functions';
 import { sibling } from '../../source/functions';
 import { Tooltip } from '../tooltips';
@@ -22,9 +23,9 @@ enum Chain {
     CONNECTING,
     CONNECTED,
 }
-export class Connector extends React.Component<
-    Props, State
-> {
+export class Connector extends Referable(
+    React.Component<Props, State>
+) {
     constructor(
         props: Props
     ) {
@@ -92,6 +93,7 @@ export class Connector extends React.Component<
             }
         };
         return <button
+            ref={this.ref('connect-metamask')}
             className='btn btn-outline-warning'
             disabled={this.connecting}
             id='connect-metamask'
@@ -141,13 +143,19 @@ export class Connector extends React.Component<
         return 'Authorize your Metamask to be connected to';
     }
     componentDidUpdate = buffered(() => {
+        const $ref = this.ref<HTMLElement>(
+            'connect-metamask'
+        );
+        if (this.state.chain !== Chain.CONNECTED) {
+            if ($ref.current && !$ref.current.dataset.focus) {
+                $ref.current.dataset.focus = 'true';
+                $ref.current.focus();
+            }
+        }
         if (this.state.chain !== Chain.UNAVAILABLE) {
             return;
         }
-        const $connect = document.getElementById(
-            'connect-metamask'
-        );
-        const $info = sibling($connect, ($el) => {
+        const $info = sibling($ref.current, ($el) => {
             return $el.classList.contains('info');
         });
         if ($info) {
