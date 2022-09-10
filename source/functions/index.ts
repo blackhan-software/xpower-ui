@@ -5,6 +5,7 @@ export * from './delayed';
 export * from './dom';
 export * from './dom-query';
 export * from './ellipse';
+export * from './ensure';
 export * from './message';
 export * from './mobile';
 export * from './queued';

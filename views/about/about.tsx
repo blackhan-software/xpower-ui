@@ -7,7 +7,7 @@ import './about.scss';
 import { Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { capitalize } from '../../routes/functions';
-import { link, script } from '../../source/functions';
+import { ensure, link, script } from '../../source/functions';
 
 import React, { useEffect, useState } from 'react';
 
@@ -86,13 +86,15 @@ async function renderMarkdown(
         script(SCRIPTS.markdownIt),
         script(SCRIPTS.markdownItAnchor)
     ]);
-    const markdownit = global.markdownit as markdownIt;
-    console.assert(markdownit);
+    const markdownit = await ensure(
+        () => global.markdownit as markdownIt
+    );
     const mdi = markdownit({
         html: true, linkify: true, typographer: true
     });
-    const anchor = global.markdownItAnchor as markdownItAnchor;
-    console.assert(anchor);
+    const anchor = await ensure(
+        () => global.markdownItAnchor as markdownItAnchor
+    );
     mdi.use(anchor, {
         permalink: anchor.permalink.linkInsideHeader({
             symbol: '¶', ariaHidden: true
@@ -122,17 +124,18 @@ async function renderKatex(
     await link(STYLES.katex);
     await script(SCRIPTS.katex);
     await script(SCRIPTS.katexAutoRender);
-    if (global.renderMathInElement) {
-        global.renderMathInElement($content, {
-            delimiters: [
-                { left: '$$', right: '$$', display: true },
-                { left: '$', right: '$', display: false },
-                { left: '\\(', right: '\\)', display: false },
-                { left: '\\[', right: '\\]', display: true }
-            ],
-            throwOnError: false
-        });
-    }
+    const render = await ensure(
+        () => global.renderMathInElement
+    );
+    render($content, {
+        delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\(', right: '\\)', display: false },
+            { left: '\\[', right: '\\]', display: true }
+        ],
+        throwOnError: false
+    });
 }
 function scrollToAnchor(
     anchor: string
