@@ -67,23 +67,27 @@ export class Minting extends React.Component<
             <label className='form-label'>
                 Mined Amounts (not minted yet)
             </label>
-            {(rows).map(
-                (row, i) => this.$mint(token, i + 1, row)
-            )}
+            {rows
+                .map((row, i) => this.$mint(token, i + 1, row))
+                .filter((row) => row)}
         </React.Fragment>;
     }
     $mint(
         token: Token, level: Level, row: MinterRow
     ) {
-        return <div
-            className='btn-group mint' key={level - 1} role='group'
-            style={{ display: row.display ? 'block' : 'none' }}
-        >
-            {this.$minter(token, level, row)}
-            {this.$nn_counter(token, level, row)}
-            {this.$tx_counter(token, level, row)}
-            {this.$forget(token, level, row)}
-        </div>;
+        const { display, tx_counter, nn_counter } = row;
+        if (display || tx_counter > 0 || nn_counter > 0) {
+            return <div
+                className='btn-group mint' key={level - 1} role='group'
+                style={{ display: row.display ? 'block' : 'none' }}
+            >
+                {this.$minter(token, level, row)}
+                {this.$nn_counter(token, level, row)}
+                {this.$tx_counter(token, level, row)}
+                {this.$forget(token, level, row)}
+            </div>;
+        }
+        return null;
     }
     $minter(
         token: Token, level: Level, { disabled, status }: MinterRow
