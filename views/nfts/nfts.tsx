@@ -176,6 +176,7 @@ export class UiNfts extends React.Component<
                     onNftTransfer={
                         this.props.onNftTransfer?.bind(this)
                     }
+                    toggled={toggled}
                     token={token}
                 />
             </div>

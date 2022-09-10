@@ -186,6 +186,7 @@ export class UiPpts extends React.Component<
                     onPptClaim={
                         this.props.onPptClaim?.bind(this)
                     }
+                    toggled={toggled}
                     token={token}
                 />
             </div>

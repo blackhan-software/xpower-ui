@@ -71,20 +71,19 @@ type State = {
     minting: {
         rows: MinterRow[];
     };
-    nfts_toggled: boolean;
     nfts: {
         details: Record<NftToken, NftDetails>;
         matrix: NftMatrix;
         minter: Record<NftToken, NftMinter>;
         list: NftList;
     };
-    ppts_toggled: boolean;
     ppts: {
         details: Record<NftToken, PptDetails>;
         matrix: PptMatrix;
         minter: Record<NftToken, PptMinter>;
         list: NftList;
     };
+    toggled: boolean;
     token: Token;
     page: Page;
 }
@@ -143,20 +142,19 @@ export class SPA extends Referable(Updatable(
             minting: {
                 rows: Minting.rows(App.level.min),
             },
-            nfts_toggled: false,
             nfts: {
                 details: get_nft_details(),
                 matrix: get_nft_matrix(),
                 minter: get_nft_minter(),
                 list: get_nft_list(),
             },
-            ppts_toggled: false,
             ppts: {
                 details: get_ppt_details(),
                 matrix: get_ppt_matrix(),
                 minter: get_ppt_minter(),
                 list: get_ppt_list(),
             },
+            toggled: false,
             token: props.token,
             page: props.page,
         };
@@ -537,8 +535,8 @@ export class SPA extends Referable(Updatable(
             console.count('[app.render]');
         }
         const { page, token } = this.state;
-        const { nfts, nfts_toggled } = this.state;
-        const { ppts, ppts_toggled } = this.state;
+        const { nfts, ppts } = this.state;
+        const { toggled } = this.state;
         const { speed } = this.props;
         return <React.StrictMode>
             {this.$h1(page)}
@@ -546,8 +544,8 @@ export class SPA extends Referable(Updatable(
             {this.$wallet(page, token)}
             {this.$selector(page, token)}
             {this.$home(page, token, speed)}
-            {this.$nfts(page, token, nfts.list, nfts_toggled)}
-            {this.$ppts(page, token, ppts.list, ppts_toggled)}
+            {this.$nfts(page, token, nfts.list, toggled)}
+            {this.$ppts(page, token, ppts.list, toggled)}
             {this.$about(page, token)}
         </React.StrictMode>;
     }
@@ -725,7 +723,7 @@ export class SPA extends Referable(Updatable(
                     });
                 }}
                 onNftMinterToggled={(toggled) => {
-                    this.setState({ nfts_toggled: toggled });
+                    this.update({ toggled });
                 }}
                 toggled={toggled}
                 token={token}
@@ -839,7 +837,7 @@ export class SPA extends Referable(Updatable(
                     });
                 }}
                 onPptMinterToggled={(toggled) => {
-                    this.setState({ ppts_toggled: toggled });
+                    this.update({ toggled });
                 }}
                 toggled={toggled}
                 token={token}

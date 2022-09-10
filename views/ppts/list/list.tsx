@@ -12,7 +12,6 @@ import { UiPptAmount } from './amount';
 import { UiPptDetails, PptDetails } from '../details/details';
 
 type Props = {
-    token: Token;
     list: PptList;
     onPptList?: (
         list: Partial<PptList>
@@ -47,6 +46,8 @@ type Props = {
         issue: NftIssue,
         level: NftLevel
     ) => void;
+    toggled: boolean;
+    token: Token;
 }
 type PptList = Record<NftLevel, {
     amount: Amount; max: Amount; min: Amount;
@@ -101,7 +102,8 @@ export class UiPptList extends React.Component<
         { amount, max, min, display, toggled }: PptList[NftLevel],
     ) {
         const any_filter = [
-            by_level.supply, by_level.amount, amount, max, min
+            by_level.supply, by_level.amount, amount, max, min,
+            this.props.toggled // toggles *all* levels!
         ];
         const style = {
             display: (display || any_filter.some((v) => v))
@@ -134,7 +136,8 @@ export class UiPptList extends React.Component<
         { amount, max, min, display, toggled }: PptList[NftLevel],
     ) {
         const any_filter = [
-            by_level.supply, by_level.amount, amount, max, min
+            by_level.supply, by_level.amount, amount, max, min,
+            this.props.toggled // toggles *all* levels!
         ];
         const style = {
             display: (display || any_filter.some((v) => v)) && toggled
