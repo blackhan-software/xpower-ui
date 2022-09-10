@@ -1,3 +1,4 @@
+import { nice } from '../../../filters';
 import { Amount, Token } from '../../../source/redux/types';
 import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
 
@@ -28,10 +29,10 @@ export class UiPptClaimed extends React.Component<
             <div className='input-group nft-claimed d-none d-sm-flex'
                 data-level={Nft.nameOf(nft_level)} role='group'
             >
-                <input type='number'
+                <input type='text'
                     className='form-control'
                     placeholder='0' readOnly
-                    value={typeof value === 'bigint' ? value.toString() : ''}
+                    value={typeof value === 'bigint' ? nice(value) : ''}
                 />
                 <span className='input-group-text info'
                     data-bs-placement='top' data-bs-toggle='tooltip'
