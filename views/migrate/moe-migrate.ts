@@ -2,17 +2,17 @@
 import './moe-migrate.scss';
 
 import { Blockchain } from '../../source/blockchain';
-import { alert, Alert, x40 } from '../../source/functions';
-import { Token } from '../../source/redux/types';
 import { XPowerMoeFactory } from '../../source/contract';
+import { Alerts, Alert, alert, x40 } from '../../source/functions';
+import { Token } from '../../source/redux/types';
 
 Blockchain.onConnect(function enableAllowanceButton() {
     const $approve = $('.approve-allowance');
     $approve.prop('disabled', false);
 });
 $('button.approve-allowance').on(
-    'click', async function approveTokens(ev) {
-        const $approve = $(ev.target);
+    'click', async function approveTokens(e) {
+        const $approve = $(e.target);
         const $allowance = $approve.parents('form.moe-allowance');
         const $migration = $allowance.next('form.moe-migration');
         if ($approve.hasClass('thor')) {
@@ -69,44 +69,39 @@ async function approve(token: Token, { $approve, $execute }: {
         `[${src_version}:allowance]`, src_allowance.toNumber()
     );
     if (src_allowance.gte(src_balance)) {
-        const $alert = $(alert(
+        alert(
             `Allowance has already been approved; you can migrate now.`,
-            Alert.info
-        ));
-        $alert.insertAfter($approve.parent('div'));
+            Alert.info, { after: $approve.parent('div')[0] }
+        );
         $execute.prop('disabled', false);
         return;
     }
+    Alerts.hide();
     try {
-        $(`.alert`).remove();
         await src_xpower.increaseAllowance(
             tgt_xpower.address, src_balance.sub(src_allowance)
         );
-        const $alert = $(alert(
+        alert(
             `Allowance has successfully been approved; you can migrate now.`,
-            Alert.success
-        ));
-        $alert.insertAfter($approve.parent('div'));
+            Alert.success, { after: $approve.parent('div')[0] }
+        );
         $execute.prop('disabled', false);
         return;
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
-                const message = `${ex.message} [${ex.data.message}]`;
-                const $alert = $(alert(message, Alert.warning));
-                $alert.insertAfter($approve.parent('div'));
-            } else {
-                const $alert = $(alert(ex.message, Alert.warning));
-                $alert.insertAfter($approve.parent('div'));
+                ex.message = `${ex.message} [${ex.data.message}]`;
             }
+            alert(ex.message, Alert.warning, {
+                after: $approve.parent('div')[0]
+            });
         }
         console.error(ex);
-        return;
     }
 }
 $('button.execute-migration').on(
-    'click', async function migrateTokens(ev) {
-        const $execute = $(ev.target);
+    'click', async function migrateTokens(e) {
+        const $execute = $(e.target);
         if ($execute.hasClass('thor')) {
             await migrate(Token.THOR, { $execute });
         }
@@ -152,11 +147,10 @@ async function migrate(token: Token, { $execute }: {
         `[${src_version}:balance]`, src_balance.toNumber()
     );
     if (src_balance.isZero()) {
-        const $alert = $(alert(
+        alert(
             `Your old balance is zero; nothing to migrate here.`,
-            Alert.warning
-        ));
-        $alert.insertAfter($execute.parent('div'));
+            Alert.warning, { after: $execute.parent('div')[0] }
+        );
         return;
     }
     const tgt_spender = tgt_xpower.address;
@@ -167,36 +161,31 @@ async function migrate(token: Token, { $execute }: {
         `[${src_version}:allowance]`, src_allowance.toNumber()
     );
     if (src_allowance.isZero()) {
-        const $alert = $(alert(
+        alert(
             `Old allowance is zero; approve allowance! ` +
             `Did your allowance transaction actually get confirmed? ` +
             `Wait a little bit and then retry.`,
-            Alert.warning
-        ));
-        $alert.insertAfter($execute.parent('div'));
+            Alert.warning, { after: $execute.parent('div')[0] }
+        );
         return;
     }
+    Alerts.hide();
     try {
-        $(`.alert`).remove();
         await tgt_xpower.migrate(src_balance);
-        const $alert = $(alert(
+        alert(
             `Your old balance has successfully been migrated! ;)`,
-            Alert.success, { id: 'success' }
-        ));
-        $alert.insertAfter($execute.parent('div'));
+            Alert.success, { after: $execute.parent('div')[0], id: 'success' }
+        );
         return;
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
-                const message = `${ex.message} [${ex.data.message}]`;
-                const $alert = $(alert(message, Alert.warning));
-                $alert.insertAfter($execute.parent('div'));
-            } else {
-                const $alert = $(alert(ex.message, Alert.warning));
-                $alert.insertAfter($execute.parent('div'));
+                ex.message = `${ex.message} [${ex.data.message}]`;
             }
+            alert(ex.message, Alert.warning, {
+                after: $execute.parent('div')[0]
+            });
         }
         console.error(ex);
-        return;
     }
 }

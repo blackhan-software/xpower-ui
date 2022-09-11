@@ -8,9 +8,10 @@ import { buffered } from '../../source/functions';
 import { sibling } from '../../source/functions';
 import { Tooltip } from '../tooltips';
 
-import React from 'react';
+import React, { createElement } from 'react';
 import { Unsubscribe } from 'redux';
 import { InfoCircle } from '../../public/images/tsx';
+import { createRoot } from 'react-dom/client';
 
 type Props = Record<string, never>;
 type State = {
@@ -206,5 +207,9 @@ function reload(
     } else {
         location.search = `?ms=${delta_ms}`;
     }
+}
+if (require.main === module) {
+    const $header = document.querySelector('form#connector');
+    createRoot($header!).render(createElement(Connector));
 }
 export default Connector;

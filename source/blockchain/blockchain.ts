@@ -112,22 +112,17 @@ export class Blockchain extends EventEmitter {
             }]
         }));
     }
-    public static async addToken(info: TokenInfo): Promise<boolean> {
+    public static async addToken(info: TokenInfo) {
         return this.me.addToken(info);
     }
-    public async addToken(info: TokenInfo): Promise<boolean> {
-        try {
-            return await this.provider.then((p) => p?.request({
-                method: 'wallet_watchAsset', params: {
-                    type: 'ERC20', options: {
-                        ...info, address: x40(info.address)
-                    }
+    public async addToken(info: TokenInfo) {
+        return await this.provider.then((p) => p?.request({
+            method: 'wallet_watchAsset', params: {
+                type: 'ERC20', options: {
+                    ...info, address: x40(info.address)
                 }
-            }));
-        } catch (ex) {
-            console.error(ex);
-        }
-        return Promise.resolve(false);
+            }
+        }));
     }
     public static onConnect(
         listener: (options: Connect) => void

@@ -3,7 +3,7 @@ import './nft-migrate.scss';
 
 import { Blockchain } from '../../source/blockchain';
 import { BigNumber } from 'ethers';
-import { alert, Alert, x40 } from '../../source/functions';
+import { Alerts, Alert, alert, x40 } from '../../source/functions';
 import { Nft, NftLevels, Token } from '../../source/redux/types';
 import { XPowerNftFactory } from '../../source/contract';
 import { Years } from '../../source/years';
@@ -12,8 +12,8 @@ Blockchain.onConnect(function enableAllowanceButton() {
     const $approve = $('.approve-allowance-nft');
     $approve.prop('disabled', false);
 });
-$('button.approve-allowance-nft').on('click', async function approveTokens(ev) {
-    const $approve = $(ev.target);
+$('button.approve-allowance-nft').on('click', async function approveTokens(e) {
+    const $approve = $(e.target);
     const $allowance_nft = $approve.parents('form.allowance-nft');
     const $migration_nft = $allowance_nft.next('form.migration-nft');
     if ($approve.hasClass('thor')) {
@@ -72,43 +72,38 @@ async function approve(token: Token, { $approve, $execute }: {
         `[${src_version}:approved]`, src_approved
     );
     if (src_approved) {
-        const $alert = $(alert(
+        alert(
             `NFTs have already been approved for; you can migrate now.`,
-            Alert.info
-        ));
-        $alert.insertAfter($approve.parent('div'));
+            Alert.info, { after: $approve.parent('div')[0] }
+        );
         $execute.prop('disabled', false);
         return;
     }
+    Alerts.hide();
     try {
-        $(`.alert`).remove();
         await src_xpower.setApprovalForAll(
             tgt_xpower.address, true
         );
-        const $alert = $(alert(
+        alert(
             `NFTs have successfully been approved for; you can migrate now.`,
-            Alert.success
-        ));
-        $alert.insertAfter($approve.parent('div'));
+            Alert.success, { after: $approve.parent('div')[0] }
+        );
         $execute.prop('disabled', false);
         return;
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
-                const message = `${ex.message} [${ex.data.message}]`;
-                const $alert = $(alert(message, Alert.warning));
-                $alert.insertAfter($approve.parent('div'));
-            } else {
-                const $alert = $(alert(ex.message, Alert.warning));
-                $alert.insertAfter($approve.parent('div'));
+                ex.message = `${ex.message} [${ex.data.message}]`;
             }
+            alert(ex.message, Alert.warning, {
+                after: $approve.parent('div')[0]
+            });
         }
         console.error(ex);
-        return;
     }
 }
-$('button.execute-migration-nft').on('click', async function migrateTokens(ev) {
-    const $execute = $(ev.target);
+$('button.execute-migration-nft').on('click', async function migrateTokens(e) {
+    const $execute = $(e.target);
     if ($execute.hasClass('thor')) {
         await migrate(Token.THOR, { $execute });
     }
@@ -150,13 +145,12 @@ async function migrate(token: Token, { $execute }: {
         x40(address), tgt_xpower.address
     );
     if (src_approved === false) {
-        const $alert = $(alert(
+        alert(
             `Old NFTs have not been approved for! ` +
             `Did your approval transaction actually get confirmed? ` +
             `Wait a little bit and then retry.`,
-            Alert.warning
-        ));
-        $alert.insertAfter($execute.parent('div'));
+            Alert.warning, { after: $execute.parent('div')[0] }
+        );
         return;
     }
     const ids = Nft.coreIds({
@@ -174,40 +168,35 @@ async function migrate(token: Token, { $execute }: {
     );
     const src_zero = src_balances.reduce((acc, b) => acc && b.isZero(), true);
     if (src_zero) {
-        const $alert = $(alert(
+        alert(
             `Your old NFT balance is zero; nothing to migrate here.`,
-            Alert.warning
-        ));
-        $alert.insertAfter($execute.parent('div'));
+            Alert.warning, { after: $execute.parent('div')[0] }
+        );
         return;
     }
     const nz = filter(ids, src_balances, { zero: false });
+    Alerts.hide();
     try {
-        $(`.alert`).remove();
         await tgt_xpower.migrateBatch(nz.ids, nz.balances);
-        const $alert = $(alert(
+        alert(
             `Your old NFTs have successfully been migrated! ;)`,
-            Alert.success, { id: 'success' }
-        ));
-        $alert.insertAfter($execute.parent('div'));
+            Alert.success, { id: 'success', after: $execute.parent('div')[0] }
+        );
         return;
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
-                const message = `${ex.message} [${ex.data.message}]`;
-                const $alert = $(alert(message, Alert.warning));
-                $alert.insertAfter($execute.parent('div'));
-            } else {
-                const $alert = $(alert(ex.message, Alert.warning));
-                $alert.insertAfter($execute.parent('div'));
+                ex.message = `${ex.message} [${ex.data.message}]`;
             }
+            alert(ex.message, Alert.warning, {
+                after: $execute.parent('div')[0]
+            });
         }
         console.error(ex);
-        return;
     }
 }
-$('button.burn-empty-nft').on('click', async function burnEmpty(ev) {
-    const $burn = $(ev.target);
+$('button.burn-empty-nft').on('click', async function burnEmpty(e) {
+    const $burn = $(e.target);
     if ($burn.hasClass('thor')) {
         await burn(Token.THOR, { $burn });
     }
@@ -251,30 +240,26 @@ async function burn(token: Token, { $burn }: {
     const zz = filter(ids, v3a_balances, {
         zero: true
     });
+    Alerts.hide();
     try {
-        $(`.alert`).remove();
         await src_xpower.burnBatch(
             x40(address), zz.ids, zz.balances
         );
-        const $alert = $(alert(
+        alert(
             `Your old empty NFTs have successfully been burned! ;)`,
-            Alert.success, { id: 'success' }
-        ));
-        $alert.insertAfter($burn.parent('div'));
+            Alert.success, { id: 'success', after: $burn.parent('div')[0] }
+        );
         return;
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
-                const message = `${ex.message} [${ex.data.message}]`;
-                const $alert = $(alert(message, Alert.warning));
-                $alert.insertAfter($burn.parent('div'));
-            } else {
-                const $alert = $(alert(ex.message, Alert.warning));
-                $alert.insertAfter($burn.parent('div'));
+                ex.message = `${ex.message} [${ex.data.message}]`;
             }
+            alert(ex.message, Alert.warning, {
+                after: $burn.parent('div')[0]
+            });
         }
         console.error(ex);
-        return;
     }
 }
 function filter<I, B extends BigNumber>(
