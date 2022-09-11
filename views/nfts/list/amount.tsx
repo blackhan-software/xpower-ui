@@ -33,7 +33,7 @@ export class UiNftAmount extends Referable(React.Component)<
         return <div
             className='btn-group' role='group'
         >
-            <button type='button'
+            <button type='button' aria-label="Decrease"
                 className='btn btn-outline-warning decrease'
                 onMouseDown={this.startDecrease.bind(this)}
                 onMouseLeave={this.stopDecrease.bind(this)}
@@ -132,7 +132,7 @@ export class UiNftAmount extends Referable(React.Component)<
         return <div
             className='btn-group' role='group'
         >
-            <button type='button'
+            <button type='button' aria-label="Increase"
                 className='btn btn-outline-warning increase'
                 onMouseDown={this.startIncrease.bind(this)}
                 onMouseLeave={this.stopIncrease.bind(this)}

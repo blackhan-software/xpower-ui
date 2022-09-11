@@ -27,7 +27,7 @@ div#nft-single-minting
         span.d-none.d-sm-inline: | 0
       div.btn-group(role="group")
         button.btn.btn-outline-warning.decrease(
-          type="button" disabled
+          type="button" aria-label="Decrease" disabled
         )
           include ../../../public/images/pug/dash-circle-fill.svg.pug
       button.btn.btn-outline-warning.amount(
@@ -37,7 +37,7 @@ div#nft-single-minting
         | 0
       div.btn-group(role="group")
         button.btn.btn-outline-warning.increase(
-          type="button" disabled
+          type="button" aria-label="Increase" disabled
         )
           include ../../../public/images/pug/plus-circle-fill.svg.pug
     div.nft-details(
