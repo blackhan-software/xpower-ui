@@ -1,4 +1,4 @@
-import { buffered, range } from '../../../source/functions';
+import { buffered, range, Referable } from '../../../source/functions';
 import { Level, Token } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
 import { Tooltip } from '../../tooltips';
@@ -23,9 +23,9 @@ export enum MinterStatus {
     minted = 'minted',
     error = 'error'
 }
-export class Minting extends React.Component<
-    Props
-> {
+export class Minting extends Referable(
+    React.Component<Props>
+ ) {
     static get levels() {
         return Array.from(range(1, 65)) as Level[];
     }
@@ -77,7 +77,7 @@ export class Minting extends React.Component<
     ) {
         const { display, tx_counter, nn_counter } = row;
         if (display || tx_counter > 0 || nn_counter > 0) {
-            return <div
+            return <div ref={this.global_ref(`.mint[level=${level}]`)}
                 className='btn-group mint' key={level - 1} role='group'
                 style={{ display: row.display ? 'block' : 'none' }}
             >

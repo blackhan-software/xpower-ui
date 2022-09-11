@@ -998,11 +998,11 @@ export class SPA extends Referable(Updatable(
                     });
                 }
             }
-            const $mints = document.querySelectorAll<HTMLElement>(
-                '.mint'
+            const $mint = this.global_ref<HTMLElement>(
+                `.mint[level=${level}]`
             );
             this.error(ex, {
-                after: $mints[level - 1], id: `${nonce}`
+                after: $mint.current, id: `${nonce}`
             });
         }
     }
