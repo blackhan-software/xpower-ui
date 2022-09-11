@@ -3,7 +3,7 @@ import './connector.scss';
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { ChainId } from '../../source/blockchain';
-import { Referable } from '../../source/functions';
+import { mobile, Referable } from '../../source/functions';
 import { buffered } from '../../source/functions';
 import { sibling } from '../../source/functions';
 import { Tooltip } from '../tooltips';
@@ -181,11 +181,7 @@ function ms(
     fallback?: number
 ) {
     if (typeof fallback === 'undefined') {
-        if (navigator.userAgent.match(/mobi/i)) {
-            fallback = 600;
-        } else {
-            fallback = 200;
-        }
+        fallback = mobile() ? 600 : 200;
     }
     const ms = Number(
         App.params.get('ms') ?? fallback

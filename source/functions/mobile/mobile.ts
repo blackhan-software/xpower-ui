@@ -1,4 +1,4 @@
 export function mobile() {
-    return navigator.userAgent.match(/mobile/i);
+    return global?.navigator?.userAgent?.match(/mobi/i);
 }
 export default mobile;
