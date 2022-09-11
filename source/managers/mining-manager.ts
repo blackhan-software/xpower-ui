@@ -27,6 +27,7 @@ export class MiningManager {
         const miner = this.miner(address, {
             token
         });
+        Alerts.hide();
         if (miner.running) {
             return await miner.stop();
         }
@@ -63,7 +64,6 @@ export class MiningManager {
             mine(address, block_hash);
         });
         const moe_wallet = new MoeWallet(address, token);
-        Alerts.hide();
         try {
             const init = await moe_wallet.init();
             console.debug('[init]', init);
