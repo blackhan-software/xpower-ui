@@ -97,7 +97,7 @@ async function renderMarkdown(
     );
     mdi.use(anchor, {
         permalink: anchor.permalink.linkInsideHeader({
-            symbol: '¶', ariaHidden: true
+            symbol: '¶'
         }),
         level: 2
     });
