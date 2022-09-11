@@ -98,6 +98,7 @@ export class Selector extends React.Component<
             'float-sm-start', this.hide(token) ? 'd-none' : '', token_lc
         ];
         return <img
+            alt={token}
             height={24} width={24}
             className={classes.join(' ')}
             src={`/images/svg/${fixed_lc}-black.svg`}
