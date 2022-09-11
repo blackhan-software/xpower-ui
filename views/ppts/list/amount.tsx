@@ -4,7 +4,7 @@ declare const global: Global;
 import { Referable } from '../../../source/functions';
 import { Amount, Nft, NftLevel } from '../../../source/redux/types';
 
-import React, { MouseEvent, TouchEvent } from 'react';
+import React, { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 import { DashCircle } from '../../../public/images/tsx';
 import { PlusCircle } from '../../../public/images/tsx';
 
@@ -38,6 +38,7 @@ export class UiPptAmount extends Referable(React.Component)<
                 onMouseDown={this.startDecrease.bind(this)}
                 onMouseLeave={this.stopDecrease.bind(this)}
                 onMouseUp={this.stopDecrease.bind(this)}
+                onKeyDown={this.decreaseByKeyboard.bind(this)}
                 onTouchStart={this.startDecrease.bind(this)}
                 onTouchCancel={this.stopDecrease.bind(this)}
                 onTouchEnd={this.stopDecrease.bind(this)}
@@ -76,7 +77,7 @@ export class UiPptAmount extends Referable(React.Component)<
         }
     }
     decrease(
-        e: MouseEvent | TouchEvent | WheelEvent
+        e: KeyboardEvent | MouseEvent | TouchEvent | WheelEvent
     ) {
         const delta = e.ctrlKey ? 100n : e.shiftKey ? 10n : 1n;
         const { amount, min, onUpdate } = this.props;
@@ -87,7 +88,13 @@ export class UiPptAmount extends Referable(React.Component)<
         } else {
             this.stopDecrease();
         }
-        e.preventDefault();
+    }
+    decreaseByKeyboard(
+        e: KeyboardEvent
+    ) {
+        if (e.code?.match(/space|enter/i)) {
+            this.decrease(e);
+        }
     }
     decreaseByWheel(
         e: WheelEvent
@@ -148,6 +155,7 @@ export class UiPptAmount extends Referable(React.Component)<
                 onMouseDown={this.startIncrease.bind(this)}
                 onMouseLeave={this.stopIncrease.bind(this)}
                 onMouseUp={this.stopIncrease.bind(this)}
+                onKeyDown={this.increaseByKeyboard.bind(this)}
                 onTouchStart={this.startIncrease.bind(this)}
                 onTouchCancel={this.stopIncrease.bind(this)}
                 onTouchEnd={this.stopIncrease.bind(this)}
@@ -186,7 +194,7 @@ export class UiPptAmount extends Referable(React.Component)<
         }
     }
     increase(
-        e: MouseEvent | TouchEvent | WheelEvent
+        e: KeyboardEvent | MouseEvent | TouchEvent | WheelEvent
     ) {
         const delta = e.ctrlKey ? 100n : e.shiftKey ? 10n : 1n;
         const { amount, max, onUpdate } = this.props;
@@ -197,7 +205,13 @@ export class UiPptAmount extends Referable(React.Component)<
         } else {
             this.stopIncrease();
         }
-        e.preventDefault();
+    }
+    increaseByKeyboard(
+        e: KeyboardEvent
+    ) {
+        if (e.code?.match(/space|enter/i)) {
+            this.increase(e);
+        }
     }
     increaseByWheel(
         e: WheelEvent
@@ -209,13 +223,13 @@ export class UiPptAmount extends Referable(React.Component)<
         }
     }
     componentDidMount() {
-        const $amount = this.ref<HTMLElement>('amount').current;
-        $amount?.addEventListener(
+        const $amount = this.ref<HTMLElement>('amount');
+        $amount.current?.addEventListener(
             'wheel', this.decreaseByWheel.bind(this), {
                 passive: false
             }
         );
-        $amount?.addEventListener(
+        $amount.current?.addEventListener(
             'wheel', this.increaseByWheel.bind(this), {
                 passive: false
             }
