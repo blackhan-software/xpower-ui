@@ -107,8 +107,8 @@ each year in Array.from(YEARS).reverse()
         role="group" data-id=`${nft_id}` data-level=`${levels[index]}`
       )
         button.btn.btn-outline-warning.toggle-old.no-ellipsis(
-          type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Show older NFTs` data-state="off"
+          data-bs-toggle="tooltip" data-bs-placement="top"
+          type="button" title=`Show older NFTs`
         )
           i.bi-eye-fill
         button.btn.btn-outline-warning.sender(

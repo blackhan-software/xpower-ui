@@ -380,7 +380,7 @@ export class SPA extends Referable(Updatable(
                         levels.map((l) => [
                             l, Object.fromEntries(
                                 issues.map((i) => [
-                                    i, { toggled: !flag }
+                                    i, { toggled: flag }
                                 ])
                             )
                         ])

@@ -253,13 +253,16 @@ export class UiNftDetails extends Referable(React.Component)<
         return <UiNftExpander
             issue={nft_issue}
             level={nft_level}
-            onToggled={(toggled) => {
+            onToggled={(flag) => {
                 if (this.props.onNftSenderExpanded) {
                     const issues = Array.from(Years());
                     this.props.onNftSenderExpanded(
-                        issues, nft_level, toggled
+                        issues, nft_level, flag
                     );
                 }
+                App.event.emit('toggle-issue', {
+                    level: nft_level, flag
+                });
             }}
             toggled={toggled}
         />;
@@ -320,13 +323,15 @@ export class UiNftDetails extends Referable(React.Component)<
             amount={amount}
             target={target}
             status={sender.status}
-            onTransfer={this.props.onNftTransfer?.bind(this)}
-            toggled={toggled}
+            onTransfer={
+                this.props.onNftTransfer?.bind(this)
+            }
             onToggled={(flag) => {
                 App.event.emit('toggle-issue', {
                     level: nft_level, flag
                 });
             }}
+            toggled={toggled}
             token={token}
         />;
     }

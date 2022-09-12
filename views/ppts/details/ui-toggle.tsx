@@ -20,8 +20,7 @@ export class UiPptToggle extends React.Component<
         return <button type='button'
             className='btn btn-outline-warning toggle-old no-ellipsis'
             data-bs-placement='top' data-bs-toggle='tooltip'
-            data-state={toggled ? 'on' : 'off' }
-            onClick={this.toggle.bind(this, toggled)}
+            onClick={this.toggle.bind(this, !toggled)}
             title={this.title(toggled)}
         >
             <i className={

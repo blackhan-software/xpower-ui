@@ -9,7 +9,7 @@ type Props = {
     issue: NftIssue;
     level: NftLevel;
     toggled: boolean;
-    onToggled: (toggled: boolean) => void;
+    onToggled?: (toggled: boolean) => void;
 }
 export class UiNftExpander extends Referable(React.Component)<
     Props
@@ -64,7 +64,9 @@ export class UiNftExpander extends Referable(React.Component)<
     toggle(
         toggled: boolean
     ) {
-        this.props.onToggled(!toggled);
+        if (this.props.onToggled) {
+            this.props.onToggled(!toggled);
+        }
     }
     expand(
         nft_issue: NftIssue, nft_level: NftLevel

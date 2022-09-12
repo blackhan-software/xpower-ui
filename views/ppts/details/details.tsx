@@ -372,13 +372,14 @@ export class UiPptDetails extends Referable(Updatable(
             issue={ppt_issue}
             level={ppt_level}
             onToggled={(flag) => {
-                const issues = Array.from(Years());
-                this.update({
-                    [ppt_level]: Object.fromEntries(
-                        issues.map((issue) => [issue, {
-                            toggled: !flag
-                        }])
-                    )
+                if (this.props.onPptClaimerExpanded) {
+                    const issues = Array.from(Years());
+                    this.props.onPptClaimerExpanded(
+                        issues, ppt_level, toggled
+                    );
+                }
+                App.event.emit('toggle-issue', {
+                    level: ppt_level, flag
                 });
             }}
             toggled={toggled}
@@ -419,7 +420,7 @@ export class UiPptDetails extends Referable(Updatable(
     ) {
         const { token, details: matrix } = this.props;
         const { claimable, claimed } = this.state[ppt_level][ppt_issue];
-        const { toggled, claimer } = matrix[ppt_level][ppt_issue];
+        const { claimer, toggled } = matrix[ppt_level][ppt_issue];
         return <UiPptClaimer
             issue={ppt_issue}
             level={ppt_level}
@@ -429,12 +430,12 @@ export class UiPptDetails extends Referable(Updatable(
             onClaim={
                 this.props.onPptClaim?.bind(this)
             }
-            toggled={toggled}
             onToggled={(flag) => {
                 App.event.emit('toggle-issue', {
                     level: ppt_level, flag
                 });
             }}
+            toggled={toggled}
             token={token}
         />;
     }

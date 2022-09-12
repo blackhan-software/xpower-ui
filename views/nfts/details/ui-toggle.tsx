@@ -19,8 +19,7 @@ export class UiNftToggle extends React.Component<
         return <button type='button'
             className='btn btn-outline-warning toggle-old no-ellipsis'
             data-bs-placement='top' data-bs-toggle='tooltip'
-            data-state={toggled ? 'on' : 'off' }
-            onClick={this.props.onToggled?.bind(this, toggled)}
+            onClick={this.props.onToggled?.bind(this, !toggled)}
             title={this.title(toggled)}
         >
             <i className={
