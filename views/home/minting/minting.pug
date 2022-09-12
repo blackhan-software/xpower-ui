@@ -7,7 +7,7 @@ div#minting
       role="group"
     )
       button.btn.btn-outline-warning.minter(
-        type="button" disabled
+        type="button" disabled data-level=${level}
       )
         | Mint {{AMOUNT_#{level}}} <span class="d-none d-sm-inline">{{TOKEN}}</span>
       span.d-inline-block(

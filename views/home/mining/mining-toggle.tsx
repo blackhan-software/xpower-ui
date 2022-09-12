@@ -43,9 +43,9 @@ function $toggle(
     return <button type='button' id='toggle-mining'
         className='btn btn-outline-warning'
         disabled={disabled || disabledFor(status)}
-        onClick={onToggle}
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
+        onClick={onToggle}
     >
         {Spinner(status)}
         {$text(status)}

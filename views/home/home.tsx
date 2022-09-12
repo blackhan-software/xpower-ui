@@ -3,10 +3,10 @@ import { App } from '../../source/app';
 import { Level, Token } from '../../source/redux/types';
 
 import React from 'react';
-import { Mining, MinerStatus } from './mining/mining';
-export { Mining, MinerStatus };
-import { Minting, MinterRow, MinterStatus } from './minting/minting';
-export { Minting, MinterRow, MinterStatus };
+import { UiMining, MinerStatus } from './mining/mining';
+export { UiMining, MinerStatus };
+import { UiMinting, Minting, MinterRow, MinterStatus } from './minting/minting';
+export { UiMinting, Minting, MinterRow, MinterStatus };
 
 type Props = {
     mining: {
@@ -35,7 +35,7 @@ export class UiHome extends React.Component<
         const { token } = this.props;
         return <React.Fragment>
             <div id='mining'>
-                <Mining
+                <UiMining
                     onToggle={this.props.mining.onToggle?.bind(this)}
                     status={status} togglable={togglable}
                     onSpeed={this.props.mining.onSpeed?.bind(this)}
@@ -43,7 +43,7 @@ export class UiHome extends React.Component<
                 />
             </div>
             <div id='minting'>
-                <Minting
+                <UiMinting
                     onForget={this.props.minting.onForget?.bind(this)}
                     onMint={this.props.minting.onMint?.bind(this)}
                     level={App.level.min} rows={rows} token={token}

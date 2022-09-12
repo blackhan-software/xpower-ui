@@ -14,7 +14,7 @@ type Props = {
     onSpeed?: (token: Token, by: number) => void;
     token: Token;
 }
-export class Mining extends React.Component<
+export class UiMining extends React.Component<
     Props
 > {
     render() {
@@ -44,4 +44,4 @@ export class Mining extends React.Component<
         }
     }
 }
-export default Mining;
+export default UiMining;

@@ -36,4 +36,18 @@ export function Referable<
         private _refs: Record<string, RefObject<U>> = {};
     };
 }
+/**
+ * @returns a global reference object
+ */
+export function global_ref<T = unknown>(
+    name: string
+)  {
+    if (global_refs === undefined) {
+        global_refs = {};
+    }
+    if (global_refs[name] === undefined) {
+        global_refs[name] = React.createRef<T>();
+    }
+    return global_refs[name] as RefObject<T>;
+}
 export default Referable;

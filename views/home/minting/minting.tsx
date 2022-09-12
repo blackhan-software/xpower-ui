@@ -1,10 +1,9 @@
-import { buffered, range, Referable } from '../../../source/functions';
+import { global_ref, range } from '../../../source/functions';
 import { Level, Token } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
-import { Tooltip } from '../../tooltips';
 import { nice } from '../../../filters';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 type Props = {
     level: Level; rows: MinterRow[]; token: Token;
@@ -23,9 +22,7 @@ export enum MinterStatus {
     minted = 'minted',
     error = 'error'
 }
-export class Minting extends Referable(
-    React.Component<Props>
- ) {
+export class Minting {
     static get levels() {
         return Array.from(range(1, 65)) as Level[];
     }
@@ -61,115 +58,133 @@ export class Minting extends Referable(
             (index !== i) ? { ...row } : { ...row, ...new_row }
         );
     }
-    render() {
-        const { rows, token } = this.props;
-        return <React.Fragment>
-            <label className='form-label'>
-                Mined Amounts (not minted yet)
-            </label>
-            {rows
-                .map((row, i) => this.$mint(token, i + 1, row))
-                .filter((row) => row)}
-        </React.Fragment>;
-    }
-    $mint(
-        token: Token, level: Level, row: MinterRow
-    ) {
-        const { display, tx_counter, nn_counter } = row;
-        if (display || tx_counter > 0 || nn_counter > 0) {
-            return <div ref={this.global_ref(`.mint[level=${level}]`)}
-                className='btn-group mint' key={level - 1} role='group'
-                style={{ display: row.display ? 'block' : 'none' }}
-            >
-                {this.$minter(token, level, row)}
-                {this.$nn_counter(token, level, row)}
-                {this.$tx_counter(token, level, row)}
-                {this.$forget(token, level, row)}
-            </div>;
-        }
-        return null;
-    }
-    $minter(
-        token: Token, level: Level, { disabled, status }: MinterRow
-    ) {
-        const amount = nice(Tokenizer.amount(token, level));
-        const minting = status === MinterStatus.minting;
-        const text = minting
-            ? <>Minting {amount} <span className='d-none d-sm-inline'>{token}</span>…</>
-            : <>Mint {amount} <span className='d-none d-sm-inline'>{token}</span></>;
-        return <button className='btn btn-outline-warning minter'
-            onClick={this.mint.bind(this, token, level)}
-            type='button' disabled={disabled || minting}
-        >
-            {Spinner({ show: minting, grow: true })}{text}
-        </button>;
-    }
-    mint(
-        token: Token, level: Level
-    ) {
-        if (this.props.onMint) {
-            this.props.onMint(token, level);
-        }
-    }
-    $nn_counter(
-        token: Token, level: Level, { disabled, nn_counter }: MinterRow
-    ) {
-        return <span
-            className='d-inline-block'
-            data-bs-toggle='tooltip' data-bs-placement='left'
-            title={`Number of level ${level} ${token} tokens mined`}
-        >
-            <button
-                className='btn btn-outline-warning nn-counter'
-                type='button' disabled={disabled}
-            >{nn_counter}</button>
-        </span>;
-    }
-    $tx_counter(
-        token: Token, level: Level, { disabled, tx_counter }: MinterRow
-    ) {
-        return <span
-            className='d-inline-block'
-            data-bs-toggle='tooltip' data-bs-placement='left'
-            title={`Number of level ${level} ${token} tokens minted`}
-        >
-            <button
-                className='btn btn-outline-warning tx-counter'
-                type='button' disabled={disabled}
-            >{tx_counter}</button>
-        </span>;
-    }
-    $forget(
-        token: Token, level: Level, { disabled }: MinterRow
-    ) {
-        return <span
-            className='d-inline-block'
-            data-bs-toggle='tooltip' data-bs-placement='top'
-            title='Forget the tokens mined so far (w/o minting them)'
-        >
-            <button
-                onClick={this.forget.bind(this, token, level)}
-                className='btn btn-outline-warning forget'
-                type='button' disabled={disabled}
-            >&times;</button>
-        </span>;
-    }
-    forget(
-        token: Token, level: Level
-    ) {
-        if (this.props.onForget) {
-            this.props.onForget(token, level);
-        }
-    }
-    componentDidUpdate = buffered(() => {
-        const $forget = document.querySelectorAll<HTMLElement>(
-            '.mint button.forget'
+}
+export function UiMinting(
+    { token, rows, onMint, onForget }: Props
+) {
+    const [focus, setFocus] = useState<Record<Level, boolean>>({});
+    const onFocus = (level: Level, flag: boolean) => {
+        setFocus({ [level]: flag });
+    };
+    const status = rows.map(({ status }) => status);
+    useEffect(() => {
+        const any_focused = Object.entries(focus).filter(
+            ([level, focused]) => focused // eslint-disable-line
         );
-        $forget.forEach(($el) => {
-            const $tip = $el.parentElement;
-            if ($tip) Tooltip.getInstance($tip)?.hide();
-        });
-    })
+        if (any_focused.length) {
+            const $button = document.querySelector<HTMLElement>(
+                `.minter[data-level="${any_focused[0][0]}"]`
+            );
+            $button?.focus();
+        }
+    }, [
+        focus, status
+    ]);
+    return <React.Fragment>
+        <label className='form-label'>
+            Mined Amounts (not minted yet)
+        </label>
+        {rows
+            .map((row, i) => $mint(
+                { token, level: i + 1, row, onMint, onForget }, onFocus
+            ))
+            .filter((row) => row)}
+    </React.Fragment>;
+}
+function $mint(
+    { token, level, row, onMint, onForget }: Omit<Props, 'rows'> & {
+        row: MinterRow
+    },
+    onFocus: (level: Level, flag: boolean) => void
+) {
+    const { display, tx_counter, nn_counter } = row;
+    if (display || tx_counter > 0 || nn_counter > 0) {
+        return <div ref={global_ref(`.mint[level=${level}]`)}
+            className='btn-group mint' key={level - 1} role='group'
+            style={{ display: row.display ? 'block' : 'none' }}
+        >
+            {$minter({ token, level, row, onMint }, onFocus)}
+            {$nn_counter({ token, level, row })}
+            {$tx_counter({ token, level, row })}
+            {$forget({ token, level, row, onForget })}
+        </div>;
+    }
+    return null;
+}
+function $minter(
+    { token, level, row, onMint }: Omit<Props, 'rows'> & {
+        row: MinterRow
+    },
+    onFocus: (level: Level, flag: boolean) => void
+) {
+    const amount = nice(Tokenizer.amount(token, level));
+    const minting = row.status === MinterStatus.minting;
+    const $token = <span className='d-none d-sm-inline'>
+        {token}
+    </span>;
+    const text = minting
+        ? <>Minting {amount} {$token}…</>
+        : <>Mint {amount} {$token}</>;
+    return <button className='btn btn-outline-warning minter'
+        onClick={() => { if (onMint) onMint(token, level); }}
+        type='button' disabled={row.disabled || minting}
+        onFocus={() => onFocus(level, true)}
+        onBlur={() => onFocus(level, false)}
+        data-level={level}
+    >
+        {Spinner({ show: minting, grow: true })}{text}
+    </button>;
+}
+function $nn_counter(
+    { token, level, row }: Omit<Props, 'rows'> & {
+        row: MinterRow
+    }
+) {
+    return <span
+        className='d-inline-block'
+        data-bs-toggle='tooltip' data-bs-placement='left'
+        title={`Number of level ${level} ${token} tokens mined`}
+    >
+        <button
+            className='btn btn-outline-warning nn-counter'
+            type='button' disabled={row.disabled}
+        >{row.nn_counter}</button>
+    </span>;
+}
+function $tx_counter(
+    { token, level, row }: Omit<Props, 'rows'> & {
+        row: MinterRow
+    }
+) {
+    return <span
+        className='d-inline-block'
+        data-bs-toggle='tooltip' data-bs-placement='left'
+        title={`Number of level ${level} ${token} tokens minted`}
+    >
+        <button
+            className='btn btn-outline-warning tx-counter'
+            type='button' disabled={row.disabled}
+        >{row.tx_counter}</button>
+    </span>;
+}
+function $forget(
+    { token, level, row, onForget }: Omit<Props, 'rows'> & {
+        row: MinterRow
+    }
+) {
+    return <span
+        className='d-inline-block'
+        data-bs-toggle='tooltip' data-bs-placement='top'
+        title='Forget the tokens mined so far (w/o minting them)'
+    >
+        <button
+            onClick={() => {
+                if (onForget) onForget(token, level);
+            }}
+            className='btn btn-outline-warning forget'
+            type='button' disabled={row.disabled}
+        >&times;</button>
+    </span>;
 }
 function Spinner(
     { show, grow }: { show: boolean, grow?: boolean }
@@ -183,4 +198,4 @@ function Spinner(
         style={{ visibility: show ? 'visible' : 'hidden' }}
     />;
 }
-export default Minting;
+export default UiMinting;
