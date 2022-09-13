@@ -436,8 +436,21 @@ export class App {
         return Parser.boolean(this.params.get('debug'), false);
     }
     public static get level(): { min: number, max: number } {
-        const min = Parser.number(this.params.get('min-level'), 5);
-        const max = Parser.number(this.params.get('max-level'), 64);
+        const min = Parser.number(
+            this.params.get('min-level'), 5
+        );
+        const max = Parser.number(
+            this.params.get('max-level'), 64
+        );
+        return { min, max };
+    }
+    public static get nftLevel(): { min: number, max: number } {
+        const min = Parser.number(
+            this.params.get('min-nft-level'), NftLevel.UNIT
+        );
+        const max = Parser.number(
+            this.params.get('max-nft-level'), NftLevel.PETA
+        );
         return { min, max };
     }
     public static get logger(): boolean {

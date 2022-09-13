@@ -1,3 +1,4 @@
+import { App } from '../../app';
 import { Amount, Supply, Year } from './base';
 
 export class Nft {
@@ -143,12 +144,21 @@ export enum NftLevel {
     YOTTA = 24
 }
 export type NftName = keyof typeof NftLevel;
-export function* NftLevels() {
+export function* NftLevels(
+    { max, min } = App.nftLevel
+) {
     for (const l in NftLevel) {
-        if (isNaN(Number(l))) {
+        const n = Number(l);
+        if (isNaN(n)) {
             continue;
         }
-        yield Number(l) as NftLevel;
+        if (n < min) {
+            continue;
+        }
+        if (n > max) {
+            continue;
+        }
+        yield n as NftLevel;
     }
 }
 export type Nfts = {

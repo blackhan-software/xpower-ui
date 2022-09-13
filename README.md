@@ -64,6 +64,8 @@ clear-all | boolean | false | flag to clear all persistence slots
 logger | boolean | false | flag to log nonces to console
 min-level | number | 5 | threshold of nonces with lower corresponding amounts to be ignored
 max-level | number | 64 | threshold of nonces with higher corresponding amounts to be ignored
+min-nft-level | number | 0 | threshold of NFT levels to display from (UNIT)
+max-nft-level | number | 15 | threshold of NFT levels to display upto (PETA)
 persist | number | 0 | flag to persist nonces; each non-zero value is a persistence slot
 speed | number | 50 | speed percentage (w.r.t a single browser tab) between 0 and 100
 
