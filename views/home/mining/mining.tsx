@@ -14,34 +14,25 @@ type Props = {
     onSpeed?: (token: Token, by: number) => void;
     token: Token;
 }
-export class UiMining extends React.Component<
-    Props
-> {
-    render() {
-        const { status, togglable } = this.props;
-        const { speed, speedable } = this.props;
-        return <React.Fragment>
-            <MiningToggle
-                disabled={!togglable} status={status}
-                onToggle={this.toggle.bind(this)}
-            />
-            <MiningSpeed
-                disabled={!speedable} speed={speed}
-                onSpeed={this.speed.bind(this)}
-            />
-        </React.Fragment>;
-    }
-    toggle() {
-        if (this.props.onToggle) {
-            this.props.onToggle(this.props.token);
-        }
-    }
-    speed(
-        by: number
-    ) {
-        if (this.props.onSpeed) {
-            this.props.onSpeed(this.props.token, by);
-        }
-    }
+export function UiMining(
+    props: Props
+){
+    const { speed, speedable, onSpeed } = props;
+    const { status, togglable, onToggle } = props;
+    const { token } = props;
+    return <React.Fragment>
+        <MiningToggle
+            disabled={!togglable} status={status}
+            onToggle={() => {
+                if (onToggle) onToggle(token);
+            }}
+        />
+        <MiningSpeed
+            disabled={!speedable} speed={speed}
+            onSpeed={(by) => {
+                if (onSpeed) onSpeed(token, by);
+            }}
+        />
+    </React.Fragment>;
 }
 export default UiMining;
