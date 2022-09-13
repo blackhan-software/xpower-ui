@@ -492,6 +492,9 @@ export class App {
     }
     private _event = mitt<{
         'refresh-tips': undefined;
+        'toggle-level': {
+            level?: NftLevel; flag: boolean;
+        };
         'toggle-issue': {
             level?: NftLevel; issue?: NftIssue; flag: boolean;
         };

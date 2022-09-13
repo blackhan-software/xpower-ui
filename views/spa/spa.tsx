@@ -367,6 +367,19 @@ export class SPA extends Referable(Updatable(
         /**
          * {nft,ppt}-details:
          */
+        App.event.on('toggle-level', async ({
+            level, flag
+        }) => {
+            const levels = level !== undefined
+                ? [level] : Array.from(NftLevels());
+            const list = Object.fromEntries(
+                levels.map((l) => [l, { toggled: flag }])
+            );
+            await this.update({
+                nfts: { list },
+                ppts: { list },
+            });
+        });
         App.event.on('toggle-issue', async ({
             level, issue, flag
         }) => {
@@ -722,8 +735,20 @@ export class SPA extends Referable(Updatable(
                         nfts: { list: lhs, matrix: { [nft_token]: rhs } }
                     });
                 }}
-                onNftMinterToggled={(toggled) => {
-                    this.update({ toggled });
+                onNftMinterToggled={(toggled, ctrlKey) => {
+                    if (!ctrlKey) {
+                        return this.update({ toggled });
+                    }
+                    const list = Object.fromEntries(
+                        Array.from(NftLevels()).map(
+                            (nft_level) => [nft_level, { toggled }]
+                        )
+                    );
+                    this.update({
+                        nfts: { list },
+                        ppts: { list },
+                        toggled
+                    });
                 }}
                 toggled={toggled}
                 token={token}
@@ -836,8 +861,20 @@ export class SPA extends Referable(Updatable(
                         ppts: { list: lhs, matrix: { [nft_token]: rhs } }
                     });
                 }}
-                onPptMinterToggled={(toggled) => {
-                    this.update({ toggled });
+                onPptMinterToggled={(toggled, ctrlKey) => {
+                    if (!ctrlKey) {
+                        return this.update({ toggled });
+                    }
+                    const list = Object.fromEntries(
+                        Array.from(NftLevels()).map(
+                            (nft_level) => [nft_level, { toggled }]
+                        )
+                    );
+                    this.update({
+                        nfts: { list },
+                        ppts: { list },
+                        toggled
+                    });
                 }}
                 toggled={toggled}
                 token={token}

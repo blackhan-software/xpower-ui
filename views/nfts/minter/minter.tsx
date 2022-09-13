@@ -14,7 +14,7 @@ type Props = {
     list: NftMinterList;
     onList?: (list: Partial<NftMinterList>) => void;
     toggled: boolean;
-    onToggled?: (toggled: boolean) => void;
+    onToggled?: (toggled: boolean, ctrl_key: boolean) => void;
     token: Token;
 }
 export type NftMinterList = Record<NftLevel, {
@@ -79,7 +79,7 @@ export class UiNftMinter extends React.Component<
             className='btn btn-outline-warning no-ellipsis'
             data-bs-placement='top' data-bs-toggle='tooltip'
             data-state={toggled ? 'off' : 'on'}
-            onClick={this.toggleAll.bind(this, toggled)}
+            onClick={(e) => this.toggleAll(toggled, e.ctrlKey)}
             title={this.title(toggled)}
         >
             <i className={toggled
@@ -92,11 +92,11 @@ export class UiNftMinter extends React.Component<
         toggled: boolean
     ) {
         return !toggled
-            ? 'Show all NFT levels'
-            : 'Hide higher NFT levels';
+            ? 'Show all levels [CTRL]'
+            : 'Hide higher levels [CTRL]';
     }
     toggleAll(
-        toggled: boolean
+        toggled: boolean, ctrl_key: boolean
     ) {
         const nft_levels = Array.from(NftLevels());
         const entries = nft_levels.map((nft_level): [
@@ -109,7 +109,7 @@ export class UiNftMinter extends React.Component<
             Object.fromEntries(entries)
         );
         const { onToggled } = this.props;
-        if (onToggled) onToggled(!toggled);
+        if (onToggled) onToggled(!toggled, ctrl_key);
     }
     $burnApproval(
         token: Token,

@@ -181,8 +181,8 @@ export class UiPptList extends React.Component<
         ppt_level: NftLevel, toggled: boolean
     ) {
         const title = toggled
-            ? `Hide ${Nft.nameOf(ppt_level)} NFTs`
-            : `Show ${Nft.nameOf(ppt_level)} NFTs`;
+            ? `Hide ${Nft.nameOf(ppt_level)} NFTs [CTRL]`
+            : `Show ${Nft.nameOf(ppt_level)} NFTs [CTRL]`;
         return <div
             className='btn-group' role='group'
         >
@@ -190,7 +190,7 @@ export class UiPptList extends React.Component<
                 className='btn btn-outline-warning toggle no-ellipsis'
                 data-bs-placement='top' data-bs-toggle='tooltip'
                 data-state={toggled ? 'on' : 'off'}
-                onClick={this.toggle.bind(this, ppt_level, toggled)}
+                onClick={(e) => this.toggle(ppt_level, toggled, e.ctrlKey)}
                 title={title}
             >
                 <i className={
@@ -200,13 +200,10 @@ export class UiPptList extends React.Component<
         </div>;
     }
     toggle(
-        ppt_level: NftLevel, toggled: boolean
+        ppt_level: NftLevel, toggled: boolean, ctrl_key: boolean
     ) {
-        if (this.props.onPptList) {
-            this.props.onPptList({
-                [ppt_level]: { toggled: !toggled }
-            });
-        }
+        const level = !ctrl_key ? ppt_level : undefined
+        App.event.emit('toggle-level', { level, flag: !toggled });
     }
     $minter(
         ppt_level: NftLevel, token: Token

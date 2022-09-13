@@ -87,7 +87,7 @@ type Props = {
         matrix: PptMatrix[NftToken]
     ) => void;
     onPptMinterToggled?: (
-        toggled: boolean
+        toggled: boolean, ctrlKey: boolean
     ) => void;
     toggled: boolean;
 }

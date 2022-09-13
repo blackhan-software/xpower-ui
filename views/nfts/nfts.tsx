@@ -80,7 +80,7 @@ type Props = {
         matrix: NftMatrix[NftToken]
     ) => void;
     onNftMinterToggled?: (
-        toggled: boolean
+        toggled: boolean, ctrlKey: boolean
     ) => void;
     toggled: boolean;
 }

@@ -21,7 +21,7 @@ type Props = {
     list: PptMinterList;
     onList?: (list: Partial<PptMinterList>) => void;
     toggled: boolean;
-    onToggled?: (toggled: boolean) => void;
+    onToggled?: (toggled: boolean, ctrlKey: boolean) => void;
     token: Token;
 }
 export type PptMinterList = Record<NftLevel, {
@@ -83,7 +83,7 @@ export class UiPptMinter extends Referable(React.Component)<
             className='btn btn-outline-warning no-ellipsis'
             data-bs-placement='top' data-bs-toggle='tooltip'
             data-state={toggled ? 'off' : 'on'}
-            onClick={this.toggleAll.bind(this, toggled)}
+            onClick={(e) => this.toggleAll(toggled, e.ctrlKey)}
             title={this.title(toggled)}
         >
             <i className={toggled
@@ -96,11 +96,11 @@ export class UiPptMinter extends Referable(React.Component)<
         toggled: boolean
     ) {
         return !toggled
-            ? 'Show all NFT levels'
-            : 'Hide higher NFT levels';
+            ? 'Show all levels [CTRL]'
+            : 'Hide higher levels [CTRL]';
     }
     toggleAll(
-        toggled: boolean
+        toggled: boolean, ctrlKey: boolean
     ) {
         const nft_levels = Array.from(NftLevels());
         const entries = nft_levels.map((nft_level): [
@@ -113,7 +113,7 @@ export class UiPptMinter extends Referable(React.Component)<
             Object.fromEntries(entries)
         );
         const { onToggled } = this.props;
-        if (onToggled) onToggled(!toggled);
+        if (onToggled) onToggled(!toggled, ctrlKey);
     }
     $burnApproval(
         token: Token,
