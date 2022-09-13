@@ -326,10 +326,9 @@ export class UiNftDetails extends Referable(React.Component)<
             onTransfer={
                 this.props.onNftTransfer?.bind(this)
             }
-            onToggled={(flag) => {
-                App.event.emit('toggle-issue', {
-                    level: nft_level, flag
-                });
+            onToggled={(flag, ctrl_key) => {
+                const level = !ctrl_key ? nft_level : undefined;
+                App.event.emit('toggle-issue', { level, flag });
             }}
             toggled={toggled}
             token={token}

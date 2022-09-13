@@ -5,7 +5,7 @@ import React from 'react';
 
 type Props = {
     toggled: boolean;
-    onToggled?: (toggled: boolean) => void;
+    onToggled?: (toggled: boolean, ctrl_key: boolean) => void;
 }
 export class UiPptToggle extends React.Component<
     Props
@@ -20,7 +20,7 @@ export class UiPptToggle extends React.Component<
         return <button type='button'
             className='btn btn-outline-warning toggle-old no-ellipsis'
             data-bs-placement='top' data-bs-toggle='tooltip'
-            onClick={this.toggle.bind(this, !toggled)}
+            onClick={(e) => this.toggle(toggled, e.ctrlKey)}
             title={this.title(toggled)}
         >
             <i className={
@@ -32,14 +32,14 @@ export class UiPptToggle extends React.Component<
         toggled: boolean
     ) {
         return toggled
-            ? 'Hide older NFTs'
-            : 'Show older NFTs';
+            ? 'Hide older NFTs [CTRL]'
+            : 'Show older NFTs [CTRL]';
     }
     toggle(
-        toggled: boolean
+        toggled: boolean, ctrl_key: boolean
     ) {
         if (this.props.onToggled) {
-            this.props.onToggled(toggled);
+            this.props.onToggled(!toggled, ctrl_key);
         }
     }
     componentDidUpdate = buffered(() => {

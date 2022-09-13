@@ -131,7 +131,7 @@ function get_ppt_list() {
 }
 export class SPA extends Referable(Updatable(
     React.Component<Props, State>
-))  {
+)) {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -246,17 +246,17 @@ export class SPA extends Referable(Updatable(
                     mining: { status: MinerStatus.resumed }
                 });
             });
-            miner.on('increased', (ev) => {
+            miner.on('increased', (e) => {
                 this.update({
                     mining: {
-                        togglable: ev.speed > 0, speed: ev.speed
+                        togglable: e.speed > 0, speed: e.speed
                     }
                 });
             });
-            miner.on('decreased', (ev) => {
+            miner.on('decreased', (e) => {
                 this.update({
                     mining: {
-                        togglable: ev.speed > 0, speed: ev.speed
+                        togglable: e.speed > 0, speed: e.speed
                     }
                 });
             });
@@ -365,7 +365,7 @@ export class SPA extends Referable(Updatable(
             };
         };
         /**
-         * {nft,ppt}-details:
+         * {nft,ppt}-list:
          */
         App.event.on('toggle-level', async ({
             level, flag
@@ -377,9 +377,12 @@ export class SPA extends Referable(Updatable(
             );
             await this.update({
                 nfts: { list },
-                ppts: { list },
+                ppts: { list }
             });
         });
+        /**
+         * {nft,ppt}-details:
+         */
         App.event.on('toggle-issue', async ({
             level, issue, flag
         }) => {
@@ -402,7 +405,7 @@ export class SPA extends Referable(Updatable(
             );
             await this.update({
                 nfts: { details },
-                ppts: { details },
+                ppts: { details }
             });
         });
         /**
@@ -735,8 +738,8 @@ export class SPA extends Referable(Updatable(
                         nfts: { list: lhs, matrix: { [nft_token]: rhs } }
                     });
                 }}
-                onNftMinterToggled={(toggled, ctrlKey) => {
-                    if (!ctrlKey) {
+                onNftMinterToggled={(toggled, ctrl_key) => {
+                    if (!ctrl_key) {
                         return this.update({ toggled });
                     }
                     const list = Object.fromEntries(
@@ -861,8 +864,8 @@ export class SPA extends Referable(Updatable(
                         ppts: { list: lhs, matrix: { [nft_token]: rhs } }
                     });
                 }}
-                onPptMinterToggled={(toggled, ctrlKey) => {
-                    if (!ctrlKey) {
+                onPptMinterToggled={(toggled, ctrl_key) => {
+                    if (!ctrl_key) {
                         return this.update({ toggled });
                     }
                     const list = Object.fromEntries(

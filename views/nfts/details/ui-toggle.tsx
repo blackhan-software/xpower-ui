@@ -2,9 +2,10 @@ import { buffered, delayed } from '../../../source/functions';
 import { Tooltip } from '../../tooltips';
 
 import React from 'react';
+
 type Props = {
     toggled: boolean;
-    onToggled?: (toggled: boolean) => void;
+    onToggled?: (toggled: boolean, ctrl_key: boolean) => void;
 }
 export class UiNftToggle extends React.Component<
     Props
@@ -19,7 +20,7 @@ export class UiNftToggle extends React.Component<
         return <button type='button'
             className='btn btn-outline-warning toggle-old no-ellipsis'
             data-bs-placement='top' data-bs-toggle='tooltip'
-            onClick={this.props.onToggled?.bind(this, !toggled)}
+            onClick={(e) => this.toggle(toggled, e.ctrlKey)}
             title={this.title(toggled)}
         >
             <i className={
@@ -27,12 +28,19 @@ export class UiNftToggle extends React.Component<
             } />
         </button>;
     }
+    toggle(
+        toggled: boolean, ctrl_key: boolean
+    ) {
+        if (this.props.onToggled) {
+            this.props.onToggled(!toggled, ctrl_key);
+        }
+    }
     title(
         toggled: boolean
     ) {
         return toggled
-            ? 'Hide older NFTs'
-            : 'Show older NFTs';
+            ? 'Hide older NFTs [CTRL]'
+            : 'Show older NFTs [CTRL]';
     }
     componentDidUpdate = buffered(() => {
         const $toggles = document.querySelectorAll<HTMLElement>(

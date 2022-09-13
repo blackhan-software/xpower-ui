@@ -21,7 +21,7 @@ type Props = {
     status: NftSenderStatus | null;
     onTransfer?: (nft_issue: NftIssue, nft_level: NftLevel) => void;
     toggled: boolean;
-    onToggled?: (toggled: boolean) => void;
+    onToggled?: (toggled: boolean, ctrl_key: boolean) => void;
 }
 export enum NftSenderStatus {
     sending = 'sending',

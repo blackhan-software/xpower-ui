@@ -430,10 +430,9 @@ export class UiPptDetails extends Referable(Updatable(
             onClaim={
                 this.props.onPptClaim?.bind(this)
             }
-            onToggled={(flag) => {
-                App.event.emit('toggle-issue', {
-                    level: ppt_level, flag
-                });
+            onToggled={(flag, ctrl_key) => {
+                const level = !ctrl_key ? ppt_level : undefined;
+                App.event.emit('toggle-issue', { level, flag });
             }}
             toggled={toggled}
             token={token}

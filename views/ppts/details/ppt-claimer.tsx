@@ -18,7 +18,7 @@ type Props = {
         level: NftLevel
     ) => void;
     toggled: boolean;
-    onToggled?: (toggled: boolean) => void;
+    onToggled?: (toggled: boolean, ctrl_key: boolean) => void;
 }
 export enum PptClaimerStatus {
     claiming = 'claiming',
