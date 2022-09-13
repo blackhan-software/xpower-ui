@@ -1,5 +1,4 @@
 import { App } from '../../../source/app';
-import { buffered } from '../../../source/functions';
 import { Miner } from '../../../source/miner';
 import { Tooltip } from '../../tooltips';
 
@@ -138,7 +137,7 @@ export class MiningSpeed extends React.Component<
             passive: false
         });
     }
-    componentDidUpdate = buffered(() => {
+    componentDidUpdate() {
         const $progressor = document.querySelector<HTMLElement>(
             '.progressor'
         );
@@ -150,6 +149,6 @@ export class MiningSpeed extends React.Component<
         if ($inc) Tooltip.getInstance($inc)?.hide();
         const $dec = document.getElementById('decrease');
         if ($dec) Tooltip.getInstance($dec)?.hide();
-    })
+    }
 }
 export default MiningSpeed;
