@@ -2,10 +2,8 @@ import './list.scss';
 import './amount';
 
 import { App } from '../../../source/app';
-import { buffered, delayed } from '../../../source/functions';
 import { Amount, Supply, Token } from '../../../source/redux/types';
 import { Nft, NftIssue, NftLevel, NftLevels } from '../../../source/redux/types';
-import { Tooltip } from '../../tooltips';
 
 import React from 'react';
 import { UiPptAmount } from './amount';
@@ -256,17 +254,8 @@ export class UiPptList extends React.Component<
             }</span>
         </button>;
     }
-    componentDidUpdate = buffered(() => {
-        const $toggles = document.querySelectorAll(
-            `.ppt-minter .toggle`
-        );
-        $toggles.forEach(($toggle) => {
-            Tooltip.getInstance($toggle)?.hide();
-        });
-        $toggles.forEach(delayed(($toggle: Element) => {
-            Tooltip.getInstance($toggle)?.dispose();
-            Tooltip.getOrCreateInstance($toggle);
-        }));
-    })
+    componentDidUpdate() {
+        App.event.emit('refresh-tips');
+    }
 }
 export default UiPptList;

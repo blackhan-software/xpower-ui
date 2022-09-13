@@ -1,7 +1,6 @@
-import { buffered } from '../../../source/functions';
+import { App } from '../../../source/app';
 import { Amount, Token } from '../../../source/redux/types';
 import { NftLevel, NftLevels } from '../../../source/redux/types';
-import { Tooltip } from '../../tooltips';
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
@@ -57,17 +56,17 @@ export class UiNftMinter extends React.Component<
     Props
 > {
     render() {
+        const { status } = this.props;
         const { approval, list, toggled, token } = this.props;
         return <div
-            className='btn-group nft-batch-minter'
-            role='group'
+            className='btn-group nft-batch-minter' role='group'
         >
             {this.$toggleAll(toggled)}
             {this.$burnApproval(
                 token, approved(approval), approving(approval)
             )}
             {this.$batchMinter(
-                token, approved(approval), list
+                token, list, approved(approval), status
             )}
             {this.$info(token)}
         </div>;
@@ -134,9 +133,9 @@ export class UiNftMinter extends React.Component<
         </button>;
     }
     $batchMinter(
-        token: Token, approved: boolean | null, list: NftMinterList
+        token: Token, list: NftMinterList,
+        approved: boolean | null, status: NftMinterStatus | null
     ) {
-        const { status } = this.props;
         const classes = [
             'btn btn-outline-warning',
             approved ? 'show' : ''
@@ -176,25 +175,9 @@ export class UiNftMinter extends React.Component<
             <InfoCircle fill={true} />
         </button>;
     }
-    componentDidUpdate = buffered(() => {
-        const $toggle = document.querySelector<HTMLElement>(
-            '#toggle-all'
-        );
-        if ($toggle) {
-            const title = this.title(this.props.toggled);
-            if (title !== $toggle.dataset.bsOriginalTitle) {
-                $toggle.dataset.bsOriginalTitle = title;
-                Tooltip.getInstance($toggle)?.dispose();
-                Tooltip.getOrCreateInstance($toggle);
-            }
-        }
-        const $approval = document.querySelector<HTMLElement>(
-            '#nft-burn-approval'
-        );
-        if ($approval) {
-            Tooltip.getInstance($approval)?.hide();
-        }
-    })
+    componentDidUpdate() {
+        App.event.emit('refresh-tips');
+    }
 }
 function Spinner(
     { show, grow }: { show: boolean, grow?: boolean }

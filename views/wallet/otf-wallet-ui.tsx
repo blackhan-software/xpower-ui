@@ -1,11 +1,11 @@
+import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
-import { buffered, Referable, x40 } from '../../source/functions';
+import { Referable, x40 } from '../../source/functions';
 import { Address, Amount } from '../../source/redux/types';
 import { OtfWallet } from '../../source/wallet';
 
 import { Web3Provider } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
-import { Tooltip } from '../tooltips';
 
 import React from 'react';
 import { InfoCircle } from '../../public/images/tsx';
@@ -184,15 +184,9 @@ export class OtfWalletUi extends Referable(React.Component)<
             {InfoCircle({ fill: true })}
         </button>;
     }
-    componentDidUpdate = buffered(() => {
-        const $otf_transfer = document.getElementById(
-            'otf-wallet-transfer'
-        );
-        if ($otf_transfer) {
-            Tooltip.getInstance($otf_transfer)?.dispose();
-            Tooltip.getOrCreateInstance($otf_transfer);
-        }
-    })
+    componentDidUpdate() {
+        App.event.emit('refresh-tips');
+    }
 }
 async function depositOtf(
     this: OtfWalletUi, processing: boolean

@@ -1,10 +1,10 @@
+import { App } from '../../../source/app';
 import { Blockchain } from '../../../source/blockchain';
 import { Referable } from '../../../source/functions';
 import { Token } from '../../../source/redux/types';
 import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
 import { NftWallet, NftWalletMock } from '../../../source/wallet';
 import { NftImageMeta } from './nft-image-meta';
-import { Tooltip } from '../../tooltips';
 
 import React from 'react';
 
@@ -70,11 +70,7 @@ export class UiNftImage extends Referable(React.Component)<
         return `Trade staked ${name} NFTs (level ${rank}/9 & ID #${id})`;
     }
     componentDidMount() {
-        const $image = this.ref<HTMLElement>('img');
-        if ($image.current) {
-            Tooltip.getInstance($image.current)?.dispose();
-            Tooltip.getOrCreateInstance($image.current);
-        }
+        App.event.emit('refresh-tips');
     }
 }
 function Spinner(

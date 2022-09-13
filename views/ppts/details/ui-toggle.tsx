@@ -1,6 +1,4 @@
-import { buffered, delayed } from '../../../source/functions';
-import { Tooltip } from '../../tooltips';
-
+import { App } from '../../../source/app';
 import React from 'react';
 
 type Props = {
@@ -28,13 +26,6 @@ export class UiPptToggle extends React.Component<
             } />
         </button>;
     }
-    title(
-        toggled: boolean
-    ) {
-        return toggled
-            ? 'Hide older NFTs [CTRL]'
-            : 'Show older NFTs [CTRL]';
-    }
     toggle(
         toggled: boolean, ctrl_key: boolean
     ) {
@@ -42,14 +33,15 @@ export class UiPptToggle extends React.Component<
             this.props.onToggled(!toggled, ctrl_key);
         }
     }
-    componentDidUpdate = buffered(() => {
-        const $toggles = document.querySelectorAll<HTMLElement>(
-            '.toggle-old'
-        );
-        $toggles.forEach(delayed(($el: HTMLElement) => {
-            Tooltip.getInstance($el)?.dispose();
-            Tooltip.getOrCreateInstance($el);
-        }));
-    })
+    title(
+        toggled: boolean
+    ) {
+        return toggled
+            ? 'Hide older NFTs [CTRL]'
+            : 'Show older NFTs [CTRL]';
+    }
+    componentDidUpdate() {
+        App.event.emit('refresh-tips');
+    }
 }
 export default UiPptToggle;

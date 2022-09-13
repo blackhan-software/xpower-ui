@@ -1,6 +1,6 @@
 import { App } from '../../source/app';
 import { ancestors, buffered } from '../../source/functions';
-export const { Tooltip } = global.bootstrap;
+const { Tooltip } = global.bootstrap;
 
 App.onTokenSwitched(function retitleTips(
     token, old_token
@@ -25,11 +25,15 @@ global.addEventListener('load', () => {
 }, {
     once: true
 });
-App.event.on('refresh-tips', buffered(() => {
+App.event.on('refresh-tips', buffered((
+    flags: { hide: boolean } | undefined
+) => {
     const $tips = document.querySelectorAll<HTMLElement>(
         '[data-bs-toggle=tooltip]'
     );
     $tips.forEach(($tip) => {
+        if (flags?.hide) Tooltip.getInstance($tip)?.hide();
+        Tooltip.getInstance($tip)?.dispose();
         Tooltip.getOrCreateInstance($tip);
     });
     $tips.forEach(($tip) => {

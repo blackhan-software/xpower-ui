@@ -1,9 +1,9 @@
+import { App } from '../../../source/app';
 import { Blockchain } from '../../../source/blockchain';
 import { Referable } from '../../../source/functions';
 import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
 import { Token } from '../../../source/redux/types';
 import { PptWallet, PptWalletMock } from '../../../source/wallet';
-import { Tooltip } from '../../tooltips';
 
 import { PptImageMeta } from './ppt-image-meta';
 import React from 'react';
@@ -70,11 +70,7 @@ export class UiPptImage extends Referable(React.Component)<
         return `Trade staked ${name} NFTs (level ${rank}/9 & ID #${id})`;
     }
     componentDidMount() {
-        const $image = this.ref<HTMLElement>('img');
-        if ($image.current) {
-            Tooltip.getInstance($image.current)?.dispose();
-            Tooltip.getOrCreateInstance($image.current);
-        }
+        App.event.emit('refresh-tips');
     }
 }
 function Spinner(

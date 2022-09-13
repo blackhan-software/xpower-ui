@@ -504,7 +504,9 @@ export class App {
         return this._store;
     }
     private _event = mitt<{
-        'refresh-tips': undefined;
+        'refresh-tips': undefined | {
+            hide?: boolean;
+        };
         'toggle-level': {
             level?: NftLevel; flag: boolean;
         };

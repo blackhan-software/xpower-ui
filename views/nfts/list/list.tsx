@@ -2,10 +2,8 @@ import './list.scss';
 import './amount';
 
 import { App } from '../../../source/app';
-import { buffered, delayed } from '../../../source/functions';
 import { Amount, Supply, Token } from '../../../source/redux/types';
 import { Nft, NftIssue, NftLevel, NftLevels } from '../../../source/redux/types';
-import { Tooltip } from '../../tooltips';
 
 import React from 'react';
 import { UiNftAmount } from './amount';
@@ -249,17 +247,8 @@ export class UiNftList extends React.Component<
             }</span>
         </button>;
     }
-    componentDidUpdate = buffered(() => {
-        const $toggles = document.querySelectorAll(
-            `.nft-minter .toggle`
-        );
-        $toggles.forEach(($toggle) => {
-            Tooltip.getInstance($toggle)?.hide();
-        });
-        $toggles.forEach((delayed(($toggle: Element) => {
-            Tooltip.getInstance($toggle)?.dispose();
-            Tooltip.getOrCreateInstance($toggle);
-        })));
-    })
+    componentDidUpdate() {
+        App.event.emit('refresh-tips');
+    }
 }
 export default UiNftList;

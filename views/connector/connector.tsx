@@ -5,8 +5,6 @@ import { Blockchain } from '../../source/blockchain';
 import { ChainId } from '../../source/blockchain';
 import { mobile, Referable } from '../../source/functions';
 import { buffered } from '../../source/functions';
-import { sibling } from '../../source/functions';
-import { Tooltip } from '../tooltips';
 
 import React, { createElement } from 'react';
 import { Unsubscribe } from 'redux';
@@ -156,13 +154,7 @@ export class Connector extends Referable(
         if (this.state.chain !== Chain.UNAVAILABLE) {
             return;
         }
-        const $info = sibling($ref.current, ($el) => {
-            return $el.classList.contains('info');
-        });
-        if ($info) {
-            Tooltip.getInstance($info)?.dispose();
-            Tooltip.getOrCreateInstance($info);
-        }
+        App.event.emit('refresh-tips');
     })
     unTokenSwitch?: Unsubscribe;
 }

@@ -1,5 +1,5 @@
+import { App } from '../../../source/app';
 import { Miner } from '../../../source/miner';
-import { Tooltip } from '../../tooltips';
 
 import React from 'react';
 import { DashCircle } from '../../../public/images/tsx';
@@ -136,17 +136,7 @@ export class MiningSpeed extends React.Component<
         });
     }
     componentDidUpdate() {
-        const $progressor = document.querySelector<HTMLElement>(
-            '.progressor'
-        );
-        if ($progressor) {
-            Tooltip.getInstance($progressor)?.dispose();
-            Tooltip.getOrCreateInstance($progressor);
-        }
-        const $inc = document.getElementById('increase');
-        if ($inc) Tooltip.getInstance($inc)?.hide();
-        const $dec = document.getElementById('decrease');
-        if ($dec) Tooltip.getInstance($dec)?.hide();
+        App.event.emit('refresh-tips', { hide: true });
     }
 }
 export default MiningSpeed;

@@ -1556,10 +1556,10 @@ export class SPA extends Referable(Updatable(
                     }
                 }
             });
-            const $ref = this.global_ref<HTMLElement>(
-                'ppt-batch-minter'
+            const $button = document.querySelector<HTMLElement>(
+                '#ppt-batch-minting'
             );
-            this.error(ex, { after: $ref.current });
+            this.error(ex, { after: $button });
         }
     }
     async pptBatchBurn(
@@ -1653,10 +1653,10 @@ export class SPA extends Referable(Updatable(
                     }
                 }
             });
-            const $ref = this.global_ref<HTMLElement>(
-                'ppt-batch-minter'
+            const $button = document.querySelector<HTMLElement>(
+                '#ppt-batch-minting'
             );
-            this.error(ex, { after: $ref.current });
+            this.error(ex, { after: $button });
         }
     }
     error(

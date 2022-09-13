@@ -1,6 +1,6 @@
-import { delayed, Referable } from '../../../source/functions';
+import { App } from '../../../source/app';
+import { Referable } from '../../../source/functions';
 import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
-import { Tooltip } from '../../tooltips';
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
@@ -127,13 +127,7 @@ export class UiNftExpander extends Referable(React.Component)<
         $sender?.classList.remove('d-none');
     }
     componentDidUpdate() {
-        const $toggles = document.querySelectorAll<HTMLElement>(
-            '.toggle-old'
-        );
-        $toggles.forEach(delayed(($el: HTMLElement) => {
-            Tooltip.getInstance($el)?.dispose();
-            Tooltip.getOrCreateInstance($el);
-        }));
+        App.event.emit('refresh-tips');
     }
 }
 export default UiNftExpander;

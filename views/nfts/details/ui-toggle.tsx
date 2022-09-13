@@ -1,6 +1,4 @@
-import { buffered, delayed } from '../../../source/functions';
-import { Tooltip } from '../../tooltips';
-
+import { App } from '../../../source/app';
 import React from 'react';
 
 type Props = {
@@ -42,14 +40,8 @@ export class UiNftToggle extends React.Component<
             ? 'Hide older NFTs [CTRL]'
             : 'Show older NFTs [CTRL]';
     }
-    componentDidUpdate = buffered(() => {
-        const $toggles = document.querySelectorAll<HTMLElement>(
-            '.toggle-old'
-        );
-        $toggles.forEach(delayed(($el: HTMLElement) => {
-            Tooltip.getInstance($el)?.dispose();
-            Tooltip.getOrCreateInstance($el);
-        }));
-    })
+    componentDidUpdate() {
+        App.event.emit('refresh-tips');
+    }
 }
 export default UiNftToggle;

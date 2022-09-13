@@ -3,7 +3,6 @@ import './selector.scss';
 import { App } from '../../source/app';
 import { Tokenizer } from '../../source/token';
 import { Token } from '../../source/redux/types';
-import { Tooltip } from '../tooltips';
 
 import React, { MouseEvent } from 'react';
 import { Unsubscribe } from 'redux';
@@ -64,17 +63,11 @@ export class Selector extends React.Component<
             data-bs-fixed='true'
             href={`?token=${token}`}
             onClick={(e) => this.switch(e, token)}
-            onMouseLeave={on_leave}
         >
             {this.$spinner(token)}
             {this.$image(token)}
             {this.$label(token)}
         </a>;
-        function on_leave(
-            e: MouseEvent<HTMLAnchorElement>
-        ) {
-            Tooltip.getInstance(e.currentTarget)?.enable();
-        }
     }
     switch(
         e: MouseEvent<HTMLAnchorElement>, token: Token

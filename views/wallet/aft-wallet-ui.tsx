@@ -1,10 +1,9 @@
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { nice, nice_si } from '../../filters';
-import { Updatable, buffered, x40 } from '../../source/functions';
+import { Updatable, x40 } from '../../source/functions';
 import { Address, Amount, Token, Tokens } from '../../source/redux/types';
 import { MoeWallet, OnTransfer } from '../../source/wallet';
-import { Tooltip } from '../tooltips';
 
 import React from 'react';
 import { InfoCircle } from '../../public/images/tsx';
@@ -132,22 +131,9 @@ export class AftWalletUi extends Updatable(
             {InfoCircle({ fill: true })}
         </button>;
     }
-    componentDidUpdate = buffered(() => {
-        const $otf_toggle = document.getElementById(
-            'otf-wallet-toggle'
-        );
-        if ($otf_toggle) {
-            Tooltip.getInstance($otf_toggle)?.dispose();
-            Tooltip.getOrCreateInstance($otf_toggle);
-        }
-        const $aft_balance = document.getElementById(
-            'aft-wallet-balance'
-        );
-        if ($aft_balance) {
-            Tooltip.getInstance($aft_balance)?.dispose();
-            Tooltip.getOrCreateInstance($aft_balance);
-        }
-    })
+    componentDidUpdate() {
+        App.event.emit('refresh-tips');
+    }
 }
 Blockchain.onceConnect(async function initialize({
     address, token

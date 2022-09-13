@@ -1,7 +1,6 @@
-import { buffered, Referable } from '../../../source/functions';
+import { App } from '../../../source/app';
 import { Amount, Token } from '../../../source/redux/types';
 import { NftLevel, NftLevels } from '../../../source/redux/types';
-import { Tooltip } from '../../tooltips';
 
 import { UiPptBatchMinter, PptMinterStatus } from './ppt-batch-minter';
 export { UiPptBatchMinter, PptMinterStatus };
@@ -51,17 +50,14 @@ function approving(
 ): boolean {
     return approval === PptMinterApproval.approving;
 }
-export class UiPptMinter extends Referable(React.Component)<
+export class UiPptMinter extends React.Component<
     Props
 > {
     render() {
         const { minter_status, burner_status } = this.props;
-        const { list, toggled, token } = this.props;
-        const { approval } = this.props;
+        const { approval, list, toggled, token } = this.props;
         return <div
-            className='btn-group ppt-batch-minter'
-            ref={this.global_ref('ppt-batch-minter')}
-            role='group'
+            className='btn-group ppt-batch-minter' role='group'
         >
             {this.$toggleAll(toggled)}
             {this.$burnApproval(
@@ -166,25 +162,9 @@ export class UiPptMinter extends Referable(React.Component)<
             <InfoCircle fill={true} />
         </button>;
     }
-    componentDidUpdate = buffered(() => {
-        const $toggle = document.querySelector<HTMLElement>(
-            '#toggle-all'
-        );
-        if ($toggle) {
-            const title = this.title(this.props.toggled);
-            if (title !== $toggle.dataset.bsOriginalTitle) {
-                $toggle.dataset.bsOriginalTitle = title;
-                Tooltip.getInstance($toggle)?.dispose();
-                Tooltip.getOrCreateInstance($toggle);
-            }
-        }
-        const $approval = document.querySelector<HTMLElement>(
-            '#ppt-burn-approval'
-        );
-        if ($approval) {
-            Tooltip.getInstance($approval)?.hide();
-        }
-    })
+    componentDidUpdate() {
+        App.event.emit('refresh-tips');
+    }
 }
 export function Spinner(
     { show, grow }: { show: boolean, grow?: boolean }
