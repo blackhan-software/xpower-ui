@@ -137,75 +137,79 @@ function split(
     }
     return { lhs, rhs };
 }
-export class UiNfts extends React.Component<
-    Props
-> {
-    render() {
-        const { token } = this.props;
-        const nft_token = Nft.token(token);
-        const { list, toggled } = this.props;
-        const { matrix, minter } = this.props;
-        return <React.Fragment>
-            <div id='nft-single-minting'>
-                <UiNftList
-                    list={
-                        join(list, matrix[nft_token])
-                    }
-                    onNftList={(
-                        list
-                    ) => {
-                        const { lhs, rhs } = split(list);
-                        const { onNftList } = this.props;
-                        if (onNftList) onNftList(lhs, rhs);
-                    }}
-                    details={
-                        this.props.details[nft_token]
-                    }
-                    onNftImageLoaded={
-                        this.props.onNftImageLoaded?.bind(this)
-                    }
-                    onNftSenderExpanded={
-                        this.props.onNftSenderExpanded?.bind(this)
-                    }
-                    onNftAmountChanged={
-                        this.props.onNftAmountChanged?.bind(this)
-                    }
-                    onNftTargetChanged={
-                        this.props.onNftTargetChanged?.bind(this)
-                    }
-                    onNftTransfer={
-                        this.props.onNftTransfer?.bind(this)
-                    }
-                    toggled={toggled}
-                    token={token}
-                />
-            </div>
-            <div id='nft-batch-minting'>
-                <UiNftMinter
-                    approval={minter[nft_token].approval}
-                    onApproval={
-                        this.props.onNftMinterApproval?.bind(this)
-                    }
-                    list={join(list, matrix[nft_token])}
-                    onList={(list) => {
-                        const { lhs, rhs } = split(list);
-                        const { onNftMinterList } = this.props;
-                        if (onNftMinterList) onNftMinterList(
-                            lhs, rhs
-                        );
-                    }}
-                    status={minter[nft_token].status}
-                    onBatchMint={
-                        this.props.onNftMinterBatchMint?.bind(this)
-                    }
-                    toggled={toggled}
-                    onToggled={
-                        this.props.onNftMinterToggled?.bind(this)
-                    }
-                    token={token}
-                />
-            </div>
-        </React.Fragment>;
-    }
+export function UiNfts(
+    props: Props
+) {
+    const { token } = props;
+    const nft_token = Nft.token(token);
+    const { list, toggled } = props;
+    const { matrix, minter } = props;
+    return <React.Fragment>
+        <div id='nft-single-minting'>
+            <UiNftList
+                list={
+                    join(list, matrix[nft_token])
+                }
+                onNftList={(
+                    list
+                ) => {
+                    const { lhs, rhs } = split(list);
+                    const { onNftList } = props;
+                    if (onNftList) onNftList(lhs, rhs);
+                }}
+                details={
+                    props.details[nft_token]
+                }
+                onNftImageLoaded={
+                    props.onNftImageLoaded
+                }
+                onNftSenderExpanded={
+                    props.onNftSenderExpanded
+                }
+                onNftAmountChanged={
+                    props.onNftAmountChanged
+                }
+                onNftTargetChanged={
+                    props.onNftTargetChanged
+                }
+                onNftTransfer={
+                    props.onNftTransfer
+                }
+                toggled={toggled}
+                token={token}
+            />
+        </div>
+        <div id='nft-batch-minting'>
+            <UiNftMinter
+                approval={
+                    minter[nft_token].approval
+                }
+                onApproval={
+                    props.onNftMinterApproval
+                }
+                list={
+                    join(list, matrix[nft_token])
+                }
+                onList={(list) => {
+                    const { lhs, rhs } = split(list);
+                    const { onNftMinterList } = props;
+                    if (onNftMinterList) onNftMinterList(
+                        lhs, rhs
+                    );
+                }}
+                status={
+                    minter[nft_token].status
+                }
+                onBatchMint={
+                    props.onNftMinterBatchMint
+                }
+                onToggled={
+                    props.onNftMinterToggled
+                }
+                toggled={toggled}
+                token={token}
+            />
+        </div>
+    </React.Fragment>;
 }
 export default UiNfts;

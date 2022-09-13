@@ -144,82 +144,86 @@ function split(
     }
     return { lhs, rhs };
 }
-export class UiPpts extends React.Component<
-    Props
-> {
-    render() {
-        const { token } = this.props;
-        const ppt_token = Nft.token(token);
-        const { list, toggled } = this.props;
-        const { matrix, minter } = this.props;
-        return <React.Fragment>
-            <div id='ppt-single-minting'>
-                <UiPptList
-                    list={
-                        join(list, matrix[ppt_token])
-                    }
-                    onPptList={(
-                        list
-                    ) => {
-                        const { lhs, rhs } = split(list);
-                        const { onPptList } = this.props;
-                        if (onPptList) onPptList(lhs, rhs);
-                    }}
-                    details={
-                        this.props.details[ppt_token]
-                    }
-                    onPptImageLoaded={
-                        this.props.onPptImageLoaded?.bind(this)
-                    }
-                    onPptClaimerExpanded={
-                        this.props.onPptClaimerExpanded?.bind(this)
-                    }
-                    onPptAmountChanged={
-                        this.props.onPptAmountChanged?.bind(this)
-                    }
-                    onPptTargetChanged={
-                        this.props.onPptTargetChanged?.bind(this)
-                    }
-                    onPptTransfer={
-                        this.props.onPptTransfer?.bind(this)
-                    }
-                    onPptClaim={
-                        this.props.onPptClaim?.bind(this)
-                    }
-                    toggled={toggled}
-                    token={token}
-                />
-            </div>
-            <div id='ppt-batch-minting'>
-                <UiPptMinter
-                    approval={minter[ppt_token].approval}
-                    onApproval={
-                        this.props.onPptMinterApproval?.bind(this)
-                    }
-                    list={join(list, matrix[ppt_token])}
-                    onList={(list) => {
-                        const { lhs, rhs } = split(list);
-                        const { onPptMinterList } = this.props;
-                        if (onPptMinterList) onPptMinterList(
-                            lhs, rhs
-                        );
-                    }}
-                    burner_status={minter[ppt_token].burner_status}
-                    onBatchBurn={
-                        this.props.onPptMinterBatchBurn?.bind(this)
-                    }
-                    minter_status={minter[ppt_token].minter_status}
-                    onBatchMint={
-                        this.props.onPptMinterBatchMint?.bind(this)
-                    }
-                    toggled={toggled}
-                    onToggled={
-                        this.props.onPptMinterToggled?.bind(this)
-                    }
-                    token={token}
-                />
-            </div>
-        </React.Fragment>;
-    }
+export function UiPpts(props: Props) {
+    const { token } = props;
+    const ppt_token = Nft.token(token);
+    const { list, toggled } = props;
+    const { matrix, minter } = props;
+    return <React.Fragment>
+        <div id='ppt-single-minting'>
+            <UiPptList
+                list={
+                    join(list, matrix[ppt_token])
+                }
+                onPptList={(
+                    list
+                ) => {
+                    const { lhs, rhs } = split(list);
+                    const { onPptList } = props;
+                    if (onPptList) onPptList(lhs, rhs);
+                }}
+                details={
+                    props.details[ppt_token]
+                }
+                onPptImageLoaded={
+                    props.onPptImageLoaded
+                }
+                onPptClaimerExpanded={
+                    props.onPptClaimerExpanded
+                }
+                onPptAmountChanged={
+                    props.onPptAmountChanged
+                }
+                onPptTargetChanged={
+                    props.onPptTargetChanged
+                }
+                onPptTransfer={
+                    props.onPptTransfer
+                }
+                onPptClaim={
+                    props.onPptClaim
+                }
+                toggled={toggled}
+                token={token}
+            />
+        </div>
+        <div id='ppt-batch-minting'>
+            <UiPptMinter
+                approval={
+                    minter[ppt_token].approval
+                }
+                onApproval={
+                    props.onPptMinterApproval
+                }
+                list={
+                    join(list, matrix[ppt_token])
+                }
+                onList={(list) => {
+                    const { lhs, rhs } = split(list);
+                    const { onPptMinterList } = props;
+                    if (onPptMinterList) onPptMinterList(
+                        lhs, rhs
+                    );
+                }}
+                burner_status={
+                    minter[ppt_token].burner_status
+                }
+                onBatchBurn={
+                    props.onPptMinterBatchBurn
+                }
+                minter_status={
+                    minter[ppt_token].minter_status
+                }
+                onBatchMint={
+                    props.onPptMinterBatchMint
+                }
+                onToggled={
+                    props.onPptMinterToggled
+                }
+                toggled={toggled}
+                token={token}
+            />
+        </div>
+    </React.Fragment>;
 }
 export default UiPpts;
