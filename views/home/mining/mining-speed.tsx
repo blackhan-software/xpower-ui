@@ -1,4 +1,3 @@
-import { App } from '../../../source/app';
 import { Miner } from '../../../source/miner';
 import { Tooltip } from '../../tooltips';
 
@@ -128,7 +127,6 @@ export class MiningSpeed extends React.Component<
             $inc?.setAttribute('title', 'Increase mining speed');
             const $dec = document.querySelector('#decrease');
             $dec?.setAttribute('title', 'Decrease mining speed');
-            App.event.emit('refresh-tips');
         }
         const $progressor = document.querySelector<HTMLElement>(
             '.progressor'

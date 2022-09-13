@@ -2,7 +2,7 @@ import './home.scss';
 import { App } from '../../source/app';
 import { Level, Token } from '../../source/redux/types';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { UiMining, MinerStatus } from './mining/mining';
 export { UiMining, MinerStatus };
 import { UiMinting, Minting, MinterRow, MinterStatus } from './minting/minting';
@@ -28,6 +28,9 @@ type Props = {
 export function UiHome(
     props: Props
 ) {
+    useEffect(() => {
+        App.event.emit('refresh-tips');
+    }, []);
     const { status, togglable } = props.mining;
     const { speed, speedable } = props.mining;
     const { rows } = props.minting;

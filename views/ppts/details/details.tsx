@@ -173,7 +173,6 @@ export class UiPptDetails extends Referable(Updatable(
             const { token, level } = this.props;
             this.reset(Nft.token(token), level, issue);
         });
-        App.event.emit('refresh-tips');
     }
     componentWillUnmount() {
         if (this.unPptChanged) {

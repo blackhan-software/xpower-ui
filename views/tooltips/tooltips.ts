@@ -1,5 +1,5 @@
 import { App } from '../../source/app';
-import { ancestors, delayed } from '../../source/functions';
+import { ancestors, buffered } from '../../source/functions';
 export const { Tooltip } = global.bootstrap;
 
 App.onTokenSwitched(function retitleTips(
@@ -20,12 +20,12 @@ App.onTokenSwitched(function retitleTips(
         }
     })
 });
-global.addEventListener('load', delayed(() => {
+global.addEventListener('load', () => {
     App.event.emit('refresh-tips');
-}), {
+}, {
     once: true
 });
-App.event.on('refresh-tips', () => {
+App.event.on('refresh-tips', buffered(() => {
     const $tips = document.querySelectorAll<HTMLElement>(
         '[data-bs-toggle=tooltip]'
     );
@@ -50,7 +50,7 @@ App.event.on('refresh-tips', () => {
             });
         });
     });
-});
+}));
 function show(e: Event) {
     const $tip = $tooltip(e.target as HTMLElement | null);
     Tooltip.getInstance($tip)?.show();

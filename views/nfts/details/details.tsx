@@ -334,8 +334,5 @@ export class UiNftDetails extends Referable(React.Component)<
             token={token}
         />;
     }
-    componentDidMount() {
-        App.event.emit('refresh-tips');
-    }
 }
 export default UiNftDetails;

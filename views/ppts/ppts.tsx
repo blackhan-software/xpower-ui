@@ -4,7 +4,7 @@ import { Amount, Token } from '../../source/redux/types';
 import { NftLevel, NftLevels } from '../../source/redux/types';
 import { Nft, NftIssue, NftToken } from '../../source/redux/types';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { UiPptList } from './list/list';
 export { UiPptList };
 
@@ -26,6 +26,7 @@ export { PptMinterApproval };
 import { PptMinterStatus, PptBurnerStatus } from './minter';
 export { PptMinterStatus, PptBurnerStatus };
 import { PptMinterList } from './minter';
+import { App } from '../../source/app';
 export { PptMinterList };
 
 type Props = {
@@ -144,7 +145,12 @@ function split(
     }
     return { lhs, rhs };
 }
-export function UiPpts(props: Props) {
+export function UiPpts(
+    props: Props
+) {
+    useEffect(() => {
+        App.event.emit('refresh-tips');
+    }, []);
     const { token } = props;
     const ppt_token = Nft.token(token);
     const { list, toggled } = props;
