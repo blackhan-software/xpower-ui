@@ -18,7 +18,7 @@ export class UiPptToggle extends React.Component<
         return <button type='button'
             className='btn btn-outline-warning toggle-old no-ellipsis'
             data-bs-placement='top' data-bs-toggle='tooltip'
-            onClick={(e) => this.toggle(toggled, e.ctrlKey)}
+            onClick={() => this.toggle(toggled, true)}
             title={this.title(toggled)}
         >
             <i className={
@@ -37,8 +37,8 @@ export class UiPptToggle extends React.Component<
         toggled: boolean
     ) {
         return toggled
-            ? 'Hide older NFTs [CTRL]'
-            : 'Show older NFTs [CTRL]';
+            ? 'Hide older NFTs'
+            : 'Show older NFTs';
     }
     componentDidUpdate() {
         App.event.emit('refresh-tips');

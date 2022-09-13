@@ -179,16 +179,17 @@ export class UiPptList extends React.Component<
         ppt_level: NftLevel, toggled: boolean
     ) {
         const title = toggled
-            ? `Hide ${Nft.nameOf(ppt_level)} NFTs [CTRL]`
-            : `Show ${Nft.nameOf(ppt_level)} NFTs [CTRL]`;
+            ? `Hide ${Nft.nameOf(ppt_level)} NFTs`
+            : `Show ${Nft.nameOf(ppt_level)} NFTs`;
         return <div
             className='btn-group' role='group'
         >
             <button type='button'
                 className='btn btn-outline-warning toggle no-ellipsis'
                 data-bs-placement='top' data-bs-toggle='tooltip'
-                data-state={toggled ? 'on' : 'off'}
-                onClick={(e) => this.toggle(ppt_level, toggled, e.ctrlKey)}
+                onClick={
+                    () => this.toggle(ppt_level, toggled, false)
+                }
                 title={title}
             >
                 <i className={

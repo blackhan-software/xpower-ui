@@ -96,7 +96,7 @@ export type PptList = Record<NftLevel, {
     display: boolean; toggled: boolean;
 }>
 export function ppt_list(
-    display = false, toggled = false
+    display = true, toggled = false
 ) {
     const entries = Object.fromEntries(
         Array.from(NftLevels()).map(

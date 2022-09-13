@@ -172,16 +172,17 @@ export class UiNftList extends React.Component<
         nft_level: NftLevel, toggled: boolean
     ) {
         const title = toggled
-            ? `Hide ${Nft.nameOf(nft_level)} NFTs [CTRL]`
-            : `Show ${Nft.nameOf(nft_level)} NFTs [CTRL]`;
+            ? `Hide ${Nft.nameOf(nft_level)} NFTs`
+            : `Show ${Nft.nameOf(nft_level)} NFTs`;
         return <div
             className='btn-group' role='group'
         >
             <button type='button'
                 className='btn btn-outline-warning toggle no-ellipsis'
                 data-bs-placement='top' data-bs-toggle='tooltip'
-                data-state={toggled ? 'on' : 'off'}
-                onClick={(e) => this.toggle(nft_level, toggled, e.ctrlKey)}
+                onClick={
+                    () => this.toggle(nft_level, toggled, false)
+                }
                 title={title}
             >
                 <i className={

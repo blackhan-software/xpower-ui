@@ -78,8 +78,7 @@ export class UiPptMinter extends React.Component<
         return <button type='button' id='toggle-all'
             className='btn btn-outline-warning no-ellipsis'
             data-bs-placement='top' data-bs-toggle='tooltip'
-            data-state={toggled ? 'off' : 'on'}
-            onClick={(e) => this.toggleAll(toggled, e.ctrlKey)}
+            onClick={() => this.toggleAll(toggled, true)}
             title={this.title(toggled)}
         >
             <i className={toggled
@@ -92,8 +91,8 @@ export class UiPptMinter extends React.Component<
         toggled: boolean
     ) {
         return !toggled
-            ? 'Show all levels [CTRL]'
-            : 'Hide higher levels [CTRL]';
+            ? 'Show all levels'
+            : 'Hide all levels';
     }
     toggleAll(
         toggled: boolean, ctrlKey: boolean

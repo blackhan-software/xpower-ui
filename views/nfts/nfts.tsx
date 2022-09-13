@@ -89,7 +89,7 @@ export type NftList = Record<NftLevel, {
     display: boolean; toggled: boolean;
 }>
 export function nft_list(
-    display = false, toggled = false
+    display = true, toggled = false
 ) {
     const entries = Object.fromEntries(
         Array.from(NftLevels()).map(
