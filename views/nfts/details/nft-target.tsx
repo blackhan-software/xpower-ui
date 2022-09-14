@@ -1,5 +1,5 @@
 import { Blockchain } from '../../../source/blockchain';
-import { x40 } from '../../../source/functions';
+import { Referable, x40 } from '../../../source/functions';
 import { Address, Amount, Nft } from '../../../source/redux/types';
 import { NftIssue, NftLevel } from '../../../source/redux/types';
 
@@ -17,16 +17,23 @@ type Props = {
         valid: boolean | null
     ) => void;
 }
-export class UiNftTarget extends React.Component<
-    Props
-> {
+export class UiNftTarget extends Referable(
+    React.Component<Props>
+) {
+    componentDidMount() {
+        const $ref = this.ref<HTMLInputElement>(
+            '.nft-transfer-to'
+        );
+        if ($ref.current && this.props.value !== null) {
+            $ref.current.value = x40(this.props.value);
+        }
+    }
     render() {
-        const { issue, level, balance, value } = this.props;
-        return this.$target(issue, level, balance, value);
+        const { issue, level, balance } = this.props;
+        return this.$target(issue, level, balance);
     }
     $target(
-        nft_issue: NftIssue, nft_level: NftLevel,
-        balance: Amount, value: Address | null
+        nft_issue: NftIssue, nft_level: NftLevel, balance: Amount
     ) {
         const classes = [
             'form-control', this.validity(this.props.valid)
@@ -38,11 +45,12 @@ export class UiNftTarget extends React.Component<
             <div className='input-group nft-transfer-to d-none d-sm-flex'
                 data-level={Nft.nameOf(nft_level)} role='group'
             >
-                <input type='text' key={this.rekey(value)}
+                <input type='text'
                     className={classes.join(' ')}
                     disabled={!balance} placeholder='0x…'
                     onChange={this.onChange.bind(this)}
                     onInput={this.onChange.bind(this)}
+                    ref={this.ref('.nft-transfer-to')}
                     style={{ cursor: this.cursor(balance) }}
                 />
                 <span className='input-group-text info'
@@ -94,26 +102,23 @@ export class UiNftTarget extends React.Component<
         if (value === null || !$target.value) {
             this.props.onTargetChanged(value, null);
         } else if (
-            $target.value.match(/^0x([0-9a-f]{40})/i) &&
-            !$target.value.match(new RegExp(x40(address), 'i'))
+            isAddress($target.value) &&
+            !isZeroAddress($target.value) &&
+            !isSameAddress($target.value, address)
         ) {
             this.props.onTargetChanged(value, true);
         } else {
             this.props.onTargetChanged(value, false);
         }
     }
-    /**
-     * If value is null, then a new key is generated
-     * resetting the input field back to its default.
-     */
-    rekey(
-        value: Address | null
-    ) {
-        if (this._key === undefined || value === null) {
-            this._key = String.random();
-        }
-        return this._key;
-    }
-    private _key?: string;
+}
+function isAddress(value: string) {
+    return value.match(/^0x([0-9a-f]{40}$)/i);
+}
+function isZeroAddress(value: string) {
+    return value.match(new RegExp(`^${x40(0n)}$`, 'i'));
+}
+function isSameAddress(value: string, address: Address) {
+    return value.match(new RegExp(`^${x40(address)}$`, 'i'));
 }
 export default UiNftTarget;

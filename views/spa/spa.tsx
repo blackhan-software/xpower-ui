@@ -1261,7 +1261,7 @@ export class SPA extends Referable(Updatable(
                 }
             });
         };
-        const nft_wallet = new NftWallet(address, App.token);
+        const nft_wallet = new NftWallet(address, token);
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
