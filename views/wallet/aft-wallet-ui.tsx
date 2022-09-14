@@ -6,7 +6,7 @@ import { Address, Amount, Token, Tokens } from '../../source/redux/types';
 import { MoeWallet, OnTransfer } from '../../source/wallet';
 
 import React from 'react';
-import { InfoCircle } from '../../public/images/tsx';
+import { XPower, XPowerBlack } from '../../public/images/tsx';
 
 type Props = {
     onToggled: (toggled: boolean) => void;
@@ -103,21 +103,21 @@ export class AftWalletUi extends Updatable(
     $address(
         address: Address | null
     ) {
-        return <input readOnly
+        return <input type='text' readOnly
             className='form-control' id='aft-wallet-address'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            title='Wallet address' type='text'
+            title='Wallet address'
             value={x40(address ?? 0n)}
         />;
     }
     $balance(
         amount: Amount | null, token: Token
     ) {
-        return <input readOnly
+        return <input type='text' readOnly
             className='form-control' id='aft-wallet-balance'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            type='text' value={nice_si(amount ?? 0n)}
             title={`${nice(amount ?? 0n)} ${token}`}
+            value={nice_si(amount ?? 0n)}
         />;
     }
     $info(
@@ -126,9 +126,12 @@ export class AftWalletUi extends Updatable(
         return <button role='tooltip'
             className='form-control input-group-text info'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            title={`Wallet address & balance of ${token} tokens`}
+            title={`Balance of ${token} tokens`}
+            style={{ padding: 0 }}
         >
-            {InfoCircle({ fill: true })}
+            {XPower({
+                token, style: { margin: 'auto', borderRadius: '12px' }
+            })}
         </button>;
     }
     componentDidUpdate() {

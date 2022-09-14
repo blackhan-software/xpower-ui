@@ -1,5 +1,6 @@
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
+import { nice, nice_si } from '../../filters';
 import { Referable, x40 } from '../../source/functions';
 import { Address, Amount } from '../../source/redux/types';
 import { OtfWallet } from '../../source/wallet';
@@ -8,8 +9,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 
 import React from 'react';
-import { InfoCircle } from '../../public/images/tsx';
-import { nice_si } from '../../filters';
+import { Avalanche } from '../../public/images/tsx';
 
 type Props = {
     toggled: boolean;
@@ -156,32 +156,33 @@ export class OtfWalletUi extends Referable(React.Component)<
     $address(
         address: Address | null
     ) {
-        return <input
-            className='form-control'
+        return <input type='text' readOnly
+            className='form-control' id='otf-wallet-address'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            id='otf-wallet-address' readOnly
             title='Minter address to pre-fund for transaction fees'
-            type='text' value={x40(address ?? 0n)}
+            value={x40(address ?? 0n)}
         />;
     }
     $balance(
         amount: Amount | null
     ) {
-        return <input
-            className='form-control'
+        return <input type='text' readOnly
+            className='form-control' id='otf-wallet-balance'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            id='otf-wallet-balance' readOnly
-            title='AVAX balance to auto-pay for transaction fees'
-            type='text' value={nice_si(amount ? amount : 0n, { base: 1e18 })}
+            title={`${nice(amount ?? 0n, { base: 1e18 })} AVAX`}
+            value={nice_si(amount ?? 0n, { base: 1e18 })}
         />;
     }
     $info() {
         return <button
             className='form-control input-group-text info'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            title='Minter address & balance for transaction fees'
+            title='Balance of AVAX to auto-pay for transaction fees'
+            style={{ padding: 0 }}
         >
-            {InfoCircle({ fill: true })}
+            {Avalanche({
+                height: 21, width: 21, style: { margin: 'auto' }
+            })}
         </button>;
     }
     componentDidUpdate() {

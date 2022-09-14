@@ -1,8 +1,8 @@
 export const trim = (text: string): string => text.trim();
 export const nice = (
-    n: number | bigint, { precision = 3, suffix = '' } = {}
+    n: number | bigint, { precision = 3, base = 1, suffix = '' } = {}
 ): string => {
-    const [text, frac] = split(n, precision);
+    const [text, frac] = split(rescale(n, base), precision);
     let result = frac + suffix;
     for (let i = text.length - 1; i >= 0; i--) {
         if ((text.length - i) % 3 === 0 && i > 0) {
@@ -44,7 +44,7 @@ export const nice_si = (
         precision
     });
 };
-const rescale = (
+export const rescale = (
     n: number | bigint, by: number
 ): number => {
     if (typeof n === 'bigint') {
