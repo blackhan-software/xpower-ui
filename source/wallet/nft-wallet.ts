@@ -1,7 +1,8 @@
 import { XPowerNftFactory } from '../contract';
 import { XPowerNftMockFactory } from '../contract';
 import { BigNumber, Contract, Transaction } from 'ethers';
-import { Address, Amount, NftCoreId, NftLevel, Token, Year } from '../redux/types';
+import { Address, Amount, Token, Year } from '../redux/types';
+import { NftCoreId, NftLevel } from '../redux/types';
 
 import { ERC1155Wallet } from './erc1155-wallet';
 import { OtfWallet } from './otf-wallet';
