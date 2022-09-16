@@ -34,7 +34,7 @@ export class MiningSpeed extends React.Component<
                 disabled={!this.increasable(speed, disabled)}
                 onClick={this.increase.bind(this, speed, disabled)}
             >
-                {PlusCircle({ fill: true })}
+                <PlusCircle fill={true} />
             </button>
         </div>;
     }
@@ -65,7 +65,7 @@ export class MiningSpeed extends React.Component<
                 disabled={!this.decreasable(speed, disabled)}
                 onClick={this.decrease.bind(this, speed, disabled)}
             >
-                {DashCircle({ fill: true })}
+                <DashCircle fill={true} />
             </button>
         </div>;
     }

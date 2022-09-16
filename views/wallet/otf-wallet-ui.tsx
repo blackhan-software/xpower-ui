@@ -178,11 +178,8 @@ export class OtfWalletUi extends Referable(React.Component)<
             className='form-control input-group-text info'
             data-bs-toggle='tooltip' data-bs-placement='top'
             title='Balance of AVAX to auto-pay for transaction fees'
-            style={{ padding: 0 }}
         >
-            {Avalanche({
-                height: 21, width: 21, style: { margin: 'auto' }
-            })}
+            <Avalanche style={{ margin: 'auto' }} />
         </button>;
     }
     componentDidUpdate() {

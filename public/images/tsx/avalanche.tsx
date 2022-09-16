@@ -1,7 +1,7 @@
 import React, { CSSProperties } from 'react';
 
 export function Avalanche({
-    height, width, style, source
+    height, width, source, style
 }: {
     height?: number,
     width?: number,
@@ -11,12 +11,18 @@ export function Avalanche({
     if (source === undefined) {
         source = '/images/png/avalanche-icon/avalanche-64x64.png';
     }
+    if (height === undefined) {
+        height = 16;
+    }
+    if (width === undefined) {
+        width = 16;
+    }
     return <img
         alt="Avalanche"
-        height={height ?? 24}
+        height={height}
         src={source}
-        width={width ?? 24}
         style={style}
+        width={width}
     />;
 }
 export default Avalanche;

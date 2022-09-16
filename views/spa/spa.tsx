@@ -568,14 +568,15 @@ export class SPA extends Referable(Updatable(
     $h1(
         page: Page
     ) {
+        const logo = <Avalanche height={24} width={24} />;
         if (page === Page.Home) {
-            return <h1>Mine & Mint Proof-of-Work Tokens on Avalanche <Avalanche /></h1>;
+            return <h1>Mine & Mint Proof-of-Work Tokens on Avalanche {logo}</h1>;
         }
         if (page === Page.Nfts) {
-            return <h1>Mint stakeable XPower NFTs on Avalanche <Avalanche /></h1>;
+            return <h1>Mint stakeable XPower NFTs on Avalanche {logo}</h1>;
         }
         if (page === Page.Ppts) {
-            return <h1>Stake minted XPower NFTs on Avalanche <Avalanche /></h1>;
+            return <h1>Stake minted XPower NFTs on Avalanche {logo}</h1>;
         }
         return null;
     }

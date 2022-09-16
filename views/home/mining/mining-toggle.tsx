@@ -106,7 +106,7 @@ function $info() {
         data-bs-toggle='tooltip' data-bs-placement='top'
         title='Toggle mining for XPower tokens (w/o minting them)'
     >
-        {InfoCircle({ fill: true })}
+        <InfoCircle fill={true} />
     </button>;
 }
 function Spinner(

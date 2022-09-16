@@ -6,7 +6,7 @@ import { Address, Amount, Token, Tokens } from '../../source/redux/types';
 import { MoeWallet, OnTransfer } from '../../source/wallet';
 
 import React from 'react';
-import { XPower, XPowerBlack } from '../../public/images/tsx';
+import { XPower } from '../../public/images/tsx';
 
 type Props = {
     onToggled: (toggled: boolean) => void;
@@ -126,12 +126,11 @@ export class AftWalletUi extends Updatable(
         return <button role='tooltip'
             className='form-control input-group-text info'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            title={`Balance of ${token} tokens`}
-            style={{ padding: 0 }}
+            title={`Balance of proof-of-work ${token} tokens`}
         >
-            {XPower({
-                token, style: { margin: 'auto', borderRadius: '12px' }
-            })}
+            <XPower token={token} style={{
+                margin: 'auto', borderRadius: '8px'
+            }} />
         </button>;
     }
     componentDidUpdate() {

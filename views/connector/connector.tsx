@@ -132,7 +132,7 @@ export class Connector extends Referable(
             data-bs-toggle='tooltip' data-bs-placement='top'
             title={this.tooltip} type='button'
         >
-            {InfoCircle({ fill: true })}
+            <InfoCircle fill={true} />
         </button>;
     }
     get tooltip() {
