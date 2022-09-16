@@ -1,6 +1,6 @@
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
-import { nice, nice_si } from '../../filters';
+import { nice, nice_si } from '../../source/functions';
 import { Referable, x40 } from '../../source/functions';
 import { Address, Amount } from '../../source/redux/types';
 import { OtfWallet } from '../../source/wallet';

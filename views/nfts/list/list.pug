@@ -3,9 +3,9 @@ div#nft-single-minting
     | Mint & Manage {{TOKEN}} NFTs
   - let levels = ["UNIT", "KILO", "MEGA", "GIGA", "TERA", "PETA", "EXA", "ZETTA", "YOTTA", "1E27"]
   - let index = 0
-  while index < 9
+  while index < 6
     div.btn-group.nft-minter(
-      role="group" data-level=`${levels[index]}` style="display: none"
+      role="group" data-level=`${levels[index]}`
     )
       div.btn-group(role="group")
         button.btn.btn-outline-warning.toggle.no-ellipsis(

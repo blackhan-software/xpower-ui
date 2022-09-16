@@ -4,12 +4,15 @@ div#minting
   - let level = 1
   while level <= 64
     div.btn-group.mint(
-      role="group"
+      role="group" data-level=`${level}`
     )
       button.btn.btn-outline-warning.minter(
-        type="button" disabled data-level=${level}
+        type="button" disabled data-level=`${level}`
       )
-        | Mint {{AMOUNT_#{level}}} <span class="d-none d-sm-inline">{{TOKEN}}</span>
+        span.spinner.spinner-border.spinner-border-sm.float-start.spinner-grow(
+          role="status" style="visibility: hidden;"
+        )
+        span.text: | Mint {{AMOUNT_#{level}}} <span class="d-none d-sm-inline">{{TOKEN}}</span>
       span.d-inline-block(
         tabindex=0 data-bs-toggle="tooltip" data-bs-placement="left"
         title=`Number of level {{LEVEL_${level}}} {{TOKEN}} tokens mined`

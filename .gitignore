@@ -1,3 +1,4 @@
+public/**/*.LICENSE.txt
 public/content/**/*.md
 public/views/**/*.pug
 public/views/**/*.pig

@@ -3,7 +3,9 @@ import { Global } from '../types';
 declare const global: Global;
 
 import { Blockchain } from '../blockchain';
+import { URLQuery } from '../url-query';
 import { EventEmitter } from 'events';
+
 import { Contract, Wallet } from 'ethers';
 import { NonceManager } from '@ethersproject/experimental';
 import { Web3Provider } from '@ethersproject/providers';
@@ -22,19 +24,19 @@ export class OtfWallet extends EventEmitter {
     }
     public static get enabled(): boolean {
         const item = localStorage.getItem('otf-wallet:flag');
-        return JSON.parse(item ?? 'false');
+        return JSON.parse(item ?? 'false') || URLQuery.otfWallet;
     }
     public static set enabled(value: boolean) {
         if (this.enabled !== value) {
             this.me.emit('toggled', { toggled: value });
         }
+        URLQuery.otfWallet = value;
         const item = JSON.stringify(value);
         localStorage.setItem('otf-wallet:flag', item);
     }
     public static onToggled(
         listener: ({ toggled }: { toggled: boolean }) => void
     ) {
-        // this.me.removeAllListeners('toggled');
         this.me.on('toggled', listener);
     }
     public static unToggled(

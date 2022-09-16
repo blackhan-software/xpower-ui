@@ -97,8 +97,8 @@ export class UiNftMinter extends React.Component<
         toggled: boolean
     ) {
         return !toggled
-            ? 'Show all levels'
-            : 'Hide all levels';
+            ? 'Show all NFT levels'
+            : 'Hide all NFT levels';
     }
     toggleAll(
         toggled: boolean, ctrl_key: boolean

@@ -1,29 +1,10 @@
-extends ../index
-
-block styles
-  include ../theme/theme.pug
-
-block globals
-  include ../global/global.pug
-
-  span#g-mining-speed(
-    style="display:none" data-value=`${UI_MINING_SPEED}`)
-  span#g-persistence(
-    style="display:none" data-value=`${UI_PERSISTENCE}`)
-  span#g-worker-path(
-    style="display:none" data-value="{{UI_WORKER_PATH}}")
-
-block header
-  include ../header/header.pug
+extends ../spa/spa.pug
 
 block content
   content
-    h1: | #{DESCRIPTION} <img src="/images/png/avalanche-icon/avalanche-64x64.png" height="24" width="24" />
+    h1: | {{DESCRIPTION}} <img alt="Avalanche" height="24" src="/images/png/avalanche-icon/avalanche-64x64.png" width="24" />
     include ../connector/connector.pug
     include ../wallet/wallet.pug
     include ../selector/selector.pug
-    include ./mining/mining.pug
-    include ./minting/minting.pug
-
-block footer
-  include ../footer/footer.pug
+    include ../home/mining/mining.pug
+    include ../home/minting/minting.pug

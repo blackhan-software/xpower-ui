@@ -1,6 +1,6 @@
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
-import { nice, nice_si } from '../../filters';
+import { nice, nice_si } from '../../source/functions';
 import { Updatable, x40 } from '../../source/functions';
 import { Address, Amount, Token, Tokens } from '../../source/redux/types';
 import { MoeWallet, OnTransfer } from '../../source/wallet';
@@ -75,8 +75,7 @@ export class AftWalletUi extends Updatable(
             className='form-control input-group-text'
             data-bs-toggle='tooltip' data-bs-placement='top'
             onClick={this.toggle.bind(this, toggled)}
-            role='button'
-            title={this.title(toggled)}
+            role='button' title={this.title(toggled)}
         >
             <i className={this.icon(toggled)} />
         </button>;

@@ -83,7 +83,7 @@ type State = {
         minter: Record<NftToken, PptMinter>;
         list: NftList;
     };
-    toggled: boolean;
+    toggled: boolean; // nfts & ppts
     token: Token;
     page: Page;
 }

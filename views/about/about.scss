@@ -1,3 +1,10 @@
 form#about {
+    span.spinner {
+        height: 2rem;
+        left: calc(50% - 1rem);
+        position: absolute;
+        top: calc(50% - 1rem);
+        width: 2rem;
+    }
     margin-top: 0;
 }

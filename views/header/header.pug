@@ -1,22 +1,22 @@
 header
     nav#menu.nav.nav-pills.nav-justified.mb-3
         a.btn.btn-outline-warning.flex-sm-fill.text-sm-center.nav-link.home(
-            href="/home?token={{TOKEN}}"
+            class="{{HEADER_HOME}}" href="/home?token={{TOKEN}}"
         )
             i.bi-lightning-charge-fill.float-sm-start
             span.d-none.d-sm-inline: | XPower
         a.btn.btn-outline-warning.flex-sm-fill.text-sm-center.nav-link.nfts(
-            href="/nfts?token={{TOKEN}}"
+            class="{{HEADER_NFTS}}" href="/nfts?token={{TOKEN}}"
         )
             i.bi-image-fill.float-sm-start
             span.d-none.d-sm-inline: | NFTs
         a.btn.btn-outline-warning.flex-sm-fill.text-sm-center.nav-link.staking(
-            href="/staking?token={{TOKEN}}"
+            class="{{HEADER_STAKING}}" href="/staking?token={{TOKEN}}"
         )
             i.bi-cash-stack.float-sm-start
             span.d-none.d-sm-inline: | Staking
         a.btn.btn-outline-warning.flex-sm-fill.text-sm-center.nav-link.about(
-            href="/about?token={{TOKEN}}"
+            class="{{HEADER_ABOUT}}" href="/about?token={{TOKEN}}"
         )
             i.bi-lightbulb-fill.float-sm-start
             span.d-none.d-sm-inline: | About

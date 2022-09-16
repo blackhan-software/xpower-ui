@@ -2,6 +2,7 @@ import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { delayed } from '../../source/functions';
 import { Page } from '../../source/redux/types';
+import { URLQuery } from '../../source/url-query';
 
 Blockchain.onceConnect(delayed(async function reloadLocation() {
     const p = await Blockchain.provider;
@@ -9,13 +10,7 @@ Blockchain.onceConnect(delayed(async function reloadLocation() {
     p.on('accountsChanged', () => location.reload());
 }, 600));
 App.onTokenSwitch(function syncLocationSearch(token) {
-    const search = location.search
-        .replace(/^$/, `?token=${token}`)
-        .replace(/token=([A-Z]+)/, `token=${token}`);
-    const [data, title, url] = [
-        { page: 1 }, document.title, `${location.pathname}${search}`
-    ];
-    history.pushState(data, title, url);
+    URLQuery.token = token;
 });
 App.onPageSwitch(function syncLocationTitle(page, prev) {
     const pathname = location.pathname

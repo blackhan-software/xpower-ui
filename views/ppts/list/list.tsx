@@ -113,7 +113,7 @@ export class UiPptList extends React.Component<
             style={style}
         >
             {this.$toggle(ppt_level, toggled)}
-            {this.$minter(ppt_level, token)}
+            {this.$minter(ppt_level, amount)}
             {this.$balance(ppt_level, by_token)}
             <UiPptAmount
                 amount={amount}
@@ -205,7 +205,7 @@ export class UiPptList extends React.Component<
         App.event.emit('toggle-level', { level, flag: !toggled });
     }
     $minter(
-        ppt_level: NftLevel, token: Token
+        ppt_level: NftLevel, amount: Amount
     ) {
         const head = (nft_level: NftLevel) => {
             const nft_name = Nft.nameOf(nft_level);
@@ -216,19 +216,18 @@ export class UiPptList extends React.Component<
             if (nft_name) return nft_name.slice(1);
         };
         const title = (
-            nft_level: NftLevel, token: Token
+            nft_level: NftLevel, amount: Amount
         ) => {
             const nft_name = Nft.nameOf(nft_level);
-            const lhs_head = head(nft_level);
-            const lhs = lhs_head ? `1${lhs_head}` : '';
-            const rhs_head = head(nft_level + 3);
-            const rhs = rhs_head ? `1${rhs_head}` : `K${lhs_head}`;
-            return `Mint ${nft_name} NFTs (for [${lhs}...${rhs}] ${token} tokens)`;
+            return amount !== 0n ? amount > 0
+                ? `Stake ${nft_name} NFTs`
+                : `Unstake ${nft_name} NFTs`
+                : `(Un)stake ${nft_name} NFTs`;
         };
         return <button type='button'
             className='btn btn-outline-warning minter'
             data-bs-placement='top' data-bs-toggle='tooltip'
-            title={title(ppt_level, token)}
+            title={title(ppt_level, amount)}
         >
             {head(ppt_level)}<span
                 className='d-none d-sm-inline'>{tail(ppt_level)} NFTs</span>
@@ -242,7 +241,7 @@ export class UiPptList extends React.Component<
         return <button type='button'
             className='btn btn-outline-warning balance'
             data-bs-placement='top' data-bs-toggle='tooltip'
-            title={`Overall personal balance & supply (${Nft.nameOf(ppt_level)} NFTs)`}
+            title={`Overall personal balance & supply (staked ${Nft.nameOf(ppt_level)} NFTs)`}
         >
             <span>{
                 total_by.amount.toString()

@@ -1,10 +1,11 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
+const { Years } = require('./source/years');
 const { mkdir } = require('fs/promises');
 const { resolve } = require('path');
 const pug = require('pug');
 
-const filters = require('./filters/pug-filters');
+const filters = require('./filters');
 const env = require('./env');
 
 const configuration = ({
@@ -90,10 +91,34 @@ const configuration = ({
             chunks: ['migrate']
         }),
         new HTMLWebpackPlugin({
-            templateContent: pug.renderFile('./views/spa/spa.pug', {
+            templateContent: pug.renderFile('./views/home/home.pug', {
                 ...env.default, filters, mode
             }),
-            filename: '../views/spa/spa.pig',
+            filename: '../views/home/home.pig',
+            minify: false, inject: 'body',
+            chunks: ['spa']
+        }),
+        new HTMLWebpackPlugin({
+            templateContent: pug.renderFile('./views/nfts/nfts.pug', {
+                ...env.default, filters, mode, ...{ YEARS: Array.from(Years()) }
+            }),
+            filename: '../views/nfts/nfts.pig',
+            minify: false, inject: 'body',
+            chunks: ['spa']
+        }),
+        new HTMLWebpackPlugin({
+            templateContent: pug.renderFile('./views/ppts/ppts.pug', {
+                ...env.default, filters, mode, ...{ YEARS: Array.from(Years()) }
+            }),
+            filename: '../views/ppts/ppts.pig',
+            minify: false, inject: 'body',
+            chunks: ['spa']
+        }),
+        new HTMLWebpackPlugin({
+            templateContent: pug.renderFile('./views/about/about.pug', {
+                ...env.default, filters, mode
+            }),
+            filename: '../views/about/about.pig',
             minify: false, inject: 'body',
             chunks: ['spa']
         }),

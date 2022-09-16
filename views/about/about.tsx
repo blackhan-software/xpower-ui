@@ -25,28 +25,46 @@ type Props = {
 export function UiAbout(
     { token, url }: Props
 ) {
-    const [html, setHtml] = useState('');
-    const md_url = about_url(url);
-    const md = sessionStorage.getItem(md_url) ?? '';
-    if (md.length) {
-        renderMarkdown(md, token).then(
-            (html) => setHtml(html)
-        );
-    } else {
-        fetchMarkdown(md_url).then((md) => {
-            sessionStorage.setItem(md_url, md);
-            return renderMarkdown(md, token);
-        }).then(
-            (html) => setHtml(html)
-        );
-    }
-    useEffect(() => {
-        const $content = document.querySelector(
-            '#md-content'
-        );
-        renderKatex($content!);
+    const $md_content = document.querySelector<HTMLElement>(
+        '#md-content'
+    );
+    const [html, setHtml] = useState(() => {
+        return $md_content ? $md_content.innerHTML : ''
+    });
+    useEffect(/*set-anchor*/() => {
         const anchor = location.hash;
         scrollToAnchor(anchor);
+    }, [html]);
+    useEffect(/*fetch-markdown*/() => {
+        if (html.length > 0) {
+            return;
+        }
+        const md_url = about_url(url);
+        const md = sessionStorage.getItem(md_url) ?? '';
+        if (md.length) {
+            renderMarkdown(md, token).then(
+                (html) => setHtml(html)
+            );
+        } else {
+            fetchMarkdown(md_url).then((md) => {
+                sessionStorage.setItem(md_url, md);
+                return renderMarkdown(md, token);
+            }).then(
+                (html) => setHtml(html)
+            );
+        }
+    }, [html, token, url]);
+    useEffect(/*render-katex*/() => {
+        const $md_content = document.querySelector<HTMLElement>(
+            '#md-content'
+        );
+        if ($md_content) try {
+            renderKatex($md_content).then(() => {
+                $md_content.classList.remove('d-none');
+            });
+        } catch (ex) {
+            console.error(ex);
+        }
     }, [html]);
     return <React.Fragment>
         <div id='md-content' dangerouslySetInnerHTML={{
@@ -87,7 +105,7 @@ async function renderMarkdown(
         script(SCRIPTS.markdownItAnchor)
     ]);
     const markdownit = await ensure(
-        () => global.markdownit as markdownIt
+        () => global.markdownit as markdownIt, 200, 2000
     );
     const mdi = markdownit({
         html: true, linkify: true, typographer: true
@@ -182,14 +200,7 @@ function Spinner(
         !props.show ? 'd-none' : '', props.grow ? 'spinner-grow' : ''
     ];
     return <span
-        className={classes.join(' ')}
-        role='status' style={{
-            height: '2rem',
-            left: 'calc(50% - 1rem)',
-            position: 'absolute',
-            top: 'calc(50% - 1rem)',
-            width: '2rem',
-        }}
+        className={classes.join(' ')} role='status'
     />;
 }
 export default UiAbout;

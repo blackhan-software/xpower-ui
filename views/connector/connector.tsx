@@ -144,10 +144,7 @@ export class Connector extends Referable(
             'connect-metamask'
         );
         if (this.state.chain !== Chain.CONNECTED) {
-            if ($ref.current && !$ref.current.dataset.focus) {
-                $ref.current.dataset.focus = 'true';
-                $ref.current.focus();
-            }
+            $ref.current?.focus();
         }
         if (this.state.chain !== Chain.UNAVAILABLE) {
             return;
@@ -157,14 +154,15 @@ export class Connector extends Referable(
     unTokenSwitch?: Unsubscribe;
 }
 function Spinner(
-    state: { show: boolean, grow?: boolean }
+    { show, grow }: { show: boolean, grow?: boolean }
 ) {
     const classes = [
-        'spinner spinner-border spinner-border-sm', 'float-start',
-        !state.show ? 'd-none' : '', state.grow ? 'spinner-grow' : ''
+        'spinner spinner-border spinner-border-sm',
+        'float-start', grow ? 'spinner-grow' : ''
     ];
     return <span
         className={classes.join(' ')} role='status'
+        style={{ visibility: show ? 'visible' : 'hidden' }}
     />;
 }
 function ms(

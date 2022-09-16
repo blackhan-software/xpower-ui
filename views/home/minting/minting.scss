@@ -1,4 +1,7 @@
 div#minting {
+  div.btn-group.mint[data-level="5"] {
+    display: block;
+  }
   div.btn-group.mint {
     display: none;
   }

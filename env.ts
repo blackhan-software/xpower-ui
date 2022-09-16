@@ -7,7 +7,7 @@ const IPFS_GATEWAY = process.env.IPFS_GATEWAY ?? 'https://dweb.link';
 assert(IPFS_GATEWAY, 'missing IPFS_GATEWAY env variable');
 const MD_ABOUT_URL = process.env.MD_ABOUT_URL ?? '/content/about.md';
 assert(MD_ABOUT_URL, 'missing MD_ABOUT_URL env variable');
-const UI_COPYRIGHT = process.env.UI_COPYRIGHT ?? 'XPowerMine.com';
+const UI_COPYRIGHT = process.env.UI_COPYRIGHT ?? 'XPowermine.com';
 assert(UI_COPYRIGHT, 'missing UI_COPYRIGHT env variable');
 const UI_PERSISTENCE = process.env.UI_PERSISTENCE ?? '0';
 assert(UI_PERSISTENCE, 'missing UI_PERSISTENCE env variable');

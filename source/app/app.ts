@@ -2,7 +2,7 @@ import { combineReducers, Unsubscribe } from 'redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { Store } from 'redux';
 
-import { NftFullId, NftIssue, NftLevel, NftToken, Pages } from '../redux/types';
+import { NftFullId, NftIssue, NftLevel, NftToken, Pager } from '../redux/types';
 import { Address, Amount, Nonce, Supply, Token } from '../redux/types';
 import { BlockHash, Page, State } from '../redux/types';
 
@@ -475,8 +475,7 @@ export class App {
     }
     public static get page(): Page {
         if (typeof location !== 'undefined') {
-            const path = location.pathname.slice(1) as Page;
-            return Pages().has(path) ? path : Page.None;
+            return Pager.parse(location.pathname);
         }
         return Page.None;
     }

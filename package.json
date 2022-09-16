@@ -15,6 +15,7 @@
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.14",
+    "@types/html-minifier": "^4.0.2",
     "@types/http-errors": "^1.8.2",
     "@types/jest": "^29.0.3",
     "@types/jquery": "^3.5.14",
@@ -35,14 +36,18 @@
     "debug": "^4.3.4",
     "dotenv": "^16.0.2",
     "eslint": "^8.23.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-webpack-plugin": "^3.2.0",
     "ethers": "^5.7.1",
     "express": "^4.18.1",
+    "html-minifier": "^4.0.0",
     "html-webpack-plugin": "^5.5.0",
     "http-errors": "^2.0.0",
     "jest": "^29.0.3",
     "jest-environment-jsdom": "^29.0.3",
     "js-keccak-tiny": "^0.4.2",
+    "markdown-it": "^13.0.1",
+    "markdown-it-anchor": "^8.6.5",
     "mini-css-extract-plugin": "^2.6.1",
     "mitt": "^3.0.0",
     "morgan": "^1.10.0",
@@ -82,17 +87,14 @@
     "wp-dev": "webpack --mode development --devtool source-map --watch",
     "ts-app": "ts-node ./bin/www.ts",
     "ts-dev": "DEBUG=\"xpower-ui:*\" ts-node-dev ./bin/www.ts",
-    "prebuild": "npm run lint && tsc",
+    "prebuild": "npm run lint && tsc && ./prefetch.sh",
     "build": "npm run wp-pro",
-    "predebug": "npm run lint && tsc",
+    "predebug": "npm run lint && tsc && ./prefetch.sh",
     "debug": "concurrently npm:wp-dev npm:ts-dev -c bold.blue,bold.grey",
     "start": "npm run ts-app",
     "pretest": "tsc",
     "test": "jest --verbose",
     "watch": "tsc --watch"
   },
-  "version": "4.0.0",
-  "devDependencies": {
-    "eslint-plugin-react-hooks": "^4.6.0"
-  }
+  "version": "4.0.0"
 }

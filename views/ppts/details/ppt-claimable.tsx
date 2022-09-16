@@ -1,4 +1,4 @@
-import { nice } from '../../../filters';
+import { nice } from '../../../source/functions';
 import { Amount, Token } from '../../../source/redux/types';
 import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
 

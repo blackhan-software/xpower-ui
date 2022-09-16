@@ -2,10 +2,9 @@ div#aft-wallet
   label.form-label
     | Wallet Address and {{TOKEN}} Balance
   div.input-group.wallet-address
-    button.form-control.input-group-text#otf-wallet-toggle(
+    button#otf-wallet-toggle.form-control.input-group-text(
       data-bs-toggle="tooltip" data-bs-placement="top"
-      role="button"
-      title="Enable minter wallet & show balance of AVAX"
+      role="button" title="Enable minter wallet & show balance of AVAX"
     )
       i.bi-wallet
     input#aft-wallet-address.form-control(
@@ -20,7 +19,6 @@ div#aft-wallet
     )
     button.form-control.input-group-text.info(
       data-bs-toggle="tooltip" data-bs-placement="top"
-      role="tooltip"
-      title="Wallet address & balance of {{TOKEN}} tokens"
+      role="tooltip" title="Wallet address & balance of {{TOKEN}} tokens"
     )
-      include ../../public/images/pug/info-circle-fill.svg.pug
+      include ../../public/images/pug/xpower.img.pug

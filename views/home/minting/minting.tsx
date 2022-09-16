@@ -1,7 +1,7 @@
 import { global_ref, range } from '../../../source/functions';
 import { Level, Token } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
-import { nice } from '../../../filters';
+import { nice } from '../../../source/functions';
 
 import React, { useEffect, useState } from 'react';
 
@@ -123,8 +123,8 @@ function $minter(
         {token}
     </span>;
     const text = minting
-        ? <>Minting {amount} {$token}…</>
-        : <>Mint {amount} {$token}</>;
+        ? <span className="text">Minting {amount} {$token}…</span>
+        : <span className="text">Mint {amount} {$token}</span>;
     return <button className='btn btn-outline-warning minter'
         onClick={() => { if (onMint) onMint(token, level); }}
         type='button' disabled={row.disabled || minting}
