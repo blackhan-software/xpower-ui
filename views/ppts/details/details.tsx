@@ -188,6 +188,10 @@ export class UiPptDetails extends Referable(Updatable(
         if (!address) {
             throw new Error('missing selected-address');
         }
+        const avalanche = await Blockchain.isAvalanche();
+        if (!avalanche) {
+            throw new Error('wrong chain');
+        }
         const core_id = Nft.coreId({
             issue: ppt_issue, level: ppt_level
         });

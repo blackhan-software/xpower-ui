@@ -522,9 +522,14 @@ export class SPA extends Referable(Updatable(
             };
         };
         /**
-         * fallback: if no chain is installed
+         * fallback: on no or wrong chain
          */
-        Blockchain.isInstalled().then(async (installed) => {
+        Promise.all([
+            Blockchain.isInstalled(),
+            Blockchain.isAvalanche()
+        ]).then(([
+            installed, avalanche
+        ]) => {
             const get_images = async (token: Token) => {
                 const images = [];
                 for (const level of NftLevels()) {
@@ -540,11 +545,11 @@ export class SPA extends Referable(Updatable(
                     (lhs, rhs) => $.extend(true, lhs, rhs)
                 ));
             };
-            if (!installed) {
+            if (!installed || !avalanche) {
                 App.onTokenSwitch(get_images);
                 get_images(this.state.token);
             }
-        });
+        })
     }
     render() {
         if (App.debug) {

@@ -91,17 +91,19 @@ export async function nft_meta({ level, issue, token }: {
     level: NftLevel, issue: NftIssue, token: Token
 }) {
     const address = await Blockchain.selectedAddress;
-    return await NftImageMeta.get(address, {
-        level, issue, token
-    });
+    const avalanche = await Blockchain.isAvalanche();
+    return address && avalanche
+        ? await NftImageMeta.get(address, { level, issue, token })
+        : await NftImageMeta.get(undefined, { level, issue, token });
 }
 export async function nft_href({ level, issue, token }: {
     level: NftLevel, issue: NftIssue, token: Token
 }) {
     const address = await Blockchain.selectedAddress;
-    const nft_wallet = address
+    const avalanche = await Blockchain.isAvalanche();
+    const nft_wallet = address && avalanche
         ? new NftWallet(address, token)
-        : new NftWalletMock(address, token);
+        : new NftWalletMock(0n, token);
     const nft_id = Nft.coreId({ level, issue });
     const supply = await nft_wallet.totalSupply(nft_id);
     if (supply > 0) {
