@@ -34,7 +34,7 @@ export class Connector extends Referable(
         };
     }
     componentDidMount = buffered(() => {
-        const reset = async () => {
+        const reset = async ({ silent } = { silent: false }) => {
             if (!await Blockchain.isInstalled()) {
                 return this.setState({ chain: Chain.UNAVAILABLE });
             }
@@ -44,7 +44,9 @@ export class Connector extends Referable(
             if (!await Blockchain.isAvalanche()) {
                 return this.setState({ chain: Chain.WRONG_ID });
             }
-            this.setState({ chain: Chain.CONNECTING });
+            if (!silent) {
+                this.setState({ chain: Chain.CONNECTING });
+            }
             try {
                 await Blockchain.connect();
                 this.setState({
@@ -55,7 +57,7 @@ export class Connector extends Referable(
             }
         };
         this.unTokenSwitch = App.onTokenSwitch(
-            reset
+            () => reset({ silent: true })
         );
         reset();
     }, ms())
