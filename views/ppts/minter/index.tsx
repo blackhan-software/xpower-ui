@@ -36,18 +36,25 @@ export function ppt_minter() {
     return { approval: null, minter_status: null, burner_status: null };
 }
 export enum PptMinterApproval {
+    unapproved = 'unapproved',
     approving = 'approving',
     approved = 'approved',
     error = 'error'
 }
 function approved(
     approval: PptMinterApproval | null
-): boolean {
+): boolean | null {
+    if (approval === null) {
+        return null;
+    }
     return approval === PptMinterApproval.approved;
 }
 function approving(
     approval: PptMinterApproval | null
-): boolean {
+): boolean | null {
+    if (approval === null) {
+        return null;
+    }
     return approval === PptMinterApproval.approving;
 }
 export class UiPptMinter extends React.Component<

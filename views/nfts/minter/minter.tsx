@@ -28,18 +28,25 @@ export function nft_minter() {
     return { approval: null, status: null };
 }
 export enum NftMinterApproval {
+    unapproved = 'unapproved',
     approving = 'approving',
     approved = 'approved',
     error = 'error'
 }
 function approved(
     approval: NftMinterApproval | null
-): boolean {
+): boolean | null {
+    if (approval === null) {
+        return null;
+    }
     return approval === NftMinterApproval.approved;
 }
 function approving(
     approval: NftMinterApproval | null
-): boolean {
+): boolean | null {
+    if (approval === null) {
+        return null;
+    }
     return approval === NftMinterApproval.approving;
 }
 export enum NftMinterStatus {

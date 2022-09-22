@@ -136,8 +136,8 @@ export class SPA extends Referable(Updatable(
         super(props);
         this.state = {
             mining: {
-                status: null, togglable: true,
-                speed: props.speed, speedable: true,
+                status: null, togglable: false,
+                speed: props.speed, speedable: false,
             },
             minting: {
                 rows: Minting.rows(App.level.min),
@@ -176,16 +176,24 @@ export class SPA extends Referable(Updatable(
             if (miner.running) {
                 await this.update({
                     mining: {
-                        speed: miner.speed,
-                        togglable: miner.speed > 0,
+                        ...{
+                            speedable: true,
+                            speed: miner.speed,
+                            togglable: miner.speed > 0,
+                        }
                     }
                 });
             } else {
                 await this.update({
                     mining: {
-                        speed: miner.speed,
-                        status: MinerStatus.stopped,
-                        togglable: miner.speed > 0,
+                        ...{
+                            speedable: true,
+                            speed: miner.speed,
+                            togglable: miner.speed > 0,
+                        },
+                        ...{
+                            status: MinerStatus.stopped,
+                        }
                     }
                 });
             }
@@ -498,7 +506,8 @@ export class SPA extends Referable(Updatable(
                 address, nft_contract.address
             );
             const approval = allowance > MID_UINT256
-                ? NftMinterApproval.approved : null;
+                ? NftMinterApproval.approved
+                : NftMinterApproval.unapproved;
             return {
                 nfts: {
                     minter: { [Nft.token(token)]: { approval } }
@@ -514,7 +523,8 @@ export class SPA extends Referable(Updatable(
                 ppt_treasury.address
             );
             const approval = approved
-                ? PptMinterApproval.approved : null;
+                ? PptMinterApproval.approved
+                : PptMinterApproval.unapproved;
             return {
                 ppts: {
                     minter: { [Nft.token(token)]: { approval } }
