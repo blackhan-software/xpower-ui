@@ -46,6 +46,7 @@ const otf_wallet = (req: Request) => {
     toggled = false;
   }
   return {
+    OTF_WALLET_TOGGLE: !toggled ? 'bi-wallet' : 'bi-wallet2',
     OTF_WALLET: !toggled ? 'd-none' : ''
   };
 };

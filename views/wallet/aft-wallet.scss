@@ -29,5 +29,10 @@ div#aft-wallet {
     input {
       font-size: smaller;
     }
+    button.info {
+      img {
+        border-radius: 8px;
+      }
+    }
   }
 }

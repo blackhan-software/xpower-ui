@@ -127,9 +127,7 @@ export class AftWalletUi extends Updatable(
             data-bs-toggle='tooltip' data-bs-placement='top'
             title={`Balance of proof-of-work ${token} tokens`}
         >
-            <XPower token={token} style={{
-                margin: 'auto', borderRadius: '8px'
-            }} />
+            <XPower token={token} />
         </button>;
     }
     componentDidUpdate() {
