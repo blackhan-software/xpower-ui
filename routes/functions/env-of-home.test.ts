@@ -9,13 +9,26 @@ describe('env_of_home', () => {
         };
         expect(env_of_home(req as any)).toEqual({
             ...{
+                HEADER_ABOUT: '',
+                HEADER_HOME: '',
+                HEADER_NFTS: '',
+                HEADER_STAKING: '',
+            }, ...{
+                OTF_WALLET: 'd-none',
+                OTF_WALLET_TOGGLE: 'bi-wallet',
+            }, ...{
+                SELECT0R_HELA: '',
+                SELECT0R_LOKI: '',
+                SELECT0R_ODIN: '',
+                SELECT0R_THOR: 'active',
+            }, ...{
                 TOKEN: "THOR",
                 Token: "Thor",
+                token: "thor",
+            }, ...{
                 XP_POWERED: "--xp-yellow",
                 XP_POWERED_DARK: "--xp-yellow-dark",
-                token: "thor",
-            },
-            ...{
+            }, ...{
                 AMOUNT_1: "1",
                 AMOUNT_2: "2",
                 AMOUNT_3: "3",
@@ -80,11 +93,8 @@ describe('env_of_home', () => {
                 AMOUNT_62: "62",
                 AMOUNT_63: "63",
                 AMOUNT_64: "64",
-            },
-            ...{
-                ACTIVE_THOR: "active",
-                ACTIVE_LOKI: "",
-                ACTIVE_ODIN: "",
+            }, ...{
+                UI_MINING_SPEED: 50,
             }
         });
     });

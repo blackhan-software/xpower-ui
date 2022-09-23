@@ -8,11 +8,27 @@ describe('env_of', () => {
             protocol: 'http'
         };
         expect(env_of(req as any)).toEqual({
-            'TOKEN': 'THOR',
-            'token': 'thor',
-            'Token': 'Thor',
-            'XP_POWERED': '--xp-yellow',
-            'XP_POWERED_DARK': '--xp-yellow-dark',
+            ...{
+                HEADER_ABOUT: '',
+                HEADER_HOME: '',
+                HEADER_NFTS: '',
+                HEADER_STAKING: '',
+            }, ...{
+                OTF_WALLET: 'd-none',
+                OTF_WALLET_TOGGLE: 'bi-wallet',
+            }, ...{
+                SELECT0R_HELA: '',
+                SELECT0R_LOKI: '',
+                SELECT0R_ODIN: '',
+                SELECT0R_THOR: 'active',
+                TOKEN: 'THOR',
+            }, ...{
+                token: 'thor',
+                Token: 'Thor',
+            }, ...{
+                XP_POWERED: '--xp-yellow',
+                XP_POWERED_DARK: '--xp-yellow-dark',
+            }
         });
     });
 });
