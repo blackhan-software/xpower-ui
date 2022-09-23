@@ -23,13 +23,11 @@ export class UiNftExpander extends Referable(React.Component)<
     ) {
         return <React.Fragment>
             <div className='btn-group nft-sender-expander d-sm-none'
-                data-level={Nft.nameOf(nft_level)} role='group'
-                style={{ marginTop: '1em', width: '100%' }}
+                role='group' style={{ marginTop: '1em', width: '100%' }}
             >
                 <button type='button'
                     className='btn btn-outline-warning toggle-old no-ellipsis'
                     data-bs-placement='top' data-bs-toggle='tooltip'
-                    data-state={toggled ? 'on' : 'off'}
                     onClick={this.toggle.bind(this, toggled)}
                     title={this.title(toggled)}
                 >
@@ -71,11 +69,11 @@ export class UiNftExpander extends Referable(React.Component)<
     expand(
         nft_issue: NftIssue, nft_level: NftLevel
     ) {
-        const id = Nft.coreId({
+        const core_id = Nft.coreId({
             issue: nft_issue, level: nft_level
         });
-        const $row = this.global_ref<HTMLElement>(
-            `nft:${id}`
+        const $row = this.globalRef<HTMLElement>(
+            `:nft.row[core-id="${core_id}"]`
         );
         if ($row.current) {
             this.hideExpander($row.current);

@@ -1,6 +1,7 @@
 import { Referable } from '../../../source/functions';
 import { Address, Amount, Token } from '../../../source/redux/types';
 import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
+import { NftSenderStatus } from '../../../source/redux/types';
 
 import React from 'react';
 import { UiNftToggle } from './ui-toggle';
@@ -21,12 +22,7 @@ type Props = {
     status: NftSenderStatus | null;
     onTransfer?: (nft_issue: NftIssue, nft_level: NftLevel) => void;
     toggled: boolean;
-    onToggled?: (toggled: boolean, ctrl_key: boolean) => void;
-}
-export enum NftSenderStatus {
-    sending = 'sending',
-    sent = 'sent',
-    error = 'error'
+    onToggled?: (toggled: boolean) => void;
 }
 export class UiNftSender extends Referable(React.Component)<
     Props
@@ -41,10 +37,10 @@ export class UiNftSender extends Referable(React.Component)<
         const core_id = Nft.coreId({
             issue: nft_issue, level: nft_level
         });
-        return <div role='group'
-            ref={this.global_ref(`nft-sender:${core_id}`)}
+        return <div
             className='btn-group nft-sender d-none d-sm-flex'
-            data-level={Nft.nameOf(nft_level)}
+            ref={this.globalRef(`.nft-sender[core-id="${core_id}"]`)}
+            role='group'
         >
             <UiNftToggle
                 toggled={this.props.toggled}
@@ -60,7 +56,7 @@ export class UiNftSender extends Referable(React.Component)<
         const { status: status } = this.props;
         return <button type='button'
             className='btn btn-outline-warning sender'
-            data-state={status} disabled={this.disabled}
+            disabled={this.disabled}
             onClick={this.props.onTransfer?.bind(
                 this, nft_issue, nft_level
             )}

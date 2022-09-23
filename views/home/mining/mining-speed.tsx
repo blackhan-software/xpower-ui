@@ -9,7 +9,7 @@ type Props = {
     disabled: boolean; speed: number;
     onSpeed?: (by: number) => void;
 }
-export class MiningSpeed extends React.Component<
+export class UiMiningSpeed extends React.Component<
     Props
 > {
     render() {
@@ -139,4 +139,4 @@ export class MiningSpeed extends React.Component<
         App.event.emit('refresh-tips', { hide: true });
     }
 }
-export default MiningSpeed;
+export default UiMiningSpeed;

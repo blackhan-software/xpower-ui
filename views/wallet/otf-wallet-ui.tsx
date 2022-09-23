@@ -61,7 +61,7 @@ export class OtfWalletUi extends Referable(React.Component)<
         const { toggled } = this.props;
         const { address, amount, processing } = this.state;
         return <div id='otf-wallet'
-            ref={this.global_ref('otf-wallet')}
+            ref={this.globalRef('#otf-wallet')}
             className={this.display(toggled)}
         >
             <label className='form-label'>

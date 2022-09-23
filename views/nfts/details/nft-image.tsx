@@ -1,8 +1,6 @@
 import { App } from '../../../source/app';
 import { Blockchain } from '../../../source/blockchain';
-import { Referable } from '../../../source/functions';
-import { Token } from '../../../source/redux/types';
-import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
+import { Nft, NftIssue, NftLevel, Token } from '../../../source/redux/types';
 import { NftWallet, NftWalletMock } from '../../../source/wallet';
 import { NftImageMeta } from './nft-image-meta';
 
@@ -20,7 +18,7 @@ type Props = {
 } & {
     onLoaded?: () => void;
 }
-export class UiNftImage extends Referable(React.Component)<
+export class UiNftImage extends React.Component<
     Props
 > {
     render() {
@@ -44,7 +42,7 @@ export class UiNftImage extends Referable(React.Component)<
         const cursor = url_market ? 'pointer' : 'default';
         const display = url_content && toggled ? 'block' : 'none';
         const title = this.title(level, issue);
-        return <img ref={this.ref('img')}
+        return <img
             className='img-fluid nft-image'
             data-bs-placement='top'
             data-bs-toggle='tooltip'

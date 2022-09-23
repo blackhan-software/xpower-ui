@@ -4,10 +4,11 @@ import './amount';
 import { App } from '../../../source/app';
 import { Amount, Supply, Token } from '../../../source/redux/types';
 import { Nft, NftIssue, NftLevel, NftLevels } from '../../../source/redux/types';
+import { PptDetails } from '../../../source/redux/types';
 
 import React from 'react';
 import { UiPptAmount } from './amount';
-import { UiPptDetails, PptDetails } from '../details/details';
+import { UiPptDetails } from '../details/details';
 
 type Props = {
     list: PptList;
@@ -85,7 +86,7 @@ export class UiPptList extends React.Component<
         { amount, max, min, display, toggled }: PptList[NftLevel],
     ) {
         return <React.Fragment key={ppt_level}>
-            {this.$amount(token, ppt_level, by_level, by_token, {
+            {this.$amount(ppt_level, by_level, by_token, {
                 amount, max, min, display, toggled
             })}
             {this.$details(token, ppt_level, by_level, {
@@ -94,7 +95,7 @@ export class UiPptList extends React.Component<
         </React.Fragment>;
     }
     $amount(
-        token: Token, ppt_level: NftLevel,
+        ppt_level: NftLevel,
         by_level: { amount: Amount, supply: Supply },
         by_token: { amount: Amount, supply: Supply },
         { amount, max, min, display, toggled }: PptList[NftLevel],
@@ -109,7 +110,6 @@ export class UiPptList extends React.Component<
         };
         return <div role='group'
             className='btn-group ppt-minter'
-            data-level={Nft.nameOf(ppt_level)}
             style={style}
         >
             {this.$toggle(ppt_level, toggled)}
@@ -144,11 +144,9 @@ export class UiPptList extends React.Component<
         if (style.display === 'block') {
             return <div role='group'
                 className='nft-details'
-                data-level={Nft.nameOf(ppt_level)}
                 style={style}
             >
                 <UiPptDetails
-                    token={token}
                     level={ppt_level}
                     details={
                         this.props.details
@@ -171,6 +169,7 @@ export class UiPptList extends React.Component<
                     onPptClaim={
                         this.props.onPptClaim?.bind(this)
                     }
+                    token={token}
                 />
             </div>;
         }
@@ -187,9 +186,7 @@ export class UiPptList extends React.Component<
             <button type='button'
                 className='btn btn-outline-warning toggle no-ellipsis'
                 data-bs-placement='top' data-bs-toggle='tooltip'
-                onClick={
-                    () => this.toggle(ppt_level, toggled, false)
-                }
+                onClick={() => this.toggle(ppt_level, toggled)}
                 title={title}
             >
                 <i className={
@@ -199,10 +196,11 @@ export class UiPptList extends React.Component<
         </div>;
     }
     toggle(
-        ppt_level: NftLevel, toggled: boolean, ctrl_key: boolean
+        ppt_level: NftLevel, toggled: boolean
     ) {
-        const level = !ctrl_key ? ppt_level : undefined
-        App.event.emit('toggle-level', { level, flag: !toggled });
+        App.event.emit('toggle-level', {
+            level: ppt_level, flag: !toggled
+        });
     }
     $minter(
         ppt_level: NftLevel, amount: Amount

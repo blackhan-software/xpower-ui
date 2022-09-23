@@ -4,10 +4,11 @@ import './amount';
 import { App } from '../../../source/app';
 import { Amount, Supply, Token } from '../../../source/redux/types';
 import { Nft, NftIssue, NftLevel, NftLevels } from '../../../source/redux/types';
+import { NftDetails } from '../../../source/redux/types';
 
 import React from 'react';
 import { UiNftAmount } from './amount';
-import { UiNftDetails, NftDetails } from '../details/details';
+import { UiNftDetails } from '../details/details';
 
 type Props = {
     list: NftList;
@@ -66,7 +67,7 @@ export class UiNftList extends React.Component<
                 const by_level = App.getNftTotalBy({
                     level: nft_level
                 });
-                return this.$nftMinter(
+                return this.$nftMinterAndDetails(
                     token, nft_level,
                     by_token, by_level,
                     list[nft_level]
@@ -74,22 +75,22 @@ export class UiNftList extends React.Component<
             })}
         </React.Fragment>;
     }
-    $nftMinter(
+    $nftMinterAndDetails(
         token: Token, nft_level: NftLevel,
         by_token: { amount: Amount, supply: Supply },
         by_level: { amount: Amount, supply: Supply },
         { amount, max, min, display, toggled }: NftList[NftLevel],
     ) {
         return <React.Fragment key={nft_level}>
-            {this.$amount(token, nft_level, by_level, by_token, {
+            {this.$nftMinter(token, nft_level, by_level, by_token, {
                 amount, max, min, display, toggled
             })}
-            {this.$details(token, nft_level, by_level, {
+            {this.$nftDetails(token, nft_level, by_level, {
                 amount, max, min, display, toggled
             })}
         </React.Fragment>;
     }
-    $amount(
+    $nftMinter(
         token: Token, nft_level: NftLevel,
         by_level: { amount: Amount, supply: Supply },
         by_token: { amount: Amount, supply: Supply },
@@ -103,10 +104,8 @@ export class UiNftList extends React.Component<
             display: (display || any_filter.some((v) => v))
                 ? 'inline-flex' : 'none',
         };
-        return <div role='group'
-            className='btn-group nft-minter'
-            data-level={Nft.nameOf(nft_level)}
-            style={style}
+        return <div className='btn-group nft-minter'
+            role='group' style={style}
         >
             {this.$toggle(nft_level, toggled)}
             {this.$minter(nft_level, token)}
@@ -124,7 +123,7 @@ export class UiNftList extends React.Component<
                 }} />
         </div>;
     }
-    $details(
+    $nftDetails(
         token: Token, nft_level: NftLevel,
         by_level: { amount: Amount, supply: Supply },
         { amount, max, min, display, toggled }: NftList[NftLevel],
@@ -138,13 +137,8 @@ export class UiNftList extends React.Component<
                 ? 'block' : 'none'
         };
         if (style.display === 'block') {
-            return <div role='group'
-                className='nft-details'
-                data-level={Nft.nameOf(nft_level)}
-                style={style}
-            >
+            return <div className='nft-details' role='group' style={style}>
                 <UiNftDetails
-                    token={token}
                     level={nft_level}
                     details={
                         this.props.details
@@ -164,6 +158,7 @@ export class UiNftList extends React.Component<
                     onNftTransfer={
                         this.props.onNftTransfer?.bind(this)
                     }
+                    token={token}
                 />
             </div>;
         }
@@ -180,9 +175,7 @@ export class UiNftList extends React.Component<
             <button type='button'
                 className='btn btn-outline-warning toggle no-ellipsis'
                 data-bs-placement='top' data-bs-toggle='tooltip'
-                onClick={
-                    () => this.toggle(nft_level, toggled, false)
-                }
+                onClick={() => this.toggle(nft_level, toggled)}
                 title={title}
             >
                 <i className={
@@ -192,10 +185,11 @@ export class UiNftList extends React.Component<
         </div>;
     }
     toggle(
-        nft_level: NftLevel, toggled: boolean, ctrl_key: boolean
+        nft_level: NftLevel, toggled: boolean
     ) {
-        const level = !ctrl_key ? nft_level : undefined
-        App.event.emit('toggle-level', { level, flag: !toggled });
+        App.event.emit('toggle-level', {
+            level: nft_level, flag: !toggled
+        });
     }
     $minter(
         nft_level: NftLevel, token: Token

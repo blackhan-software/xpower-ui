@@ -1,45 +1,28 @@
 import { App } from '../../../source/app';
-import { Amount, Token } from '../../../source/redux/types';
-import { NftLevel, NftLevels } from '../../../source/redux/types';
+import { Token } from '../../../source/redux/types';
+import { PptMinterList } from '../../../source/redux/types';
+import { PptMinterApproval } from '../../../source/redux/types';
+import { PptMinterStatus, PptBurnerStatus } from '../../../source/redux/types';
 
-import { UiPptBatchMinter, PptMinterStatus } from './ppt-batch-minter';
-export { UiPptBatchMinter, PptMinterStatus };
-import { UiPptBatchBurner, PptBurnerStatus } from './ppt-batch-burner';
-export { UiPptBatchBurner, PptBurnerStatus };
+import { UiPptBatchMinter } from './ppt-batch-minter';
+export { UiPptBatchMinter };
+import { UiPptBatchBurner } from './ppt-batch-burner';
+export { UiPptBatchBurner };
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 
 type Props = {
+    list: PptMinterList;
     approval: PptMinterApproval | null;
     onApproval?: (token: Token) => void;
     burner_status: PptBurnerStatus | null;
     onBatchBurn?: (token: Token, list: PptMinterList) => void;
     minter_status: PptMinterStatus | null;
     onBatchMint?: (token: Token, list: PptMinterList) => void;
-    list: PptMinterList;
-    onList?: (list: Partial<PptMinterList>) => void;
     toggled: boolean;
-    onToggled?: (toggled: boolean, ctrlKey: boolean) => void;
+    onToggled?: (toggled: boolean) => void;
     token: Token;
-}
-export type PptMinterList = Record<NftLevel, {
-    amount: Amount; max: Amount; min: Amount;
-    display: boolean; toggled: boolean;
-}>
-export type PptMinter = {
-    approval: PptMinterApproval | null;
-    minter_status: PptMinterStatus | null;
-    burner_status: PptBurnerStatus | null;
-}
-export function ppt_minter() {
-    return { approval: null, minter_status: null, burner_status: null };
-}
-export enum PptMinterApproval {
-    unapproved = 'unapproved',
-    approving = 'approving',
-    approved = 'approved',
-    error = 'error'
 }
 function approved(
     approval: PptMinterApproval | null
@@ -85,7 +68,7 @@ export class UiPptMinter extends React.Component<
         return <button type='button' id='toggle-all'
             className='btn btn-outline-warning no-ellipsis'
             data-bs-placement='top' data-bs-toggle='tooltip'
-            onClick={() => this.toggleAll(toggled, true)}
+            onClick={() => this.toggleAll(toggled)}
             title={this.title(toggled)}
         >
             <i className={toggled
@@ -102,20 +85,10 @@ export class UiPptMinter extends React.Component<
             : 'Hide all NFT levels';
     }
     toggleAll(
-        toggled: boolean, ctrlKey: boolean
+        toggled: boolean
     ) {
-        const nft_levels = Array.from(NftLevels());
-        const entries = nft_levels.map((nft_level): [
-            NftLevel, Partial<PptMinterList[NftLevel]>
-        ] => ([
-            nft_level, { display: !toggled }
-        ]));
-        const { onList } = this.props;
-        if (onList) onList(
-            Object.fromEntries(entries)
-        );
         const { onToggled } = this.props;
-        if (onToggled) onToggled(!toggled, ctrlKey);
+        if (onToggled) onToggled(!toggled);
     }
     $burnApproval(
         token: Token,

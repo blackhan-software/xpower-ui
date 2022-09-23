@@ -1,6 +1,7 @@
 import { Referable } from '../../../source/functions';
 import { Amount, Token } from '../../../source/redux/types';
 import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
+import { PptClaimerStatus } from '../../../source/redux/types';
 
 import React from 'react';
 import { UiPptToggle } from './ui-toggle';
@@ -18,12 +19,7 @@ type Props = {
         level: NftLevel
     ) => void;
     toggled: boolean;
-    onToggled?: (toggled: boolean, ctrl_key: boolean) => void;
-}
-export enum PptClaimerStatus {
-    claiming = 'claiming',
-    claimed = 'claimed',
-    error = 'error'
+    onToggled?: (toggled: boolean) => void;
 }
 export class UiPptClaimer extends Referable(React.Component)<
     Props
@@ -39,9 +35,8 @@ export class UiPptClaimer extends Referable(React.Component)<
             issue: ppt_issue, level: ppt_level
         });
         return <div role='group'
-            ref={this.global_ref(`ppt-claimer:${core_id}`)}
+            ref={this.globalRef(`.ppt-claimer[core-id="${core_id}"]`)}
             className='btn-group nft-claimer d-none d-sm-flex'
-            data-id={core_id} data-level={Nft.nameOf(ppt_level)}
         >
             <UiPptToggle
                 toggled={this.props.toggled}
@@ -57,7 +52,7 @@ export class UiPptClaimer extends Referable(React.Component)<
         const { status } = this.props;
         return <button type='button'
             className='btn btn-outline-warning claimer'
-            data-state={status} disabled={this.disabled}
+            disabled={this.disabled}
             onClick={this.props.onClaim?.bind(
                 this, ppt_issue, ppt_level
             )}

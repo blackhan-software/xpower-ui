@@ -5,8 +5,7 @@ import { Referable } from '../../../source/functions';
 import { Amount, Nft, NftLevel } from '../../../source/redux/types';
 
 import React, { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
-import { DashCircle } from '../../../public/images/tsx';
-import { PlusCircle } from '../../../public/images/tsx';
+import { DashCircle, PlusCircle } from '../../../public/images/tsx';
 
 type Props = {
     amount: Amount, level: NftLevel,
@@ -108,10 +107,9 @@ export class UiPptAmount extends Referable(React.Component)<
     $amount(
         amount: Amount, nft_level: NftLevel
     ) {
-        return <button type='button' ref={this.ref('amount')}
+        return <button type='button' ref={this.ref('.amount')}
             className='btn btn-outline-warning amount'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            data-max={amount.toString()} data-min={0n.toString()}
             onClick={this.extremify.bind(this, amount, nft_level)}
             title={this.title(amount, nft_level)}
         >{amount.toString()}</button>;
@@ -223,7 +221,7 @@ export class UiPptAmount extends Referable(React.Component)<
         }
     }
     componentDidMount() {
-        const $amount = this.ref<HTMLElement>('amount');
+        const $amount = this.ref<HTMLElement>('.amount');
         $amount.current?.addEventListener(
             'wheel', this.decreaseByWheel.bind(this), {
                 passive: false

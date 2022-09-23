@@ -1,15 +1,13 @@
 import './connector.scss';
 
 import { App } from '../../source/app';
-import { Blockchain } from '../../source/blockchain';
-import { ChainId } from '../../source/blockchain';
-import { mobile, Referable } from '../../source/functions';
-import { buffered } from '../../source/functions';
+import { Blockchain, ChainId } from '../../source/blockchain';
+import { buffered, mobile, Referable } from '../../source/functions';
 
 import React, { createElement } from 'react';
+import { createRoot } from 'react-dom/client';
 import { Unsubscribe } from 'redux';
 import { InfoCircle } from '../../public/images/tsx';
-import { createRoot } from 'react-dom/client';
 
 type Props = Record<string, never>;
 type State = {
@@ -90,7 +88,7 @@ export class Connector extends Referable(
             }
         };
         return <button
-            ref={this.ref('connect-metamask')}
+            ref={this.ref('#connect-metamask')}
             className='btn btn-outline-warning'
             disabled={this.connecting}
             id='connect-metamask'
@@ -141,7 +139,7 @@ export class Connector extends Referable(
     }
     componentDidUpdate = buffered(() => {
         const $ref = this.ref<HTMLElement>(
-            'connect-metamask'
+            '#connect-metamask'
         );
         if (this.state.chain !== Chain.CONNECTED) {
             $ref.current?.focus();

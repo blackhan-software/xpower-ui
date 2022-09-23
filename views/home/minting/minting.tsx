@@ -1,7 +1,6 @@
-import { global_ref, range } from '../../../source/functions';
-import { Level, Token } from '../../../source/redux/types';
+import { globalRef, nice } from '../../../source/functions';
+import { Level, MinterRow, MinterStatus, Token } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
-import { nice } from '../../../source/functions';
 
 import React, { useEffect, useState } from 'react';
 
@@ -9,55 +8,6 @@ type Props = {
     level: Level; rows: MinterRow[]; token: Token;
     onMint?: (token: Token, level: Level) => void;
     onForget?: (token: Token, level: Level) => void;
-}
-export type MinterRow = {
-    status: MinterStatus | null;
-    disabled: boolean;
-    display: boolean;
-    nn_counter: number;
-    tx_counter: number;
-};
-export enum MinterStatus {
-    minting = 'minting',
-    minted = 'minted',
-    error = 'error'
-}
-export class Minting {
-    static get levels() {
-        return Array.from(range(1, 65)) as Level[];
-    }
-    static rows(min_level: Level) {
-        return this.levels.map((level) => this.empty({
-            display: level === min_level
-        }));
-    }
-    static empty(
-        row: Partial<MinterRow> = {}
-    ) {
-        return {
-            status: null,
-            disabled: true,
-            display: false,
-            nn_counter: 0,
-            tx_counter: 0,
-            ...row
-        };
-    }
-    static getRow(
-        rows: MinterRow[], index: number
-    ) {
-        if (index >= rows.length) {
-            throw new Error('index out-of-range');
-        }
-        return rows[index];
-    }
-    static setRow(
-        rows: MinterRow[], index: number, new_row: Partial<MinterRow>
-    ) {
-        return rows.map((row, i) =>
-            (index !== i) ? { ...row } : { ...row, ...new_row }
-        );
-    }
 }
 export function UiMinting(
     { token, rows, onMint, onForget }: Props
@@ -72,10 +22,10 @@ export function UiMinting(
             ([level, focused]) => focused // eslint-disable-line
         );
         if (any_focused.length) {
-            const $button = document.querySelector<HTMLElement>(
-                `.minter[data-level="${any_focused[0][0]}"]`
+            const $button = globalRef<HTMLElement>(
+                `.minter[level="${any_focused[0][0]}"]`
             );
-            $button?.focus();
+            $button.current?.focus();
         }
     }, [
         focus, status
@@ -99,8 +49,10 @@ function $mint(
 ) {
     const { display, tx_counter, nn_counter } = row;
     if (display || tx_counter > 0 || nn_counter > 0) {
-        return <div ref={global_ref(`.mint[level=${level}]`)}
-            className='btn-group mint' key={level - 1} role='group'
+        return <div
+            className='btn-group mint' key={level - 1}
+            ref={globalRef(`.mint[level=${level}]`)}
+            role='group'
             style={{ display: row.display ? 'block' : 'none' }}
         >
             {$minter({ token, level, row, onMint }, onFocus)}
@@ -125,12 +77,14 @@ function $minter(
     const text = minting
         ? <span className="text">Minting {amount} {$token}…</span>
         : <span className="text">Mint {amount} {$token}</span>;
-    return <button className='btn btn-outline-warning minter'
+    return <button
+        className='btn btn-outline-warning minter'
+        disabled={row.disabled || minting}
         onClick={() => { if (onMint) onMint(token, level); }}
-        type='button' disabled={row.disabled || minting}
-        onFocus={() => onFocus(level, true)}
         onBlur={() => onFocus(level, false)}
-        data-level={level}
+        onFocus={() => onFocus(level, true)}
+        ref={globalRef(`.minter[level="${level}"]`)}
+        type='button'
     >
         {Spinner({ show: minting, grow: true })}{text}
     </button>;

@@ -5,7 +5,7 @@ div#ppt-single-minting
   - let index = 0
   while index < 6
     div.btn-group.ppt-minter(
-      role="group" data-level=`${levels[index]}`
+      role="group"
     )
       div.btn-group(role="group")
         button.btn.btn-outline-warning.toggle.no-ellipsis(
@@ -41,7 +41,7 @@ div#ppt-single-minting
         )
           include ../../../public/images/pug/plus-circle-fill.svg.pug
     div.nft-details(
-      role="group" data-level=`${levels[index]}`
+      role="group"
     )
       include ../details/details.pug
     - index++

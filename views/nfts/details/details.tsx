@@ -1,7 +1,8 @@
 import { App } from '../../../source/app';
 import { Referable } from '../../../source/functions';
-import { Address, Amount, Supply, Token } from '../../../source/redux/types';
-import { Nft, NftIssue, NftLevel, NftLevels } from '../../../source/redux/types';
+import { Amount, Supply, Token } from '../../../source/redux/types';
+import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
+import { NftDetails } from '../../../source/redux/types';
 import { Years } from '../../../source/years';
 
 import React from 'react';
@@ -10,8 +11,6 @@ export { UiNftImage, nft_meta, nft_href };
 import { UiNftTarget } from './nft-target';
 import { UiNftAmount } from './nft-amount';
 import { UiNftSender } from './nft-sender';
-import { NftSenderStatus } from './nft-sender';
-export { NftSenderStatus };
 import { UiNftExpander } from './nft-expander';
 import { InfoCircle } from '../../../public/images/tsx';
 
@@ -45,56 +44,6 @@ type Props = {
         level: NftLevel
     ) => void;
 }
-export type NftDetails = Record<NftLevel, Record<NftIssue, {
-    image: {
-        url_content: string | null;
-        url_market: string | null;
-        loading: boolean;
-    };
-    target: {
-        valid: boolean | null;
-        value: Address | null;
-    };
-    amount: {
-        valid: boolean | null;
-        value: Amount | null;
-    };
-    sender: {
-        status: NftSenderStatus | null;
-    };
-    fixed: boolean;
-    toggled: boolean;
-}>>
-export function nft_details(
-    image = {
-        loading: true, url_market: null, url_content: null
-    },
-    target = {
-        valid: null, value: null
-    },
-    amount = {
-        valid: null, value: null
-    },
-    sender = {
-        status: null
-    }
-) {
-    const issues = Array.from(Years()).reverse();
-    const levels = Array.from(NftLevels());
-    const details = Object.fromEntries(
-        levels.map((level) => [level, Object.fromEntries(
-            issues.map((issue) => [issue, {
-                amount,
-                fixed: issues[0] - issue ? false : true,
-                image,
-                sender,
-                target,
-                toggled: false,
-            }])
-        )])
-    );
-    return details as NftDetails;
-}
 export class UiNftDetails extends Referable(React.Component)<
     Props
 > {
@@ -123,7 +72,7 @@ export class UiNftDetails extends Referable(React.Component)<
             level: nft_level,
             token: nft_token
         });
-        const nfts = App.getNfts({
+        const nfts = App.getNftsBy({
             issue: nft_issue,
             level: nft_level,
             token: nft_token
@@ -133,9 +82,7 @@ export class UiNftDetails extends Referable(React.Component)<
         };
         return <React.Fragment key={core_id}>
             <div className='row year'
-                data-year={nft_issue}
-                data-state={fixed || toggled ? 'on' : 'off'}
-                ref={this.global_ref(`nft:${core_id}`)}
+                ref={this.globalRef(`:nft.row[core-id="${core_id}"]`)}
                 style={{
                     display: fixed || toggled ? 'flex' : 'none'
                 }}
@@ -326,9 +273,8 @@ export class UiNftDetails extends Referable(React.Component)<
             onTransfer={
                 this.props.onNftTransfer?.bind(this)
             }
-            onToggled={(flag, ctrl_key) => {
-                const level = !ctrl_key ? nft_level : undefined;
-                App.event.emit('toggle-issue', { level, flag });
+            onToggled={(flag) => {
+                App.event.emit('toggle-issue', { flag });
             }}
             toggled={toggled}
             token={token}

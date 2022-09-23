@@ -1,12 +1,15 @@
 import './home.scss';
+
 import { App } from '../../source/app';
 import { Level, Token } from '../../source/redux/types';
+import { MinerStatus } from '../../source/redux/types';
+import { MinterRow } from '../../source/redux/types';
 
 import React, { useEffect } from 'react';
-import { UiMining, MinerStatus } from './mining/mining';
-export { UiMining, MinerStatus };
-import { UiMinting, Minting, MinterRow, MinterStatus } from './minting/minting';
-export { UiMinting, Minting, MinterRow, MinterStatus };
+import { UiMining } from './mining/mining';
+export { UiMining };
+import { UiMinting } from './minting/minting';
+export { UiMinting };
 
 type Props = {
     mining: {

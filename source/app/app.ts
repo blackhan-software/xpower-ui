@@ -1,64 +1,18 @@
-import { combineReducers, Unsubscribe } from 'redux';
 import { configureStore } from '@reduxjs/toolkit';
-import { Store } from 'redux';
-
-import { NftFullId, NftIssue, NftLevel, NftToken, Pager } from '../redux/types';
-import { Address, Amount, Nonce, Supply, Token } from '../redux/types';
-import { BlockHash, Page, State } from '../redux/types';
-
+import { combineReducers, DeepPartial, Store, Unsubscribe } from 'redux';
+import { delayed } from '../functions';
+import { Parser } from '../parser';
+import { Action, addNft, addNonce, addPpt, addToken, refresh, removeNft, removeNonce, removeNonceByAmount, removeNonces, removePpt, removeToken, setMining, setMinting, setNft, setNftsUi, setPpt, setPptsUi, setToken, switchPage, switchToken } from '../redux/actions';
 import { middleware } from '../redux/middleware';
-import { Action } from '../redux/actions'
-
-import { onPageSwitch, OnPageSwitch } from '../redux/observers';
-import { onTokenSwitch, OnTokenSwitch } from '../redux/observers';
-import { onNftAdded, OnNftAdded } from '../redux/observers';
-import { onPptAdded, OnPptAdded } from '../redux/observers';
-import { onNftRemoved, OnNftRemoved } from '../redux/observers';
-import { onPptRemoved, OnPptRemoved } from '../redux/observers';
-import { onNonceAdded, OnNonceAdded } from '../redux/observers';
-import { onNonceRemoved, OnNonceRemoved } from '../redux/observers';
-import { onTokenAdded, OnTokenAdded } from '../redux/observers';
-import { onTokenRemoved, OnTokenRemoved } from '../redux/observers';
-
-import { switchPage } from '../redux/actions';
-import { pageReducer } from '../redux/reducers';
-import { switchToken } from '../redux/actions';
-import { tokenReducer } from '../redux/reducers';
-
-import { addNonce } from '../redux/actions';
-import { removeNonce } from '../redux/actions';
-import { removeNonces } from '../redux/actions';
-import { removeNonceByAmount } from '../redux/actions';
-import { noncesReducer } from '../redux/reducers';
-import { noncesBy } from '../redux/selectors';
-import { nonceBy } from '../redux/selectors';
-
-import { setNft, setPpt } from '../redux/actions';
-import { addNft, addPpt } from '../redux/actions';
-import { removeNft, removePpt } from '../redux/actions';
-import { nftsReducer, pptsReducer } from '../redux/reducers';
-import { nftTotalBy, pptTotalBy } from '../redux/selectors';
-import { nftsBy, pptsBy } from '../redux/selectors';
-
-import { setToken } from '../redux/actions';
-import { addToken } from '../redux/actions';
-import { removeToken } from '../redux/actions';
-import { tokensReducer } from '../redux/reducers';
-import { tokensBy } from '../redux/selectors';
-
-import { refresh } from '../redux/actions';
-import { refreshed } from '../redux/selectors';
-import { refreshReducer } from '../redux/reducers';
-
+import { onNftAdded, OnNftAdded, onNftRemoved, OnNftRemoved, onNonceAdded, OnNonceAdded, onNonceRemoved, OnNonceRemoved, onPageSwitch, OnPageSwitch, onPptAdded, OnPptAdded, onPptRemoved, OnPptRemoved, onTokenAdded, OnTokenAdded, onTokenRemoved, OnTokenRemoved, onTokenSwitch, OnTokenSwitch } from '../redux/observers';
+import { miningReducer, mintingReducer, nftsReducer, nftsUiReducer, noncesReducer, pageReducer, pptsReducer, pptsUiReducer, refreshReducer, tokenReducer, tokensReducer } from '../redux/reducers';
+import { nftsBy, nftTotalBy, nonceBy, noncesBy, pptsBy, pptTotalBy, refreshed, tokensBy } from '../redux/selectors';
+import { Address, Amount, BlockHash, Mining, Minting, NftFullId, NftIssue, NftLevel, NftsUi, NftToken, Nonce, Page, Pager, PptsUi, State, Supply, Token } from '../redux/types';
 import { StateDb } from '../state-db';
 import { Tokenizer } from '../token';
-import { Parser } from '../parser';
 
-import { Version } from '../types';
-import { Global } from '../types';
-import { delayed } from '../functions';
+import { Global, Version } from '../types';
 declare const global: Global;
-
 import mitt from 'mitt';
 
 export class App {
@@ -73,10 +27,14 @@ export class App {
     }
     private constructor() {
         const reducer = combineReducers({
+            mining: miningReducer,
+            minting: mintingReducer,
             nfts: nftsReducer,
+            nfts_ui: nftsUiReducer,
             nonces: noncesReducer,
             page: pageReducer,
             ppts: pptsReducer,
+            ppts_ui: pptsUiReducer,
             refresh: refreshReducer,
             token: tokenReducer,
             tokens: tokensReducer,
@@ -123,14 +81,42 @@ export class App {
         this.me.store.dispatch(switchToken(token));
     }
     public static onTokenSwitch(
-        callback: OnTokenSwitch
+        callback: OnTokenSwitch, ms = 0
     ) {
-        return onTokenSwitch(this.me.store, callback);
+        return onTokenSwitch(this.me.store, delayed(callback, ms));
     }
     public static onTokenSwitched(
         callback: OnTokenSwitch, ms = 900
     ) {
         return onTokenSwitch(this.me.store, delayed(callback, ms));
+    }
+    public static getMining(): State['mining'] {
+        const { mining } = this.me.store.getState();
+        return mining;
+    }
+    public static setMining(mining: Partial<Mining>) {
+        this.me.store.dispatch(setMining(mining));
+    }
+    public static getMinting(): State['minting'] {
+        const { minting } = this.me.store.getState();
+        return minting;
+    }
+    public static setMinting(minting: Partial<Minting>) {
+        this.me.store.dispatch(setMinting(minting));
+    }
+    public static getNftsUi(): State['nfts_ui'] {
+        const { nfts_ui } = this.me.store.getState();
+        return nfts_ui;
+    }
+    public static setNftsUi(nfts_ui: DeepPartial<NftsUi>) {
+        this.me.store.dispatch(setNftsUi(nfts_ui));
+    }
+    public static getPptsUi(): State['ppts_ui'] {
+        const { ppts_ui } = this.me.store.getState();
+        return ppts_ui;
+    }
+    public static setPptsUi(ppts_ui: DeepPartial<PptsUi>) {
+        this.me.store.dispatch(setPptsUi(ppts_ui));
     }
     public static addNonce(
         nonce: Nonce, item: {
@@ -336,7 +322,7 @@ export class App {
         const un_rem = this.onPptRemoved(callback);
         return () => { un_add(); un_rem(); };
     }
-    public static getNfts(nft: NftFullId | {
+    public static getNftsBy(nft: NftFullId | {
         issue?: NftIssue,
         level?: NftLevel,
         token?: NftToken,
@@ -354,7 +340,7 @@ export class App {
         const { nfts } = this.me.store.getState();
         return nftTotalBy(nfts, nft);
     }
-    public static getPpts(ppt: NftFullId | {
+    public static getPptsBy(ppt: NftFullId | {
         issue?: NftIssue,
         level?: NftLevel,
         token?: NftToken,
@@ -498,6 +484,9 @@ export class App {
             return new URLSearchParams(location.search.substring(1));
         }
         return new URLSearchParams();
+    }
+    public static get store() {
+        return this.me.store;
     }
     private get store(): Store<State, Action> {
         return this._store;

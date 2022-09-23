@@ -1,3 +1,5 @@
+export * from './mining-speedable';
+export * from './mining-togglable';
 export * from './nft-total-by';
 export * from './nfts-by';
 export * from './ppt-total-by';

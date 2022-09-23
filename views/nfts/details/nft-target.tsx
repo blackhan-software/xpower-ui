@@ -43,7 +43,7 @@ export class UiNftTarget extends Referable(
                 Send To
             </label>
             <div className='input-group nft-transfer-to d-none d-sm-flex'
-                data-level={Nft.nameOf(nft_level)} role='group'
+                role='group'
             >
                 <input type='text'
                     className={classes.join(' ')}

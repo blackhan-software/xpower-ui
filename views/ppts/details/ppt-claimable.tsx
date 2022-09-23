@@ -1,31 +1,28 @@
 import { nice } from '../../../source/functions';
-import { Amount, Token } from '../../../source/redux/types';
-import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
+import { Amount, NftIssue, Token } from '../../../source/redux/types';
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 
 type Props = {
     issue: NftIssue;
-    level: NftLevel;
     token: Token;
     value: Amount | null;
 }
 export function UiPptClaimable(
-    { issue, level, token, value }: Props
+    { issue, token, value }: Props
 ) {
-    return $amount(issue, level, token, value);
+    return $amount(issue, token, value);
 }
 function $amount(
-    nft_issue: NftIssue, nft_level: NftLevel,
-    token: Token, value: Amount | null
+    nft_issue: NftIssue, token: Token, value: Amount | null
 ) {
     return <React.Fragment>
         <label className='form-label nft-claimable-label d-none d-sm-flex'>
             Claimable Amount
         </label>
         <div className='input-group nft-claimable d-none d-sm-flex'
-            data-level={Nft.nameOf(nft_level)} role='group'
+            role='group'
         >
             <input type='text'
                 className='form-control'

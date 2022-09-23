@@ -1,3 +1,5 @@
+import { MinerStatus } from '../../../source/redux/types';
+
 import React, { useEffect, useState } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 
@@ -6,19 +8,7 @@ type Props = {
     onToggle?: () => void;
     disabled: boolean;
 }
-export enum MinerStatus {
-    initializing,
-    initialized,
-    starting,
-    started,
-    stopping,
-    stopped,
-    pausing,
-    paused,
-    resuming,
-    resumed
-}
-export function MiningToggle(
+export function UiMiningToggle(
     { status, disabled, onToggle }: Props
 ) {
     return <div
@@ -147,4 +137,4 @@ function Spinner(
         style={{ visibility: visible(status) }}
     />;
 }
-export default MiningToggle;
+export default UiMiningToggle;

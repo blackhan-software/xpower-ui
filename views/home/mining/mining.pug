@@ -23,11 +23,11 @@ div#mining
         include ../../../public/images/pug/dash-circle-fill.svg.pug
     div.btn-group.progressor(
       role="group" data-bs-toggle="tooltip" data-bs-placement="top"
-      title=`Mining speed: ${UI_MINING_SPEED}%`
+      title="Mining speed: {{UI_MINING_SPEED}}%"
     )
       div.progress: div#speed.progress-bar.with-indicator(
         role="progressbar" aria-label="mining speed controller"
-        style=`width: ${UI_MINING_SPEED}%`
+        style="width: {{UI_MINING_SPEED}}%"
       )
     div.btn-group.increaser(role="group")
       button.btn.btn-outline-warning#increase(

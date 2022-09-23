@@ -1,13 +1,12 @@
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { x40 } from '../../source/functions';
-import { Nft, NftFullId } from '../../source/redux/types';
-import { NftLevels } from '../../source/redux/types';
-import { NftWallet } from '../../source/wallet';
-import { OnTransferBatch } from '../../source/wallet';
-import { OnTransferSingle } from '../../source/wallet';
+import { Nft, NftFullId, NftLevels } from '../../source/redux/types';
+import { NftWallet, OnTransferBatch, OnTransferSingle } from '../../source/wallet';
 import { Years } from '../../source/years';
-
+/**
+ * nfts:
+ */
 Blockchain.onceConnect(async function initNfts({
     address, token
 }) {
@@ -38,7 +37,7 @@ Blockchain.onceConnect(async function initNfts({
 Blockchain.onConnect(function syncNfts({
     token
 }) {
-    const nfts = App.getNfts({
+    const nfts = App.getNftsBy({
         token: Nft.token(token)
     });
     for (const [id, nft] of Object.entries(nfts.items)) {

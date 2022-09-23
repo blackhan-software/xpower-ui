@@ -1,7 +1,8 @@
 import { Token } from '../../../source/redux/types';
+import { PptMinterList } from '../../../source/redux/types';
+import { PptBurnerStatus } from '../../../source/redux/types';
 
 import React from 'react';
-import { PptMinterList } from './index';
 import { Spinner } from './index';
 
 type Props = {
@@ -10,11 +11,6 @@ type Props = {
     onBatchBurn?: (token: Token, list: PptMinterList) => void;
     status: PptBurnerStatus | null;
     token: Token;
-}
-export enum PptBurnerStatus {
-    burning = 'burning',
-    burned = 'burned',
-    error = 'error'
 }
 function burning(
     status: PptBurnerStatus | null

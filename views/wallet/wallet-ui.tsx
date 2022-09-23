@@ -38,7 +38,7 @@ export class WalletUi extends Referable(React.Component)<
                 toggled={toggled} token={token}
             ></AftWalletUi>
             <CSSTransition
-                nodeRef={this.global_ref<HTMLElement>('otf-wallet')}
+                nodeRef={this.globalRef<HTMLElement>('#otf-wallet')}
                 in={toggled} timeout={600} classNames='fade-in-600'
             >
                 <OtfWalletUi toggled={toggled}></OtfWalletUi>

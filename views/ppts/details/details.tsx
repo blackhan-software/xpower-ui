@@ -2,10 +2,11 @@ import { App } from '../../../source/app';
 import { Blockchain } from '../../../source/blockchain';
 import { MoeTreasuryFactory } from '../../../source/contract';
 import { Referable, Updatable, x40 } from '../../../source/functions';
-import { Address, Amount, Supply, Token } from '../../../source/redux/types';
+import { Amount, Supply, Token } from '../../../source/redux/types';
 import { NftToken, NftTokens } from '../../../source/redux/types';
 import { NftLevel, NftLevels } from '../../../source/redux/types';
 import { Nft, NftFullId, NftIssue } from '../../../source/redux/types';
+import { PptDetails } from '../../../source/redux/types';
 import { Years } from '../../../source/years';
 
 import React from 'react';
@@ -14,8 +15,6 @@ export { UiPptImage, ppt_meta, ppt_href };
 import { UiPptClaimable } from './ppt-claimable';
 import { UiPptClaimed } from './ppt-claimed';
 import { UiPptClaimer } from './ppt-claimer';
-import { PptClaimerStatus } from './ppt-claimer';
-export { PptClaimerStatus };
 import { UiPptExpander } from './ppt-expander';
 import { InfoCircle } from '../../../public/images/tsx';
 import { Unsubscribe } from 'redux';
@@ -53,56 +52,6 @@ type Props = {
         issue: NftIssue,
         level: NftLevel
     ) => void;
-}
-export type PptDetails = Record<NftLevel, Record<NftIssue, {
-    image: {
-        url_content: string | null;
-        url_market: string | null;
-        loading: boolean;
-    };
-    target: {
-        valid: boolean | null;
-        value: Address | null;
-    };
-    amount: {
-        valid: boolean | null;
-        value: Amount | null;
-    };
-    claimer: {
-        status: PptClaimerStatus | null;
-    };
-    fixed: boolean;
-    toggled: boolean;
-}>>
-export function ppt_details(
-    image = {
-        loading: true, url_market: null, url_content: null
-    },
-    target = {
-        valid: null, value: null
-    },
-    amount = {
-        valid: null, value: null
-    },
-    claimer = {
-        status: null
-    }
-) {
-    const issues = Array.from(Years()).reverse();
-    const levels = Array.from(NftLevels());
-    const state = Object.fromEntries(
-        levels.map((level) => [level, Object.fromEntries(
-            issues.map((issue) => [issue, {
-                amount,
-                fixed: issues[0] - issue ? false : true,
-                image,
-                claimer,
-                target,
-                toggled: false,
-            }])
-        )])
-    );
-    return state as PptDetails;
 }
 type State = Record<NftLevel, Record<NftIssue, {
     claimable: Record<NftToken, Amount>;
@@ -163,8 +112,8 @@ export class UiPptDetails extends Referable(Updatable(
             const core_id = Nft.coreId({
                 level: this.props.level, issue
             });
-            const ref = this.global_ref<HTMLElement>(
-                `ppt:${core_id}`
+            const ref = this.globalRef<HTMLElement>(
+                `:ppt.row[core-id="${core_id}"]`
             );
             ref.current?.addEventListener('refresh-claims', () => {
                 const { token, level } = this.props;
@@ -244,7 +193,7 @@ export class UiPptDetails extends Referable(Updatable(
             level: ppt_level,
             token: ppt_token
         });
-        const ppts = App.getPpts({
+        const ppts = App.getPptsBy({
             issue: ppt_issue,
             level: ppt_level,
             token: ppt_token
@@ -254,12 +203,8 @@ export class UiPptDetails extends Referable(Updatable(
         };
         return <React.Fragment key={core_id}>
             <div className='row year'
-                data-year={ppt_issue}
-                data-state={fixed || toggled ? 'on' : 'off'}
-                ref={this.global_ref(`ppt:${core_id}`)}
-                style={{
-                    display: fixed || toggled ? 'flex' : 'none'
-                }}
+                ref={this.globalRef(`:ppt.row[core-id="${core_id}"]`)}
+                style={{ display: fixed || toggled ? 'flex' : 'none' }}
             >
                 <div className='col-sm nft-details-lhs'>
                     {this.$image(ppt_issue, ppt_level)}
@@ -269,8 +214,8 @@ export class UiPptDetails extends Referable(Updatable(
                     {this.$balance(ppt_issue, ppt_level, ppt)}
                     {this.$supply(ppt_issue, ppt_level, ppt)}
                     {this.$expander(ppt_issue, ppt_level)}
-                    {this.$claimed(ppt_issue, ppt_level)}
-                    {this.$claimable(ppt_issue, ppt_level)}
+                    {this.$claimed(ppt_issue, ppt_level, ppt_token)}
+                    {this.$claimable(ppt_issue, ppt_level, ppt_token)}
                     {this.$claimer(ppt_issue, ppt_level, ppt_token)}
                 </div>
             </div>
@@ -287,12 +232,8 @@ export class UiPptDetails extends Referable(Updatable(
         const { image, fixed, toggled } = by_issue;
         const { token } = this.props;
         return <UiPptImage
-            token={token}
             issue={ppt_issue}
             level={ppt_level}
-            toggled={fixed || toggled}
-            url_content={image.url_content}
-            url_market={image.url_market}
             loading={image.loading}
             onLoaded={() => {
                 if (this.props.onPptImageLoaded) {
@@ -301,6 +242,10 @@ export class UiPptDetails extends Referable(Updatable(
                     );
                 }
             }}
+            toggled={fixed || toggled}
+            token={token}
+            url_content={image.url_content}
+            url_market={image.url_market}
         />;
     }
     $issue(
@@ -389,54 +334,49 @@ export class UiPptDetails extends Referable(Updatable(
         />;
     }
     $claimed(
-        ppt_issue: NftIssue, ppt_level: NftLevel
+        ppt_issue: NftIssue, ppt_level: NftLevel, ppt_token: NftToken
     ) {
         const { token } = this.props;
-        const ppt_token = Nft.token(token);
         const by_level = this.state[ppt_level];
         const by_issue = by_level[ppt_issue];
         const { claimed } = by_issue;
         return <UiPptClaimed
             issue={ppt_issue}
-            level={ppt_level}
-            value={claimed[ppt_token]}
             token={token}
+            value={claimed[ppt_token]}
         />;
     }
     $claimable(
-        ppt_issue: NftIssue, ppt_level: NftLevel
+        ppt_issue: NftIssue, ppt_level: NftLevel, ppt_token: NftToken
     ) {
         const { token } = this.props;
-        const ppt_token = Nft.token(token);
         const by_level = this.state[ppt_level];
         const by_issue = by_level[ppt_issue];
         const { claimable } = by_issue;
         return <UiPptClaimable
             issue={ppt_issue}
-            level={ppt_level}
-            value={claimable[ppt_token]}
             token={token}
+            value={claimable[ppt_token]}
         />;
     }
     $claimer(
         ppt_issue: NftIssue, ppt_level: NftLevel, ppt_token: NftToken
     ) {
-        const { token, details: matrix } = this.props;
+        const { token, details } = this.props;
         const { claimable, claimed } = this.state[ppt_level][ppt_issue];
-        const { claimer, toggled } = matrix[ppt_level][ppt_issue];
+        const { claimer, toggled } = details[ppt_level][ppt_issue];
         return <UiPptClaimer
             issue={ppt_issue}
             level={ppt_level}
             claimable={claimable[ppt_token]}
             claimed={claimed[ppt_token]}
-            status={claimer.status}
             onClaim={
                 this.props.onPptClaim?.bind(this)
             }
-            onToggled={(flag, ctrl_key) => {
-                const level = !ctrl_key ? ppt_level : undefined;
-                App.event.emit('toggle-issue', { level, flag });
+            onToggled={(flag) => {
+                App.event.emit('toggle-issue', { flag });
             }}
+            status={claimer.status}
             toggled={toggled}
             token={token}
         />;

@@ -14,8 +14,7 @@ export const env_of = (req: Request): Record<string, string> => {
       TOKEN: token,
       token: token_lc,
       Token: capitalize(token_lc),
-    },
-    ...{
+    }, ...{
       ...theme(token),
       ...header_page(req),
       ...otf_wallet(req),
@@ -54,10 +53,10 @@ const selector_token = (req: Request) => {
   const params = new URLSearchParams(req.query as any);
   const token = Tokenizer.token(params.get('token'));
   return {
-      SELECT0R_THOR: token === Token.THOR ? 'active' : '',
-      SELECT0R_LOKI: token === Token.LOKI ? 'active' : '',
-      SELECT0R_ODIN: token === Token.ODIN ? 'active' : '',
-      SELECT0R_HELA: token === Token.HELA ? 'active' : ''
+    SELECT0R_THOR: token === Token.THOR ? 'active' : '',
+    SELECT0R_LOKI: token === Token.LOKI ? 'active' : '',
+    SELECT0R_ODIN: token === Token.ODIN ? 'active' : '',
+    SELECT0R_HELA: token === Token.HELA ? 'active' : ''
   };
 };
 export default env_of;

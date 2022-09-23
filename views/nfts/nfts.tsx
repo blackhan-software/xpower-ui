@@ -1,8 +1,10 @@
 import './nfts.scss';
 
+import { App } from '../../source/app';
 import { Amount, Token } from '../../source/redux/types';
-import { NftLevel, NftLevels } from '../../source/redux/types';
-import { Nft, NftIssue, NftToken } from '../../source/redux/types';
+import { NftMinter, NftMinterList } from '../../source/redux/types'
+import { NftAmounts, NftDetails, NftFlags } from '../../source/redux/types';
+import { Nft, NftIssue, NftToken, NftLevel } from '../../source/redux/types';
 
 import React, { useEffect } from 'react';
 import { UiNftList } from './list/list';
@@ -12,32 +14,18 @@ import { UiNftDetails } from './details/details';
 export { UiNftDetails };
 import { UiNftImage, nft_meta, nft_href } from './details/details';
 export { UiNftImage, nft_meta, nft_href };
-import { NftDetails, nft_details } from './details/details';
-export { NftDetails, nft_details };
-import { NftSenderStatus } from './details/details';
-export { NftSenderStatus };
-
 import { UiNftMinter } from './minter/minter';
 export { UiNftMinter };
-import { NftMinter, nft_minter } from './minter/minter';
-export { NftMinter, nft_minter };
-import { NftMinterApproval } from './minter/minter';
-export { NftMinterApproval };
-import { NftMinterStatus } from './minter/minter';
-export { NftMinterStatus };
-import { NftMinterList } from './minter/minter';
-import { App } from '../../source/app';
-export { NftMinterList };
 
 type Props = {
     token: Token;
-    matrix: NftMatrix;
+    amounts: Record<NftToken, NftAmounts>;
     details: Record<NftToken, NftDetails>;
     minter: Record<NftToken, NftMinter>;
-    list: NftList;
+    flags: NftFlags;
     onNftList?: (
-        list: NftList,
-        matrix: NftMatrix[NftToken]
+        flags: NftFlags,
+        amounts: NftAmounts
     ) => void;
     /**
      * nft-list:
@@ -76,48 +64,15 @@ type Props = {
     onNftMinterBatchMint?: (
         token: Token, list: NftMinterList
     ) => void;
-    onNftMinterList?: (
-        list: NftList,
-        matrix: NftMatrix[NftToken]
-    ) => void;
     onNftMinterToggled?: (
-        toggled: boolean, ctrlKey: boolean
+        toggled: boolean
     ) => void;
     toggled: boolean;
 }
-export type NftList = Record<NftLevel, {
-    display: boolean; toggled: boolean;
-}>
-export function nft_list(
-    display = true, toggled = false
-) {
-    const entries = Object.fromEntries(
-        Array.from(NftLevels()).map(
-            (nft_level) => [nft_level, {
-                display, toggled
-            }]
-        )
-    );
-    return entries as NftList;
-}
-export type NftMatrix = Record<NftToken, Record<NftLevel, {
-    amount: Amount; max: Amount; min: Amount;
-}>>
-export function nft_matrix(
-    amount = 0n, max = 0n, min = 0n
-) {
-    return Object.fromEntries(
-        Array.from(NftLevels()).map(
-            (nft_level) => [nft_level, {
-                amount, max, min
-            }]
-        )
-    );
-}
 function join(
-    lhs: NftList, rhs: NftMatrix[NftToken]
+    lhs: NftFlags, rhs: NftAmounts
 ) {
-    const union = {} as NftList & NftMatrix[NftToken];
+    const union = {} as NftFlags & NftAmounts;
     for (const [key, value] of Object.entries(rhs)) {
         const nft_level = key as unknown as NftLevel;
         union[nft_level] = { ...value, ...lhs[nft_level] };
@@ -125,10 +80,10 @@ function join(
     return union;
 }
 function split(
-    union: Partial<NftList & NftMatrix[NftToken]>
+    union: Partial<NftFlags & NftAmounts>
 ) {
-    const lhs = {} as NftList;
-    const rhs = {} as NftMatrix[NftToken];
+    const lhs = {} as NftFlags;
+    const rhs = {} as NftAmounts;
     for (const [key, value] of Object.entries(union)) {
         const nft_level = key as unknown as NftLevel;
         const { display, toggled } = value;
@@ -146,13 +101,13 @@ export function UiNfts(
     }, []);
     const { token } = props;
     const nft_token = Nft.token(token);
-    const { list, toggled } = props;
-    const { matrix, minter } = props;
+    const { flags, toggled } = props;
+    const { amounts, minter } = props;
     return <React.Fragment>
         <div id='nft-single-minting'>
             <UiNftList
                 list={
-                    join(list, matrix[nft_token])
+                    join(flags, amounts[nft_token])
                 }
                 onNftList={(
                     list
@@ -185,22 +140,15 @@ export function UiNfts(
         </div>
         <div id='nft-batch-minting'>
             <UiNftMinter
+                list={
+                    join(flags, amounts[nft_token])
+                }
                 approval={
                     minter[nft_token].approval
                 }
                 onApproval={
                     props.onNftMinterApproval
                 }
-                list={
-                    join(list, matrix[nft_token])
-                }
-                onList={(list) => {
-                    const { lhs, rhs } = split(list);
-                    const { onNftMinterList } = props;
-                    if (onNftMinterList) onNftMinterList(
-                        lhs, rhs
-                    );
-                }}
                 status={
                     minter[nft_token].status
                 }

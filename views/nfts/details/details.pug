@@ -1,11 +1,8 @@
 each year in Array.from(YEARS).reverse()
   - let nft_id = 100 * year + 3 * index
   div.row.year(
-    data-year=`${year}` style=`display:${
+    style=`display:${
       YEARS[YEARS.length-1] - year ? 'none' : 'flex'
-    }`
-    data-state=`${
-      YEARS[YEARS.length-1] - year ? 'off' : 'on'
     }`
   )
     div.col-sm.nft-details-lhs
@@ -15,7 +12,7 @@ each year in Array.from(YEARS).reverse()
             role="status"
           )
           img.img-fluid.nft-image(
-            data-bs-toggle="tooltip" data-bs-placement="top" loading="lazy" data-id=`${nft_id}`
+            data-bs-toggle="tooltip" data-bs-placement="top" loading="lazy"
             title=`Trade ${levels[index]} NFTs (level ${index+1}/9 & ID #${nft_id})`
           )
 
@@ -57,12 +54,11 @@ each year in Array.from(YEARS).reverse()
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
       div.btn-group.nft-sender-expander.d-sm-none(
-        role="group" data-level=`${levels[index]}`
-        style="margin-top: 1em; width: 100%"
+        role="group" style="margin-top: 1em; width: 100%"
       )
         button.btn.btn-outline-warning.toggle-old.no-ellipsis(
           type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Show older NFTs` data-state="off"
+          title=`Show older NFTs`
         )
           i.bi-eye-fill
         button.btn.btn-outline-warning.sender-expander(
@@ -78,7 +74,7 @@ each year in Array.from(YEARS).reverse()
       label.form-label.nft-transfer-to-label.d-none.d-sm-flex
         | Send To
       div.input-group.nft-transfer-to.d-none.d-sm-flex(
-        role="group"  data-level=`${levels[index]}`
+        role="group"
       )
         input.form-control(
           type="text" placeholder="0x…" disabled
@@ -92,7 +88,7 @@ each year in Array.from(YEARS).reverse()
       label.form-label.nft-transfer-amount-label.d-none.d-sm-flex
         | Send Amount
       div.input-group.nft-transfer-amount.d-none.d-sm-flex(
-        role="group"  data-level=`${levels[index]}`
+        role="group"
       )
         input.form-control(
           type="number" placeholder="0" min="0"  disabled
@@ -104,7 +100,7 @@ each year in Array.from(YEARS).reverse()
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
       div.btn-group.nft-sender.d-none.d-sm-flex(
-        role="group" data-id=`${nft_id}` data-level=`${levels[index]}`
+        role="group"
       )
         button.btn.btn-outline-warning.toggle-old.no-ellipsis(
           data-bs-toggle="tooltip" data-bs-placement="top"

@@ -3,7 +3,7 @@ import React from 'react';
 
 type Props = {
     toggled: boolean;
-    onToggled?: (toggled: boolean, ctrl_key: boolean) => void;
+    onToggled?: (toggled: boolean) => void;
 }
 export class UiPptToggle extends React.Component<
     Props
@@ -18,7 +18,7 @@ export class UiPptToggle extends React.Component<
         return <button type='button'
             className='btn btn-outline-warning toggle-old no-ellipsis'
             data-bs-placement='top' data-bs-toggle='tooltip'
-            onClick={() => this.toggle(toggled, true)}
+            onClick={() => this.toggle(toggled)}
             title={this.title(toggled)}
         >
             <i className={
@@ -27,10 +27,10 @@ export class UiPptToggle extends React.Component<
         </button>;
     }
     toggle(
-        toggled: boolean, ctrl_key: boolean
+        toggled: boolean
     ) {
         if (this.props.onToggled) {
-            this.props.onToggled(!toggled, ctrl_key);
+            this.props.onToggled(!toggled);
         }
     }
     title(

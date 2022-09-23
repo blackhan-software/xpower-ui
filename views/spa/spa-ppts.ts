@@ -1,14 +1,13 @@
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { MoeTreasuryFactory } from '../../source/contract';
-import { ancestor, next } from '../../source/functions';
-import { buffered, x40 } from '../../source/functions';
+import { buffered, globalRef, x40 } from '../../source/functions';
 import { Nft, NftFullId, NftLevels } from '../../source/redux/types';
-import { PptWallet } from '../../source/wallet';
-import { OnTransferBatch } from '../../source/wallet';
-import { OnTransferSingle } from '../../source/wallet';
-import { Years}  from '../../source/years';
-
+import { OnTransferBatch, OnTransferSingle, PptWallet } from '../../source/wallet';
+import { Years } from '../../source/years';
+/**
+ * ppts:
+ */
 Blockchain.onceConnect(async function initPpts({
     address, token
 }) {
@@ -39,7 +38,7 @@ Blockchain.onceConnect(async function initPpts({
 Blockchain.onConnect(function syncPpts({
     token
 }) {
-    const ppts = App.getPpts({
+    const ppts = App.getPptsBy({
         token: Nft.token(token)
     });
     for (const [id, ppt] of Object.entries(ppts.items)) {
@@ -119,21 +118,27 @@ Blockchain.onceConnect(async function updateClaims() {
         token: App.token
     });
     moe_treasury.provider.on('block', buffered(() => {
-        const $toggles = document.querySelectorAll<HTMLElement>(
-            '.ppt-minter .toggle[data-state="on"]'
-        );
-        $toggles.forEach(($toggle) => {
-            const $minter_on = ancestor($toggle, ($el) => {
-                return $el.classList.contains('ppt-minter');
-            });
-            const $details = next($minter_on, ($el) => {
-                return $el.classList.contains('nft-details');
-            })
-            const $rows_on = $details?.querySelectorAll<HTMLElement>(
-                '.row.year[data-state="on"]'
-            );
-            $rows_on?.forEach(($el) => {
-                $el.dispatchEvent(new Event('refresh-claims'));
+        const nft_token = Nft.token(App.token);
+        const { details } = App.getPptsUi();
+        const by_token = details[nft_token];
+        Object.entries(by_token).forEach(([
+            nft_level, nft_issues
+        ]) => {
+            Object.entries(nft_issues).forEach(([
+                nft_issue, { fixed, toggled }
+            ]) => {
+                if (fixed || toggled) {
+                    const core_id = Nft.coreId({
+                        level: Number(nft_level),
+                        issue: Number(nft_issue)
+                    });
+                    const $ref = globalRef<HTMLElement>(
+                        `:ppt.row[core-id="${core_id}"]`
+                    );
+                    $ref.current?.dispatchEvent(
+                        new Event('refresh-claims')
+                    );
+                }
             });
         });
     }));

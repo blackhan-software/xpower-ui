@@ -3,580 +3,61 @@ import './spa.scss';
 
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
-import { MoeTreasuryFactory, PptTreasuryFactory } from '../../source/contract';
-import { OnClaim, OnStakeBatch, OnUnstakeBatch } from '../../source/contract';
-import { Updatable, buffered, x40 } from '../../source/functions';
-import { Alerts, Alert, alert } from '../../source/functions';
-import { Referable, ancestor } from '../../source/functions';
+import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
+import { Alert, alert, Alerts, ancestor, Referable, x40 } from '../../source/functions';
 import { HashManager, MiningManager } from '../../source/managers';
-import { Address, Amount, Balance, Level, Page, Token } from '../../source/redux/types';
-import { Nft, NftCoreId, NftIssue } from '../../source/redux/types';
-import { NftToken, NftTokens } from '../../source/redux/types';
-import { NftLevel, NftLevels } from '../../source/redux/types';
+import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
+import { Address, Amount, Level, MAX_UINT256, Mining, MinterRows, MinterStatus, Minting, Nft, NftCoreId, NftFlags, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, NftSenderStatus, NftsUi, Page, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, PptsUi, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
-import { OnApprovalForAll, OnTransferBatch, OnTransferSingle } from '../../source/wallet';
-import { MoeWallet, NftWallet, OtfWallet } from '../../source/wallet';
-import { OnApproval, OnTransfer } from '../../source/wallet';
+import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
 
 import React, { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Connector } from '../connector/connector';
-import { WalletUi } from '../wallet/wallet-ui';
-import { Selector } from '../selector/selector';
-import { UiHome, Minting } from '../home/home';
-import { MinerStatus, MinterStatus, MinterRow } from '../home/home';
-import { UiNfts, nft_meta, nft_href } from '../nfts/nfts';
-import { UiPpts, ppt_meta, ppt_href } from '../ppts/ppts';
-import { NftList, nft_list } from '../nfts/nfts';
-import { PptList, ppt_list } from '../ppts/ppts';
-import { NftDetails, nft_details } from '../nfts/nfts';
-import { PptDetails, ppt_details } from '../ppts/ppts';
-import { NftSenderStatus } from '../nfts/nfts';
-import { PptClaimerStatus } from '../ppts/ppts';
-import { NftMatrix, nft_matrix } from '../nfts/nfts';
-import { PptMatrix, ppt_matrix } from '../ppts/ppts';
-import { NftMinter, nft_minter } from '../nfts/nfts';
-import { PptMinter, ppt_minter } from '../ppts/ppts';
-import { NftMinterApproval } from '../nfts/nfts';
-import { PptMinterApproval } from '../ppts/ppts';
-import { NftMinterList } from '../nfts/nfts';
-import { PptMinterList } from '../ppts/ppts';
-import { NftMinterStatus } from '../nfts/nfts';
-import { PptMinterStatus } from '../ppts/ppts';
-import { PptBurnerStatus } from '../ppts/ppts';
-import { UiAbout } from '../about/about';
-import { Avalanche } from '../../public/images/tsx';
+import { connect, Provider } from 'react-redux';
 
-export const MAX_UINT256 = 2n ** 256n - 1n;
-export const MID_UINT256 = 2n ** 255n - 1n;
+import { Avalanche } from '../../public/images/tsx';
+import { UiAbout } from '../about/about';
+import { Connector } from '../connector/connector';
+import { UiHome } from '../home/home';
+import { UiNfts } from '../nfts/nfts';
+import { UiPpts } from '../ppts/ppts';
+import { Selector } from '../selector/selector';
+import { WalletUi } from '../wallet/wallet-ui';
 
 import { Transaction } from 'ethers';
 import './spa-home';
 import './spa-nfts';
+import './spa-nfts-ui';
 import './spa-ppts';
+import './spa-ppts-ui';
 
 type Props = {
     page: Page;
     token: Token;
-    speed: number;
+    mining: Mining;
+    minting: Minting;
+    nfts_ui: NftsUi;
+    ppts_ui: PptsUi;
 }
-type State = {
-    mining: {
-        speed: number;
-        speedable: boolean;
-        status: MinerStatus | null;
-        togglable: boolean;
-    };
-    minting: {
-        rows: MinterRow[];
-    };
-    nfts: {
-        details: Record<NftToken, NftDetails>;
-        matrix: NftMatrix;
-        minter: Record<NftToken, NftMinter>;
-        list: NftList;
-    };
-    ppts: {
-        details: Record<NftToken, PptDetails>;
-        matrix: PptMatrix;
-        minter: Record<NftToken, PptMinter>;
-        list: NftList;
-    };
-    toggled: boolean; // nfts & ppts
-    token: Token;
-    page: Page;
-}
-function get_nft_details() {
-    const entries = Object.fromEntries(
-        Array.from(NftTokens()).map((t) => [t, nft_details()])
-    );
-    return entries as Record<NftToken, NftDetails>;
-}
-function get_ppt_details() {
-    const entries = Object.fromEntries(
-        Array.from(NftTokens()).map((t) => [t, ppt_details()])
-    );
-    return entries as Record<NftToken, PptDetails>;
-}
-function get_nft_minter() {
-    const entries = Object.fromEntries(
-        Array.from(NftTokens()).map((t) => [t, nft_minter()])
-    );
-    return entries as Record<NftToken, NftMinter>;
-}
-function get_ppt_minter() {
-    const entries = Object.fromEntries(
-        Array.from(NftTokens()).map((t) => [t, ppt_minter()])
-    );
-    return entries as Record<NftToken, PptMinter>;
-}
-function get_nft_matrix() {
-    const entries = Object.fromEntries(
-        Array.from(NftTokens()).map((t) => [t, nft_matrix()])
-    );
-    return entries as NftMatrix;
-}
-function get_ppt_matrix() {
-    const entries = Object.fromEntries(
-        Array.from(NftTokens()).map((t) => [t, ppt_matrix()])
-    );
-    return entries as PptMatrix;
-}
-function get_nft_list() {
-    return nft_list() as NftList;
-}
-function get_ppt_list() {
-    return ppt_list() as PptList;
-}
-export class SPA extends Referable(Updatable(
-    React.Component<Props, State>
-)) {
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            mining: {
-                status: null, togglable: false,
-                speed: props.speed, speedable: false,
-            },
-            minting: {
-                rows: Minting.rows(App.level.min),
-            },
-            nfts: {
-                details: get_nft_details(),
-                matrix: get_nft_matrix(),
-                minter: get_nft_minter(),
-                list: get_nft_list(),
-            },
-            ppts: {
-                details: get_ppt_details(),
-                matrix: get_ppt_matrix(),
-                minter: get_ppt_minter(),
-                list: get_ppt_list(),
-            },
-            toggled: false,
-            token: props.token,
-            page: props.page,
-        };
-    }
-    async componentDidMount() {
-        App.onPageSwitch((page) => this.setState({
-            page
-        }));
-        App.onTokenSwitch((token) => this.update({
-            token, minting: { rows: Minting.rows(App.level.min) }
-        }));
-        /**
-         * mining:
-         */
-        Blockchain.onConnect(async ({ address, token }) => {
-            const miner = MiningManager.miner(address, {
-                token
-            });
-            if (miner.running) {
-                await this.update({
-                    mining: {
-                        ...{
-                            speedable: true,
-                            speed: miner.speed,
-                            togglable: miner.speed > 0,
-                        }
-                    }
-                });
-            } else {
-                await this.update({
-                    mining: {
-                        ...{
-                            speedable: true,
-                            speed: miner.speed,
-                            togglable: miner.speed > 0,
-                        },
-                        ...{
-                            status: MinerStatus.stopped,
-                        }
-                    }
-                });
-            }
-        });
-        Blockchain.onceConnect(({
-            address, token
-        }) => {
-            const miner = MiningManager.miner(address, {
-                token
-            });
-            miner.on('initializing', () => {
-                this.update({
-                    mining: { status: MinerStatus.initializing }
-                });
-            });
-            miner.on('initialized', () => {
-                this.update({
-                    mining: { status: MinerStatus.initialized }
-                });
-            });
-            miner.on('starting', () => {
-                this.update({
-                    mining: { status: MinerStatus.starting, speedable: false }
-                });
-            });
-            miner.on('started', () => {
-                this.update({
-                    mining: { status: MinerStatus.started }
-                });
-            });
-            miner.on('stopping', () => {
-                this.update({
-                    mining: { status: MinerStatus.stopping }
-                });
-            });
-            miner.on('stopped', () => {
-                this.update({
-                    mining: { status: MinerStatus.stopped, speedable: true }
-                });
-            });
-            miner.on('pausing', () => {
-                this.update({
-                    mining: { status: MinerStatus.pausing }
-                });
-            });
-            miner.on('paused', () => {
-                this.update({
-                    mining: { status: MinerStatus.paused }
-                });
-            });
-            miner.on('resuming', () => {
-                this.update({
-                    mining: { status: MinerStatus.resuming }
-                });
-            });
-            miner.on('resumed', () => {
-                this.update({
-                    mining: { status: MinerStatus.resumed }
-                });
-            });
-            miner.on('increased', (e) => {
-                this.update({
-                    mining: {
-                        togglable: e.speed > 0, speed: e.speed
-                    }
-                });
-            });
-            miner.on('decreased', (e) => {
-                this.update({
-                    mining: {
-                        togglable: e.speed > 0, speed: e.speed
-                    }
-                });
-            });
-        }, {
-            per: () => App.token
-        });
-        /**
-         * minting:
-         */
-        App.onNonceChanged(async (
-            nonce, { address, amount, token }, total
-        ) => {
-            if (address !== await Blockchain.selectedAddress) {
-                return;
-            }
-            if (token !== this.state.token) {
-                return;
-            }
-            const amount_min = Tokenizer.amount(
-                token, App.level.min
-            );
-            const level = Tokenizer.level(token, amount);
-            const { tx_counter } = Minting.getRow(
-                this.state.minting.rows, level - 1
-            );
-            const row = {
-                disabled: !total,
-                display: amount === amount_min || total > 0n || tx_counter > 0n,
-                nn_counter: Number(total / amount),
-            };
-            const rows = Minting.setRow(
-                this.state.minting.rows, level - 1, row
-            );
-            await this.update({
-                minting: { rows }
-            });
-        });
-        /**
-         * nfts:
-         */
-        App.onTokenChanged(buffered((
-            token: Token, { amount: balance }: { amount: Amount }
-        ) => {
-            this.update({
-                ...nft_amounts(token, balance)
-            });
-        }));
-        const nft_amounts = (
-            token: Token, balance: Balance
-        ) => {
-            const nft_token = Nft.token(token);
-            const entries = Array.from(NftLevels()).map((nft_level): [
-                NftLevel, NftMatrix[NftToken][NftLevel]
-            ] => {
-                const remainder = balance % 10n ** (BigInt(nft_level) + 3n);
-                const amount = remainder / 10n ** BigInt(nft_level);
-                return [nft_level, {
-                    amount, max: amount, min: 0n
-                }];
-            });
-            return {
-                nfts: {
-                    matrix: Object.assign(get_nft_matrix(), {
-                        [nft_token]: Object.fromEntries(entries)
-                    })
-                }
-            };
-        };
-        /**
-         * ppts:
-         */
-        App.onNftChanged(buffered(() => {
-            const nft_token = Nft.token(this.state.token);
-            this.update({
-                ...ppt_amounts(nft_token)
-            });
-        }));
-        App.onPptChanged(buffered(() => {
-            const nft_token = Nft.token(this.state.token);
-            this.update({
-                ...ppt_amounts(nft_token)
-            });
-        }));
-        const ppt_amounts = (
-            ppt_token: NftToken
-        ) => {
-            const entries = Array.from(NftLevels()).map((nft_level): [
-                NftLevel, PptMatrix[NftToken][NftLevel]
-            ] => {
-                const { amount: max } = App.getNftTotalBy({
-                    level: nft_level, token: ppt_token
-                });
-                const { amount: min } = App.getPptTotalBy({
-                    level: nft_level, token: ppt_token
-                });
-                return [nft_level, {
-                    amount: max, max, min: -min
-                }];
-            });
-            return {
-                ppts: {
-                    matrix: Object.assign(get_ppt_matrix(), {
-                        [ppt_token]: Object.fromEntries(entries)
-                    })
-                }
-            };
-        };
-        /**
-         * {nft,ppt}-list:
-         */
-        App.event.on('toggle-level', async ({
-            level, flag
-        }) => {
-            const levels = level !== undefined
-                ? [level] : Array.from(NftLevels());
-            const list = Object.fromEntries(
-                levels.map((l) => [l, { toggled: flag }])
-            );
-            await this.update({
-                nfts: { list },
-                ppts: { list }
-            });
-        });
-        /**
-         * {nft,ppt}-details:
-         */
-        App.event.on('toggle-issue', async ({
-            level, issue, flag
-        }) => {
-            const levels = level !== undefined
-                ? [level] : Array.from(NftLevels());
-            const issues = issue !== undefined
-                ? [issue] : Array.from(Years());
-            const details = Object.fromEntries(
-                Array.from(NftTokens()).map(
-                    (t) => [t, Object.fromEntries(
-                        levels.map((l) => [
-                            l, Object.fromEntries(
-                                issues.map((i) => [
-                                    i, { toggled: flag }
-                                ])
-                            )
-                        ])
-                    )]
-                )
-            );
-            await this.update({
-                nfts: { details },
-                ppts: { details }
-            });
-        });
-        /**
-         * {nft,ppt}-{image,minter}:
-         */
-        Blockchain.onceConnect(async ({
-            address, token
-        }) => {
-            const images = [];
-            for (const level of NftLevels()) {
-                for (const issue of Years({ reverse: true })) {
-                    images.push(nft_image(level, issue, token));
-                    images.push(ppt_image(level, issue, token));
-                }
-            }
-            const details = await Promise.all([
-                nft_approval(address, token),
-                ppt_approval(address, token),
-                ...images
-            ]);
-            await this.update(details.reduce(
-                (lhs, rhs) => $.extend(true, lhs, rhs)
-            ));
-        }, {
-            per: () => App.token
-        });
-        const nft_image = async (
-            level: NftLevel, issue: NftIssue, token: Token
-        ) => {
-            const nft_token = Nft.token(token);
-            const pack = (
-                image: Partial<NftDetails[0][0]['image']>
-            ) => ({
-                nfts: {
-                    details: {
-                        [nft_token]: {
-                            [level]: {
-                                [issue]: { image }
-                            }
-                        }
-                    }
-                },
-            });
-            const [url_content, url_market] = await Promise.all([
-                await nft_meta({ issue, level, token }).then(
-                    ({ image }) => image
-                ),
-                await nft_href({ issue, level, token }),
-            ]);
-            return pack({
-                url_market: url_market?.toString() ?? null,
-                url_content
-            });
-        }
-        const ppt_image = async (
-            level: NftLevel, issue: NftIssue, token: Token
-        ) => {
-            const ppt_token = Nft.token(token);
-            const pack = (
-                image: Partial<PptDetails[0][0]['image']>
-            ) => ({
-                ppts: {
-                    details: {
-                        [ppt_token]: {
-                            [level]: {
-                                [issue]: { image }
-                            }
-                        }
-                    }
-                },
-            });
-            const [url_content, url_market] = await Promise.all([
-                await ppt_meta({ issue, level, token }).then(
-                    ({ image }) => image
-                ),
-                await ppt_href({ issue, level, token }),
-            ]);
-            return pack({
-                url_market: url_market?.toString() ?? null,
-                url_content
-            });
-        }
-        const nft_approval = async (
-            address: Address, token: Token
-        ) => {
-            const moe_wallet = new MoeWallet(address, token);
-            const nft_wallet = new NftWallet(address, token);
-            const nft_contract = await nft_wallet.contract;
-            const allowance = await moe_wallet.allowance(
-                address, nft_contract.address
-            );
-            const approval = allowance > MID_UINT256
-                ? NftMinterApproval.approved
-                : NftMinterApproval.unapproved;
-            return {
-                nfts: {
-                    minter: { [Nft.token(token)]: { approval } }
-                }
-            };
-        };
-        const ppt_approval = async (
-            address: Address, token: Token
-        ) => {
-            const ppt_treasury = await PptTreasuryFactory({ token });
-            const nft_wallet = new NftWallet(address, token);
-            const approved = await nft_wallet.isApprovedForAll(
-                ppt_treasury.address
-            );
-            const approval = approved
-                ? PptMinterApproval.approved
-                : PptMinterApproval.unapproved;
-            return {
-                ppts: {
-                    minter: { [Nft.token(token)]: { approval } }
-                }
-            };
-        };
-        /**
-         * fallback: on no or wrong chain
-         */
-        Promise.all([
-            Blockchain.isInstalled(),
-            Blockchain.isAvalanche()
-        ]).then(([
-            installed, avalanche
-        ]) => {
-            const get_images = async (token: Token) => {
-                const images = [];
-                for (const level of NftLevels()) {
-                    for (const issue of Years({ reverse: true })) {
-                        images.push(nft_image(level, issue, token));
-                        images.push(ppt_image(level, issue, token));
-                    }
-                }
-                const details = await Promise.all([
-                    ...images
-                ]);
-                await this.update(details.reduce(
-                    (lhs, rhs) => $.extend(true, lhs, rhs)
-                ));
-            };
-            if (!installed || !avalanche) {
-                App.onTokenSwitch(get_images);
-                get_images(this.state.token);
-            }
-        })
-    }
+export class SPA extends Referable(
+    React.Component<Props>
+) {
     render() {
         if (App.debug) {
             console.count('[app.render]');
         }
-        const { page, token } = this.state;
-        const { nfts, ppts } = this.state;
-        const { toggled } = this.state;
-        const { speed } = this.props;
+        const { mining: { speed } } = this.props;
+        const { page, token } = this.props;
+        const { nfts_ui, ppts_ui } = this.props;
         return <React.StrictMode>
             {this.$h1(page)}
             {this.$connector(page)}
             {this.$wallet(page, token)}
             {this.$selector(page, token)}
             {this.$home(page, token, speed)}
-            {this.$nfts(page, token, nfts.list, toggled)}
-            {this.$ppts(page, token, ppts.list, toggled)}
+            {this.$nfts(page, token, nfts_ui.flags, nfts_ui.toggled)}
+            {this.$ppts(page, token, ppts_ui.flags, ppts_ui.toggled)}
             {this.$about(page, token)}
         </React.StrictMode>;
     }
@@ -631,14 +112,16 @@ export class SPA extends Referable(Updatable(
         if (page !== Page.Home) {
             return null;
         }
-        const { mining, minting } = this.state;
+        const { mining, minting } = this.props;
         return <form id='home'
             onSubmit={(e) => e.preventDefault()}
         >
             <UiHome
                 mining={{
                     onToggle: this.toggle.bind(this),
+                    togglable: miningTogglable(mining),
                     onSpeed: this.speed.bind(this),
+                    speedable: miningSpeedable(mining),
                     ...mining
                 }}
                 minting={{
@@ -652,7 +135,7 @@ export class SPA extends Referable(Updatable(
         </form>;
     }
     $nfts(
-        page: Page, token: Token, list: NftList, toggled: boolean
+        page: Page, token: Token, flags: NftFlags, toggled: boolean
     ) {
         if (page !== Page.Nfts) {
             return null;
@@ -662,83 +145,73 @@ export class SPA extends Referable(Updatable(
             onSubmit={(e) => e.preventDefault()}
         >
             <UiNfts
-                details={this.state.nfts.details}
-                matrix={this.state.nfts.matrix}
-                minter={this.state.nfts.minter}
-                list={list}
+                details={this.props.nfts_ui.details}
+                amounts={this.props.nfts_ui.amounts}
+                minter={this.props.nfts_ui.minter}
+                flags={flags}
                 onNftList={(lhs, rhs) => {
-                    this.update({
-                        nfts: { list: lhs, matrix: { [nft_token]: rhs } },
-                        ppts: { list: lhs }
-                    })
+                    App.setNftsUi({
+                        flags: lhs, amounts: { [nft_token]: rhs }
+                    });
+                    App.setPptsUi({
+                        flags: lhs
+                    });
                 }}
                 onNftImageLoaded={(
                     nft_issue, nft_level
                 ) => {
-                    this.update({
-                        nfts: {
-                            details: {
-                                [nft_token]: {
-                                    [nft_level]: {
-                                        [nft_issue]: {
-                                            image: { loading: false }
-                                        }
-                                    }
+                    const details = {
+                        [nft_token]: {
+                            [nft_level]: {
+                                [nft_issue]: {
+                                    image: { loading: false }
                                 }
                             }
                         }
-                    });
+                    };
+                    App.setNftsUi({ details });
                 }}
                 onNftSenderExpanded={(
                     nft_issues, nft_level, toggled
                 ) => {
-                    this.update({
-                        nfts: {
-                            details: {
-                                [nft_token]: {
-                                    [nft_level]: Object.fromEntries(
-                                        nft_issues.map((issue) => [issue, {
-                                            toggled
-                                        }])
-                                    )
-                                }
-                            }
+                    const details = {
+                        [nft_token]: {
+                            [nft_level]: Object.fromEntries(
+                                nft_issues.map((issue) => [issue, {
+                                    toggled
+                                }])
+                            )
                         }
-                    });
+                    };
+                    App.setNftsUi({ details });
                 }}
                 onNftAmountChanged={(
                     nft_issue, nft_level, value, valid
                 ) => {
-                    this.update({
-                        nfts: {
-                            details: {
-                                [nft_token]: {
-                                    [nft_level]: {
-                                        [nft_issue]: {
-                                            amount: { valid, value }
-                                        }
-                                    }
+                    const details = {
+                        [nft_token]: {
+                            [nft_level]: {
+                                [nft_issue]: {
+                                    amount: { valid, value }
                                 }
                             }
                         }
-                    });
+                    };
+                    App.setNftsUi({ details });
                 }}
                 onNftTargetChanged={(
                     nft_issue, nft_level, value, valid
                 ) => {
-                    this.update({
-                        nfts: {
-                            details: {
-                                [nft_token]: {
-                                    [nft_level]: {
-                                        [nft_issue]: {
-                                            target: { valid, value }
-                                        }
-                                    }
+                    const details = {
+                        [nft_token]: {
+                            [nft_level]: {
+                                [nft_issue]: {
+                                    target: { valid, value }
                                 }
                             }
                         }
-                    });
+                    };
+                    App.setNftsUi({ details });
                 }}
                 onNftTransfer={
                     this.nftTransfer.bind(this)
@@ -749,25 +222,16 @@ export class SPA extends Referable(Updatable(
                 onNftMinterBatchMint={
                     this.nftBatchMint.bind(this)
                 }
-                onNftMinterList={(lhs, rhs) => {
-                    this.update({
-                        nfts: { list: lhs, matrix: { [nft_token]: rhs } }
-                    });
-                }}
-                onNftMinterToggled={(toggled, ctrl_key) => {
-                    if (!ctrl_key) {
-                        return this.update({ toggled });
-                    }
-                    const list = Object.fromEntries(
+                onNftMinterToggled={(toggled) => {
+                    const flags = Object.fromEntries(
                         Array.from(NftLevels()).map(
-                            (nft_level) => [nft_level, { toggled }]
+                            (nft_level) => [nft_level, {
+                                toggled
+                            }]
                         )
                     );
-                    this.update({
-                        nfts: { list },
-                        ppts: { list },
-                        toggled
-                    });
+                    App.setNftsUi({ flags, toggled });
+                    App.setPptsUi({ flags, toggled });
                 }}
                 toggled={toggled}
                 token={token}
@@ -775,7 +239,7 @@ export class SPA extends Referable(Updatable(
         </form>;
     }
     $ppts(
-        page: Page, token: Token, list: NftList, toggled: boolean
+        page: Page, token: Token, flags: NftFlags, toggled: boolean
     ) {
         if (page !== Page.Ppts) {
             return null;
@@ -785,83 +249,73 @@ export class SPA extends Referable(Updatable(
             onSubmit={(e) => e.preventDefault()}
         >
             <UiPpts
-                details={this.state.ppts.details}
-                matrix={this.state.ppts.matrix}
-                minter={this.state.ppts.minter}
-                list={list}
+                details={this.props.ppts_ui.details}
+                amounts={this.props.ppts_ui.amounts}
+                minter={this.props.ppts_ui.minter}
+                flags={flags}
                 onPptList={(lhs, rhs) => {
-                    this.update({
-                        nfts: { list: lhs },
-                        ppts: { list: lhs, matrix: { [nft_token]: rhs } }
-                    })
+                    App.setNftsUi({
+                        flags: lhs
+                    });
+                    App.setPptsUi({
+                        flags: lhs, amounts: { [nft_token]: rhs }
+                    });
                 }}
                 onPptImageLoaded={(
                     ppt_issue, ppt_level
                 ) => {
-                    this.update({
-                        ppts: {
-                            details: {
-                                [nft_token]: {
-                                    [ppt_level]: {
-                                        [ppt_issue]: {
-                                            image: { loading: false }
-                                        }
-                                    }
+                    const details = {
+                        [nft_token]: {
+                            [ppt_level]: {
+                                [ppt_issue]: {
+                                    image: { loading: false }
                                 }
                             }
                         }
-                    });
+                    };
+                    App.setPptsUi({ details });
                 }}
                 onPptClaimerExpanded={(
                     ppt_issues, ppt_level, toggled
                 ) => {
-                    this.update({
-                        ppts: {
-                            details: {
-                                [nft_token]: {
-                                    [ppt_level]: Object.fromEntries(
-                                        ppt_issues.map((issue) => [issue, {
-                                            toggled
-                                        }])
-                                    )
-                                }
-                            }
+                    const details = {
+                        [nft_token]: {
+                            [ppt_level]: Object.fromEntries(
+                                ppt_issues.map((issue) => [issue, {
+                                    toggled
+                                }])
+                            )
                         }
-                    });
+                    };
+                    App.setPptsUi({ details });
                 }}
                 onPptAmountChanged={(
                     nft_issue, nft_level, value, valid
                 ) => {
-                    this.update({
-                        ppts: {
-                            details: {
-                                [nft_token]: {
-                                    [nft_level]: {
-                                        [nft_issue]: {
-                                            amount: { valid, value }
-                                        }
-                                    }
+                    const details = {
+                        [nft_token]: {
+                            [nft_level]: {
+                                [nft_issue]: {
+                                    amount: { valid, value }
                                 }
                             }
                         }
-                    });
+                    };
+                    App.setPptsUi({ details });
                 }}
                 onPptTargetChanged={(
                     nft_issue, nft_level, value, valid
                 ) => {
-                    this.update({
-                        ppts: {
-                            details: {
-                                [nft_token]: {
-                                    [nft_level]: {
-                                        [nft_issue]: {
-                                            target: { valid, value }
-                                        }
-                                    }
+                    const details = {
+                        [nft_token]: {
+                            [nft_level]: {
+                                [nft_issue]: {
+                                    target: { valid, value }
                                 }
                             }
                         }
-                    });
+                    };
+                    App.setPptsUi({ details });
                 }}
                 onPptClaim={
                     this.pptClaim.bind(this)
@@ -875,25 +329,16 @@ export class SPA extends Referable(Updatable(
                 onPptMinterBatchBurn={
                     this.pptBatchBurn.bind(this)
                 }
-                onPptMinterList={(lhs, rhs) => {
-                    this.update({
-                        ppts: { list: lhs, matrix: { [nft_token]: rhs } }
-                    });
-                }}
-                onPptMinterToggled={(toggled, ctrl_key) => {
-                    if (!ctrl_key) {
-                        return this.update({ toggled });
-                    }
-                    const list = Object.fromEntries(
+                onPptMinterToggled={(toggled) => {
+                    const flags = Object.fromEntries(
                         Array.from(NftLevels()).map(
-                            (nft_level) => [nft_level, { toggled }]
+                            (nft_level) => [nft_level, {
+                                toggled
+                            }]
                         )
                     );
-                    this.update({
-                        nfts: { list },
-                        ppts: { list },
-                        toggled
-                    });
+                    App.setNftsUi({ flags, toggled });
+                    App.setPptsUi({ flags, toggled });
                 }}
                 toggled={toggled}
                 token={token}
@@ -974,58 +419,50 @@ export class SPA extends Referable(Updatable(
                     return;
                 }
                 moe_wallet.offTransfer(on_transfer);
-                if (token !== this.state.token) {
+                if (token !== this.props.token) {
                     return;
                 }
-                const { tx_counter } = Minting.getRow(
-                    this.state.minting.rows, level - 1
+                const { tx_counter } = MinterRows.get(
+                    this.props.minting.rows, level - 1
                 );
                 if (tx_counter > 0) {
-                    const rows = Minting.setRow(
-                        this.state.minting.rows, level - 1, {
+                    const rows = MinterRows.set(
+                        this.props.minting.rows, level - 1, {
                         tx_counter: tx_counter - 1
                     });
-                    this.update({
-                        minting: { rows }
-                    });
+                    App.setMinting({ rows });
                 }
             };
-            await this.update({
-                minting: {
-                    rows: Minting.setRow(
-                        this.state.minting.rows, level - 1, {
-                        status: MinterStatus.minting,
-                    })
-                }
+            App.setMinting({
+                rows: MinterRows.set(
+                    this.props.minting.rows, level - 1, {
+                    status: MinterStatus.minting,
+                })
             });
             const mint = await moe_wallet.mint(
                 block_hash, nonce
             );
             console.debug('[mint]', mint);
             moe_wallet.onTransfer(on_transfer);
-            const { tx_counter } = Minting.getRow(
-                this.state.minting.rows, level - 1
+            const { tx_counter } = MinterRows.get(
+                this.props.minting.rows, level - 1
             );
-            await this.update({
-                minting: {
-                    rows: Minting.setRow(
-                        this.state.minting.rows, level - 1, {
-                        status: MinterStatus.minted,
-                        tx_counter: tx_counter + 1
-                    })
-                }
+            App.setMinting({
+                rows: MinterRows.set(
+                    this.props.minting.rows, level - 1, {
+                    status: MinterStatus.minted,
+                    tx_counter: tx_counter + 1
+                })
             });
             App.removeNonce(nonce, {
                 address, block_hash, token
             });
         } catch (ex: any) {
-            this.update({
-                minting: {
-                    rows: Minting.setRow(
-                        this.state.minting.rows, level - 1, {
-                        status: MinterStatus.error
-                    })
-                }
+            App.setMinting({
+                rows: MinterRows.set(
+                    this.props.minting.rows, level - 1, {
+                    status: MinterStatus.error
+                })
             });
             /* eslint no-ex-assign: [off] */
             if (ex.error) {
@@ -1054,8 +491,8 @@ export class SPA extends Referable(Updatable(
                     });
                 }
             }
-            const $mint = this.global_ref<HTMLElement>(
-                `.mint[level=${level}]`
+            const $mint = this.globalRef<HTMLElement>(
+                `.mint[level="${level}"]`
             );
             this.error(ex, {
                 after: $mint.current, id: `${nonce}`
@@ -1090,18 +527,18 @@ export class SPA extends Referable(Updatable(
             throw new Error('missing selected-address');
         }
         const nft_token = Nft.token(
-            this.state.token
+            this.props.token
         );
         const core_id = Nft.coreId({
             issue: nft_issue, level: nft_level
         });
-        const by_token = this.state.nfts.details[nft_token];
+        const by_token = this.props.nfts_ui.details[nft_token];
         const by_level = by_token[nft_level];
         const by_issue = by_level[nft_issue];
         const target = by_issue.target.value as Address;
         const amount = by_issue.amount.value as Amount;
         const nft_wallet = new NftWallet(
-            address, this.state.token
+            address, this.props.token
         );
         const on_single_tx: OnTransferSingle = async (
             op, from, to, id, value, ev
@@ -1109,36 +546,32 @@ export class SPA extends Referable(Updatable(
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            this.update({
-                nfts: {
-                    details: {
-                        [nft_token]: {
-                            [nft_level]: {
-                                [nft_issue]: {
-                                    amount: { valid: null, value: null },
-                                    sender: { status: NftSenderStatus.sent }
-                                }
-                            }
+            const details = {
+                [nft_token]: {
+                    [nft_level]: {
+                        [nft_issue]: {
+                            amount: { valid: null, value: null },
+                            sender: { status: NftSenderStatus.sent }
                         }
                     }
                 }
-            });
+            };
+            App.setNftsUi({ details });
         };
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
-            this.update({
-                nfts: {
-                    details: {
-                        [nft_token]: {
-                            [nft_level]: {
-                                [nft_issue]: {
-                                    sender: { status: NftSenderStatus.sending }
-                                }
-                            }
+            const details = {
+                [nft_token]: {
+                    [nft_level]: {
+                        [nft_issue]: {
+                            sender: { status: NftSenderStatus.sending }
                         }
                     }
                 }
+            };
+            App.setNftsUi({
+                details
             });
             nft_wallet.onTransferSingle(on_single_tx);
             tx = await nft_wallet.safeTransfer(
@@ -1153,8 +586,8 @@ export class SPA extends Referable(Updatable(
                 if (ex.data && ex.data.message) {
                     ex.message = `${ex.message} [${ex.data.message}]`;
                 }
-                const $ref = this.global_ref<HTMLElement>(
-                    `nft-sender:${core_id}`
+                const $ref = this.globalRef<HTMLElement>(
+                    `.nft-sender[core-id="${core_id}"]`
                 );
                 const $sender_row = ancestor(
                     $ref.current, (e) => e.classList.contains('row')
@@ -1164,19 +597,16 @@ export class SPA extends Referable(Updatable(
                     after: $sender_row
                 });
             }
-            this.update({
-                nfts: {
-                    details: {
-                        [nft_token]: {
-                            [nft_level]: {
-                                [nft_issue]: {
-                                    sender: { status: NftSenderStatus.error }
-                                }
-                            }
+            const details = {
+                [nft_token]: {
+                    [nft_level]: {
+                        [nft_issue]: {
+                            sender: { status: NftSenderStatus.error }
                         }
                     }
                 }
-            });
+            };
+            App.setNftsUi({ details });
             console.error(ex);
         }
     }
@@ -1202,27 +632,23 @@ export class SPA extends Referable(Updatable(
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            this.update({
-                nfts: {
-                    minter: {
-                        [Nft.token(token)]: {
-                            approval: NftMinterApproval.approved
-                        }
-                    }
+            const minter = {
+                [Nft.token(token)]: {
+                    approval: NftMinterApproval.approved
                 }
-            });
+            };
+            App.setNftsUi({ minter });
         };
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
-            this.update({
-                nfts: {
-                    minter: {
-                        [Nft.token(token)]: {
-                            approval: NftMinterApproval.approving
-                        }
-                    }
+            const minter = {
+                [Nft.token(token)]: {
+                    approval: NftMinterApproval.approving
                 }
+            };
+            App.setNftsUi({
+                minter
             });
             moe_wallet.onApproval(on_approval);
             const nft_contract = await nft_wallet.contract;
@@ -1230,14 +656,13 @@ export class SPA extends Referable(Updatable(
                 nft_contract.address, MAX_UINT256 - old_allowance
             );
         } catch (ex) {
-            this.update({
-                nfts: {
-                    minter: {
-                        [Nft.token(token)]: {
-                            approval: NftMinterApproval.error
-                        }
-                    }
+            const minter = {
+                [Nft.token(token)]: {
+                    approval: NftMinterApproval.error
                 }
+            };
+            App.setNftsUi({
+                minter
             });
             const $button = document.querySelector<HTMLElement>(
                 '#nft-batch-minting'
@@ -1267,40 +692,35 @@ export class SPA extends Referable(Updatable(
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            this.update({
-                nfts: {
-                    minter: {
-                        [Nft.token(token)]: {
-                            status: NftMinterStatus.minted
-                        }
-                    }
+            const minter = {
+                [Nft.token(token)]: {
+                    status: NftMinterStatus.minted
                 }
-            });
+            };
+            App.setNftsUi({ minter });
         };
         const nft_wallet = new NftWallet(address, token);
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
-            this.update({
-                nfts: {
-                    minter: {
-                        [Nft.token(token)]: {
-                            status: NftMinterStatus.minting
-                        }
-                    }
+            const minter = {
+                [Nft.token(token)]: {
+                    status: NftMinterStatus.minting
                 }
+            };
+            App.setNftsUi({
+                minter
             });
             nft_wallet.onTransferBatch(on_batch_tx);
             tx = await nft_wallet.mintBatch(levels, amounts);
         } catch (ex) {
-            this.update({
-                nfts: {
-                    minter: {
-                        [Nft.token(token)]: {
-                            status: NftMinterStatus.error
-                        }
-                    }
+            const minter = {
+                [Nft.token(token)]: {
+                    status: NftMinterStatus.error
                 }
+            };
+            App.setNftsUi({
+                minter
             });
             const $button = document.querySelector<HTMLElement>(
                 '#nft-batch-minting'
@@ -1319,13 +739,13 @@ export class SPA extends Referable(Updatable(
             throw new Error('missing selected-address');
         }
         const ppt_token = Nft.token(
-            this.state.token
+            this.props.token
         );
         const core_id = Nft.coreId({
             issue: ppt_issue, level: ppt_level
         });
         const moe_treasury = MoeTreasuryFactory({
-            token: this.state.token
+            token: this.props.token
         });
         const on_claim_tx: OnClaim = async (
             acc, id, amount, ev
@@ -1333,39 +753,35 @@ export class SPA extends Referable(Updatable(
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            this.update({
-                ppts: {
-                    details: {
-                        [ppt_token]: {
-                            [ppt_level]: {
-                                [ppt_issue]: {
-                                    claimer: {
-                                        status: PptClaimerStatus.claimed
-                                    }
-                                }
+            const details = {
+                [ppt_token]: {
+                    [ppt_level]: {
+                        [ppt_issue]: {
+                            claimer: {
+                                status: PptClaimerStatus.claimed
                             }
                         }
                     }
                 }
-            });
+            };
+            App.setPptsUi({ details });
         };
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
-            this.update({
-                ppts: {
-                    details: {
-                        [ppt_token]: {
-                            [ppt_level]: {
-                                [ppt_issue]: {
-                                    claimer: {
-                                        status: PptClaimerStatus.claiming
-                                    }
-                                }
+            const details = {
+                [ppt_token]: {
+                    [ppt_level]: {
+                        [ppt_issue]: {
+                            claimer: {
+                                status: PptClaimerStatus.claiming
                             }
                         }
                     }
                 }
+            };
+            App.setPptsUi({
+                details
             });
             moe_treasury.then(
                 (c) => c.on('Claim', on_claim_tx)
@@ -1377,23 +793,22 @@ export class SPA extends Referable(Updatable(
                 x40(address), core_id
             );
         } catch (ex: any) {
-            this.update({
-                ppts: {
-                    details: {
-                        [ppt_token]: {
-                            [ppt_level]: {
-                                [ppt_issue]: {
-                                    claimer: {
-                                        status: PptClaimerStatus.error
-                                    }
-                                }
+            const details = {
+                [ppt_token]: {
+                    [ppt_level]: {
+                        [ppt_issue]: {
+                            claimer: {
+                                status: PptClaimerStatus.error
                             }
                         }
                     }
                 }
+            };
+            App.setPptsUi({
+                details
             });
-            const $ref = this.global_ref<HTMLElement>(
-                `ppt-claimer:${core_id}`
+            const $ref = this.globalRef<HTMLElement>(
+                `.ppt-claimer[core-id="${core_id}"]`
             );
             const $claimer_row = ancestor(
                 $ref.current, (e) => e.classList.contains('row')
@@ -1422,15 +837,12 @@ export class SPA extends Referable(Updatable(
             address
         );
         if (approved) {
-            this.update({
-                ppts: {
-                    minter: {
-                        [Nft.token(token)]: {
-                            approval: PptMinterApproval.approved
-                        }
-                    }
+            const minter = {
+                [Nft.token(token)]: {
+                    approval: PptMinterApproval.approved
                 }
-            });
+            };
+            App.setPptsUi({ minter });
         } else {
             const on_approval: OnApprovalForAll = (
                 account, op, flag, ev
@@ -1438,41 +850,36 @@ export class SPA extends Referable(Updatable(
                 if (ev.transactionHash !== tx?.hash) {
                     return;
                 }
-                this.update({
-                    ppts: {
-                        minter: {
-                            [Nft.token(token)]: {
-                                approval: PptMinterApproval.approved
-                            }
-                        }
+                const minter = {
+                    [Nft.token(token)]: {
+                        approval: PptMinterApproval.approved
                     }
-                });
+                };
+                App.setPptsUi({ minter });
             };
             let tx: Transaction | undefined;
             Alerts.hide();
             try {
-                this.update({
-                    ppts: {
-                        minter: {
-                            [Nft.token(token)]: {
-                                approval: PptMinterApproval.approving
-                            }
-                        }
+                const minter = {
+                    [Nft.token(token)]: {
+                        approval: PptMinterApproval.approving
                     }
+                };
+                App.setPptsUi({
+                    minter
                 });
                 nft_wallet.onApprovalForAll(on_approval);
                 tx = await nft_wallet.setApprovalForAll(
                     await ppt_treasury.then((c) => c.address), true
                 );
             } catch (ex) {
-                this.update({
-                    ppts: {
-                        minter: {
-                            [Nft.token(token)]: {
-                                approval: PptMinterApproval.error
-                            }
-                        }
+                const minter = {
+                    [Nft.token(token)]: {
+                        approval: PptMinterApproval.error
                     }
+                };
+                App.setPptsUi({
+                    minter
                 });
                 const $button = document.querySelector<HTMLElement>(
                     '#ppt-batch-minting'
@@ -1528,15 +935,12 @@ export class SPA extends Referable(Updatable(
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            this.update({
-                ppts: {
-                    minter: {
-                        [Nft.token(token)]: {
-                            minter_status: PptMinterStatus.minted
-                        }
-                    }
+            const minter = {
+                [Nft.token(token)]: {
+                    minter_status: PptMinterStatus.minted
                 }
-            });
+            };
+            App.setPptsUi({ minter });
         };
         const ppt_treasury = PptTreasuryFactory({
             token
@@ -1544,14 +948,13 @@ export class SPA extends Referable(Updatable(
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
-            this.update({
-                ppts: {
-                    minter: {
-                        [Nft.token(token)]: {
-                            minter_status: PptMinterStatus.minting
-                        }
-                    }
+            const minter = {
+                [Nft.token(token)]: {
+                    minter_status: PptMinterStatus.minting
                 }
+            };
+            App.setPptsUi({
+                minter
             });
             ppt_treasury.then(
                 (c) => c?.on('StakeBatch', on_stake_batch)
@@ -1563,14 +966,13 @@ export class SPA extends Referable(Updatable(
                 x40(address), ppt_ids, amounts
             );
         } catch (ex: any) {
-            this.update({
-                ppts: {
-                    minter: {
-                        [Nft.token(token)]: {
-                            minter_status: PptMinterStatus.error
-                        }
-                    }
+            const minter = {
+                [Nft.token(token)]: {
+                    minter_status: PptMinterStatus.error
                 }
+            };
+            App.setPptsUi({
+                minter
             });
             const $button = document.querySelector<HTMLElement>(
                 '#ppt-batch-minting'
@@ -1625,15 +1027,12 @@ export class SPA extends Referable(Updatable(
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            this.update({
-                ppts: {
-                    minter: {
-                        [Nft.token(token)]: {
-                            burner_status: PptBurnerStatus.burned
-                        }
-                    }
+            const minter = {
+                [Nft.token(token)]: {
+                    burner_status: PptBurnerStatus.burned
                 }
-            });
+            };
+            App.setPptsUi({ minter });
         };
         const ppt_treasury = PptTreasuryFactory({
             token
@@ -1641,14 +1040,13 @@ export class SPA extends Referable(Updatable(
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
-            this.update({
-                ppts: {
-                    minter: {
-                        [Nft.token(token)]: {
-                            burner_status: PptBurnerStatus.burning
-                        }
-                    }
+            const minter = {
+                [Nft.token(token)]: {
+                    burner_status: PptBurnerStatus.burning
                 }
+            };
+            App.setPptsUi({
+                minter
             });
             ppt_treasury.then(
                 (c) => c?.on('UnstakeBatch', on_unstake_batch)
@@ -1660,14 +1058,13 @@ export class SPA extends Referable(Updatable(
                 x40(address), ppt_ids, amounts
             );
         } catch (ex: any) {
-            this.update({
-                ppts: {
-                    minter: {
-                        [Nft.token(token)]: {
-                            burner_status: PptBurnerStatus.error
-                        }
-                    }
+            const minter = {
+                [Nft.token(token)]: {
+                    burner_status: PptBurnerStatus.error
                 }
+            };
+            App.setPptsUi({
+                minter
             });
             const $button = document.querySelector<HTMLElement>(
                 '#ppt-batch-minting'
@@ -1699,9 +1096,22 @@ export class SPA extends Referable(Updatable(
     }
 }
 if (require.main === module) {
+    const mapper = ({
+        page, token, mining, minting, nfts_ui, ppts_ui
+    }: {
+        page: Page;
+        token: Token;
+        mining: Mining;
+        minting: Minting;
+        nfts_ui: NftsUi;
+        ppts_ui: PptsUi;
+    }) => ({
+        page, token, mining, minting, nfts_ui, ppts_ui
+    });
     const $content = document.querySelector('content');
-    createRoot($content!).render(createElement(SPA, {
-        page: App.page, token: App.token, speed: App.speed
-    }));
+    const spa = createElement(connect(mapper)(SPA));
+    createRoot($content!).render(
+        <Provider store={App.store}>{spa}</Provider>
+    );
 }
 export default SPA;

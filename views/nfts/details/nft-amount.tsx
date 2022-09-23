@@ -34,7 +34,7 @@ export class UiNftAmount extends React.Component<
                 Send Amount
             </label>
             <div className='input-group nft-transfer-amount d-none d-sm-flex'
-                data-level={Nft.nameOf(nft_level)} role='group'
+                role='group'
             >
                 <input type='number'
                     className={classes.join(' ')}

@@ -4,10 +4,10 @@ div#minting
   - let level = 1
   while level <= 64
     div.btn-group.mint(
-      role="group" data-level=`${level}`
+      role="group"
     )
       button.btn.btn-outline-warning.minter(
-        type="button" disabled data-level=`${level}`
+        type="button" disabled
       )
         span.spinner.spinner-border.spinner-border-sm.float-start.spinner-grow(
           role="status" style="visibility: hidden;"

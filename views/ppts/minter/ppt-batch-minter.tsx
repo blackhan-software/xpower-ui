@@ -1,7 +1,8 @@
 import { Token } from '../../../source/redux/types';
+import { PptMinterList } from '../../../source/redux/types';
+import { PptMinterStatus } from '../../../source/redux/types';
 
 import React from 'react';
-import { PptMinterList } from './index';
 import { Spinner } from './index';
 
 type Props = {
@@ -10,11 +11,6 @@ type Props = {
     onBatchMint?: (token: Token, list: PptMinterList) => void;
     status: PptMinterStatus | null;
     token: Token;
-}
-export enum PptMinterStatus {
-    minting = 'minting',
-    minted = 'minted',
-    error = 'error'
 }
 function minting(
     status: PptMinterStatus | null
