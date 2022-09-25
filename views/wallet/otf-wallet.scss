@@ -42,5 +42,8 @@ div#otf-wallet {
     input {
       font-size: smaller;
     }
+    button.info {
+      svg { top: 0; }
+    }
   }
 }

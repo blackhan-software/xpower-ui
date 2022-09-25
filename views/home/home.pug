@@ -2,7 +2,8 @@ extends ../spa/spa.pug
 
 block content
   content
-    h1: | {{DESCRIPTION}} <img alt="Avalanche" height="24" src="/images/png/avalanche-icon/avalanche-64x64.png" width="24" />
+    h1: | {{DESCRIPTION}}!{' '}
+      include ../../public/images/pug/avalanche-24.svg.pug
     include ../connector/connector.pug
     include ../wallet/wallet.pug
     include ../selector/selector.pug
