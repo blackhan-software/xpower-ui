@@ -2,24 +2,22 @@ import { App } from '../../../source/app';
 import { Blockchain } from '../../../source/blockchain';
 import { MoeTreasuryFactory } from '../../../source/contract';
 import { Referable, Updatable, x40 } from '../../../source/functions';
-import { Amount, Supply, Token } from '../../../source/redux/types';
-import { NftToken, NftTokens } from '../../../source/redux/types';
-import { NftLevel, NftLevels } from '../../../source/redux/types';
-import { Nft, NftFullId, NftIssue } from '../../../source/redux/types';
-import { PptDetails } from '../../../source/redux/types';
+import { pptsBy } from '../../../source/redux/selectors';
+import { Amount, Nft, NftFullId, NftIssue, NftLevel, NftLevels, Nfts, NftToken, NftTokens, PptDetails, Supply, Token } from '../../../source/redux/types';
 import { Years } from '../../../source/years';
 
 import React from 'react';
-import { UiPptImage, ppt_meta, ppt_href } from './ppt-image';
-export { UiPptImage, ppt_meta, ppt_href };
+import { Unsubscribe } from 'redux';
+import { InfoCircle } from '../../../public/images/tsx';
 import { UiPptClaimable } from './ppt-claimable';
 import { UiPptClaimed } from './ppt-claimed';
 import { UiPptClaimer } from './ppt-claimer';
 import { UiPptExpander } from './ppt-expander';
-import { InfoCircle } from '../../../public/images/tsx';
-import { Unsubscribe } from 'redux';
+import { ppt_href, ppt_meta, UiPptImage } from './ppt-image';
+export { UiPptImage, ppt_meta, ppt_href };
 
 type Props = {
+    ppts: Nfts;
     token: Token;
     level: NftLevel;
     details: PptDetails;
@@ -170,13 +168,13 @@ export class UiPptDetails extends Referable(Updatable(
     }
     render() {
         const years = Array.from(Years({ reverse: true }));
-        const level = this.props.level;
+        const { ppts, level } = this.props;
         return <React.Fragment>{
-            years.map((issue) => this.$row(issue, level))
+            years.map((issue) => this.$row(ppts, issue, level))
         }</React.Fragment>;
     }
     $row(
-        ppt_issue: NftIssue, ppt_level: NftLevel
+        ppts: Nfts, ppt_issue: NftIssue, ppt_level: NftLevel
     ) {
         const by_level = this.props.details[ppt_level];
         const by_issue = by_level[ppt_issue];
@@ -193,12 +191,12 @@ export class UiPptDetails extends Referable(Updatable(
             level: ppt_level,
             token: ppt_token
         });
-        const ppts = App.getPptsBy({
+        const ppts_by = pptsBy(ppts, {
             issue: ppt_issue,
             level: ppt_level,
             token: ppt_token
         });
-        const ppt = ppts.items[full_id] ?? {
+        const ppt = ppts_by.items[full_id] ?? {
             amount: 0n, supply: 0n
         };
         return <React.Fragment key={core_id}>
@@ -375,8 +373,10 @@ export class UiPptDetails extends Referable(Updatable(
             onClaim={
                 this.props.onPptClaim?.bind(this)
             }
-            onToggled={(flag) => {
-                App.event.emit('toggle-issue', { flag });
+            onToggled={(toggled) => {
+                App.event.emit('toggle-issue', {
+                    flag: toggled
+                });
             }}
             status={claimer.status}
             toggled={toggled}

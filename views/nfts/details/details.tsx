@@ -1,20 +1,20 @@
 import { App } from '../../../source/app';
 import { Referable } from '../../../source/functions';
-import { Amount, Supply, Token } from '../../../source/redux/types';
-import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
-import { NftDetails } from '../../../source/redux/types';
+import { nftsBy } from '../../../source/redux/selectors';
+import { Amount, Nft, NftDetails, NftIssue, NftLevel, Nfts, Supply, Token } from '../../../source/redux/types';
 import { Years } from '../../../source/years';
 
 import React from 'react';
-import { UiNftImage, nft_meta, nft_href } from './nft-image';
-export { UiNftImage, nft_meta, nft_href };
-import { UiNftTarget } from './nft-target';
-import { UiNftAmount } from './nft-amount';
-import { UiNftSender } from './nft-sender';
-import { UiNftExpander } from './nft-expander';
 import { InfoCircle } from '../../../public/images/tsx';
+import { UiNftAmount } from './nft-amount';
+import { UiNftExpander } from './nft-expander';
+import { nft_href, nft_meta, UiNftImage } from './nft-image';
+import { UiNftSender } from './nft-sender';
+import { UiNftTarget } from './nft-target';
+export { UiNftImage, nft_meta, nft_href };
 
 type Props = {
+    nfts: Nfts;
     token: Token;
     level: NftLevel;
     details: NftDetails;
@@ -49,13 +49,13 @@ export class UiNftDetails extends Referable(
 ) {
     render() {
         const years = Array.from(Years({ reverse: true }));
-        const level = this.props.level;
+        const { nfts, level } = this.props;
         return <React.Fragment>{
-            years.map((issue) => this.$row(issue, level))
+            years.map((issue) => this.$row(nfts, issue, level))
         }</React.Fragment>;
     }
     $row(
-        nft_issue: NftIssue, nft_level: NftLevel
+        nfts: Nfts, nft_issue: NftIssue, nft_level: NftLevel
     ) {
         const by_level = this.props.details[nft_level];
         const by_issue = by_level[nft_issue];
@@ -72,12 +72,12 @@ export class UiNftDetails extends Referable(
             level: nft_level,
             token: nft_token
         });
-        const nfts = App.getNftsBy({
+        const nfts_by = nftsBy(nfts, {
             issue: nft_issue,
             level: nft_level,
             token: nft_token
         });
-        const nft = nfts.items[full_id] ?? {
+        const nft = nfts_by.items[full_id] ?? {
             amount: 0n, supply: 0n
         };
         return <React.Fragment key={core_id}>
@@ -275,8 +275,10 @@ export class UiNftDetails extends Referable(
             onTransfer={
                 this.props.onNftTransfer?.bind(this)
             }
-            onToggled={(flag) => {
-                App.event.emit('toggle-issue', { flag });
+            onToggled={(toggled) => {
+                App.event.emit('toggle-issue', {
+                    flag: toggled
+                });
             }}
             toggled={toggled}
             token={token}

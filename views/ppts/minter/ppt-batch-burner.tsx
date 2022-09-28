@@ -1,6 +1,4 @@
-import { Token } from '../../../source/redux/types';
-import { PptMinterList } from '../../../source/redux/types';
-import { PptBurnerStatus } from '../../../source/redux/types';
+import { PptBurnerStatus, PptMinterList, Token } from '../../../source/redux/types';
 
 import React from 'react';
 import { Spinner } from './index';
@@ -12,32 +10,20 @@ type Props = {
     status: PptBurnerStatus | null;
     token: Token;
 }
-function burning(
-    status: PptBurnerStatus | null
-): boolean {
-    return status === PptBurnerStatus.burning;
-}
-export function UiPptBatchBurner({
-    approved, list, onBatchBurn, status, token
-}: Props) {
+export function UiPptBatchBurner(
+    { approved, list, status, token, onBatchBurn }: Props
+) {
     const classes = [
         'btn btn-outline-warning',
         approved ? 'show' : ''
     ];
-    const disabled = () => {
-        if (burning(status)) {
-            return true;
-        }
-        if (!negatives(list)) {
-            return true;
-        }
-        return false;
-    };
     const text = burning(status)
         ? <>Unstaking<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
         : <>Unstake<span className="d-none d-sm-inline">&nbsp;NFTs</span></>;
-    return <button type='button' id='ppt-batch-burner'
-        className={classes.join(' ')} disabled={disabled()}
+    return <button
+        type='button' id='ppt-batch-burner'
+        className={classes.join(' ')}
+        disabled={disabled({ list, status })}
         onClick={onBatchBurn?.bind(null, token, list)}
     >
         {Spinner({
@@ -45,6 +31,22 @@ export function UiPptBatchBurner({
         })}
         <span className='text'>{text}</span>
     </button>;
+}
+function disabled(
+    { list, status }: Pick<Props, 'list' | 'status'>
+) {
+    if (burning(status)) {
+        return true;
+    }
+    if (!negatives(list)) {
+        return true;
+    }
+    return false;
+}
+function burning(
+    status: PptBurnerStatus | null
+): boolean {
+    return status === PptBurnerStatus.burning;
 }
 function negatives(
     list: PptMinterList

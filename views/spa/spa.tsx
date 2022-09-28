@@ -7,7 +7,7 @@ import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryF
 import { Alert, alert, Alerts, ancestor, Referable, x40 } from '../../source/functions';
 import { HashManager, MiningManager } from '../../source/managers';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
-import { Address, Amount, Level, MAX_UINT256, Mining, MinterRows, MinterStatus, Minting, Nft, NftCoreId, NftFlags, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, NftSenderStatus, NftsUi, Page, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, PptsUi, Token } from '../../source/redux/types';
+import { Address, Amount, Level, MAX_UINT256, Mining, MinterRows, MinterStatus, Minting, Nft, NftCoreId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, Nfts, NftSenderStatus, NftsUi, Page, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, PptsUi, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
@@ -37,7 +37,9 @@ type Props = {
     token: Token;
     mining: Mining;
     minting: Minting;
+    nfts: Nfts;
     nfts_ui: NftsUi;
+    ppts: Nfts;
     ppts_ui: PptsUi;
 }
 export class SPA extends Referable(
@@ -49,15 +51,16 @@ export class SPA extends Referable(
         }
         const { mining: { speed } } = this.props;
         const { page, token } = this.props;
-        const { nfts_ui, ppts_ui } = this.props;
+        const { nfts, nfts_ui } = this.props;
+        const { ppts, ppts_ui } = this.props;
         return <React.StrictMode>
             {this.$h1(page)}
             {this.$connector(page)}
             {this.$wallet(page, token)}
             {this.$selector(page, token)}
             {this.$home(page, token, speed)}
-            {this.$nfts(page, token, nfts_ui.flags, nfts_ui.toggled)}
-            {this.$ppts(page, token, ppts_ui.flags, ppts_ui.toggled)}
+            {this.$nfts(page, token, nfts, nfts_ui)}
+            {this.$ppts(page, token, ppts, ppts_ui)}
             {this.$about(page, token)}
         </React.StrictMode>;
     }
@@ -135,20 +138,23 @@ export class SPA extends Referable(
         </form>;
     }
     $nfts(
-        page: Page, token: Token, flags: NftFlags, toggled: boolean
+        page: Page, token: Token,
+        nfts: Nfts, nfts_ui: NftsUi
     ) {
         if (page !== Page.Nfts) {
             return null;
         }
         const nft_token = Nft.token(token);
-        return <form id='nfts'
-            onSubmit={(e) => e.preventDefault()}
+        return <form
+            id='nfts' onSubmit={(e) => e.preventDefault()}
         >
             <UiNfts
-                details={this.props.nfts_ui.details}
-                amounts={this.props.nfts_ui.amounts}
-                minter={this.props.nfts_ui.minter}
-                flags={flags}
+                nfts={nfts}
+                amounts={nfts_ui.amounts}
+                details={nfts_ui.details}
+                flags={nfts_ui.flags}
+                minter={nfts_ui.minter}
+                toggled={nfts_ui.toggled}
                 onNftList={(lhs, rhs) => {
                     App.setNftsUi({
                         flags: lhs, amounts: { [nft_token]: rhs }
@@ -232,26 +238,28 @@ export class SPA extends Referable(
                     App.setNftsUi({ flags, toggled });
                     App.setPptsUi({ flags, toggled });
                 }}
-                toggled={toggled}
                 token={token}
             />
         </form>;
     }
     $ppts(
-        page: Page, token: Token, flags: NftFlags, toggled: boolean
+        page: Page, token: Token,
+        ppts: Nfts, ppts_ui: PptsUi
     ) {
         if (page !== Page.Ppts) {
             return null;
         }
         const nft_token = Nft.token(token);
-        return <form id='nfts'
-            onSubmit={(e) => e.preventDefault()}
+        return <form
+            id='nfts' onSubmit={(e) => e.preventDefault()}
         >
             <UiPpts
-                details={this.props.ppts_ui.details}
-                amounts={this.props.ppts_ui.amounts}
-                minter={this.props.ppts_ui.minter}
-                flags={flags}
+                ppts={ppts}
+                amounts={ppts_ui.amounts}
+                details={ppts_ui.details}
+                flags={ppts_ui.flags}
+                minter={ppts_ui.minter}
+                toggled={ppts_ui.toggled}
                 onPptList={(lhs, rhs) => {
                     App.setNftsUi({
                         flags: lhs
@@ -340,7 +348,6 @@ export class SPA extends Referable(
                     App.setNftsUi({ flags, toggled });
                     App.setPptsUi({ flags, toggled });
                 }}
-                toggled={toggled}
                 token={token}
             />
         </form>;
@@ -1097,16 +1104,20 @@ export class SPA extends Referable(
 }
 if (require.main === module) {
     const mapper = ({
-        page, token, mining, minting, nfts_ui, ppts_ui
+        page, token, mining, minting,
+        nfts, nfts_ui, ppts, ppts_ui
     }: {
         page: Page;
         token: Token;
         mining: Mining;
         minting: Minting;
+        nfts: Nfts;
         nfts_ui: NftsUi;
+        ppts: Nfts;
         ppts_ui: PptsUi;
     }) => ({
-        page, token, mining, minting, nfts_ui, ppts_ui
+        page, token, mining, minting,
+        nfts, nfts_ui, ppts, ppts_ui
     });
     const $content = document.querySelector('content');
     const spa = createElement(connect(mapper)(SPA));

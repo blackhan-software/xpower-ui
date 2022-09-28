@@ -1,16 +1,16 @@
-import './list.scss';
 import './amount';
+import './list.scss';
 
 import { App } from '../../../source/app';
-import { Amount, Supply, Token } from '../../../source/redux/types';
-import { Nft, NftIssue, NftLevel, NftLevels } from '../../../source/redux/types';
-import { NftDetails } from '../../../source/redux/types';
+import { nftsBy, nftTotalBy } from '../../../source/redux/selectors';
+import { Amount, Nft, NftDetails, NftIssue, NftLevel, NftLevels, Nfts, Supply, Token } from '../../../source/redux/types';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { UiNftAmount } from './amount';
 import { UiNftDetails } from '../details/details';
 
 type Props = {
+    nfts: Nfts;
     list: NftList;
     onNftList?: (
         list: Partial<NftList>
@@ -48,202 +48,172 @@ export type NftList = Record<NftLevel, {
     amount: Amount; max: Amount; min: Amount;
     display: boolean; toggled: boolean;
 }>;
-export class UiNftList extends React.Component<
-    Props
-> {
-    render() {
-        const { token, list } = this.props;
-        return <React.Fragment>
-            <label className='form-label'>
-                Mint & Manage {token} NFTs
-            </label>
-            {Array.from(NftLevels()).map((
-                nft_level
-            ) => {
-                const by_token = App.getNftTotalBy({
-                    token: Nft.token(token),
-                    level: nft_level
-                });
-                const by_level = App.getNftTotalBy({
-                    level: nft_level
-                });
-                return this.$nftMinterAndDetails(
-                    token, nft_level,
-                    by_token, by_level,
-                    list[nft_level]
-                );
-            })}
-        </React.Fragment>;
-    }
-    $nftMinterAndDetails(
-        token: Token, nft_level: NftLevel,
-        by_token: { amount: Amount, supply: Supply },
-        by_level: { amount: Amount, supply: Supply },
-        { amount, max, min, display, toggled }: NftList[NftLevel],
-    ) {
-        return <React.Fragment key={nft_level}>
-            {this.$nftMinter(token, nft_level, by_level, by_token, {
-                amount, max, min, display, toggled
-            })}
-            {this.$nftDetails(token, nft_level, by_level, {
-                amount, max, min, display, toggled
-            })}
-        </React.Fragment>;
-    }
-    $nftMinter(
-        token: Token, nft_level: NftLevel,
-        by_level: { amount: Amount, supply: Supply },
-        by_token: { amount: Amount, supply: Supply },
-        { amount, max, min, display, toggled }: NftList[NftLevel],
-    ) {
-        const any_filter = [
-            by_level.supply, by_level.amount, amount, max, min,
-            this.props.toggled // toggles *all* levels!
-        ];
-        const style = {
-            display: (display || any_filter.some((v) => v))
-                ? 'inline-flex' : 'none',
-        };
-        return <div className='btn-group nft-minter'
-            role='group' style={style}
+export function UiNftList(
+    props: Props
+) {
+    useEffect(() => {
+        App.event.emit('refresh-tips');
+    });
+    const { token, list } = props;
+    return <React.Fragment>
+        <label className='form-label'>
+            Mint & Manage {token} NFTs
+        </label>
+        {Array.from(NftLevels()).map((
+            nft_level
+        ) => {
+            return <React.Fragment key={nft_level}>
+                {$nftMinter(props, nft_level, list[nft_level])}
+                {$nftDetails(props, nft_level, list[nft_level])}
+            </React.Fragment>
+        })}
+    </React.Fragment>;
+}
+function $nftMinter(
+    props: Props, nft_level: NftLevel,
+    { display, toggled, amount, max, min }: NftList[NftLevel]
+) {
+    if (display) {
+        const total_by = nftTotalBy(props.nfts, {
+            level: nft_level, token: Nft.token(props.token)
+        });
+        return <div
+            className='btn-group nft-minter' role='group'
+            style={{ display: 'inline-flex' }}
         >
-            {this.$toggle(nft_level, toggled)}
-            {this.$minter(nft_level, token)}
-            {this.$balance(nft_level, by_token)}
+            {$toggle(nft_level, toggled)}
+            {$minter(nft_level, props.token)}
+            {$balance(nft_level, total_by)}
             <UiNftAmount
                 amount={amount}
                 level={nft_level}
                 max={max} min={min}
                 onUpdate={({ amount }) => {
-                    if (this.props.onNftList) {
-                        this.props.onNftList({
+                    if (props.onNftList) {
+                        props.onNftList({
                             [nft_level]: { amount }
                         });
                     }
                 }} />
         </div>;
     }
-    $nftDetails(
-        token: Token, nft_level: NftLevel,
-        by_level: { amount: Amount, supply: Supply },
-        { amount, max, min, display, toggled }: NftList[NftLevel],
-    ) {
-        const any_filter = [
-            by_level.supply, by_level.amount, amount, max, min,
-            this.props.toggled // toggles *all* levels!
-        ];
-        const style = {
-            display: (display || any_filter.some((v) => v)) && toggled
-                ? 'block' : 'none'
-        };
-        if (style.display === 'block') {
-            return <div className='nft-details' role='group' style={style}>
-                <UiNftDetails
-                    level={nft_level}
-                    details={
-                        this.props.details
-                    }
-                    onNftImageLoaded={
-                        this.props.onNftImageLoaded?.bind(this)
-                    }
-                    onNftSenderExpanded={
-                        this.props.onNftSenderExpanded?.bind(this)
-                    }
-                    onNftTargetChanged={
-                        this.props.onNftTargetChanged?.bind(this)
-                    }
-                    onNftAmountChanged={
-                        this.props.onNftAmountChanged?.bind(this)
-                    }
-                    onNftTransfer={
-                        this.props.onNftTransfer?.bind(this)
-                    }
-                    token={token}
-                />
-            </div>;
-        }
-    }
-    $toggle(
-        nft_level: NftLevel, toggled: boolean
-    ) {
-        const title = toggled
-            ? `Hide ${Nft.nameOf(nft_level)} NFTs`
-            : `Show ${Nft.nameOf(nft_level)} NFTs`;
+}
+function $nftDetails(
+    props: Props, nft_level: NftLevel,
+    { display, toggled }: NftList[NftLevel]
+) {
+    if (display && toggled) {
+        const nfts = nftsBy(props.nfts, {
+            token: Nft.token(props.token),
+            level: nft_level
+        });
         return <div
-            className='btn-group' role='group'
+            className='nft-details' role='group'
+            style={{ display: 'block' }}
         >
-            <button type='button'
-                className='btn btn-outline-warning toggle no-ellipsis'
-                data-bs-placement='top' data-bs-toggle='tooltip'
-                onClick={() => this.toggle(nft_level, toggled)}
-                title={title}
-            >
-                <i className={
-                    toggled ? 'bi-chevron-up' : 'bi-chevron-down'
-                } />
-            </button>
+            <UiNftDetails
+                nfts={nfts}
+                level={nft_level}
+                details={
+                    props.details
+                }
+                onNftImageLoaded={
+                    props.onNftImageLoaded
+                }
+                onNftSenderExpanded={
+                    props.onNftSenderExpanded
+                }
+                onNftTargetChanged={
+                    props.onNftTargetChanged
+                }
+                onNftAmountChanged={
+                    props.onNftAmountChanged
+                }
+                onNftTransfer={
+                    props.onNftTransfer
+                }
+                token={
+                    props.token
+                }
+            />
         </div>;
     }
-    toggle(
-        nft_level: NftLevel, toggled: boolean
-    ) {
-        App.event.emit('toggle-level', {
-            level: nft_level, flag: !toggled
-        });
-    }
-    $minter(
+}
+function $toggle(
+    nft_level: NftLevel, toggled: boolean
+) {
+    const title = toggled
+        ? `Hide ${Nft.nameOf(nft_level)} NFTs`
+        : `Show ${Nft.nameOf(nft_level)} NFTs`;
+    return <div
+        className='btn-group' role='group'
+    >
+        <button type='button'
+            className='btn btn-outline-warning toggle no-ellipsis'
+            data-bs-placement='top' data-bs-toggle='tooltip'
+            onClick={() => toggle(nft_level, toggled)}
+            title={title}
+        >
+            <i className={
+                toggled ? 'bi-chevron-up' : 'bi-chevron-down'
+            } />
+        </button>
+    </div>;
+}
+function toggle(
+    nft_level: NftLevel, toggled: boolean
+) {
+    App.event.emit('toggle-level', {
+        level: nft_level, flag: !toggled
+    });
+}
+function $minter(
+    nft_level: NftLevel, token: Token
+) {
+    const head = (nft_level: NftLevel) => {
+        const nft_name = Nft.nameOf(nft_level);
+        if (nft_name) return nft_name.slice(0, 1);
+    };
+    const tail = (nft_level: NftLevel) => {
+        const nft_name = Nft.nameOf(nft_level);
+        if (nft_name) return nft_name.slice(1);
+    };
+    const title = (
         nft_level: NftLevel, token: Token
-    ) {
-        const head = (nft_level: NftLevel) => {
-            const nft_name = Nft.nameOf(nft_level);
-            if (nft_name) return nft_name.slice(0, 1);
-        };
-        const tail = (nft_level: NftLevel) => {
-            const nft_name = Nft.nameOf(nft_level);
-            if (nft_name) return nft_name.slice(1);
-        };
-        const title = (
-            nft_level: NftLevel, token: Token
-        ) => {
-            const nft_name = Nft.nameOf(nft_level);
-            const lhs_head = head(nft_level);
-            const lhs = lhs_head ? `1${lhs_head}` : '';
-            const rhs_head = head(nft_level + 3);
-            const rhs = rhs_head ? `1${rhs_head}` : `K${lhs_head}`;
-            return `Mint ${nft_name} NFTs (for [${lhs}...${rhs}] ${token} tokens)`;
-        };
-        return <button type='button'
-            className='btn btn-outline-warning minter'
-            data-bs-placement='top' data-bs-toggle='tooltip'
-            title={title(nft_level, token)}
-        >
-            {head(nft_level)}<span
-                className='d-none d-sm-inline'>{tail(nft_level)} NFTs</span>
-        </button>;
-    }
-    $balance(
-        nft_level: NftLevel, total_by: {
-            amount: Amount, supply: Supply
-        }
-    ) {
-        return <button type='button'
-            className='btn btn-outline-warning balance'
-            data-bs-placement='top' data-bs-toggle='tooltip'
-            title={`Overall personal balance & supply (${Nft.nameOf(nft_level)} NFTs)`}
-        >
-            <span>{
-                total_by.amount.toString()
-            }</span>
-            <span className='d-none d-sm-inline'>
-                &nbsp;/&nbsp;
-            </span>
-            <span className='d-none d-sm-inline'>{
-                total_by.supply.toString()
-            }</span>
-        </button>;
-    }
-    componentDidUpdate() {
-        App.event.emit('refresh-tips');
-    }
+    ) => {
+        const nft_name = Nft.nameOf(nft_level);
+        const lhs_head = head(nft_level);
+        const lhs = lhs_head ? `1${lhs_head}` : '';
+        const rhs_head = head(nft_level + 3);
+        const rhs = rhs_head ? `1${rhs_head}` : `K${lhs_head}`;
+        return `Mint ${nft_name} NFTs (for [${lhs}...${rhs}] ${token} tokens)`;
+    };
+    return <button type='button'
+        className='btn btn-outline-warning minter'
+        data-bs-placement='top' data-bs-toggle='tooltip'
+        title={title(nft_level, token)}
+    >
+        {head(nft_level)}<span
+            className='d-none d-sm-inline'>{tail(nft_level)} NFTs</span>
+    </button>;
+}
+function $balance(
+    nft_level: NftLevel, total_by: { amount: Amount, supply: Supply }
+) {
+    return <button type='button'
+        className='btn btn-outline-warning balance'
+        data-bs-placement='top' data-bs-toggle='tooltip'
+        title={`Overall personal balance & supply (${Nft.nameOf(nft_level)} NFTs)`}
+    >
+        <span>{
+            total_by.amount.toString()
+        }</span>
+        <span className='d-none d-sm-inline'>
+            &nbsp;/&nbsp;
+        </span>
+        <span className='d-none d-sm-inline'>{
+            total_by.supply.toString()
+        }</span>
+    </button>;
 }
 export default UiNftList;

@@ -18,6 +18,19 @@ type OnUpdate = (args: Omit<Props, 'onUpdate'> & {
 export class UiPptAmount extends Referable(React.Component)<
     Props
 > {
+    componentDidMount() {
+        const $amount = this.ref<HTMLElement>('.amount');
+        $amount.current?.addEventListener(
+            'wheel', this.decreaseByWheel.bind(this), {
+                passive: false
+            }
+        );
+        $amount.current?.addEventListener(
+            'wheel', this.increaseByWheel.bind(this), {
+                passive: false
+            }
+        );
+    }
     render() {
         const { amount, max, min, level } = this.props;
         return <React.Fragment>
@@ -219,19 +232,6 @@ export class UiPptAmount extends Referable(React.Component)<
         if (e.deltaY < 0) {
             this.increase(e);
         }
-    }
-    componentDidMount() {
-        const $amount = this.ref<HTMLElement>('.amount');
-        $amount.current?.addEventListener(
-            'wheel', this.decreaseByWheel.bind(this), {
-                passive: false
-            }
-        );
-        $amount.current?.addEventListener(
-            'wheel', this.increaseByWheel.bind(this), {
-                passive: false
-            }
-        );
     }
 }
 export default UiPptAmount;

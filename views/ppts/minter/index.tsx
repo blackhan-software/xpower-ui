@@ -9,7 +9,7 @@ export { UiPptBatchMinter };
 import { UiPptBatchBurner } from './ppt-batch-burner';
 export { UiPptBatchBurner };
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 
 type Props = {
@@ -23,6 +23,108 @@ type Props = {
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
     token: Token;
+}
+export function UiPptMinter(
+    props: Props
+) {
+    useEffect(() => {
+        App.event.emit('refresh-tips');
+    });
+    return <div
+        className='btn-group ppt-batch-minter' role='group'
+    >
+        {$toggleAll(props)}
+        {$burnApproval(props)}
+        {$pptBatchMinter(props)}
+        {$pptBatchBurner(props)}
+        {$info(props)}
+    </div>;
+}
+function $toggleAll(
+    { toggled, onToggled }: Props
+) {
+    const title = !toggled
+        ? 'Show all NFT levels'
+        : 'Hide all NFT levels';
+    return <button
+        type='button' id='toggle-all'
+        className='btn btn-outline-warning no-ellipsis'
+        data-bs-placement='top' data-bs-toggle='tooltip'
+        onClick={onToggled?.bind(null, !toggled)}
+        title={title}
+    >
+        <i className={toggled
+            ? 'bi-chevron-double-up'
+            : 'bi-chevron-double-down'
+        } />
+    </button>;
+}
+function $burnApproval(
+    { token, approval, onApproval }: Props
+) {
+    const is_approved = approved(approval);
+    const is_approving = approving(approval);
+    const text = is_approving
+        ? 'Approving NFT Staking…'
+        : 'Approve NFT Staking';
+    return <button type='button' id='ppt-burn-approval'
+        className='btn btn-outline-warning'
+        data-bs-placement='top' data-bs-toggle='tooltip'
+        disabled={is_approving || is_approved || is_approved === null}
+        onClick={onApproval?.bind(null, token)}
+        style={{ display: !is_approved ? 'block' : 'none' }}
+        title={`Approve staking (and unstaking) of NFTs`}
+    >
+        {Spinner({
+            show: !!is_approving, grow: true
+        })}
+        <span className='text'>{text}</span>
+    </button>;
+}
+function $pptBatchMinter(
+    { approval, list, minter_status, token, onBatchMint }: Props
+) {
+    return <UiPptBatchMinter
+        approved={approved(approval)}
+        list={list}
+        status={minter_status}
+        token={token}
+        onBatchMint={onBatchMint}
+    />;
+}
+function $pptBatchBurner(
+    { approval, list, burner_status, token, onBatchBurn }: Props
+) {
+    return <UiPptBatchBurner
+        approved={approved(approval)}
+        list={list}
+        status={burner_status}
+        token={token}
+        onBatchBurn={onBatchBurn}
+    />;
+}
+function $info(
+    { token }: Props
+) {
+    return <button type='button'
+        className='btn btn-outline-warning info'
+        data-bs-placement='top' data-bs-toggle='tooltip'
+        title={`(Batch) stake or unstake ${token} NFTs`}
+    >
+        <InfoCircle fill={true} />
+    </button>;
+}
+export function Spinner(
+    { show, grow }: { show: boolean, grow?: boolean }
+) {
+    const classes = [
+        'spinner spinner-border spinner-border-sm',
+        'float-start', grow ? 'spinner-grow' : ''
+    ];
+    return <span
+        className={classes.join(' ')} role='status'
+        style={{ visibility: show ? 'visible' : 'hidden' }}
+    />;
 }
 function approved(
     approval: PptMinterApproval | null
@@ -39,122 +141,5 @@ function approving(
         return null;
     }
     return approval === PptMinterApproval.approving;
-}
-export class UiPptMinter extends React.Component<
-    Props
-> {
-    render() {
-        const { minter_status, burner_status } = this.props;
-        const { approval, list, toggled, token } = this.props;
-        return <div
-            className='btn-group ppt-batch-minter' role='group'
-        >
-            {this.$toggleAll(toggled)}
-            {this.$burnApproval(
-                token, approved(approval), approving(approval)
-            )}
-            {this.$pptBatchMinter(
-                token, list, approved(approval), minter_status
-            )}
-            {this.$pptBatchBurner(
-                token, list, approved(approval), burner_status
-            )}
-            {this.$info(token)}
-        </div>;
-    }
-    $toggleAll(
-        toggled: boolean
-    ) {
-        return <button type='button' id='toggle-all'
-            className='btn btn-outline-warning no-ellipsis'
-            data-bs-placement='top' data-bs-toggle='tooltip'
-            onClick={() => this.toggleAll(toggled)}
-            title={this.title(toggled)}
-        >
-            <i className={toggled
-                ? 'bi-chevron-double-up'
-                : 'bi-chevron-double-down'
-            } />
-        </button>;
-    }
-    title(
-        toggled: boolean
-    ) {
-        return !toggled
-            ? 'Show all NFT levels'
-            : 'Hide all NFT levels';
-    }
-    toggleAll(
-        toggled: boolean
-    ) {
-        const { onToggled } = this.props;
-        if (onToggled) onToggled(!toggled);
-    }
-    $burnApproval(
-        token: Token,
-        approved: boolean | null,
-        approving: boolean | null
-    ) {
-        const text = approving
-            ? 'Approving NFT Staking…'
-            : 'Approve NFT Staking';
-        return <button type='button' id='ppt-burn-approval'
-            className='btn btn-outline-warning'
-            data-bs-placement='top' data-bs-toggle='tooltip'
-            disabled={approving || approved || approved === null}
-            onClick={this.props.onApproval?.bind(this, token)}
-            style={{ display: !approved ? 'block' : 'none' }}
-            title={`Approve staking (and unstaking) of NFTs`}
-        >
-            {Spinner({
-                show: !!approving, grow: true
-            })}
-            <span className='text'>{text}</span>
-        </button>;
-    }
-    $pptBatchMinter(
-        token: Token, list: PptMinterList,
-        approved: boolean | null, status: PptMinterStatus | null
-    ) {
-        return <UiPptBatchMinter
-            approved={approved} list={list} token={token} status={status}
-            onBatchMint={this.props.onBatchMint?.bind(this, token, list)}
-        />;
-    }
-    $pptBatchBurner(
-        token: Token, list: PptMinterList,
-        approved: boolean | null, status: PptBurnerStatus | null
-    ) {
-        return <UiPptBatchBurner
-            approved={approved} list={list} token={token} status={status}
-            onBatchBurn={this.props.onBatchBurn?.bind(this, token, list)}
-        />;
-    }
-    $info(
-        token: Token
-    ) {
-        return <button type='button'
-            className='btn btn-outline-warning info'
-            data-bs-placement='top' data-bs-toggle='tooltip'
-            title={`(Batch) stake or unstake ${token} NFTs`}
-        >
-            <InfoCircle fill={true} />
-        </button>;
-    }
-    componentDidUpdate() {
-        App.event.emit('refresh-tips');
-    }
-}
-export function Spinner(
-    { show, grow }: { show: boolean, grow?: boolean }
-) {
-    const classes = [
-        'spinner spinner-border spinner-border-sm',
-        'float-start', grow ? 'spinner-grow' : ''
-    ];
-    return <span
-        className={classes.join(' ')} role='status'
-        style={{ visibility: show ? 'visible' : 'hidden' }}
-    />;
 }
 export default UiPptMinter;

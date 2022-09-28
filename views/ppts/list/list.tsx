@@ -1,16 +1,16 @@
-import './list.scss';
 import './amount';
+import './list.scss';
 
 import { App } from '../../../source/app';
-import { Amount, Supply, Token } from '../../../source/redux/types';
-import { Nft, NftIssue, NftLevel, NftLevels } from '../../../source/redux/types';
-import { PptDetails } from '../../../source/redux/types';
+import { pptsBy, pptTotalBy } from '../../../source/redux/selectors';
+import { Amount, Nft, NftIssue, NftLevel, NftLevels, Nfts, PptDetails, Supply, Token } from '../../../source/redux/types';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { UiPptAmount } from './amount';
 import { UiPptDetails } from '../details/details';
 
 type Props = {
+    ppts: Nfts;
     list: PptList;
     onPptList?: (
         list: Partial<PptList>
@@ -52,208 +52,174 @@ type PptList = Record<NftLevel, {
     amount: Amount; max: Amount; min: Amount;
     display: boolean; toggled: boolean;
 }>;
-export class UiPptList extends React.Component<
-    Props
-> {
-    render() {
-        const { token, list } = this.props;
-        return <React.Fragment>
-            <label className='form-label'>
-                Stake & Manage {token} NFTs
-            </label>
-            {Array.from(NftLevels()).map((
-                nft_level
-            ) => {
-                const by_token = App.getPptTotalBy({
-                    token: Nft.token(token),
-                    level: nft_level
-                });
-                const by_level = App.getPptTotalBy({
-                    level: nft_level
-                });
-                return this.$pptMinter(
-                    token, nft_level,
-                    by_token, by_level,
-                    list[nft_level]
-                );
-            })}
-        </React.Fragment>;
-    }
-    $pptMinter(
-        token: Token, ppt_level: NftLevel,
-        by_token: { amount: Amount, supply: Supply },
-        by_level: { amount: Amount, supply: Supply },
-        { amount, max, min, display, toggled }: PptList[NftLevel],
-    ) {
-        return <React.Fragment key={ppt_level}>
-            {this.$amount(ppt_level, by_level, by_token, {
-                amount, max, min, display, toggled
-            })}
-            {this.$details(token, ppt_level, by_level, {
-                amount, max, min, display, toggled
-            })}
-        </React.Fragment>;
-    }
-    $amount(
-        ppt_level: NftLevel,
-        by_level: { amount: Amount, supply: Supply },
-        by_token: { amount: Amount, supply: Supply },
-        { amount, max, min, display, toggled }: PptList[NftLevel],
-    ) {
-        const any_filter = [
-            by_level.supply, by_level.amount, amount, max, min,
-            this.props.toggled // toggles *all* levels!
-        ];
-        const style = {
-            display: (display || any_filter.some((v) => v))
-                ? 'inline-flex' : 'none',
-        };
-        return <div role='group'
-            className='btn-group ppt-minter'
-            style={style}
+export function UiPptList(
+    props: Props
+) {
+    useEffect(() => {
+        App.event.emit('refresh-tips');
+    });
+    const { token, list } = props;
+    return <React.Fragment>
+        <label className='form-label'>
+            Stake & Manage {token} NFTs
+        </label>
+        {Array.from(NftLevels()).map((
+            nft_level
+        ) => {
+            return <React.Fragment key={nft_level}>
+                {$pptMinter(props, nft_level, list[nft_level])}
+                {$pptDetails(props, nft_level, list[nft_level])}
+            </React.Fragment>
+        })}
+    </React.Fragment>;
+}
+function $pptMinter(
+    props: Props, ppt_level: NftLevel,
+    { display, toggled, amount, max, min }: PptList[NftLevel]
+) {
+    if (display) {
+        const total_by = pptTotalBy(props.ppts, {
+            level: ppt_level, token: Nft.token(props.token)
+        });
+        return <div
+            className='btn-group ppt-minter' role='group'
+            style={{ display: 'inline-flex' }}
         >
-            {this.$toggle(ppt_level, toggled)}
-            {this.$minter(ppt_level, amount)}
-            {this.$balance(ppt_level, by_token)}
+            {$toggle(ppt_level, toggled)}
+            {$minter(ppt_level, amount)}
+            {$balance(ppt_level, total_by)}
             <UiPptAmount
                 amount={amount}
                 level={ppt_level}
                 max={max} min={min}
                 onUpdate={({ amount }) => {
-                    if (this.props.onPptList) {
-                        this.props.onPptList({
+                    if (props.onPptList) {
+                        props.onPptList({
                             [ppt_level]: { amount }
                         });
                     }
                 }} />
         </div>;
     }
-    $details(
-        token: Token, ppt_level: NftLevel,
-        by_level: { amount: Amount, supply: Supply },
-        { amount, max, min, display, toggled }: PptList[NftLevel],
-    ) {
-        const any_filter = [
-            by_level.supply, by_level.amount, amount, max, min,
-            this.props.toggled // toggles *all* levels!
-        ];
-        const style = {
-            display: (display || any_filter.some((v) => v)) && toggled
-                ? 'block' : 'none'
-        };
-        if (style.display === 'block') {
-            return <div role='group'
-                className='nft-details'
-                style={style}
-            >
-                <UiPptDetails
-                    level={ppt_level}
-                    details={
-                        this.props.details
-                    }
-                    onPptImageLoaded={
-                        this.props.onPptImageLoaded?.bind(this)
-                    }
-                    onPptClaimerExpanded={
-                        this.props.onPptClaimerExpanded?.bind(this)
-                    }
-                    onPptTargetChanged={
-                        this.props.onPptTargetChanged?.bind(this)
-                    }
-                    onPptAmountChanged={
-                        this.props.onPptAmountChanged?.bind(this)
-                    }
-                    onPptTransfer={
-                        this.props.onPptTransfer?.bind(this)
-                    }
-                    onPptClaim={
-                        this.props.onPptClaim?.bind(this)
-                    }
-                    token={token}
-                />
-            </div>;
-        }
-    }
-    $toggle(
-        ppt_level: NftLevel, toggled: boolean
-    ) {
-        const title = toggled
-            ? `Hide ${Nft.nameOf(ppt_level)} NFTs`
-            : `Show ${Nft.nameOf(ppt_level)} NFTs`;
+}
+function $pptDetails(
+    props: Props, ppt_level: NftLevel,
+    { display, toggled }: PptList[NftLevel]
+) {
+    if (display && toggled) {
+        const ppts = pptsBy(props.ppts, {
+            token: Nft.token(props.token),
+            level: ppt_level
+        })
         return <div
-            className='btn-group' role='group'
+            className='nft-details' role='group'
+            style={{ display: 'block' }}
         >
-            <button type='button'
-                className='btn btn-outline-warning toggle no-ellipsis'
-                data-bs-placement='top' data-bs-toggle='tooltip'
-                onClick={() => this.toggle(ppt_level, toggled)}
-                title={title}
-            >
-                <i className={
-                    toggled ? 'bi-chevron-up' : 'bi-chevron-down'
-                } />
-            </button>
+            <UiPptDetails
+                ppts={ppts}
+                level={ppt_level}
+                details={
+                    props.details
+                }
+                onPptImageLoaded={
+                    props.onPptImageLoaded
+                }
+                onPptClaimerExpanded={
+                    props.onPptClaimerExpanded
+                }
+                onPptTargetChanged={
+                    props.onPptTargetChanged
+                }
+                onPptAmountChanged={
+                    props.onPptAmountChanged
+                }
+                onPptTransfer={
+                    props.onPptTransfer
+                }
+                onPptClaim={
+                    props.onPptClaim
+                }
+                token={
+                    props.token
+                }
+            />
         </div>;
     }
-    toggle(
-        ppt_level: NftLevel, toggled: boolean
-    ) {
-        App.event.emit('toggle-level', {
-            level: ppt_level, flag: !toggled
-        });
-    }
-    $minter(
+}
+function $toggle(
+    ppt_level: NftLevel, toggled: boolean
+) {
+    const title = toggled
+        ? `Hide ${Nft.nameOf(ppt_level)} NFTs`
+        : `Show ${Nft.nameOf(ppt_level)} NFTs`;
+    return <div
+        className='btn-group' role='group'
+    >
+        <button type='button'
+            className='btn btn-outline-warning toggle no-ellipsis'
+            data-bs-placement='top' data-bs-toggle='tooltip'
+            onClick={() => toggle(ppt_level, toggled)}
+            title={title}
+        >
+            <i className={
+                toggled ? 'bi-chevron-up' : 'bi-chevron-down'
+            } />
+        </button>
+    </div>;
+}
+function toggle(
+    ppt_level: NftLevel, toggled: boolean
+) {
+    App.event.emit('toggle-level', {
+        level: ppt_level, flag: !toggled
+    });
+}
+function $minter(
+    ppt_level: NftLevel, amount: Amount
+) {
+    const head = (ppt_level: NftLevel) => {
+        const nft_name = Nft.nameOf(ppt_level);
+        if (nft_name) return nft_name.slice(0, 1);
+    };
+    const tail = (ppt_level: NftLevel) => {
+        const nft_name = Nft.nameOf(ppt_level);
+        if (nft_name) return nft_name.slice(1);
+    };
+    const title = (
         ppt_level: NftLevel, amount: Amount
-    ) {
-        const head = (nft_level: NftLevel) => {
-            const nft_name = Nft.nameOf(nft_level);
-            if (nft_name) return nft_name.slice(0, 1);
-        };
-        const tail = (nft_level: NftLevel) => {
-            const nft_name = Nft.nameOf(nft_level);
-            if (nft_name) return nft_name.slice(1);
-        };
-        const title = (
-            nft_level: NftLevel, amount: Amount
-        ) => {
-            const nft_name = Nft.nameOf(nft_level);
-            return amount !== 0n ? amount > 0
-                ? `Stake ${nft_name} NFTs`
-                : `Unstake ${nft_name} NFTs`
-                : `(Un)stake ${nft_name} NFTs`;
-        };
-        return <button type='button'
-            className='btn btn-outline-warning minter'
-            data-bs-placement='top' data-bs-toggle='tooltip'
-            title={title(ppt_level, amount)}
-        >
-            {head(ppt_level)}<span
-                className='d-none d-sm-inline'>{tail(ppt_level)} NFTs</span>
-        </button>;
-    }
-    $balance(
-        ppt_level: NftLevel, total_by: {
-            amount: Amount, supply: Supply
-        }
-    ) {
-        return <button type='button'
-            className='btn btn-outline-warning balance'
-            data-bs-placement='top' data-bs-toggle='tooltip'
-            title={`Overall personal balance & supply (staked ${Nft.nameOf(ppt_level)} NFTs)`}
-        >
-            <span>{
-                total_by.amount.toString()
-            }</span>
-            <span className='d-none d-sm-inline'>
-                &nbsp;/&nbsp;
-            </span>
-            <span className='d-none d-sm-inline'>{
-                total_by.supply.toString()
-            }</span>
-        </button>;
-    }
-    componentDidUpdate() {
-        App.event.emit('refresh-tips');
-    }
+    ) => {
+        const nft_name = Nft.nameOf(ppt_level);
+        return amount !== 0n ? amount > 0
+            ? `Stake ${nft_name} NFTs`
+            : `Unstake ${nft_name} NFTs`
+            : `(Un)stake ${nft_name} NFTs`;
+    };
+    return <button type='button'
+        className='btn btn-outline-warning minter'
+        data-bs-placement='top' data-bs-toggle='tooltip'
+        title={title(ppt_level, amount)}
+    >
+        {head(ppt_level)}<span
+            className='d-none d-sm-inline'>{tail(ppt_level)} NFTs</span>
+    </button>;
+}
+function $balance(
+    ppt_level: NftLevel, total_by: { amount: Amount, supply: Supply }
+) {
+    return <button type='button'
+        className='btn btn-outline-warning balance'
+        data-bs-placement='top' data-bs-toggle='tooltip'
+        title={`Overall personal balance & supply (staked ${Nft.nameOf(ppt_level)} NFTs)`}
+    >
+        <span>{
+            total_by.amount.toString()
+        }</span>
+        <span className='d-none d-sm-inline'>
+            &nbsp;/&nbsp;
+        </span>
+        <span className='d-none d-sm-inline'>{
+            total_by.supply.toString()
+        }</span>
+    </button>;
 }
 export default UiPptList;

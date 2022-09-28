@@ -4,7 +4,7 @@ import { App } from '../../source/app';
 import { Amount, Token } from '../../source/redux/types';
 import { PptMinter, PptMinterList } from '../../source/redux/types';
 import { PptAmounts, PptDetails, PptFlags } from '../../source/redux/types';
-import { Nft, NftIssue, NftToken, NftLevel } from '../../source/redux/types';
+import { Nft, Nfts, NftIssue, NftToken, NftLevel } from '../../source/redux/types';
 
 import React, { useEffect } from 'react';
 import { UiPptList } from './list/list';
@@ -18,11 +18,10 @@ import { UiPptMinter } from './minter';
 export { UiPptMinter };
 
 type Props = {
-    token: Token;
+    token: Token; ppts: Nfts; flags: PptFlags;
     amounts: Record<NftToken, PptAmounts>;
     details: Record<NftToken, PptDetails>;
     minter: Record<NftToken, PptMinter>;
-    flags: PptFlags;
     onPptList?: (
         flags: PptFlags,
         amounts: PptAmounts
@@ -106,13 +105,14 @@ export function UiPpts(
     useEffect(() => {
         App.event.emit('refresh-tips');
     }, []);
-    const { token } = props;
+    const { ppts, token } = props;
     const ppt_token = Nft.token(token);
     const { flags, toggled } = props;
     const { amounts, minter } = props;
     return <React.Fragment>
         <div id='ppt-single-minting'>
             <UiPptList
+                ppts={ppts}
                 list={
                     join(flags, amounts[ppt_token])
                 }

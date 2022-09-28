@@ -4,7 +4,7 @@ import { App } from '../../source/app';
 import { Amount, Token } from '../../source/redux/types';
 import { NftMinter, NftMinterList } from '../../source/redux/types'
 import { NftAmounts, NftDetails, NftFlags } from '../../source/redux/types';
-import { Nft, NftIssue, NftToken, NftLevel } from '../../source/redux/types';
+import { Nft, Nfts, NftIssue, NftToken, NftLevel } from '../../source/redux/types';
 
 import React, { useEffect } from 'react';
 import { UiNftList } from './list/list';
@@ -18,11 +18,10 @@ import { UiNftMinter } from './minter/minter';
 export { UiNftMinter };
 
 type Props = {
-    token: Token;
+    token: Token; nfts: Nfts; flags: NftFlags;
     amounts: Record<NftToken, NftAmounts>;
     details: Record<NftToken, NftDetails>;
     minter: Record<NftToken, NftMinter>;
-    flags: NftFlags;
     onNftList?: (
         flags: NftFlags,
         amounts: NftAmounts
@@ -99,13 +98,14 @@ export function UiNfts(
     useEffect(() => {
         App.event.emit('refresh-tips');
     }, []);
-    const { token } = props;
+    const { nfts, token } = props;
     const nft_token = Nft.token(token);
     const { flags, toggled } = props;
     const { amounts, minter } = props;
     return <React.Fragment>
         <div id='nft-single-minting'>
             <UiNftList
+                nfts={nfts}
                 list={
                     join(flags, amounts[nft_token])
                 }
