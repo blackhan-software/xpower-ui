@@ -172,18 +172,17 @@ export class SPA extends Referable(
                     App.setNftsUi({ details });
                 }}
                 onNftSenderExpanded={(
-                    nft_issues, nft_level, toggled
+                    nft_issue, nft_level, expanded
                 ) => {
                     const details = {
                         [nft_token]: {
-                            [nft_level]: Object.fromEntries(
-                                nft_issues.map((issue) => [issue, {
-                                    toggled
-                                }])
-                            )
+                            [nft_level]: {
+                                [nft_issue]: { expanded }
+                            }
                         }
                     };
                     App.setNftsUi({ details });
+                    App.setPptsUi({ details });
                 }}
                 onNftAmountChanged={(
                     nft_issue, nft_level, value, valid
@@ -276,17 +275,18 @@ export class SPA extends Referable(
                     App.setPptsUi({ details });
                 }}
                 onPptClaimerExpanded={(
-                    ppt_issues, ppt_level, toggled
+                    ppt_issue, ppt_level, expanded
                 ) => {
                     const details = {
                         [nft_token]: {
-                            [ppt_level]: Object.fromEntries(
-                                ppt_issues.map((issue) => [issue, {
-                                    toggled
-                                }])
-                            )
+                            [ppt_level]: {
+                                [ppt_issue]: {
+                                    expanded
+                                }
+                            }
                         }
                     };
+                    App.setNftsUi({ details });
                     App.setPptsUi({ details });
                 }}
                 onPptAmountChanged={(

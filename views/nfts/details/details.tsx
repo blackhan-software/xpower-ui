@@ -23,9 +23,9 @@ type Props = {
         level: NftLevel
     ) => void;
     onNftSenderExpanded?: (
-        issues: NftIssue[],
+        issue: NftIssue,
         level: NftLevel,
-        toggled: boolean
+        expanded: boolean
     ) => void;
     onNftTargetChanged?: (
         issue: NftIssue,
@@ -44,9 +44,9 @@ type Props = {
         level: NftLevel
     ) => void;
 }
-export class UiNftDetails extends Referable(React.Component)<
-    Props
-> {
+export class UiNftDetails extends Referable(
+    React.Component<Props>
+) {
     render() {
         const years = Array.from(Years({ reverse: true }));
         const level = this.props.level;
@@ -196,21 +196,23 @@ export class UiNftDetails extends Referable(React.Component)<
     ) {
         const by_level = this.props.details[nft_level];
         const by_issue = by_level[nft_issue];
-        const { toggled } = by_issue;
+        const { expanded, toggled } = by_issue;
         return <UiNftExpander
             issue={nft_issue}
             level={nft_level}
-            onToggled={(flag) => {
+            onExpanded={((expanded) => {
                 if (this.props.onNftSenderExpanded) {
-                    const issues = Array.from(Years());
                     this.props.onNftSenderExpanded(
-                        issues, nft_level, flag
+                        nft_issue, nft_level, expanded
                     );
                 }
+            })}
+            onToggled={(toggled) => {
                 App.event.emit('toggle-issue', {
-                    level: nft_level, flag
+                    flag: toggled
                 });
             }}
+            expanded={expanded}
             toggled={toggled}
         />;
     }

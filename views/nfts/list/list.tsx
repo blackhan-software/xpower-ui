@@ -21,9 +21,9 @@ type Props = {
         level: NftLevel
     ) => void;
     onNftSenderExpanded?: (
-        issues: NftIssue[],
+        issue: NftIssue,
         level: NftLevel,
-        toggled: boolean
+        expanded: boolean
     ) => void;
     onNftTargetChanged?: (
         issue: NftIssue,

@@ -26,6 +26,7 @@ export type NftDetails = Record<NftLevel, Record<NftIssue, {
     };
     fixed: boolean;
     toggled: boolean;
+    expanded: boolean | null;
 }>>
 export type NftMinterList = Record<NftLevel, {
     amount: Amount; max: Amount; min: Amount;

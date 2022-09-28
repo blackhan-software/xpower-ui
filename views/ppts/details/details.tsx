@@ -28,9 +28,9 @@ type Props = {
         level: NftLevel
     ) => void;
     onPptClaimerExpanded?: (
-        issues: NftIssue[],
+        issue: NftIssue,
         level: NftLevel,
-        toggled: boolean
+        expanded: boolean
     ) => void;
     onPptTargetChanged?: (
         issue: NftIssue,
@@ -315,21 +315,23 @@ export class UiPptDetails extends Referable(Updatable(
     ) {
         const by_level = this.props.details[ppt_level];
         const by_issue = by_level[ppt_issue];
-        const { toggled } = by_issue;
+        const { expanded, toggled } = by_issue;
         return <UiPptExpander
             issue={ppt_issue}
             level={ppt_level}
-            onToggled={(flag) => {
+            onExpanded={((expanded) => {
                 if (this.props.onPptClaimerExpanded) {
-                    const issues = Array.from(Years());
                     this.props.onPptClaimerExpanded(
-                        issues, ppt_level, toggled
+                        ppt_issue, ppt_level, expanded
                     );
                 }
+            })}
+            onToggled={(toggled) => {
                 App.event.emit('toggle-issue', {
-                    level: ppt_level, flag
+                    flag: toggled
                 });
             }}
+            expanded={expanded}
             toggled={toggled}
         />;
     }

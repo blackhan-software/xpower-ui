@@ -62,6 +62,7 @@ export function pptDetails(
                 claimer,
                 target,
                 toggled: false,
+                expanded: null,
             }])
         )])
     );

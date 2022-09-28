@@ -8,7 +8,8 @@ describe('Store w/nfts-ui-reducer', () => {
             details: nftWrap(nftDetails()),
             minter: nftWrap(nftMinter()),
             flags: nftFlags(),
-            toggled: false
+            toggled: false,
+            expanded: null
         };
         const state_1 = nftsUiReducer(state_0, setNftsUi({
             toggled: true
@@ -21,7 +22,8 @@ describe('Store w/nfts-ui-reducer', () => {
             details: nftWrap(nftDetails()),
             minter: nftWrap(nftMinter()),
             flags: nftFlags(),
-            toggled: true
+            toggled: true,
+            expanded: null
         };
         const state_1 = nftsUiReducer(state_0, setNftsUi({
             toggled: false

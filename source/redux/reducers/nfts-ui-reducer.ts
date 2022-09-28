@@ -62,6 +62,7 @@ export function nftDetails(
                 sender,
                 target,
                 toggled: false,
+                expanded: null,
             }])
         )])
     );

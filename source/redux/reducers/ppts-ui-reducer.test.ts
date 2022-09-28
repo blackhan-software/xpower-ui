@@ -8,7 +8,8 @@ describe('Store w/ppts-ui-reducer', () => {
             details: pptWrap(pptDetails()),
             minter: pptWrap(pptMinter()),
             flags: pptFlags(),
-            toggled: false
+            toggled: false,
+            expanded: null
         };
         const state_1 = pptsUiReducer(state_0, setPptsUi({
             toggled: true
@@ -21,7 +22,8 @@ describe('Store w/ppts-ui-reducer', () => {
             details: pptWrap(pptDetails()),
             minter: pptWrap(pptMinter()),
             flags: pptFlags(),
-            toggled: true
+            toggled: true,
+            expanded: null
         };
         const state_1 = pptsUiReducer(state_0, setPptsUi({
             toggled: false

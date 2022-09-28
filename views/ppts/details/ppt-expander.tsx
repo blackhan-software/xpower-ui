@@ -8,49 +8,54 @@ import { InfoCircle } from '../../../public/images/tsx';
 type Props = {
     issue: NftIssue;
     level: NftLevel;
+    expanded: boolean | null;
+    onExpanded?: (expanded: boolean) => void;
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
 }
-export class UiPptExpander extends Referable(React.Component)<
-    Props
-> {
+export class UiPptExpander extends Referable(
+    React.Component<Props>
+) {
     render() {
-        const { issue, level, toggled } = this.props;
-        return this.$expander(issue, level, toggled);
+        const { expanded, toggled } = this.props;
+        return this.$expander(expanded, toggled);
     }
     $expander(
-        nft_issue: NftIssue, nft_level: NftLevel, toggled: boolean
+        expanded: boolean | null, toggled: boolean
     ) {
-        return <React.Fragment>
-            <div className='btn-group nft-claimer-expander d-sm-none'
-                role='group' style={{ marginTop: '1em', width: '100%' }}
+        const classes = [
+            'btn-group', 'nft-claimer-expander',
+            expanded ? 'd-none' : 'd-sm-none'
+        ];
+        return <div
+            className={classes.join(' ')} role='group'
+            style={{ marginTop: '1em', width: '100%' }}
+        >
+            <button type='button'
+                className='btn btn-outline-warning toggle-old no-ellipsis'
+                data-bs-placement='top' data-bs-toggle='tooltip'
+                onClick={this.toggle.bind(this, toggled)}
+                title={this.title(toggled)}
             >
-                <button type='button'
-                    className='btn btn-outline-warning toggle-old no-ellipsis'
-                    data-bs-placement='top' data-bs-toggle='tooltip'
-                    onClick={this.toggle.bind(this, toggled)}
-                    title={this.title(toggled)}
-                >
-                    <i className={
-                        toggled ? 'bi-eye-slash-fill' : 'bi-eye-fill'
-                    } />
-                </button>
-                <button type='button'
-                    className='btn btn-outline-warning claimer-expander'
-                    onClick={this.expand.bind(this, nft_issue, nft_level)}
-                >
-                    <i className='bi-chevron-down' />
-                </button>
-                <button type='button'
-                    className='btn btn-outline-warning info'
-                    data-bs-placement='top' data-bs-toggle='tooltip'
-                    style={{ width: '43px' }}
-                    title='Show claimed & claimable'
-                >
-                    <InfoCircle fill={true} />
-                </button>
-            </div>
-        </React.Fragment>;
+                <i className={
+                    toggled ? 'bi-eye-slash-fill' : 'bi-eye-fill'
+                } />
+            </button>
+            <button type='button'
+                className='btn btn-outline-warning claimer-expander'
+                onClick={this.expand.bind(this)}
+            >
+                <i className='bi-chevron-down' />
+            </button>
+            <button type='button'
+                className='btn btn-outline-warning info'
+                data-bs-placement='top' data-bs-toggle='tooltip'
+                style={{ width: '43px' }}
+                title='Show claimed & claimable'
+            >
+                <InfoCircle fill={true} />
+            </button>
+        </div>;
     }
     title(
         toggled: boolean
@@ -66,31 +71,27 @@ export class UiPptExpander extends Referable(React.Component)<
             this.props.onToggled(!toggled);
         }
     }
-    expand(
-        nft_issue: NftIssue, nft_level: NftLevel
-    ) {
-        const core_id = Nft.coreId({
-            issue: nft_issue, level: nft_level
-        });
-        const $row = this.globalRef<HTMLElement>(
-            `:ppt.row[core-id="${core_id}"]`
-        );
-        if ($row.current) {
-            this.hideExpander($row.current);
-            this.showClaimed($row.current);
-            this.showClaimable($row.current);
-            this.showClaimer($row.current);
+    expand() {
+        if (this.props.onExpanded) {
+            this.props.onExpanded(true);
         }
     }
-    hideExpander(
-        $row: HTMLElement
-    ) {
-        const $expander = $row.querySelector<HTMLElement>(
-            '.nft-claimer-expander'
-        );
-        if ($expander) {
-            $expander.hidden = true;
+    componentDidUpdate() {
+        if (this.props.expanded) {
+            const core_id = Nft.coreId({
+                issue: this.props.issue,
+                level: this.props.level
+            });
+            const $row = this.globalRef<HTMLElement>(
+                `:ppt.row[core-id="${core_id}"]`
+            );
+            if ($row.current) {
+                this.showClaimed($row.current);
+                this.showClaimable($row.current);
+                this.showClaimer($row.current);
+            }
         }
+        App.event.emit('refresh-tips');
     }
     showClaimed(
         $row: HTMLElement
@@ -123,9 +124,6 @@ export class UiPptExpander extends Referable(React.Component)<
             '.nft-claimer'
         );
         $claimer?.classList.remove('d-none');
-    }
-    componentDidUpdate() {
-        App.event.emit('refresh-tips');
     }
 }
 export default UiPptExpander;

@@ -21,9 +21,9 @@ type Props = {
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
 }
-export class UiPptClaimer extends Referable(React.Component)<
-    Props
-> {
+export class UiPptClaimer extends Referable(
+    React.Component<Props>
+) {
     render() {
         const { level, issue } = this.props;
         return this.$claimer(issue, level);

@@ -24,9 +24,9 @@ type Props = {
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
 }
-export class UiNftSender extends Referable(React.Component)<
-    Props
-> {
+export class UiNftSender extends Referable(
+    React.Component<Props>
+ ) {
     render() {
         const { level, issue } = this.props;
         return this.$sender(issue, level);
