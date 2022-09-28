@@ -27,9 +27,8 @@ export class UiNftImage extends React.Component<
         return <div
             className='nft-image-wrap'
         >
-            <a target='_blank' href={url_market ?? ''}>
-                {Spinner({ loading })}
-                {this.$image(level, issue)}
+            <a target='_blank' href={url_market ?? undefined}>
+                {Spinner({ loading })}{this.$image(level, issue)}
             </a>
         </div>;
     }
