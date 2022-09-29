@@ -32,11 +32,22 @@ App.event.on('refresh-tips', buffered((
         '[data-bs-toggle=tooltip]'
     );
     $tips.forEach(($tip) => {
-        if (flags?.hide) Tooltip.getInstance($tip)?.hide();
+        if (flags?.hide) {
+            Tooltip.getInstance($tip)?.hide();
+        }
+        if (refresh($tip)) {
+            recreate($tip);
+            resubscribe($tip);
+        }
+    });
+    function refresh($tip: HTMLElement) {
+        return $tip.title.length > 0;
+    }
+    function recreate($tip: HTMLElement) {
         Tooltip.getInstance($tip)?.dispose();
         Tooltip.getOrCreateInstance($tip);
-    });
-    $tips.forEach(($tip) => {
+    }
+    function resubscribe($tip: HTMLElement) {
         $tip.addEventListener('shown.bs.tooltip', ({
             target
         }) => {
@@ -53,7 +64,7 @@ App.event.on('refresh-tips', buffered((
                 once: true
             });
         });
-    });
+    }
 }));
 function show(e: Event) {
     const $tip = $tooltip(e.target as HTMLElement | null);
