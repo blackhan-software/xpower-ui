@@ -1,14 +1,10 @@
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { x64 } from '../../source/functions';
-import { HashManager } from '../../source/managers';
-import { IntervalManager } from '../../source/managers';
-import { MiningManager } from '../../source/managers';
-import { MinerStatus } from '../../source/redux/types';
-import { Token, Tokens } from '../../source/redux/types';
+import { HashManager, IntervalManager, MiningManager } from '../../source/managers';
+import { MinerStatus, Token, Tokens } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
-import { MoeWallet } from '../../source/wallet';
-import { OnInit } from '../../source/wallet';
+import { MoeWallet, OnInit, OtfWallet } from '../../source/wallet';
 
 Blockchain.onceConnect(function setupMining({
     address, token
@@ -147,4 +143,23 @@ Blockchain.onceConnect(function benchmarkMining({
     });
 }, {
     per: () => App.token
+});
+Blockchain.onceConnect(async function resumeMiningIf({
+    address
+}) {
+    const on_block = async () => {
+        if (OtfWallet.enabled) {
+            const otf_balance = await otf_wallet.getBalance();
+            if (otf_balance.gt(OtfWallet.threshold)) {
+                const miner = MiningManager.miner(address, {
+                    token: App.token
+                });
+                if (miner.running) {
+                    miner.resume();
+                }
+            }
+        }
+    };
+    const otf_wallet = await OtfWallet.init();
+    otf_wallet.provider?.on('block', on_block);
 });

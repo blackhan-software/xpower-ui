@@ -1,5 +1,5 @@
 import { Address, Amount } from './base';
-import { Token } from './tokens';
+import { Token } from './token';
 
 export type BlockHash = bigint;
 export type Interval = number;

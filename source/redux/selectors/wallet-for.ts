@@ -1,10 +1,10 @@
-import { Token, Tokens } from '../types';
+import { Token, Wallet } from '../types';
 
-export function tokensBy(
-    tokens: Tokens, token?: Token
-): Tokens {
+export function walletFor(
+    wallet: Wallet, token?: Token
+): Wallet {
     const items = Object.fromEntries(
-        Object.entries(tokens.items).filter(([t]) => {
+        Object.entries(wallet.items).filter(([t]) => {
             if (token !== undefined && token !== t) {
                 return false;
             }

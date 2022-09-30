@@ -2,15 +2,15 @@
 import { Global } from '../types';
 declare const global: Global;
 
+import { EventEmitter } from 'events';
 import { Blockchain } from '../blockchain';
 import { URLQuery } from '../url-query';
-import { EventEmitter } from 'events';
 
-import { Contract, Wallet } from 'ethers';
 import { NonceManager } from '@ethersproject/experimental';
 import { Web3Provider } from '@ethersproject/providers';
 import { randomBytes } from '@ethersproject/random';
 import { parseUnits } from '@ethersproject/units';
+import { Contract, Wallet } from 'ethers';
 
 export class OtfWallet extends EventEmitter {
     private static get me(): OtfWallet {
@@ -38,11 +38,13 @@ export class OtfWallet extends EventEmitter {
         listener: ({ toggled }: { toggled: boolean }) => void
     ) {
         this.me.on('toggled', listener);
+        return listener;
     }
     public static unToggled(
         listener: ({ toggled }: { toggled: boolean }) => void
     ) {
         this.me.removeListener('toggled', listener);
+        return listener;
     }
     public static async init(
         key = 'otf-wallet'

@@ -1,22 +1,22 @@
-import { Action } from '../actions/tokens-actions';
-import { Tokens, Token, Empty } from '../types';
+import { Action } from '../actions/wallet-actions';
+import { Wallet, Token, Empty } from '../types';
 import { Amount, Supply } from '../types';
 
-export function tokensReducer(
-    tokens = Empty<Tokens>(), action: Action
-): Tokens {
-    if (!action.type.startsWith('tokens/')) {
-        return tokens;
+export function walletReducer(
+    wallet = Empty<Wallet>(), action: Action
+): Wallet {
+    if (!action.type.startsWith('wallet/')) {
+        return wallet;
     }
-    const items = { ...tokens.items };
+    const items = { ...wallet.items };
     const token = action.payload.token;
-    if (action.type === 'tokens/set') {
+    if (action.type === 'wallet/set') {
         const s = action.payload.item.supply;
         const a = action.payload.item.amount;
         items[token] = pack(a, s, { token: token });
         return { items, more: [token] };
     }
-    if (action.type === 'tokens/add') {
+    if (action.type === 'wallet/increase') {
         const item_old = items[token];
         const item_new = {
             amount: action.payload.item?.amount ?? 1n,
@@ -33,7 +33,7 @@ export function tokensReducer(
         }
         return { items, more: [token] };
     }
-    if (action.type === 'tokens/remove') {
+    if (action.type === 'wallet/decrease') {
         const item_old = items[token];
         const item_new = {
             amount: action.payload.item?.amount ?? 1n,
@@ -50,7 +50,7 @@ export function tokensReducer(
         }
         return { items, less: [token] };
     }
-    return tokens;
+    return wallet;
 }
 function pack(amount: Amount, supply: Supply, { token }: { token: Token }) {
     if (supply < amount) {
@@ -61,4 +61,4 @@ function pack(amount: Amount, supply: Supply, { token }: { token: Token }) {
     }
     return { amount, supply };
 }
-export default tokensReducer;
+export default walletReducer;

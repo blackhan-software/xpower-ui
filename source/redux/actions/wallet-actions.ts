@@ -1,57 +1,57 @@
 import { Amount, Supply, Token } from '../types';
 
-export type SetToken = {
-    type: 'tokens/set', payload: {
+export type SetWallet = {
+    type: 'wallet/set', payload: {
         token: Token, item: {
             amount: Amount,
             supply: Supply
         }
     }
 };
-export const setToken = (
+export const setWallet = (
     token: Token, item: {
         amount: Amount,
         supply: Supply
     }
-): SetToken => ({
-    type: 'tokens/set', payload: {
+): SetWallet => ({
+    type: 'wallet/set', payload: {
         token, item
     }
 });
-export type AddToken = {
-    type: 'tokens/add', payload: {
+export type IncreaseWallet = {
+    type: 'wallet/increase', payload: {
         token: Token, item?: {
             amount: Amount,
             supply?: Supply
         }
     }
 };
-export const addToken = (
+export const increaseWallet = (
     token: Token, item?: {
         amount: Amount, // new-amount = old-amount + amount
         supply?: Supply // new-supply = supply ?? old-supply + amount
     }
-): AddToken => ({
-    type: 'tokens/add', payload: {
+): IncreaseWallet => ({
+    type: 'wallet/increase', payload: {
         token, item
     }
 });
-export type RemoveToken = {
-    type: 'tokens/remove', payload: {
+export type DecreaseWallet = {
+    type: 'wallet/decrease', payload: {
         token: Token, item?: {
             amount: Amount,
             supply?: Supply
         }
     }
 };
-export const removeToken = (
+export const decreaseWallet = (
     token: Token, item?: {
         amount: Amount, // new-amount = old-amount - amount
         supply?: Supply // new-supply = supply ?? old-supply (*no* decrease!)
     }
-): RemoveToken => ({
-    type: 'tokens/remove', payload: {
+): DecreaseWallet => ({
+    type: 'wallet/decrease', payload: {
         token, item
     }
 });
-export type Action = SetToken | AddToken | RemoveToken;
+export type Action = SetWallet | IncreaseWallet | DecreaseWallet;

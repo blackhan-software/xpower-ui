@@ -9,7 +9,7 @@ import { nft_href, nft_meta } from '../nfts/nfts';
 /**
  * nfts-ui:
  */
-App.onTokenChanged(buffered((
+App.onWalletChanged(buffered((
     token: Token, { amount: balance }: { amount: Amount }
 ) => {
     App.setNftsUi({ ...nft_amounts(token, balance) });

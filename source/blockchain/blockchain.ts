@@ -127,21 +127,22 @@ export class Blockchain extends EventEmitter {
     public static onConnect(
         listener: (options: Connect) => void
     ) {
-        this.me.onConnect(listener);
-        return this;
+        return this.me.onConnect(listener);
     }
     public onConnect(
         listener: (options: Connect) => void
     ) {
-        return this.on('connect', listener);
+        this.on('connect', listener);
+        return () => {
+            this.off('connect', listener);
+        };
     }
     public static onceConnect(
         listener: (options: Connect) => void, context?: {
             per: () => Token, tokens?: Set<Token>
         }
     ) {
-        this.me.onceConnect(listener, context);
-        return this;
+        return this.me.onceConnect(listener, context);
     }
     public onceConnect(
         listener: (options: Connect) => void, context?: {
@@ -149,11 +150,13 @@ export class Blockchain extends EventEmitter {
         }
     ) {
         if (context === undefined) {
-            return this.once('connect', listener);
+            this.once('connect', listener);
+            return () => { this.off('connect', listener); }
         }
         if (context.tokens === undefined) {
             context.tokens = new Set(Tokens());
         }
+        const handlers = [] as Array<(options: Connect) => void>;
         for (const token of context.tokens) {
             const handler = (options: Connect) => {
                 if (token === context.per()) {
@@ -162,8 +165,13 @@ export class Blockchain extends EventEmitter {
                 }
             };
             this.on('connect', handler);
+            handlers.push(handler);
         }
-        return this;
+        return () => {
+            handlers.forEach((handler) => {
+                this.off('connect', handler);
+            });
+        };
     }
     private get chainId() {
         return new Promise<string | undefined>(async (resolve) => {

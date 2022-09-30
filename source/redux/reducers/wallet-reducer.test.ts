@@ -1,16 +1,14 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-import { tokensReducer } from './tokens-reducer';
+import { walletReducer } from './wallet-reducer';
 
-import { setToken } from '../actions';
-import { addToken } from '../actions';
-import { removeToken } from '../actions';
-import { Token, Tokens, Empty } from '../types';
+import { increaseWallet, decreaseWallet, setWallet } from '../actions';
+import { Empty, Token, Wallet } from '../types';
 
-describe('Store w/tokens-reducer (set)', () => {
+describe('Store w/wallet-reducer (set)', () => {
     const t = Token.THOR;
-    it('should set 1 token', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, setToken(t, {
+    it('should set-wallet to amount=1', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, setWallet(t, {
             amount: 1n, supply: 1n
         }));
         expect(state_1.items[t]).toEqual({
@@ -19,9 +17,9 @@ describe('Store w/tokens-reducer (set)', () => {
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
     });
-    it('should set 2 tokens', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, setToken(t, {
+    it('should set-wallet to amount=2', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, setWallet(t, {
             amount: 2n, supply: 5n
         }));
         expect(state_1.items[t]).toEqual({
@@ -31,11 +29,11 @@ describe('Store w/tokens-reducer (set)', () => {
         expect(state_1.less).not.toBeDefined();
     });
 });
-describe('Store w/tokens-reducer (add)', () => {
+describe('Store w/wallet-reducer (inrease)', () => {
     const t = Token.LOKI;
-    it('should add 1 token (w/rel. supply)', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, addToken(t, {
+    it('should inc-wallet by amount=1 (w/rel. supply)', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, increaseWallet(t, {
             amount: 1n
         }));
         expect(state_1.items[t]).toEqual({
@@ -44,9 +42,9 @@ describe('Store w/tokens-reducer (add)', () => {
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
     });
-    it('should add 1 token (w/abs. supply)', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, addToken(t, {
+    it('should inc-wallet by amount=1 (w/abs. supply)', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, increaseWallet(t, {
             amount: 1n, supply: 10n
         }));
         expect(state_1.items[t]).toEqual({
@@ -55,11 +53,11 @@ describe('Store w/tokens-reducer (add)', () => {
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
     });
-    it('should *not* add 1 token (w/abs. supply)', () => {
-        const state_0 = Empty<Tokens>();
+    it('should *not* inc-wallet by amount=1 (w/abs. supply)', () => {
+        const state_0 = Empty<Wallet>();
         let state_1;
         try {
-            state_1 = tokensReducer(state_0, addToken(t, {
+            state_1 = walletReducer(state_0, increaseWallet(t, {
                 amount: 2n, supply: 1n
             }));
         } catch (ex: any) {
@@ -67,15 +65,15 @@ describe('Store w/tokens-reducer (add)', () => {
         }
         expect(state_1).not.toBeDefined();
     });
-    it('should add 2 tokens (w/1st:rel. supply & 2nd:rel. supply)', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, addToken(t, {
+    it('should inc-wallet by amount=2 (w/1st:rel. supply & 2nd:rel. supply)', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, increaseWallet(t, {
             amount: 1n
         }));
         expect(state_1.items[t]).toEqual({
             amount: 1n, supply: 1n
         });
-        const state_2 = tokensReducer(state_1, addToken(t, {
+        const state_2 = walletReducer(state_1, increaseWallet(t, {
             amount: 2n
         }));
         expect(state_2.items[t]).toEqual({
@@ -86,15 +84,15 @@ describe('Store w/tokens-reducer (add)', () => {
         expect(state_2.more).toEqual([t]);
         expect(state_2.less).not.toBeDefined();
     });
-    it('should add 2 tokens (w/1st:abs. supply & 2nd:rel. supply)', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, addToken(t, {
+    it('should inc-wallet by amount=2 (w/1st:abs. supply & 2nd:rel. supply)', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, increaseWallet(t, {
             amount: 1n, supply: 10n
         }));
         expect(state_1.items[t]).toEqual({
             amount: 1n, supply: 10n
         });
-        const state_2 = tokensReducer(state_1, addToken(t, {
+        const state_2 = walletReducer(state_1, increaseWallet(t, {
             amount: 2n
         }));
         expect(state_2.items[t]).toEqual({
@@ -105,15 +103,15 @@ describe('Store w/tokens-reducer (add)', () => {
         expect(state_2.more).toEqual([t]);
         expect(state_2.less).not.toBeDefined();
     });
-    it('should add 2 tokens (w/1st:rel. supply & 2nd:abs. supply)', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, addToken(t, {
+    it('should inc-wallet by amount=2 (w/1st:rel. supply & 2nd:abs. supply)', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, increaseWallet(t, {
             amount: 1n
         }));
         expect(state_1.items[t]).toEqual({
             amount: 1n, supply: 1n
         });
-        const state_2 = tokensReducer(state_1, addToken(t, {
+        const state_2 = walletReducer(state_1, increaseWallet(t, {
             amount: 2n, supply: 20n
         }));
         expect(state_2.items[t]).toEqual({
@@ -124,15 +122,15 @@ describe('Store w/tokens-reducer (add)', () => {
         expect(state_2.more).toEqual([t]);
         expect(state_2.less).not.toBeDefined();
     });
-    it('should add 2 tokens (w/1st:abs. supply & 2nd:abs. supply)', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, addToken(t, {
+    it('should inc-wallet by amount=2 (w/1st:abs. supply & 2nd:abs. supply)', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, increaseWallet(t, {
             amount: 1n, supply: 10n
         }));
         expect(state_1.items[t]).toEqual({
             amount: 1n, supply: 10n
         });
-        const state_2 = tokensReducer(state_1, addToken(t, {
+        const state_2 = walletReducer(state_1, increaseWallet(t, {
             amount: 2n, supply: 20n
         }));
         expect(state_2.items[t]).toEqual({
@@ -144,17 +142,17 @@ describe('Store w/tokens-reducer (add)', () => {
         expect(state_2.less).not.toBeDefined();
     });
 });
-describe('Store w/tokens-reducer (decrease)', () => {
+describe('Store w/wallet-reducer (decrease)', () => {
     const t = Token.ODIN;
-    it('should remove 1 token (w/rel. supply)', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, addToken(t, {
+    it('should dec-wallet by amount=1 (w/rel. supply)', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, increaseWallet(t, {
             amount: 1n
         }));
         expect(state_1.items[t]).toEqual({
             amount: 1n, supply: 1n
         });
-        const state_2 = tokensReducer(state_1, removeToken(t, {
+        const state_2 = walletReducer(state_1, decreaseWallet(t, {
             amount: 1n
         }));
         expect(state_2.items[t]).toEqual({
@@ -165,15 +163,15 @@ describe('Store w/tokens-reducer (decrease)', () => {
         expect(state_2.more).not.toBeDefined();
         expect(state_2.less).toEqual([t]);
     });
-    it('should remove 1 token (w/abs. supply)', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, addToken(t, {
+    it('should dec-wallet by amount=1 (w/abs. supply)', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, increaseWallet(t, {
             amount: 1n
         }));
         expect(state_1.items[t]).toEqual({
             amount: 1n, supply: 1n
         });
-        const state_2 = tokensReducer(state_1, removeToken(t, {
+        const state_2 = walletReducer(state_1, decreaseWallet(t, {
             amount: 1n, supply: 10n
         }));
         expect(state_2.items[t]).toEqual({
@@ -184,14 +182,14 @@ describe('Store w/tokens-reducer (decrease)', () => {
         expect(state_2.more).not.toBeDefined();
         expect(state_2.less).toEqual([t]);
     });
-    it('should *not* remove 1 token (w/abs. supply)', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, addToken(t, {
+    it('should *not* dec-wallet by amount=1 (w/abs. supply)', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, increaseWallet(t, {
             amount: 5n
         }));
         let state_2;
         try {
-            state_2 = tokensReducer(state_1, removeToken(t, {
+            state_2 = walletReducer(state_1, decreaseWallet(t, {
                 amount: 2n, supply: 1n
             }));
         } catch (ex: any) {
@@ -201,21 +199,21 @@ describe('Store w/tokens-reducer (decrease)', () => {
         expect(state_1.less).not.toBeDefined();
         expect(state_2).not.toBeDefined();
     });
-    it('should remove 2 tokens (w/1st:rel. supply & 2nd:rel. supply)', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, addToken(t, {
+    it('should dec-wallet by amount=2 (w/1st:rel. supply & 2nd:rel. supply)', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, increaseWallet(t, {
             amount: 5n
         }));
         expect(state_1.items[t]).toEqual({
             amount: 5n, supply: 5n
         });
-        const state_2 = tokensReducer(state_1, removeToken(t, {
+        const state_2 = walletReducer(state_1, decreaseWallet(t, {
             amount: 2n
         }));
         expect(state_2.items[t]).toEqual({
             amount: 3n, supply: 5n
         });
-        const state_3 = tokensReducer(state_2, removeToken(t, {
+        const state_3 = walletReducer(state_2, decreaseWallet(t, {
             amount: 1n
         }));
         expect(state_3.items[t]).toEqual({
@@ -228,21 +226,21 @@ describe('Store w/tokens-reducer (decrease)', () => {
         expect(state_3.more).not.toBeDefined();
         expect(state_3.less).toEqual([t]);
     });
-    it('should remove 2 tokens (w/1st:abs. supply & 2nd:rel. supply)', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, addToken(t, {
+    it('should dec-wallet by amount=2 (w/1st:abs. supply & 2nd:rel. supply)', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, increaseWallet(t, {
             amount: 5n
         }));
         expect(state_1.items[t]).toEqual({
             amount: 5n, supply: 5n
         });
-        const state_2 = tokensReducer(state_1, removeToken(t, {
+        const state_2 = walletReducer(state_1, decreaseWallet(t, {
             amount: 2n, supply: 4n
         }));
         expect(state_2.items[t]).toEqual({
             amount: 3n, supply: 4n
         });
-        const state_3 = tokensReducer(state_2, removeToken(t, {
+        const state_3 = walletReducer(state_2, decreaseWallet(t, {
             amount: 1n
         }));
         expect(state_3.items[t]).toEqual({
@@ -255,21 +253,21 @@ describe('Store w/tokens-reducer (decrease)', () => {
         expect(state_3.more).not.toBeDefined();
         expect(state_3.less).toEqual([t]);
     });
-    it('should remove 2 tokens (w/1st:rel. supply & 2nd:abs. supply)', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, addToken(t, {
+    it('should dec-wallet by amount=2 (w/1st:rel. supply & 2nd:abs. supply)', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, increaseWallet(t, {
             amount: 5n
         }));
         expect(state_1.items[t]).toEqual({
             amount: 5n, supply: 5n
         });
-        const state_2 = tokensReducer(state_1, removeToken(t, {
+        const state_2 = walletReducer(state_1, decreaseWallet(t, {
             amount: 2n
         }));
         expect(state_2.items[t]).toEqual({
             amount: 3n, supply: 5n
         });
-        const state_3 = tokensReducer(state_2, removeToken(t, {
+        const state_3 = walletReducer(state_2, decreaseWallet(t, {
             amount: 1n, supply: 4n
         }));
         expect(state_3.items[t]).toEqual({
@@ -282,21 +280,21 @@ describe('Store w/tokens-reducer (decrease)', () => {
         expect(state_3.more).not.toBeDefined();
         expect(state_3.less).toEqual([t]);
     });
-    it('should remove 2 tokens (w/1st:abs. supply & 2nd:abs. supply)', () => {
-        const state_0 = Empty<Tokens>();
-        const state_1 = tokensReducer(state_0, addToken(t, {
+    it('should dec-wallet by amount=2 (w/1st:abs. supply & 2nd:abs. supply)', () => {
+        const state_0 = Empty<Wallet>();
+        const state_1 = walletReducer(state_0, increaseWallet(t, {
             amount: 5n
         }));
         expect(state_1.items[t]).toEqual({
             amount: 5n, supply: 5n
         });
-        const state_2 = tokensReducer(state_1, removeToken(t, {
+        const state_2 = walletReducer(state_1, decreaseWallet(t, {
             amount: 2n, supply: 4n
         }));
         expect(state_2.items[t]).toEqual({
             amount: 3n, supply: 4n
         });
-        const state_3 = tokensReducer(state_2, removeToken(t, {
+        const state_3 = walletReducer(state_2, decreaseWallet(t, {
             amount: 1n, supply: 3n
         }));
         expect(state_3.items[t]).toEqual({

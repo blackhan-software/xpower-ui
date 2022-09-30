@@ -6,9 +6,10 @@ export * from './nfts-actions';
 export * from './nfts-ui-actions';
 export * from './ppts-actions';
 export * from './ppts-ui-actions';
-export * from './token-actions';
-export * from './tokens-actions';
 export * from './refresh-actions';
+export * from './token-actions';
+export * from './wallet-actions';
+export * from './wallet-ui-actions';
 
 import { Action as PageAction } from './page-actions';
 import { Action as MiningAction } from './mining-actions';
@@ -18,9 +19,10 @@ import { Action as NftsAction } from './nfts-actions';
 import { Action as NftsUiAction } from './nfts-ui-actions';
 import { Action as PptsAction } from './ppts-actions';
 import { Action as PptsUiAction } from './ppts-ui-actions';
-import { Action as TokenAction } from './token-actions';
-import { Action as TokensAction } from './tokens-actions';
 import { Action as RefreshAction } from './refresh-actions';
+import { Action as TokenAction } from './token-actions';
+import { Action as WalletAction } from './wallet-actions';
+import { Action as WalletUiAction } from './wallet-ui-actions';
 
 export type Action =
     PageAction |
@@ -31,6 +33,8 @@ export type Action =
     NftsUiAction |
     PptsAction |
     PptsUiAction |
+    RefreshAction |
     TokenAction |
-    TokensAction |
-    RefreshAction ;
+    WalletAction |
+    WalletUiAction
+;

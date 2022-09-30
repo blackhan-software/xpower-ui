@@ -1,14 +1,14 @@
-import { Empty, Token, Tokens } from '../types';
-import { tokensBy } from './tokens-by';
+import { Empty, Token, Wallet } from '../types';
+import { walletFor } from './wallet-for';
 
-describe('nfts-by', () => {
-    it('should return empty tokens', () => {
-        const tokens = Empty<Tokens>();
-        const tokens_by = tokensBy(tokens);
-        expect(tokens_by).toEqual(tokens);
+describe('wallet-for', () => {
+    it('should return wallet empty', () => {
+        const wallet = Empty<Wallet>();
+        const wallet_by = walletFor(wallet);
+        expect(wallet_by).toEqual(wallet);
     });
-    it('should return full token set', () => {
-        const tokens = {
+    it('should return wallet full[ish]', () => {
+        const wallet = {
             items: {
                 [Token.THOR]: { amount: 0n, supply: 1n },
                 [Token.LOKI]: { amount: 1n, supply: 2n },
@@ -16,11 +16,11 @@ describe('nfts-by', () => {
                 [Token.HELA]: { amount: 3n, supply: 4n },
             }
         };
-        const tokens_by = tokensBy(tokens);
-        expect(tokens_by).toEqual(tokens);
+        const wallet_by = walletFor(wallet);
+        expect(wallet_by).toEqual(wallet);
     });
-    it('should return THOR tokens only', () => {
-        const tokens = {
+    it('should return wallet for THOR only', () => {
+        const wallet = {
             items: {
                 [Token.THOR]: { amount: 0n, supply: 1n },
                 [Token.LOKI]: { amount: 1n, supply: 2n },
@@ -28,50 +28,50 @@ describe('nfts-by', () => {
                 [Token.HELA]: { amount: 3n, supply: 4n },
             }
         };
-        const tokens_by = tokensBy(tokens, Token.THOR);
-        expect(tokens_by).toEqual({
+        const wallet_by = walletFor(wallet, Token.THOR);
+        expect(wallet_by).toEqual({
             items: {
                 [Token.THOR]: { amount: 0n, supply: 1n },
             }
         });
     });
-    it('should return LOKI tokens only', () => {
-        const tokens = {
+    it('should return wallet for LOKI only', () => {
+        const wallet = {
             items: {
                 [Token.LOKI]: { amount: 1n, supply: 2n },
                 [Token.ODIN]: { amount: 2n, supply: 3n },
                 [Token.HELA]: { amount: 3n, supply: 4n },
             }
         };
-        const tokens_by = tokensBy(tokens, Token.LOKI);
-        expect(tokens_by).toEqual({
+        const wallet_by = walletFor(wallet, Token.LOKI);
+        expect(wallet_by).toEqual({
             items: {
                 [Token.LOKI]: { amount: 1n, supply: 2n },
             }
         });
     });
-    it('should return ODIN tokens only', () => {
-        const tokens = {
+    it('should return wallet for ODIN only', () => {
+        const wallet = {
             items: {
                 [Token.ODIN]: { amount: 2n, supply: 3n },
                 [Token.HELA]: { amount: 3n, supply: 4n },
             }
         };
-        const tokens_by = tokensBy(tokens, Token.ODIN);
-        expect(tokens_by).toEqual({
+        const wallet_by = walletFor(wallet, Token.ODIN);
+        expect(wallet_by).toEqual({
             items: {
                 [Token.ODIN]: { amount: 2n, supply: 3n },
             }
         });
     });
-    it('should return HELA tokens only', () => {
-        const tokens = {
+    it('should return wallet for HELA only', () => {
+        const wallet = {
             items: {
                 [Token.HELA]: { amount: 3n, supply: 4n },
             }
         };
-        const tokens_by = tokensBy(tokens, Token.HELA);
-        expect(tokens_by).toEqual({
+        const wallet_by = walletFor(wallet, Token.HELA);
+        expect(wallet_by).toEqual({
             items: {
                 [Token.HELA]: { amount: 3n, supply: 4n },
             }

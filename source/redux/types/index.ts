@@ -7,7 +7,9 @@ export * from './nonces';
 export * from './page';
 export * from './ppts-ui';
 export * from './refresh';
-export * from './tokens';
+export * from './token';
+export * from './wallet';
+export * from './wallet-ui';
 
 import { Page } from './page';
 import { Mining } from './mining';
@@ -17,7 +19,9 @@ import { NftsUi } from './nfts-ui';
 import { Nonces } from './nonces';
 import { PptsUi } from './ppts-ui';
 import { Refresh } from './refresh';
-import { Token, Tokens } from './tokens';
+import { Token } from './token';
+import { Wallet } from './wallet';
+import { WalletUi } from './wallet-ui';
 
 export type State = {
     page: Page,
@@ -30,7 +34,8 @@ export type State = {
     nonces: Nonces,
     refresh: Refresh,
     token: Token,
-    tokens: Tokens,
+    wallet: Wallet,
+    wallet_ui: WalletUi,
 };
 export function Empty<T extends {
     items: Record<string | number | symbol, unknown>

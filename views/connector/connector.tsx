@@ -20,7 +20,7 @@ enum Chain {
     CONNECTING,
     CONNECTED,
 }
-export class Connector extends Referable(
+export class UiConnector extends Referable(
     React.Component<Props, State>
 ) {
     constructor(
@@ -192,6 +192,6 @@ function reload(
 }
 if (require.main === module) {
     const $header = document.querySelector('form#connector');
-    createRoot($header!).render(createElement(Connector));
+    createRoot($header!).render(createElement(UiConnector));
 }
-export default Connector;
+export default UiConnector;

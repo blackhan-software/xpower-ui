@@ -16,7 +16,7 @@ type State = {
 function state() {
     return { switching: false };
 }
-export class Selector extends React.Component<
+export class UiSelector extends React.Component<
     Props, State
 > {
     constructor(props: {
@@ -128,4 +128,4 @@ function Spinner(
         className={classes.join(' ')} role='status'
     />;
 }
-export default Selector;
+export default UiSelector;

@@ -2,23 +2,22 @@
 import { Store, Unsubscribe } from 'redux';
 import { observe } from './observe';
 
-import { Amount, Supply, State } from '../types';
-import { Token, Tokens, Empty } from '../types';
 import { Action } from '../actions';
+import { Amount, Empty, State, Supply, Token, Wallet } from '../types';
 
-export type OnTokenAdded = (
+export type OnWalletIncreased = (
     token: Token, item: { amount: Amount, supply: Supply }
 ) => void;
-export type OnTokenRemoved = (
+export type OnWalletDecreased = (
     token: Token, item: { amount: Amount, supply: Supply }
 ) => void;
 
-export function onTokenAdded(
-    store: Store<State, Action>, handler: OnTokenAdded
+export function onWalletIncreased(
+    store: Store<State, Action>, handler: OnWalletIncreased
 ): Unsubscribe {
-    const selector = (state: State) => state.tokens;
-    const observer = observe<Tokens>(store)(
-        selector, Empty<Tokens>()
+    const selector = (state: State) => state.wallet;
+    const observer = observe<Wallet>(store)(
+        selector, Empty<Wallet>()
     );
     return observer((next) => {
         const added = (token: Token) => {
@@ -30,12 +29,12 @@ export function onTokenAdded(
         }
     });
 }
-export function onTokenRemoved(
-    store: Store<State, Action>, handler: OnTokenRemoved
+export function onWalledDecreased(
+    store: Store<State, Action>, handler: OnWalletDecreased
 ): Unsubscribe {
-    const selector = (state: State) => state.tokens;
-    const observer = observe<Tokens>(store)(
-        selector, Empty<Tokens>()
+    const selector = (state: State) => state.wallet;
+    const observer = observe<Wallet>(store)(
+        selector, Empty<Wallet>()
     );
     return observer((next) => {
         const removed = (token: Token) => {

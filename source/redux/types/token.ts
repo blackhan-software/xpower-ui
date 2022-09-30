@@ -1,4 +1,4 @@
-import { Address, Amount, Supply } from './base';
+import { Address } from './base';
 
 export enum Token {
     THOR = 'THOR',
@@ -14,19 +14,6 @@ export function Tokens(): Set<Token> {
         ref._set = new Set(Object.values(Token));
     }
     return ref._set;
-}
-export type Tokens = {
-    /** token => { amount, supply } */
-    items: {
-        [token in Token]?: {
-            amount: Amount;
-            supply: Supply;
-        }
-    },
-    /** set for added token(s) */
-    more?: Token[],
-    /** set for removed token(s) */
-    less?: Token[]
 }
 export type TokenInfo = {
     /** address the token is at */

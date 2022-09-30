@@ -9,4 +9,4 @@ export * from './nonces-by';
 export * from './nonce-by';
 export * from './total-by';
 export * from './total';
-export * from './tokens-by';
+export * from './wallet-for';

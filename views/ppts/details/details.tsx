@@ -58,16 +58,16 @@ type State = Record<NftLevel, Record<NftIssue, {
 function state(
     claimable = 0n, claimed = 0n
 ) {
-    const tokens = Array.from(NftTokens());
-    const issues = Array.from(Years({ reverse: true }));
-    const levels = Array.from(NftLevels());
+    const ppt_tokens = Array.from(NftTokens());
+    const ppt_issues = Array.from(Years({ reverse: true }));
+    const ppt_levels = Array.from(NftLevels());
     const state = Object.fromEntries(
-        levels.map((level) => [level, Object.fromEntries(
-            issues.map((issue) => [issue, {
-                claimable: Object.assign({}, ...tokens.map((t) => ({
+        ppt_levels.map((level) => [level, Object.fromEntries(
+            ppt_issues.map((issue) => [issue, {
+                claimable: Object.assign({}, ...ppt_tokens.map((t) => ({
                     [t]: claimable
                 }))),
-                claimed: Object.assign({}, ...tokens.map((t) => ({
+                claimed: Object.assign({}, ...ppt_tokens.map((t) => ({
                     [t]: claimed
                 }))),
             }])

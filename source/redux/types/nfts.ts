@@ -169,8 +169,8 @@ export type Nfts = {
             supply: Supply
         }
     },
-    /** set for added nft(s) */
+    /** set for more nft(s) */
     more?: NftFullId[],
-    /** set for removed nft(s) */
+    /** set for less nft(s) */
     less?: NftFullId[]
 }
