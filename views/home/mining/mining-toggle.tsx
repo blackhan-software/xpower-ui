@@ -22,7 +22,7 @@ function $toggle(
     { status, disabled, onToggle }: Props
 ) {
     const [focus, setFocus] = useState(false);
-    useEffect(() => {
+    useEffect(/*re-focus*/() => {
         if (focus) {
             const $toggle = document.getElementById(
                 'toggle-mining'

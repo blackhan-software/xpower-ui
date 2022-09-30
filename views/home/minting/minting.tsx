@@ -1,5 +1,5 @@
 import { globalRef, nice } from '../../../source/functions';
-import { Level, MinterRow, MinterStatus, Token } from '../../../source/redux/types';
+import { Level, MinterRow, MinterStatus, NftLevels, Token } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
 
 import React, { useEffect, useState } from 'react';
@@ -13,11 +13,8 @@ export function UiMinting(
     { token, rows, onMint, onForget }: Props
 ) {
     const [focus, setFocus] = useState<Record<Level, boolean>>({});
-    const onFocus = (level: Level, flag: boolean) => {
-        setFocus({ [level]: flag });
-    };
     const status = rows.map(({ status }) => status);
-    useEffect(() => {
+    useEffect(/*re-focus*/() => {
         const any_focused = Object.entries(focus).filter(
             ([level, focused]) => focused // eslint-disable-line
         );
@@ -30,15 +27,27 @@ export function UiMinting(
     }, [
         focus, status
     ]);
+    useEffect(/*set-title*/() => {
+        const title = 'Forget the tokens mined so far (w/o minting them)';
+        if (document.body.clientWidth > 576) {
+            for (const level of NftLevels()) {
+                const $ref = globalRef<HTMLElement>(
+                    `.forget[level="${level}"]`
+                );
+                if ($ref.current) {
+                    $ref.current.title = title;
+                }
+            }
+        }
+    }, []);
     return <React.Fragment>
         <label className='form-label'>
             Mined Amounts (not minted yet)
         </label>
-        {rows
-            .map((row, i) => $mint(
-                { token, level: i + 1, row, onMint, onForget }, onFocus
-            ))
-            .filter((row) => row)}
+        {rows.map((row, i) => $mint(
+            { token, level: i + 1, row, onMint, onForget },
+            (level, flag) => setFocus({ [level]: flag })
+        )).filter((row) => row)}
     </React.Fragment>;
 }
 function $mint(
@@ -126,13 +135,6 @@ function $forget(
         row: MinterRow
     }
 ) {
-    useEffect(() => {
-        if (document.body.clientWidth > 576) {
-            const title = 'Forget the tokens mined so far (w/o minting them)';
-            const $ref = globalRef<HTMLElement>(`.forget[level="${level}"]`);
-            if ($ref.current) $ref.current.title = title;
-        }
-    }, [level]);
     return <span
         className='d-inline-block'
         data-bs-toggle='tooltip' data-bs-placement='top'
