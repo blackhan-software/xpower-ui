@@ -26,13 +26,13 @@ global.addEventListener('load', () => {
     once: true
 });
 App.event.on('refresh-tips', buffered((
-    flags: { hide: boolean } | undefined
+    flags?: { keep?: boolean }
 ) => {
     const $tips = document.querySelectorAll<HTMLElement>(
         '[data-bs-toggle=tooltip]'
     );
     $tips.forEach(($tip) => {
-        if (flags?.hide) {
+        if (!flags || !flags.keep) {
             Tooltip.getInstance($tip)?.hide();
         }
         if (refresh($tip)) {

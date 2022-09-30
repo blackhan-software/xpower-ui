@@ -126,10 +126,17 @@ function $forget(
         row: MinterRow
     }
 ) {
+    useEffect(() => {
+        if (document.body.clientWidth > 576) {
+            const title = 'Forget the tokens mined so far (w/o minting them)';
+            const $ref = globalRef<HTMLElement>(`.forget[level="${level}"]`);
+            if ($ref.current) $ref.current.title = title;
+        }
+    }, [level]);
     return <span
         className='d-inline-block'
         data-bs-toggle='tooltip' data-bs-placement='top'
-        title='Forget the tokens mined so far (w/o minting them)'
+        ref={globalRef(`.forget[level="${level}"]`)}
     >
         <button
             onClick={() => {

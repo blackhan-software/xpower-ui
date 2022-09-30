@@ -502,7 +502,7 @@ export class App {
     }
     private _event = mitt<{
         'refresh-tips': undefined | {
-            hide?: boolean;
+            keep?: boolean;
         };
         'toggle-level': {
             level?: NftLevel; flag: boolean;

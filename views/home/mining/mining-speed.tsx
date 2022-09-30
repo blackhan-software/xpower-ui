@@ -136,7 +136,7 @@ export class UiMiningSpeed extends React.Component<
         });
     }
     componentDidUpdate() {
-        App.event.emit('refresh-tips', { hide: true });
+        App.event.emit('refresh-tips');
     }
 }
 export default UiMiningSpeed;
