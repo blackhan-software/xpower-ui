@@ -8,8 +8,8 @@ export * from './ppts-actions';
 export * from './ppts-ui-actions';
 export * from './refresh-actions';
 export * from './token-actions';
-export * from './wallet-actions';
-export * from './wallet-ui-actions';
+export * from './aft-wallet-actions';
+export * from './otf-wallet-actions';
 
 import { Action as PageAction } from './page-actions';
 import { Action as MiningAction } from './mining-actions';
@@ -21,8 +21,8 @@ import { Action as PptsAction } from './ppts-actions';
 import { Action as PptsUiAction } from './ppts-ui-actions';
 import { Action as RefreshAction } from './refresh-actions';
 import { Action as TokenAction } from './token-actions';
-import { Action as WalletAction } from './wallet-actions';
-import { Action as WalletUiAction } from './wallet-ui-actions';
+import { Action as AftWalletAction } from './aft-wallet-actions';
+import { Action as OftWalletAction } from './otf-wallet-actions';
 
 export type Action =
     PageAction |
@@ -35,6 +35,6 @@ export type Action =
     PptsUiAction |
     RefreshAction |
     TokenAction |
-    WalletAction |
-    WalletUiAction
+    AftWalletAction |
+    OftWalletAction
 ;

@@ -8,8 +8,10 @@ import { MiningManager } from '../../source/managers';
 import { MinterRows } from '../../source/redux/types';
 import { Page } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
-import { OtfWallet } from '../../source/wallet';
-
+import { OtfManager } from '../../source/wallet';
+/**
+ * minting:
+ */
 App.onNonceChanged(async function updateMinters(
     nonce, { address, amount, token }, total
 ) {
@@ -80,7 +82,7 @@ Blockchain.onceConnect(function autoMint({
         }
     });
     function on_tick() {
-        if (OtfWallet.enabled) {
+        if (OtfManager.enabled) {
             const $minters = document.querySelectorAll<HTMLElement>(
                 '.minter'
             );

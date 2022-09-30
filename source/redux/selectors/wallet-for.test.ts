@@ -1,9 +1,9 @@
-import { Empty, Token, Wallet } from '../types';
+import { Empty, Token, AftWallet } from '../types';
 import { walletFor } from './wallet-for';
 
 describe('wallet-for', () => {
     it('should return wallet empty', () => {
-        const wallet = Empty<Wallet>();
+        const wallet = Empty<AftWallet>();
         const wallet_by = walletFor(wallet);
         expect(wallet_by).toEqual(wallet);
     });

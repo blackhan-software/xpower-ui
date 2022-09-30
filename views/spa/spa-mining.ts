@@ -4,8 +4,10 @@ import { x64 } from '../../source/functions';
 import { HashManager, IntervalManager, MiningManager } from '../../source/managers';
 import { MinerStatus, Token, Tokens } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
-import { MoeWallet, OnInit, OtfWallet } from '../../source/wallet';
-
+import { MoeWallet, OnInit, OtfManager } from '../../source/wallet';
+/**
+ * mining:
+ */
 Blockchain.onceConnect(function setupMining({
     address, token
 }) {
@@ -148,9 +150,9 @@ Blockchain.onceConnect(async function resumeMiningIf({
     address
 }) {
     const on_block = async () => {
-        if (OtfWallet.enabled) {
+        if (OtfManager.enabled) {
             const otf_balance = await otf_wallet.getBalance();
-            if (otf_balance.gt(OtfWallet.threshold)) {
+            if (otf_balance.gt(OtfManager.threshold)) {
                 const miner = MiningManager.miner(address, {
                     token: App.token
                 });
@@ -160,6 +162,6 @@ Blockchain.onceConnect(async function resumeMiningIf({
             }
         }
     };
-    const otf_wallet = await OtfWallet.init();
+    const otf_wallet = await OtfManager.init();
     otf_wallet.provider?.on('block', on_block);
 });

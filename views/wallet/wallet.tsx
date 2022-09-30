@@ -2,8 +2,8 @@ import './wallet.scss';
 
 import { App } from '../../source/app';
 import { globalRef } from '../../source/functions';
-import { Address, Amount, Token, Wallet } from '../../source/redux/types';
-import { OtfWallet } from '../../source/wallet';
+import { Address, AftWallet, OtfWallet, Token } from '../../source/redux/types';
+import { OtfManager } from '../../source/wallet';
 
 import React, { useEffect, useState } from 'react';
 import { CSSTransition } from 'react-transition-group';
@@ -11,38 +11,33 @@ import { UiAftWallet } from './aft-wallet';
 import { UiOtfWallet } from './otf-wallet';
 
 type Props = {
-    aft: {
+    aft: AftWallet & {
         address: Address | null;
     };
-    otf: {
-        address: Address | null;
-        amount: Amount | null;
-        processing: boolean;
-    } & {
+    otf: OtfWallet & {
         onDeposit?: (processing: boolean) => void;
         onWithdraw?: (processing: boolean) => void;
     };
     token: Token;
-    wallet: Wallet;
 }
 type State = {
     toggled: boolean;
 }
 export function UiWallet(
-    { aft, otf, token, wallet }: Props
+    { aft, otf, token }: Props
 ) {
     const [toggled, set_toggled] = useState<State['toggled']>(
-        OtfWallet.enabled
+        OtfManager.enabled
     );
     useEffect(() => {
-        OtfWallet.enabled = toggled;
+        OtfManager.enabled = toggled;
     }, [toggled]);
     useEffect(() => {
-        const handler = OtfWallet.onToggled(
+        const handler = OtfManager.onToggled(
             ({ toggled }) => set_toggled(toggled)
         );
         return () => {
-            OtfWallet.unToggled(handler);
+            OtfManager.unToggled(handler);
         };
     }, []);
     useEffect(() => {
@@ -50,7 +45,7 @@ export function UiWallet(
     });
     return <>
         <UiAftWallet
-            address={aft.address} token={token} wallet={wallet}
+            wallet={aft.items} address={aft.address} token={token}
             toggled={toggled} onToggled={(t) => set_toggled(t)}
         ></UiAftWallet>
         <CSSTransition

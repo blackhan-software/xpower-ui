@@ -5,7 +5,7 @@ import { Address, Amount, Token, Year } from '../redux/types';
 import { NftCoreId, NftLevel } from '../redux/types';
 
 import { ERC1155Wallet } from './erc1155-wallet';
-import { OtfWallet } from './otf-wallet';
+import { OtfManager } from './otf-manager';
 
 export class NftWallet extends ERC1155Wallet {
     constructor(
@@ -17,7 +17,7 @@ export class NftWallet extends ERC1155Wallet {
     async mint(
         level: NftLevel, amount: Amount
     ): Promise<Transaction> {
-        const contract = await OtfWallet.connect(
+        const contract = await OtfManager.connect(
             await this.contract
         );
         return contract.mint(
@@ -27,7 +27,7 @@ export class NftWallet extends ERC1155Wallet {
     async mintBatch(
         levels: NftLevel[], amounts: Amount[]
     ): Promise<Transaction> {
-        const contract = await OtfWallet.connect(
+        const contract = await OtfManager.connect(
             await this.contract
         );
         return contract.mintBatch(

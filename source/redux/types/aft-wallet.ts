@@ -1,7 +1,7 @@
 import { Amount, Supply } from './base';
 import { Token } from './token';
 
-export type Wallet = {
+export type AftWallet = {
     /** token => { amount, supply } */
     items: {
         [token in Token]?: {
@@ -14,4 +14,4 @@ export type Wallet = {
     /** set for less token(s) */
     less?: Token[];
 };
-export default Wallet;
+export default AftWallet;

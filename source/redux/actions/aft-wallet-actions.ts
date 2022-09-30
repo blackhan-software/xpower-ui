@@ -1,57 +1,57 @@
 import { Amount, Supply, Token } from '../types';
 
-export type SetWallet = {
-    type: 'wallet/set', payload: {
+export type SetAftWallet = {
+    type: 'aft-wallet/set', payload: {
         token: Token, item: {
             amount: Amount,
             supply: Supply
         }
     }
 };
-export const setWallet = (
+export const setAftWallet = (
     token: Token, item: {
         amount: Amount,
         supply: Supply
     }
-): SetWallet => ({
-    type: 'wallet/set', payload: {
+): SetAftWallet => ({
+    type: 'aft-wallet/set', payload: {
         token, item
     }
 });
-export type IncreaseWallet = {
-    type: 'wallet/increase', payload: {
+export type IncreaseAftWallet = {
+    type: 'aft-wallet/increase', payload: {
         token: Token, item?: {
             amount: Amount,
             supply?: Supply
         }
     }
 };
-export const increaseWallet = (
+export const increaseAftWallet = (
     token: Token, item?: {
         amount: Amount, // new-amount = old-amount + amount
         supply?: Supply // new-supply = supply ?? old-supply + amount
     }
-): IncreaseWallet => ({
-    type: 'wallet/increase', payload: {
+): IncreaseAftWallet => ({
+    type: 'aft-wallet/increase', payload: {
         token, item
     }
 });
-export type DecreaseWallet = {
-    type: 'wallet/decrease', payload: {
+export type DecreaseAftWallet = {
+    type: 'aft-wallet/decrease', payload: {
         token: Token, item?: {
             amount: Amount,
             supply?: Supply
         }
     }
 };
-export const decreaseWallet = (
+export const decreaseAftWallet = (
     token: Token, item?: {
         amount: Amount, // new-amount = old-amount - amount
         supply?: Supply // new-supply = supply ?? old-supply (*no* decrease!)
     }
-): DecreaseWallet => ({
-    type: 'wallet/decrease', payload: {
+): DecreaseAftWallet => ({
+    type: 'aft-wallet/decrease', payload: {
         token, item
     }
 });
-export type Action = SetWallet | IncreaseWallet | DecreaseWallet;
+export type Action = SetAftWallet | IncreaseAftWallet | DecreaseAftWallet;

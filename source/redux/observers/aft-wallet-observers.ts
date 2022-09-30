@@ -3,21 +3,21 @@ import { Store, Unsubscribe } from 'redux';
 import { observe } from './observe';
 
 import { Action } from '../actions';
-import { Amount, Empty, State, Supply, Token, Wallet } from '../types';
+import { Amount, Empty, State, Supply, Token, AftWallet } from '../types';
 
-export type OnWalletIncreased = (
+export type OnAftWalletIncreased = (
     token: Token, item: { amount: Amount, supply: Supply }
 ) => void;
-export type OnWalletDecreased = (
+export type OnAftWalletDecreased = (
     token: Token, item: { amount: Amount, supply: Supply }
 ) => void;
 
-export function onWalletIncreased(
-    store: Store<State, Action>, handler: OnWalletIncreased
+export function onAftWalletIncreased(
+    store: Store<State, Action>, handler: OnAftWalletIncreased
 ): Unsubscribe {
-    const selector = (state: State) => state.wallet;
-    const observer = observe<Wallet>(store)(
-        selector, Empty<Wallet>()
+    const selector = (state: State) => state.aft_wallet;
+    const observer = observe<AftWallet>(store)(
+        selector, Empty<AftWallet>()
     );
     return observer((next) => {
         const added = (token: Token) => {
@@ -29,12 +29,12 @@ export function onWalletIncreased(
         }
     });
 }
-export function onWalledDecreased(
-    store: Store<State, Action>, handler: OnWalletDecreased
+export function onAftWalledDecreased(
+    store: Store<State, Action>, handler: OnAftWalletDecreased
 ): Unsubscribe {
-    const selector = (state: State) => state.wallet;
-    const observer = observe<Wallet>(store)(
-        selector, Empty<Wallet>()
+    const selector = (state: State) => state.aft_wallet;
+    const observer = observe<AftWallet>(store)(
+        selector, Empty<AftWallet>()
     );
     return observer((next) => {
         const removed = (token: Token) => {

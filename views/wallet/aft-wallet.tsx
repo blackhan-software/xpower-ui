@@ -1,13 +1,13 @@
 import { nice, nice_si, x40 } from '../../source/functions';
-import { Address, Token, Wallet } from '../../source/redux/types';
+import { Address, AftWallet, Token } from '../../source/redux/types';
 
 import React from 'react';
 import { XPower } from '../../public/images/tsx';
 
 type Props = {
+    wallet: AftWallet['items'];
     address: Address | null;
     token: Token;
-    wallet: Wallet;
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
 }
@@ -56,7 +56,7 @@ function $address(
 function $balance(
     { token, wallet }: Props
 ) {
-    const item = wallet.items[token];
+    const item = wallet[token];
     return <input type='text' readOnly
         className='form-control' id='aft-wallet-balance'
         data-bs-toggle='tooltip' data-bs-placement='top'

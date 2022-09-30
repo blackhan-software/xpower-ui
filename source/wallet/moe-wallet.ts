@@ -6,7 +6,7 @@ import { Address, BlockHash, Nonce } from '../redux/types';
 import { Timestamp, Token } from '../redux/types';
 
 import { ERC20Wallet } from './erc20-wallet';
-import { OtfWallet } from './otf-wallet';
+import { OtfManager } from './otf-manager';
 
 export type OnInit = (
     block_hash: BlockHash, timestamp: Timestamp, ev: Event
@@ -20,7 +20,7 @@ export class MoeWallet extends ERC20Wallet {
         this._token = token;
     }
     async init(): Promise<Transaction> {
-        const contract = await OtfWallet.connect(
+        const contract = await OtfManager.connect(
             await this.contract
         );
         return contract.init();
@@ -28,7 +28,7 @@ export class MoeWallet extends ERC20Wallet {
     async mint(
         block_hash: BlockHash, nonce: Nonce
     ): Promise<Transaction> {
-        const contract = await OtfWallet.connect(
+        const contract = await OtfManager.connect(
             await this.contract
         );
         return contract.mint(
@@ -43,7 +43,7 @@ export class MoeWallet extends ERC20Wallet {
         ) => {
             handler(BigInt(block_hash), timestamp.toBigInt(), ev);
         };
-        const contract = await OtfWallet.connect(
+        const contract = await OtfManager.connect(
             await this.contract
         );
         if (once) {

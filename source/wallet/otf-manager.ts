@@ -12,10 +12,10 @@ import { randomBytes } from '@ethersproject/random';
 import { parseUnits } from '@ethersproject/units';
 import { Contract, Wallet } from 'ethers';
 
-export class OtfWallet extends EventEmitter {
-    private static get me(): OtfWallet {
+export class OtfManager extends EventEmitter {
+    private static get me(): OtfManager {
         if (this._me === undefined) {
-            this._me = new OtfWallet();
+            this._me = new OtfManager();
         }
         return this._me;
     }
@@ -64,8 +64,8 @@ export class OtfWallet extends EventEmitter {
     public static async connect(
         fallback: Contract
     ): Promise<Contract> {
-        if (OtfWallet.enabled) {
-            const wallet = await OtfWallet.init();
+        if (OtfManager.enabled) {
+            const wallet = await OtfManager.init();
             const balance = await wallet.getBalance();
             if (balance.gt(0)) {
                 return fallback.connect(wallet);
@@ -76,4 +76,4 @@ export class OtfWallet extends EventEmitter {
     private static _wallet: NonceManager | undefined;
     private static _me: any;
 }
-export default OtfWallet;
+export default OtfManager;

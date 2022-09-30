@@ -2,10 +2,10 @@ import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers, DeepPartial, Store, Unsubscribe } from 'redux';
 import { delayed } from '../functions';
 import { Parser } from '../parser';
-import { Action, addNft, addNonce, addPpt, increaseWallet, refresh, removeNft, removeNonce, removeNonceByAmount, removeNonces, removePpt, decreaseWallet, setMining, setMinting, setNft, setNftsUi, setPpt, setPptsUi, setWallet, switchPage, switchToken, setWalletUi } from '../redux/actions';
+import { Action, addNft, addNonce, addPpt, decreaseAftWallet, increaseAftWallet, refresh, removeNft, removeNonce, removeNonceByAmount, removeNonces, removePpt, setAftWallet, setMining, setMinting, setNft, setNftsUi, setOtfWallet, setPpt, setPptsUi, switchPage, switchToken } from '../redux/actions';
 import { middleware } from '../redux/middleware';
-import { onNftAdded, OnNftAdded, onNftRemoved, OnNftRemoved, onNonceAdded, OnNonceAdded, onNonceRemoved, OnNonceRemoved, onPageSwitch, OnPageSwitch, onPptAdded, OnPptAdded, onPptRemoved, OnPptRemoved, onWalletIncreased, OnWalletIncreased, onWalledDecreased, OnWalletDecreased, onTokenSwitch, OnTokenSwitch } from '../redux/observers';
-import { miningReducer, mintingReducer, nftsReducer, nftsUiReducer, noncesReducer, pageReducer, pptsReducer, pptsUiReducer, refreshReducer, tokenReducer, walletReducer, walletUiReducer } from '../redux/reducers';
+import { onNftAdded, OnNftAdded, onNftRemoved, OnNftRemoved, onNonceAdded, OnNonceAdded, onNonceRemoved, OnNonceRemoved, onPageSwitch, OnPageSwitch, onPptAdded, OnPptAdded, onPptRemoved, OnPptRemoved, onTokenSwitch, OnTokenSwitch, onAftWalledDecreased, OnAftWalletDecreased, onAftWalletIncreased, OnAftWalletIncreased } from '../redux/observers';
+import { aftWalletReducer, miningReducer, mintingReducer, nftsReducer, nftsUiReducer, noncesReducer, otfWalletReducer, pageReducer, pptsReducer, pptsUiReducer, refreshReducer, tokenReducer } from '../redux/reducers';
 import { nftsBy, nftTotalBy, nonceBy, noncesBy, pptsBy, pptTotalBy, refreshed, walletFor } from '../redux/selectors';
 import { Address, Amount, BlockHash, NftFullId, NftIssue, NftLevel, NftToken, Nonce, Page, Pager, State, Supply, Token } from '../redux/types';
 import { StateDb } from '../state-db';
@@ -36,9 +36,9 @@ export class App {
             nfts_ui: nftsUiReducer,
             ppts: pptsReducer,
             ppts_ui: pptsUiReducer,
-            wallet: walletReducer,
-            wallet_ui: walletUiReducer,
             refresh: refreshReducer,
+            aft_wallet: aftWalletReducer,
+            otf_wallet: otfWalletReducer,
         });
         if (App.clear) {
             this.db.clear(App.persist);
@@ -367,50 +367,50 @@ export class App {
         const { ppts } = this.me.store.getState();
         return pptTotalBy(ppts, ppt);
     }
-    public static getWallet(token?: Token) {
-        const { wallet } = this.me.store.getState();
-        return walletFor(wallet, token)
+    public static getAftWallet(token?: Token) {
+        const { aft_wallet } = this.me.store.getState();
+        return walletFor(aft_wallet, token)
     }
-    public static setWallet(
+    public static setAftWallet(
         token: Token, item: { amount: Amount, supply: Supply }
     ) {
-        this.me.store.dispatch(setWallet(token, item));
+        this.me.store.dispatch(setAftWallet(token, item));
     }
-    public static increaseWallet(
+    public static increaseAftWallet(
         token: Token, item: { amount: Amount, supply?: Supply }
     ) {
-        this.me.store.dispatch(increaseWallet(token, item));
+        this.me.store.dispatch(increaseAftWallet(token, item));
     }
-    public static decreaseWallet(
+    public static decreaseAftWallet(
         token: Token, item: { amount: Amount, supply?: Supply }
     ) {
-        this.me.store.dispatch(decreaseWallet(token, item));
+        this.me.store.dispatch(decreaseAftWallet(token, item));
     }
-    public static onWalletIncreased(
-        callback: OnWalletIncreased
+    public static onAftWalletIncreased(
+        callback: OnAftWalletIncreased
     ) {
-        return onWalletIncreased(this.me.store, callback);
+        return onAftWalletIncreased(this.me.store, callback);
     }
-    public static onWalletDecreased(
-        callback: OnWalletDecreased
+    public static onAftWalletDecreased(
+        callback: OnAftWalletDecreased
     ) {
-        return onWalledDecreased(this.me.store, callback);
+        return onAftWalledDecreased(this.me.store, callback);
     }
-    public static onWalletChanged(
-        callback: OnWalletIncreased | OnWalletDecreased
+    public static onAftWalletChanged(
+        callback: OnAftWalletIncreased | OnAftWalletDecreased
     ): Unsubscribe {
-        const un_add = this.onWalletIncreased(callback);
-        const un_rem = this.onWalletDecreased(callback);
+        const un_add = this.onAftWalletIncreased(callback);
+        const un_rem = this.onAftWalletDecreased(callback);
         return () => { un_add(); un_rem(); };
     }
-    public static getWalletUi(): State['wallet_ui'] {
-        const { wallet_ui } = this.me.store.getState();
-        return wallet_ui;
+    public static getOtfWallet(): State['otf_wallet'] {
+        const { otf_wallet } = this.me.store.getState();
+        return otf_wallet;
     }
-    public static setWalletUi(
-        wallet_ui: DeepPartial<State['wallet_ui']>
+    public static setOtfWallet(
+        otf_wallet: Partial<State['otf_wallet']>
     ) {
-        this.me.store.dispatch(setWalletUi(wallet_ui));
+        this.me.store.dispatch(setOtfWallet(otf_wallet));
     }
     public static refresh() {
         this.me.store.dispatch(refresh());

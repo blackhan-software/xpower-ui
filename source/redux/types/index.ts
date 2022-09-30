@@ -8,10 +8,11 @@ export * from './page';
 export * from './ppts-ui';
 export * from './refresh';
 export * from './token';
-export * from './wallet';
-export * from './wallet-ui';
+export * from './aft-wallet';
+export * from './otf-wallet';
 
 import { Page } from './page';
+import { Token } from './token';
 import { Mining } from './mining';
 import { Minting } from './minting';
 import { Nfts } from './nfts';
@@ -19,12 +20,12 @@ import { NftsUi } from './nfts-ui';
 import { Nonces } from './nonces';
 import { PptsUi } from './ppts-ui';
 import { Refresh } from './refresh';
-import { Token } from './token';
-import { Wallet } from './wallet';
-import { WalletUi } from './wallet-ui';
+import { AftWallet } from './aft-wallet';
+import { OtfWallet } from './otf-wallet';
 
 export type State = {
     page: Page,
+    token: Token,
     mining: Mining,
     minting: Minting,
     nfts: Nfts,
@@ -33,9 +34,8 @@ export type State = {
     ppts_ui: PptsUi,
     nonces: Nonces,
     refresh: Refresh,
-    token: Token,
-    wallet: Wallet,
-    wallet_ui: WalletUi,
+    aft_wallet: AftWallet,
+    otf_wallet: OtfWallet,
 };
 export function Empty<T extends {
     items: Record<string | number | symbol, unknown>

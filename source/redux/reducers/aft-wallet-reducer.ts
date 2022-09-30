@@ -1,22 +1,22 @@
-import { Action } from '../actions/wallet-actions';
-import { Wallet, Token, Empty } from '../types';
+import { Action } from '../actions/aft-wallet-actions';
+import { AftWallet, Token, Empty } from '../types';
 import { Amount, Supply } from '../types';
 
-export function walletReducer(
-    wallet = Empty<Wallet>(), action: Action
-): Wallet {
-    if (!action.type.startsWith('wallet/')) {
-        return wallet;
+export function aftWalletReducer(
+    aft_wallet = Empty<AftWallet>(), action: Action
+): AftWallet {
+    if (!action.type.startsWith('aft-wallet/')) {
+        return aft_wallet;
     }
-    const items = { ...wallet.items };
+    const items = { ...aft_wallet.items };
     const token = action.payload.token;
-    if (action.type === 'wallet/set') {
+    if (action.type === 'aft-wallet/set') {
         const s = action.payload.item.supply;
         const a = action.payload.item.amount;
         items[token] = pack(a, s, { token: token });
         return { items, more: [token] };
     }
-    if (action.type === 'wallet/increase') {
+    if (action.type === 'aft-wallet/increase') {
         const item_old = items[token];
         const item_new = {
             amount: action.payload.item?.amount ?? 1n,
@@ -33,7 +33,7 @@ export function walletReducer(
         }
         return { items, more: [token] };
     }
-    if (action.type === 'wallet/decrease') {
+    if (action.type === 'aft-wallet/decrease') {
         const item_old = items[token];
         const item_new = {
             amount: action.payload.item?.amount ?? 1n,
@@ -50,7 +50,7 @@ export function walletReducer(
         }
         return { items, less: [token] };
     }
-    return wallet;
+    return aft_wallet;
 }
 function pack(amount: Amount, supply: Supply, { token }: { token: Token }) {
     if (supply < amount) {
@@ -61,4 +61,4 @@ function pack(amount: Amount, supply: Supply, { token }: { token: Token }) {
     }
     return { amount, supply };
 }
-export default walletReducer;
+export default aftWalletReducer;

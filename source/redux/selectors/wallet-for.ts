@@ -1,8 +1,8 @@
-import { Token, Wallet } from '../types';
+import { Token, AftWallet } from '../types';
 
 export function walletFor(
-    wallet: Wallet, token?: Token
-): Wallet {
+    wallet: AftWallet, token?: Token
+): AftWallet {
     const items = Object.fromEntries(
         Object.entries(wallet.items).filter(([t]) => {
             if (token !== undefined && token !== t) {

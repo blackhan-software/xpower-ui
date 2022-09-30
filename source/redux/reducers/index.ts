@@ -8,5 +8,5 @@ export * from './ppts-ui-reducer';
 export * from './nonces-reducer';
 export * from './refresh-reducer';
 export * from './token-reducer';
-export * from './wallet-reducer';
-export * from './wallet-ui-reducer';
+export * from './aft-wallet-reducer';
+export * from './otf-wallet-reducer';

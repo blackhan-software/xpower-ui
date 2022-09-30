@@ -4,4 +4,4 @@ export * from './page-observers';
 export * from './ppts-observers';
 export * from './nonces-observers';
 export * from './token-observers';
-export * from './wallet-observers';
+export * from './aft-wallet-observers';

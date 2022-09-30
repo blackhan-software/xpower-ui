@@ -8,9 +8,9 @@ import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryF
 import { Alert, alert, Alerts, ancestor, globalRef, x40 } from '../../source/functions';
 import { HashManager, MiningManager } from '../../source/managers';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
-import { Address, Amount, Level, MAX_UINT256, Mining, MinterRows, MinterStatus, Minting, Nft, NftCoreId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, Nfts, NftSenderStatus, NftsUi, Page, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, PptsUi, Token, Wallet, WalletUi } from '../../source/redux/types';
+import { Address, Amount, Level, MAX_UINT256, Mining, MinterRows, MinterStatus, Minting, Nft, NftCoreId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, Nfts, NftSenderStatus, NftsUi, Page, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, PptsUi, Token, AftWallet, OtfWallet } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
-import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfWallet } from '../../source/wallet';
+import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfManager } from '../../source/wallet';
 import { Years } from '../../source/years';
 
 import React, { createElement, useContext } from 'react';
@@ -30,13 +30,13 @@ import { Web3Provider } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import { Transaction } from 'ethers';
 
-import './spa-home';
+import './spa-mining';
+import './spa-minting';
 import './spa-nfts';
 import './spa-nfts-ui';
 import './spa-ppts';
 import './spa-ppts-ui';
 import './spa-wallet';
-import './spa-wallet-ui';
 
 type Props = {
     page: Page;
@@ -47,8 +47,8 @@ type Props = {
     nfts_ui: NftsUi;
     ppts: Nfts;
     ppts_ui: PptsUi;
-    wallet: Wallet;
-    wallet_ui: WalletUi;
+    aft_wallet: AftWallet;
+    otf_wallet: OtfWallet;
 }
 export function SPA(
     props: Props
@@ -56,7 +56,7 @@ export function SPA(
     if (App.debug) {
         console.count('[app.render]');
     }
-    const { wallet, wallet_ui } = props;
+    const { aft_wallet, otf_wallet } = props;
     const { mining, minting } = props;
     const { nfts, nfts_ui } = props;
     const { ppts, ppts_ui } = props;
@@ -64,7 +64,7 @@ export function SPA(
     return <React.StrictMode>
         {$h1(page)}
         {$connector(page)}
-        {$wallet(page, token, wallet, wallet_ui)}
+        {$wallet(page, token, aft_wallet, otf_wallet)}
         {$selector(page, token)}
         {$home(page, token, mining, minting)}
         {$nfts(page, token, nfts, nfts_ui)}
@@ -99,7 +99,8 @@ function $connector(
 }
 function $wallet(
     page: Page, token: Token,
-    wallet: Wallet, wallet_ui: WalletUi
+    aft_wallet: AftWallet,
+    otf_wallet: OtfWallet
 ) {
     const [address] = useContext(AddressContext);
     return <form id='wallet'
@@ -107,14 +108,15 @@ function $wallet(
         onSubmit={(e) => e.preventDefault()}
     >
         <UiWallet
-            aft={{address}}
+            aft={{
+                ...aft_wallet, address
+            }}
             otf={{
+                ...otf_wallet,
                 onDeposit: otfDeposit,
-                onWithdraw: otfWithdraw,
-                ...wallet_ui.otf
+                onWithdraw: otfWithdraw
             }}
             token={token}
-            wallet={wallet}
         />
     </form>;
 }
@@ -501,7 +503,7 @@ async function mint(
             if (ex.data && ex.data.message && ex.data.message.match(
                 /gas required exceeds allowance/i
             )) {
-                if (OtfWallet.enabled) {
+                if (OtfManager.enabled) {
                     const miner = MiningManager.miner(address, {
                         token
                     });
@@ -814,7 +816,7 @@ async function pptClaim(
         moe_treasury.then(
             (c) => c.on('Claim', on_claim_tx)
         );
-        const contract = await OtfWallet.connect(
+        const contract = await OtfManager.connect(
             await moe_treasury
         );
         tx = await contract.claimFor(
@@ -987,7 +989,7 @@ async function pptBatchMint(
         ppt_treasury.then(
             (c) => c?.on('StakeBatch', on_stake_batch)
         );
-        const contract = await OtfWallet.connect(
+        const contract = await OtfManager.connect(
             await ppt_treasury
         );
         tx = await contract.stakeBatch(
@@ -1079,7 +1081,7 @@ async function pptBatchBurn(
         ppt_treasury.then(
             (c) => c?.on('UnstakeBatch', on_unstake_batch)
         );
-        const contract = await OtfWallet.connect(
+        const contract = await OtfManager.connect(
             await ppt_treasury
         );
         tx = await contract.unstakeBatch(
@@ -1109,8 +1111,8 @@ async function otfDeposit(
     if (processing) {
         return;
     } else {
-        App.setWalletUi({
-            otf: { processing: true }
+        App.setOtfWallet({
+            processing: true
         });
     }
     const address = await Blockchain.selectedAddress;
@@ -1128,8 +1130,8 @@ async function otfDeposit(
             to: x40(address),
         });
     } catch (ex) {
-        App.setWalletUi({
-            otf: { processing: false }
+        App.setOtfWallet({
+            processing: false
         });
         console.error(ex);
         return;
@@ -1139,7 +1141,7 @@ async function otfDeposit(
     const fee = gas_limit.mul(gas_price);
     const value = mmw_balance.lt(unit.add(fee))
         ? mmw_balance.sub(fee) : unit;
-    const otf_wallet = await OtfWallet.init();
+    const otf_wallet = await OtfManager.init();
     const otf_address = await otf_wallet.getAddress();
     try {
         const tx = await mmw_signer.sendTransaction({
@@ -1147,17 +1149,17 @@ async function otfDeposit(
             to: otf_address, value
         });
         tx.wait(1).then(() => {
-            App.setWalletUi({
-                otf: { processing: false }
+            App.setOtfWallet({
+                processing: false
             });
         });
-        App.setWalletUi({
-            otf: { processing: true }
+        App.setOtfWallet({
+            processing: true
         });
         console.debug('[otf-deposit]', tx);
     } catch (ex) {
-        App.setWalletUi({
-            otf: { processing: false }
+        App.setOtfWallet({
+            processing: false
         });
         console.error(ex);
     }
@@ -1168,15 +1170,15 @@ async function otfWithdraw(
     if (processing) {
         return;
     } else {
-        App.setWalletUi({
-            otf: { processing: true }
+        App.setOtfWallet({
+            processing: true
         });
     }
     const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
-    const otf_signer = await OtfWallet.init();
+    const otf_signer = await OtfManager.init();
     const otf_balance = await otf_signer.getBalance();
     let gas_limit = parseUnits('0');
     try {
@@ -1184,8 +1186,8 @@ async function otfWithdraw(
             to: x40(address), value: otf_balance
         });
     } catch (ex) {
-        App.setWalletUi({
-            otf: { processing: false }
+        App.setOtfWallet({
+            processing: false
         });
         console.error(ex);
         return;
@@ -1200,17 +1202,17 @@ async function otfWithdraw(
             to: x40(address), value
         });
         tx.wait(1).then(() => {
-            App.setWalletUi({
-                otf: { processing: false }
+            App.setOtfWallet({
+                processing: false
             });
         });
-        App.setWalletUi({
-            otf: { processing: true }
+        App.setOtfWallet({
+            processing: true
         });
         console.debug('[otf-withdraw]', tx);
     } catch (ex) {
-        App.setWalletUi({
-            otf: { processing: false }
+        App.setOtfWallet({
+            processing: false
         });
         console.error(ex);
     }
@@ -1239,11 +1241,12 @@ function error(
 }
 if (require.main === module) {
     const mapper = ({
-        wallet, wallet_ui,
+        page, token,
         mining, minting,
         nfts, nfts_ui,
         ppts, ppts_ui,
-        page, token,
+        aft_wallet,
+        otf_wallet,
     }: {
         page: Page;
         token: Token;
@@ -1253,14 +1256,15 @@ if (require.main === module) {
         nfts_ui: NftsUi;
         ppts: Nfts;
         ppts_ui: PptsUi;
-        wallet: Wallet;
-        wallet_ui: WalletUi;
+        aft_wallet: AftWallet;
+        otf_wallet: OtfWallet;
     }) => ({
-        wallet, wallet_ui,
+        page, token,
         mining, minting,
         nfts, nfts_ui,
         ppts, ppts_ui,
-        page, token,
+        aft_wallet,
+        otf_wallet,
     });
     const $content = document.querySelector('content');
     const spa = createElement(connect(mapper)(SPA));

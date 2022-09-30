@@ -1,15 +1,11 @@
 import { globalRef, nice, nice_si, x40 } from '../../source/functions';
-import { Address, Amount } from '../../source/redux/types';
-import { OtfWallet } from '../../source/wallet';
+import { Amount, OtfWallet } from '../../source/redux/types';
+import { OtfManager } from '../../source/wallet';
 
-import React, {  } from 'react';
+import React from 'react';
 import { Avalanche } from '../../public/images/tsx';
 
-type Props = {
-    address: Address | null;
-    amount: Amount | null;
-} & {
-    processing: boolean;
+type Props = OtfWallet & {
     onDeposit?: (processing: boolean) => void;
     onWithdraw?: (processing: boolean) => void;
 } & {
@@ -141,6 +137,6 @@ function $info() {
     </button>;
 }
 function threshold_lte(amount: Amount) {
-    return OtfWallet.threshold.lte(amount);
+    return OtfManager.threshold.lte(amount);
 }
 export default UiOtfWallet;
