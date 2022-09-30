@@ -2,10 +2,10 @@ import './amount';
 import './list.scss';
 
 import { App } from '../../../source/app';
-import { nftsBy, nftTotalBy } from '../../../source/redux/selectors';
+import { nftTotalBy } from '../../../source/redux/selectors';
 import { Amount, Nft, NftDetails, NftIssue, NftLevel, NftLevels, Nfts, Supply, Token } from '../../../source/redux/types';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { UiNftAmount } from './amount';
 import { UiNftDetails } from '../details/details';
 
@@ -73,10 +73,12 @@ function $nftMinter(
     props: Props, nft_level: NftLevel,
     { display, toggled, amount, max, min }: NftList[NftLevel]
 ) {
+    const total_by = useMemo(() => nftTotalBy(props.nfts, {
+        level: nft_level, token: Nft.token(props.token)
+    }), [
+        props.nfts, nft_level, props.token
+    ]);
     if (display) {
-        const total_by = nftTotalBy(props.nfts, {
-            level: nft_level, token: Nft.token(props.token)
-        });
         return <div
             className='btn-group nft-minter' role='group'
             style={{ display: 'inline-flex' }}
@@ -103,17 +105,15 @@ function $nftDetails(
     { display, toggled }: NftList[NftLevel]
 ) {
     if (display && toggled) {
-        const nfts = nftsBy(props.nfts, {
-            token: Nft.token(props.token),
-            level: nft_level
-        });
         return <div
             className='nft-details' role='group'
             style={{ display: 'block' }}
         >
             <UiNftDetails
-                nfts={nfts}
                 level={nft_level}
+                nfts={
+                    props.nfts
+                }
                 details={
                     props.details
                 }

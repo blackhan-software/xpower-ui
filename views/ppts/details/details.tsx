@@ -2,19 +2,19 @@ import { App } from '../../../source/app';
 import { Blockchain } from '../../../source/blockchain';
 import { MoeTreasuryFactory } from '../../../source/contract';
 import { Referable, Updatable, x40 } from '../../../source/functions';
-import { pptsBy } from '../../../source/redux/selectors';
 import { Amount, Nft, NftFullId, NftIssue, NftLevel, NftLevels, Nfts, NftToken, NftTokens, PptDetails, Supply, Token } from '../../../source/redux/types';
 import { Years } from '../../../source/years';
 
 import React from 'react';
-import { Unsubscribe } from 'redux';
 import { InfoCircle } from '../../../public/images/tsx';
 import { UiPptClaimable } from './ppt-claimable';
 import { UiPptClaimed } from './ppt-claimed';
 import { UiPptClaimer } from './ppt-claimer';
 import { UiPptExpander } from './ppt-expander';
+
+import { Unsubscribe } from 'redux';
 import { ppt_href, ppt_meta, UiPptImage } from './ppt-image';
-export { UiPptImage, ppt_meta, ppt_href };
+export { ppt_href, ppt_meta, UiPptImage };
 
 type Props = {
     ppts: Nfts;
@@ -191,12 +191,7 @@ export class UiPptDetails extends Referable(Updatable(
             level: ppt_level,
             token: ppt_token
         });
-        const ppts_by = pptsBy(ppts, {
-            issue: ppt_issue,
-            level: ppt_level,
-            token: ppt_token
-        });
-        const ppt = ppts_by.items[full_id] ?? {
+        const ppt = ppts.items[full_id] ?? {
             amount: 0n, supply: 0n
         };
         return <React.Fragment key={core_id}>

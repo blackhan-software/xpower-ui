@@ -2,10 +2,10 @@ import './amount';
 import './list.scss';
 
 import { App } from '../../../source/app';
-import { pptsBy, pptTotalBy } from '../../../source/redux/selectors';
+import { pptTotalBy } from '../../../source/redux/selectors';
 import { Amount, Nft, NftIssue, NftLevel, NftLevels, Nfts, PptDetails, Supply, Token } from '../../../source/redux/types';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { UiPptAmount } from './amount';
 import { UiPptDetails } from '../details/details';
 
@@ -77,10 +77,12 @@ function $pptMinter(
     props: Props, ppt_level: NftLevel,
     { display, toggled, amount, max, min }: PptList[NftLevel]
 ) {
+    const total_by = useMemo(() => pptTotalBy(props.ppts, {
+        level: ppt_level, token: Nft.token(props.token)
+    }), [
+        props.ppts, ppt_level, props.token
+    ]);
     if (display) {
-        const total_by = pptTotalBy(props.ppts, {
-            level: ppt_level, token: Nft.token(props.token)
-        });
         return <div
             className='btn-group ppt-minter' role='group'
             style={{ display: 'inline-flex' }}
@@ -107,17 +109,15 @@ function $pptDetails(
     { display, toggled }: PptList[NftLevel]
 ) {
     if (display && toggled) {
-        const ppts = pptsBy(props.ppts, {
-            token: Nft.token(props.token),
-            level: ppt_level
-        })
         return <div
             className='nft-details' role='group'
             style={{ display: 'block' }}
         >
             <UiPptDetails
-                ppts={ppts}
                 level={ppt_level}
+                ppts={
+                    props.ppts
+                }
                 details={
                     props.details
                 }
