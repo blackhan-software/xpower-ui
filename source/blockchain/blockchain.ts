@@ -66,19 +66,19 @@ export class Blockchain extends EventEmitter {
         }));
         return address;
     }
-    public static get selectedAddress(): Promise<Address | undefined> {
+    public static get selectedAddress(): Promise<Address | null> {
         return this.me.selectedAddress;
     }
-    public get selectedAddress(): Promise<Address | undefined> {
+    public get selectedAddress(): Promise<Address | null> {
         if (this.provider) {
             const req = this.provider.then((p) => p?.request({
                 method: 'eth_accounts'
             }));
             return req.then((a: string[]) =>
-                a?.length > 0 ? BigInt(a[0]) : undefined
+                a?.length > 0 ? BigInt(a[0]) : null
             );
         }
-        return Promise.resolve(undefined);
+        return Promise.resolve(null);
     }
     public static async isAvalanche(): Promise<boolean> {
         return this.me.isAvalanche();

@@ -113,8 +113,8 @@ function $wallet(
             }}
             otf={{
                 ...otf_wallet,
-                onDeposit: otfDeposit,
-                onWithdraw: otfWithdraw
+                onDeposit: otfDeposit.bind(null, address),
+                onWithdraw: otfWithdraw.bind(null, address)
             }}
             token={token}
         />
@@ -134,6 +134,7 @@ function $home(
     page: Page, token: Token,
     mining: Mining, minting: Minting
 ) {
+    const [address] = useContext(AddressContext);
     if (page !== Page.Home) {
         return null;
     }
@@ -142,15 +143,15 @@ function $home(
     >
         <UiHome
             mining={{
-                onToggle: miningToggle,
+                onToggle: miningToggle.bind(null, address),
                 togglable: miningTogglable(mining),
-                onSpeed: miningSpeed,
+                onSpeed: miningSpeed.bind(null, address),
                 speedable: miningSpeedable(mining),
                 ...mining
             }}
             minting={{
-                onForget: mintingForget,
-                onMint: mintingMint,
+                onForget: mintingForget.bind(null, address),
+                onMint: mintingMint.bind(null, address),
                 ...minting
             }}
             speed={mining.speed}
@@ -162,6 +163,7 @@ function $nfts(
     page: Page, token: Token,
     nfts: Nfts, nfts_ui: NftsUi
 ) {
+    const [address] = useContext(AddressContext);
     if (page !== Page.Nfts) {
         return null;
     }
@@ -240,15 +242,15 @@ function $nfts(
                 App.setNftsUi({ details });
             }}
             onNftTransfer={
-                (issue, level) => nftTransfer(
+                (issue, level) => nftTransfer.bind(null, address)(
                     token, issue, level
                 )
             }
             onNftMinterApproval={
-                nftApprove
+                nftApprove.bind(null, address)
             }
             onNftMinterBatchMint={
-                nftBatchMint
+                nftBatchMint.bind(null, address)
             }
             onNftMinterToggled={(toggled) => {
                 const flags = Object.fromEntries(
@@ -269,6 +271,7 @@ function $ppts(
     page: Page, token: Token,
     ppts: Nfts, ppts_ui: PptsUi
 ) {
+    const [address] = useContext(AddressContext);
     if (page !== Page.Ppts) {
         return null;
     }
@@ -349,16 +352,18 @@ function $ppts(
                 App.setPptsUi({ details });
             }}
             onPptClaim={
-                (issue, level) => pptClaim(token, issue, level)
+                (issue, level) => pptClaim.bind(null, address)(
+                    token, issue, level
+                )
             }
             onPptMinterApproval={
-                pptApprove
+                pptApprove.bind(null, address)
             }
             onPptMinterBatchMint={
-                pptBatchMint
+                pptBatchMint.bind(null, address)
             }
             onPptMinterBatchBurn={
-                pptBatchBurn
+                pptBatchBurn.bind(null, address)
             }
             onPptMinterToggled={(toggled) => {
                 const flags = Object.fromEntries(
@@ -390,19 +395,17 @@ function $about(
 /**
  * mining:
  */
-async function miningToggle(
-    token: Token
+function miningToggle(
+    address: Address | null, token: Token
 ) {
-    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
     MiningManager.toggle(address, { token });
 }
-async function miningSpeed(
-    token: Token, by: number
+function miningSpeed(
+    address: Address | null, token: Token, by: number
 ) {
-    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -419,13 +422,10 @@ async function miningSpeed(
  * minting:
  */
 async function mintingMint(
-    token: Token, level: Level
+    address: Address | null, token: Token, level: Level
 ) {
-    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
-    } else {
-        Alerts.hide();
     }
     const amount = Tokenizer.amount(token, level);
     const block_hash = HashManager.latestHash({
@@ -441,6 +441,7 @@ async function mintingMint(
         throw new Error(`missing nonce for amount=${amount}`);
     }
     const moe_wallet = new MoeWallet(address, token);
+    Alerts.hide();
     try {
         const on_transfer: OnTransfer = async (
             from, to, amount, ev
@@ -514,10 +515,9 @@ async function mintingMint(
         });
     }
 }
-async function mintingForget(
-    token: Token, level: Level
+function mintingForget(
+    address: Address | null, token: Token, level: Level
 ) {
-    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -535,9 +535,9 @@ async function mintingForget(
  * nft-sender:
  */
 async function nftTransfer(
-    token: Token, nft_issue: NftIssue, nft_level: NftLevel
+    address: Address | null, token: Token,
+    nft_issue: NftIssue, nft_level: NftLevel
 ) {
-    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -631,9 +631,8 @@ async function nftTransfer(
  * nft-minter:
  */
 async function nftApprove(
-    token: Token
+    address: Address | null, token: Token
 ) {
-    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -687,9 +686,8 @@ async function nftApprove(
     }
 }
 async function nftBatchMint(
-    token: Token, list: NftMinterList
+    address: Address | null, token: Token, list: NftMinterList
 ) {
-    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -750,9 +748,9 @@ async function nftBatchMint(
  * ppt-claimer:
  */
 async function pptClaim(
-    token: Token, ppt_issue: NftIssue, ppt_level: NftLevel
+    address: Address | null, token: Token,
+    ppt_issue: NftIssue, ppt_level: NftLevel
 ) {
-    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -840,9 +838,8 @@ async function pptClaim(
  * ppt-minter:
  */
 async function pptApprove(
-    token: Token
+    address: Address | null, token: Token
 ) {
-    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -908,9 +905,8 @@ async function pptApprove(
     }
 }
 async function pptBatchMint(
-    token: Token, list: PptMinterList
+    address: Address | null, token: Token, list: PptMinterList
 ) {
-    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -1002,9 +998,8 @@ async function pptBatchMint(
     }
 }
 async function pptBatchBurn(
-    token: Token, list: PptMinterList
+    address: Address | null, token: Token, list: PptMinterList
 ) {
-    const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -1099,18 +1094,17 @@ async function pptBatchBurn(
  * {aft,otf}-wallet:
  */
 async function otfDeposit(
-    processing: boolean
+    address: Address | null, processing: boolean
 ) {
+    if (!address) {
+        throw new Error('missing selected-address');
+    }
     if (processing) {
         return;
     } else {
         App.setOtfWallet({
             processing: true
         });
-    }
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
     }
     const unit = parseUnits('1.0');
     const provider = new Web3Provider(await Blockchain.provider);
@@ -1158,18 +1152,17 @@ async function otfDeposit(
     }
 }
 async function otfWithdraw(
-    processing: boolean
+    address: Address | null, processing: boolean
 ) {
+    if (!address) {
+        throw new Error('missing selected-address');
+    }
     if (processing) {
         return;
     } else {
         App.setOtfWallet({
             processing: true
         });
-    }
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
     }
     const otf_signer = await OtfManager.init();
     const otf_balance = await otf_signer.getBalance();

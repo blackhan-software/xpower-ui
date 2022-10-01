@@ -91,7 +91,7 @@ export async function nft_meta({ level, issue, token }: {
     const avalanche = await Blockchain.isAvalanche();
     return address && avalanche
         ? await NftImageMeta.get(address, { level, issue, token })
-        : await NftImageMeta.get(undefined, { level, issue, token });
+        : await NftImageMeta.get(null, { level, issue, token });
 }
 export async function nft_href({ level, issue, token }: {
     level: NftLevel, issue: NftIssue, token: Token

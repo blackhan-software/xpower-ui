@@ -91,7 +91,7 @@ export async function ppt_meta({ level, issue, token }: {
     const avalanche = await Blockchain.isAvalanche();
     return address && avalanche
         ? await PptImageMeta.get(address, { level, issue, token })
-        : await PptImageMeta.get(undefined, { level, issue, token });
+        : await PptImageMeta.get(null, { level, issue, token });
 }
 export async function ppt_href({ level, issue, token }: {
     level: NftLevel, issue: NftIssue, token: Token
@@ -100,7 +100,7 @@ export async function ppt_href({ level, issue, token }: {
     const avalanche = await Blockchain.isAvalanche();
     const ppt_wallet = address && avalanche
         ? new PptWallet(address, token)
-        : new PptWalletMock(address, token);
+        : new PptWalletMock(0n, token);
     const ppt_id = Nft.coreId({ level, issue });
     const supply = await ppt_wallet.totalSupply(ppt_id);
     if (supply > 0) {

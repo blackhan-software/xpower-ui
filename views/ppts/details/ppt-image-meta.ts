@@ -5,14 +5,14 @@ import { NftIssue, NftLevel } from '../../../source/redux/types';
 import { PptWallet, PptWalletMock } from '../../../source/wallet';
 
 export class PptImageMeta {
-    static key(address: Address | undefined, {
+    static key(address: Address | null, {
         issue: i, level: l, token: t
     }: {
         issue: NftIssue; level: NftLevel; token: Token;
     }) {
         return `ppt-image-meta:${x40(address ?? 0n)}:${t}:${l}:${i}#000`;
     }
-    static get_cache(address: Address | undefined, nft: {
+    static get_cache(address: Address | null, nft: {
         issue: NftIssue; level: NftLevel; token: Token;
     }) {
         const key = this.key(address, nft);
@@ -22,7 +22,7 @@ export class PptImageMeta {
         }
         return null;
     }
-    static set_cache(address: Address | undefined, nft: {
+    static set_cache(address: Address | null, nft: {
         issue: NftIssue; level: NftLevel; token: Token;
     }, meta: Meta) {
         const key = this.key(address, nft);
@@ -30,7 +30,7 @@ export class PptImageMeta {
         localStorage.setItem(key, value);
         return meta;
     }
-    static async get(address: Address | undefined, nft: {
+    static async get(address: Address | null, nft: {
         issue: NftIssue; level: NftLevel; token: Token;
     }) {
         const meta = this.get_cache(address, nft);
