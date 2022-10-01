@@ -3,7 +3,7 @@ import './home.scss';
 import { App } from '../../source/app';
 import { Level, Token } from '../../source/redux/types';
 import { MinerStatus } from '../../source/redux/types';
-import { MinterRow } from '../../source/redux/types';
+import { Minting } from '../../source/redux/types';
 
 import React, { useEffect } from 'react';
 import { UiMining } from './mining/mining';
@@ -21,7 +21,7 @@ type Props = {
         onSpeed?: (token: Token, by: number) => void;
     };
     minting: {
-        rows: MinterRow[];
+        rows: Minting['rows'];
         onMint?: (token: Token, level: Level) => void;
         onForget?: (token: Token, level: Level) => void;
     };

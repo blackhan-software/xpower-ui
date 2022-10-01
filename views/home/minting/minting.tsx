@@ -1,11 +1,11 @@
 import { globalRef, nice } from '../../../source/functions';
-import { Level, MinterRow, MinterStatus, NftLevels, Token } from '../../../source/redux/types';
+import { Level, MinterStatus, Minting, MintingRow, NftLevels, Token } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
 
 import React, { useEffect, useState } from 'react';
 
 type Props = {
-    level: Level; rows: MinterRow[]; token: Token;
+    level: Level; rows: Minting['rows']; token: Token;
     onMint?: (token: Token, level: Level) => void;
     onForget?: (token: Token, level: Level) => void;
 }
@@ -52,7 +52,7 @@ export function UiMinting(
 }
 function $mint(
     { token, level, row, onMint, onForget }: Omit<Props, 'rows'> & {
-        row: MinterRow
+        row: MintingRow
     },
     onFocus: (level: Level, flag: boolean) => void
 ) {
@@ -60,7 +60,7 @@ function $mint(
     if (display || tx_counter > 0 || nn_counter > 0) {
         return <div
             className='btn-group mint' key={level - 1}
-            ref={globalRef(`.mint[level=${level}]`)}
+            ref={globalRef(`.mint[level="${level}"]`)}
             role='group'
             style={{ display: row.display ? 'block' : 'none' }}
         >
@@ -74,7 +74,7 @@ function $mint(
 }
 function $minter(
     { token, level, row, onMint }: Omit<Props, 'rows'> & {
-        row: MinterRow
+        row: MintingRow
     },
     onFocus: (level: Level, flag: boolean) => void
 ) {
@@ -100,7 +100,7 @@ function $minter(
 }
 function $nn_counter(
     { token, level, row }: Omit<Props, 'rows'> & {
-        row: MinterRow
+        row: MintingRow
     }
 ) {
     return <span
@@ -116,7 +116,7 @@ function $nn_counter(
 }
 function $tx_counter(
     { token, level, row }: Omit<Props, 'rows'> & {
-        row: MinterRow
+        row: MintingRow
     }
 ) {
     return <span
@@ -132,7 +132,7 @@ function $tx_counter(
 }
 function $forget(
     { token, level, row, onForget }: Omit<Props, 'rows'> & {
-        row: MinterRow
+        row: MintingRow
     }
 ) {
     return <span

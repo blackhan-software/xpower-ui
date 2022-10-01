@@ -5,7 +5,6 @@ import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { IntervalManager } from '../../source/managers';
 import { MiningManager } from '../../source/managers';
-import { MinterRows } from '../../source/redux/types';
 import { Page } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { OtfManager } from '../../source/wallet';
@@ -21,26 +20,20 @@ App.onNonceChanged(async function updateMinters(
     if (token !== App.token) {
         return;
     }
-    const { rows } = App.getMinting();
     const level = Tokenizer.level(token, amount);
-    const { tx_counter } = MinterRows.get(rows, level - 1);
-    const amount_min = Tokenizer.amount(token, App.level.min);
-    const row = {
-        disabled: !total,
-        display: amount === amount_min || total > 0n || tx_counter > 0n,
+    const { tx_counter } = App.getMintingRow(level);
+    const min = Tokenizer.amount(token, App.level.min);
+    const display = amount === min || total > 0n || tx_counter > 0n;
+    App.setMintingRow(level, {
+        disabled: !total, display,
         nn_counter: Number(total / amount),
-    };
-    App.setMinting({
-        rows: MinterRows.set(rows, level - 1, row)
     });
 });
 App.onTokenSwitch(function resetMinters() {
     if (Page.Home !== App.page) {
         return;
     }
-    App.setMinting({
-        rows: MinterRows.init(App.level.min)
-    });
+    App.clearMintingRows();
 });
 App.onTokenSwitched(function forgetNonces() {
     if (Page.Home !== App.page) {

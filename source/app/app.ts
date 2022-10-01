@@ -2,12 +2,12 @@ import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers, DeepPartial, Store, Unsubscribe } from 'redux';
 import { delayed } from '../functions';
 import { Parser } from '../parser';
-import { Action, addNft, addNonce, addPpt, decreaseAftWallet, increaseAftWallet, refresh, removeNft, removeNonce, removeNonceByAmount, removeNonces, removePpt, setAftWallet, setMiningSpeed, setMiningStatus, setMinting, setNft, setNftsUi, setOtfWallet, setPpt, setPptsUi, switchPage, switchToken } from '../redux/actions';
+import { Action, addNft, addNonce, addPpt, decreaseAftWallet, clearMintingRow, clearMintingRows, increaseAftWallet, refresh, removeNft, removeNonce, removeNonceByAmount, removeNonces, removePpt, setAftWallet, setMiningSpeed, setMiningStatus, setMintingRow, setNft, setNftsUi, setOtfWallet, setPpt, setPptsUi, switchPage, switchToken } from '../redux/actions';
 import { middleware } from '../redux/middleware';
 import { onAftWalledDecreased, OnAftWalletDecreased, onAftWalletIncreased, OnAftWalletIncreased, onNftAdded, OnNftAdded, onNftRemoved, OnNftRemoved, onNonceAdded, OnNonceAdded, onNonceRemoved, OnNonceRemoved, onPageSwitch, OnPageSwitch, onPptAdded, OnPptAdded, onPptRemoved, OnPptRemoved, onTokenSwitch, OnTokenSwitch } from '../redux/observers';
 import { aftWalletReducer, miningReducer, mintingReducer, nftsReducer, nftsUiReducer, noncesReducer, otfWalletReducer, pageReducer, pptsReducer, pptsUiReducer, refreshReducer, tokenReducer } from '../redux/reducers';
 import { nftsBy, nftTotalBy, nonceBy, noncesBy, pptsBy, pptTotalBy, refreshed, walletFor } from '../redux/selectors';
-import { Address, Amount, BlockHash, NftFullId, NftIssue, NftLevel, NftToken, Nonce, Page, Pager, State, Supply, Token } from '../redux/types';
+import { Address, Amount, BlockHash, Level, MintingRow, NftFullId, NftIssue, NftLevel, NftToken, Nonce, Page, Pager, State, Supply, Token } from '../redux/types';
 import { StateDb } from '../state-db';
 import { Tokenizer } from '../token';
 
@@ -91,32 +91,34 @@ export class App {
     ) {
         return onTokenSwitch(this.me.store, delayed(callback, ms));
     }
-    public static getMining(): State['mining'] {
-        const { mining } = this.me.store.getState();
-        return mining;
-    }
-    public static setMining(
-        mining: Partial<State['mining']>
+    public static setMiningSpeed(
+        mining_speed: Pick<State['mining'], 'speed'>
     ) {
-        if (mining.speed !== undefined) {
-            this.me.store.dispatch(setMiningSpeed({
-                speed: mining.speed
-            }));
-        }
-        if (mining.status !== undefined) {
-            this.me.store.dispatch(setMiningStatus({
-                status: mining.status
-            }));
-        }
+        this.me.store.dispatch(setMiningSpeed(mining_speed));
     }
-    public static getMinting(): State['minting'] {
+    public static setMiningStatus(
+        mining_status: Pick<State['mining'], 'status'>
+    ) {
+        this.me.store.dispatch(setMiningStatus(mining_status));
+    }
+    public static clearMintingRows() {
+        this.me.store.dispatch(clearMintingRows());
+    }
+    public static clearMintingRow(
+        level: Level
+    ) {
+        this.me.store.dispatch(clearMintingRow({ level }));
+    }
+    public static getMintingRow(
+        level: Level
+    ): MintingRow {
         const { minting } = this.me.store.getState();
-        return minting;
+        return minting.rows[level - 1];
     }
-    public static setMinting(
-        minting: Partial<State['minting']>
+    public static setMintingRow(
+        level: Level, row: Partial<MintingRow>
     ) {
-        this.me.store.dispatch(setMinting(minting));
+        this.me.store.dispatch(setMintingRow({ level, row }));
     }
     public static getNftsUi(): State['nfts_ui'] {
         const { nfts_ui } = this.me.store.getState();
@@ -464,12 +466,14 @@ export class App {
         return Parser.number(this.params.get('auto-mint'), 3000);
     }
     public static get persist(): number {
-        const element = document.getElementById('g-persistence');
+        const element = typeof document !== 'undefined'
+            ? document.getElementById('g-persistence') : undefined;
         const fallback = Parser.number(element?.dataset.value, 0);
         return Parser.number(this.params.get('persist'), fallback);
     }
     public static get speed(): number {
-        const element = document.getElementById('g-mining-speed');
+        const element = typeof document !== 'undefined'
+            ? document.getElementById('g-mining-speed') : undefined;
         const fallback = Parser.number(element?.dataset.value, 50);
         const value = Parser.number(this.params.get('speed'), fallback);
         return Math.min(100, Math.max(0, value)) / 100;

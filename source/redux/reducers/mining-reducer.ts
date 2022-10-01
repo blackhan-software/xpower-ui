@@ -11,7 +11,7 @@ export function miningReducer(
         case 'mining/set-speed':
             return { ...mining, speed: action.payload.speed };
         case 'mining/set':
-            return { ...mining, ...action.payload };
+            return $.extend(true, {}, mining, action.payload);
         default:
             return mining;
     }

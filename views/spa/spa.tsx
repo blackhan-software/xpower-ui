@@ -8,7 +8,7 @@ import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryF
 import { Alert, alert, Alerts, ancestor, globalRef, x40 } from '../../source/functions';
 import { HashManager, MiningManager } from '../../source/managers';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
-import { Address, AftWallet, Amount, Level, MAX_UINT256, Mining, MinterRows, MinterStatus, Minting, Nft, NftCoreId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, Nfts, NftSenderStatus, NftsUi, OtfWallet, Page, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, PptsUi, Token } from '../../source/redux/types';
+import { Address, AftWallet, Amount, Level, MAX_UINT256, Mining, MinterStatus, Minting, Nft, NftCoreId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, Nfts, NftSenderStatus, NftsUi, OtfWallet, Page, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, PptsUi, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfManager } from '../../source/wallet';
 import { Years } from '../../source/years';
@@ -142,15 +142,15 @@ function $home(
     >
         <UiHome
             mining={{
-                onToggle: toggle,
+                onToggle: miningToggle,
                 togglable: miningTogglable(mining),
-                onSpeed: speed,
+                onSpeed: miningSpeed,
                 speedable: miningSpeedable(mining),
                 ...mining
             }}
             minting={{
-                onForget: forget,
-                onMint: mint,
+                onForget: mintingForget,
+                onMint: mintingMint,
                 ...minting
             }}
             speed={mining.speed}
@@ -390,7 +390,7 @@ function $about(
 /**
  * mining:
  */
-async function toggle(
+async function miningToggle(
     token: Token
 ) {
     const address = await Blockchain.selectedAddress;
@@ -399,7 +399,7 @@ async function toggle(
     }
     MiningManager.toggle(address, { token });
 }
-async function speed(
+async function miningSpeed(
     token: Token, by: number
 ) {
     const address = await Blockchain.selectedAddress;
@@ -418,13 +418,9 @@ async function speed(
 /**
  * minting:
  */
-async function mint(
+async function mintingMint(
     token: Token, level: Level
 ) {
-    const rows = () => {
-        const { rows } = App.getMinting();
-        return rows;
-    };
     const address = await Blockchain.selectedAddress;
     if (!address) {
         throw new Error('missing selected-address');
@@ -456,44 +452,32 @@ async function mint(
             if (App.token !== token) {
                 return;
             }
-            const { tx_counter } = MinterRows.get(
-                rows(), level - 1
-            );
-            if (tx_counter > 0) {
-                App.setMinting({
-                    rows: MinterRows.set(rows(), level - 1, {
-                        tx_counter: tx_counter - 1
-                    })
-                });
-            }
+            const { tx_counter } = App.getMintingRow(level);
+            if (tx_counter > 0) App.setMintingRow(level, {
+                tx_counter: tx_counter - 1
+            });
         };
-        App.setMinting({
-            rows: MinterRows.set(rows(), level - 1, {
-                status: MinterStatus.minting,
-            })
+        App.setMintingRow(level, {
+            status: MinterStatus.minting,
         });
         const mint = await moe_wallet.mint(
             block_hash, nonce
         );
         console.debug('[mint]', mint);
         moe_wallet.onTransfer(on_transfer);
-        const { tx_counter } = MinterRows.get(
-            rows(), level - 1
+        const { tx_counter } = App.getMintingRow(
+            level
         );
-        App.setMinting({
-            rows: MinterRows.set(rows(), level - 1, {
-                status: MinterStatus.minted,
-                tx_counter: tx_counter + 1
-            })
+        App.setMintingRow(level, {
+            status: MinterStatus.minted,
+            tx_counter: tx_counter + 1
         });
         App.removeNonce(nonce, {
             address, block_hash, token
         });
     } catch (ex: any) {
-        App.setMinting({
-            rows: MinterRows.set(rows(), level - 1, {
-                status: MinterStatus.error
-            })
+        App.setMintingRow(level, {
+            status: MinterStatus.error
         });
         /* eslint no-ex-assign: [off] */
         if (ex.error) {
@@ -530,7 +514,7 @@ async function mint(
         });
     }
 }
-async function forget(
+async function mintingForget(
     token: Token, level: Level
 ) {
     const address = await Blockchain.selectedAddress;
