@@ -1,14 +1,22 @@
-/* eslint @typescript-eslint/no-unused-vars: [off] */
+import { App } from '../../app';
 import { Action } from '../actions/mining-actions';
 import { Mining } from '../types';
-import { App } from '../../app';
 
 export function miningReducer(
-    mining: Mining = { speed: App.speed, status: null }, action: Action
+    mining: Mining = miningState(), action: Action
 ): Mining {
-    if (!action.type.startsWith('mining/set')) {
-        return mining;
+    switch (action.type) {
+        case 'mining/set-status':
+            return { ...mining, status: action.payload.status };
+        case 'mining/set-speed':
+            return { ...mining, speed: action.payload.speed };
+        case 'mining/set':
+            return { ...mining, ...action.payload };
+        default:
+            return mining;
     }
-    return { ...mining, ...action.payload };
+}
+export function miningState() {
+    return { speed: App.speed, status: null };
 }
 export default miningReducer;

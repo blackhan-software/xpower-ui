@@ -14,43 +14,31 @@ Blockchain.onceConnect(function setupMining({
     const miner = MiningManager.miner(address, {
         token
     });
-    miner.on('initializing', () => App.setMining({
-        status: MinerStatus.initializing
-    }));
-    miner.on('initialized', () => App.setMining({
-        status: MinerStatus.initialized
-    }));
-    miner.on('starting', () => App.setMining({
-        status: MinerStatus.starting
-    }));
-    miner.on('started', () => App.setMining({
-        status: MinerStatus.started
-    }));
-    miner.on('stopping', () => App.setMining({
-        status: MinerStatus.stopping
-    }));
-    miner.on('stopped', () => App.setMining({
-        status: MinerStatus.stopped
-    }));
-    miner.on('pausing', () => App.setMining({
-        status: MinerStatus.pausing
-    }));
-    miner.on('paused', () => App.setMining({
-        status: MinerStatus.paused
-    }));
-    miner.on('resuming', () => App.setMining({
-        status: MinerStatus.resuming
-    }));
-    miner.on('resumed', () => App.setMining({
-        status: MinerStatus.resumed
-    }));
-    miner.on('increased', (e) => App.setMining({
-        speed: e.speed
-    }));
-    miner.on('decreased', (e) => App.setMining({
-        speed: e.speed
-    }));
-    App.setMining({
+    miner.on('initializing', () =>
+        App.setMiningStatus({ status: MinerStatus.initializing }));
+    miner.on('initialized', () =>
+        App.setMiningStatus({ status: MinerStatus.initialized }));
+    miner.on('starting', () =>
+        App.setMiningStatus({ status: MinerStatus.starting }));
+    miner.on('started', () =>
+        App.setMiningStatus({ status: MinerStatus.started }));
+    miner.on('stopping', () =>
+        App.setMiningStatus({ status: MinerStatus.stopping }));
+    miner.on('stopped', () =>
+        App.setMiningStatus({ status: MinerStatus.stopped }));
+    miner.on('pausing', () =>
+        App.setMiningStatus({ status: MinerStatus.pausing }));
+    miner.on('paused', () =>
+        App.setMiningStatus({ status: MinerStatus.paused }));
+    miner.on('resuming', () =>
+        App.setMiningStatus({ status: MinerStatus.resuming }));
+    miner.on('resumed', () =>
+        App.setMiningStatus({ status: MinerStatus.resumed }));
+    miner.on('increased', (e) =>
+        App.setMiningSpeed({ speed: e.speed }));
+    miner.on('decreased', (e) =>
+        App.setMiningSpeed({ speed: e.speed }));
+    App.setMiningStatus({
         status: MinerStatus.stopped
     });
 }, {
@@ -62,7 +50,7 @@ Blockchain.onConnect(function resetSpeed({
     const miner = MiningManager.miner(address, {
         token
     });
-    App.setMining({ speed: miner.speed });
+    App.setMiningSpeed({ speed: miner.speed });
 });
 App.onPageSwitch(async function stopMining() {
     const address = await Blockchain.selectedAddress;

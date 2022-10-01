@@ -2,18 +2,18 @@ import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers, DeepPartial, Store, Unsubscribe } from 'redux';
 import { delayed } from '../functions';
 import { Parser } from '../parser';
-import { Action, addNft, addNonce, addPpt, decreaseAftWallet, increaseAftWallet, refresh, removeNft, removeNonce, removeNonceByAmount, removeNonces, removePpt, setAftWallet, setMining, setMinting, setNft, setNftsUi, setOtfWallet, setPpt, setPptsUi, switchPage, switchToken } from '../redux/actions';
+import { Action, addNft, addNonce, addPpt, decreaseAftWallet, increaseAftWallet, refresh, removeNft, removeNonce, removeNonceByAmount, removeNonces, removePpt, setAftWallet, setMiningSpeed, setMiningStatus, setMinting, setNft, setNftsUi, setOtfWallet, setPpt, setPptsUi, switchPage, switchToken } from '../redux/actions';
 import { middleware } from '../redux/middleware';
-import { onNftAdded, OnNftAdded, onNftRemoved, OnNftRemoved, onNonceAdded, OnNonceAdded, onNonceRemoved, OnNonceRemoved, onPageSwitch, OnPageSwitch, onPptAdded, OnPptAdded, onPptRemoved, OnPptRemoved, onTokenSwitch, OnTokenSwitch, onAftWalledDecreased, OnAftWalletDecreased, onAftWalletIncreased, OnAftWalletIncreased } from '../redux/observers';
+import { onAftWalledDecreased, OnAftWalletDecreased, onAftWalletIncreased, OnAftWalletIncreased, onNftAdded, OnNftAdded, onNftRemoved, OnNftRemoved, onNonceAdded, OnNonceAdded, onNonceRemoved, OnNonceRemoved, onPageSwitch, OnPageSwitch, onPptAdded, OnPptAdded, onPptRemoved, OnPptRemoved, onTokenSwitch, OnTokenSwitch } from '../redux/observers';
 import { aftWalletReducer, miningReducer, mintingReducer, nftsReducer, nftsUiReducer, noncesReducer, otfWalletReducer, pageReducer, pptsReducer, pptsUiReducer, refreshReducer, tokenReducer } from '../redux/reducers';
 import { nftsBy, nftTotalBy, nonceBy, noncesBy, pptsBy, pptTotalBy, refreshed, walletFor } from '../redux/selectors';
 import { Address, Amount, BlockHash, NftFullId, NftIssue, NftLevel, NftToken, Nonce, Page, Pager, State, Supply, Token } from '../redux/types';
 import { StateDb } from '../state-db';
 import { Tokenizer } from '../token';
 
+import mitt from 'mitt';
 import { Global, Version } from '../types';
 declare const global: Global;
-import mitt from 'mitt';
 
 export class App {
     public static get event() {
@@ -98,7 +98,16 @@ export class App {
     public static setMining(
         mining: Partial<State['mining']>
     ) {
-        this.me.store.dispatch(setMining(mining));
+        if (mining.speed !== undefined) {
+            this.me.store.dispatch(setMiningSpeed({
+                speed: mining.speed
+            }));
+        }
+        if (mining.status !== undefined) {
+            this.me.store.dispatch(setMiningStatus({
+                status: mining.status
+            }));
+        }
     }
     public static getMinting(): State['minting'] {
         const { minting } = this.me.store.getState();
