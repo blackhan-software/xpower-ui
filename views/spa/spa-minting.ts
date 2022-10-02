@@ -21,12 +21,18 @@ App.onNonceChanged(async function updateMinters(
         return;
     }
     const level = Tokenizer.level(token, amount);
-    const { tx_counter } = App.getMintingRow(level);
-    const min = Tokenizer.amount(token, App.level.min);
-    const display = amount === min || total > 0n || tx_counter > 0n;
-    App.setMintingRow(level, {
-        disabled: !total, display,
-        nn_counter: Number(total / amount),
+    const { tx_counter } = App.getMintingRow({
+        level
+    });
+    const min
+        = Tokenizer.amount(token, App.level.min);
+    const display
+        = amount === min || total > 0n || tx_counter > 0n;
+    App.setMintingRow({
+        level, row: {
+            disabled: !total, display,
+            nn_counter: Number(total / amount),
+        }
     });
 });
 App.onTokenSwitch(function resetMinters() {

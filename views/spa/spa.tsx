@@ -8,7 +8,7 @@ import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryF
 import { Alert, alert, Alerts, ancestor, globalRef, x40 } from '../../source/functions';
 import { HashManager, MiningManager } from '../../source/managers';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
-import { Address, AftWallet, Amount, Level, MAX_UINT256, Mining, MinterStatus, Minting, Nft, NftCoreId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, Nfts, NftSenderStatus, NftsUi, OtfWallet, Page, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, PptsUi, Token } from '../../source/redux/types';
+import { Address, AftWallet, Amount, Level, MAX_UINT256, Mining, MinterStatus, Minting, Nft, NftCoreId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, Nfts, NftSenderStatus, NftsUi, OtfWallet, Page, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, PptsUi, State, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfManager } from '../../source/wallet';
 import { Years } from '../../source/years';
@@ -453,32 +453,36 @@ async function mintingMint(
             if (App.token !== token) {
                 return;
             }
-            const { tx_counter } = App.getMintingRow(level);
-            if (tx_counter > 0) App.setMintingRow(level, {
-                tx_counter: tx_counter - 1
-            });
+            const { tx_counter } = App.getMintingRow({ level });
+            if (tx_counter > 0) App.setMintingRow(
+                { level, row: { tx_counter: tx_counter - 1 } }
+            );
         };
-        App.setMintingRow(level, {
-            status: MinterStatus.minting,
-        });
+        App.setMintingRow(
+            { level, row: { status: MinterStatus.minting } }
+        );
         const mint = await moe_wallet.mint(
             block_hash, nonce
         );
         console.debug('[mint]', mint);
         moe_wallet.onTransfer(on_transfer);
         const { tx_counter } = App.getMintingRow(
-            level
+            { level }
         );
-        App.setMintingRow(level, {
-            status: MinterStatus.minted,
-            tx_counter: tx_counter + 1
+        App.setMintingRow({
+            level, row: {
+                status: MinterStatus.minted,
+                tx_counter: tx_counter + 1
+            }
         });
         App.removeNonce(nonce, {
             address, block_hash, token
         });
     } catch (ex: any) {
-        App.setMintingRow(level, {
-            status: MinterStatus.error
+        App.setMintingRow({
+            level, row: {
+                status: MinterStatus.error
+            }
         });
         /* eslint no-ex-assign: [off] */
         if (ex.error) {
@@ -1101,11 +1105,10 @@ async function otfDeposit(
     }
     if (processing) {
         return;
-    } else {
-        App.setOtfWallet({
-            processing: true
-        });
     }
+    App.setOtfWalletProcessing({
+        processing: true
+    });
     const unit = parseUnits('1.0');
     const provider = new Web3Provider(await Blockchain.provider);
     const mmw_signer = provider.getSigner(x40(address));
@@ -1117,7 +1120,7 @@ async function otfDeposit(
             to: x40(address),
         });
     } catch (ex) {
-        App.setOtfWallet({
+        App.setOtfWalletProcessing({
             processing: false
         });
         console.error(ex);
@@ -1136,16 +1139,13 @@ async function otfDeposit(
             to: otf_address, value
         });
         tx.wait(1).then(() => {
-            App.setOtfWallet({
+            App.setOtfWalletProcessing({
                 processing: false
             });
         });
-        App.setOtfWallet({
-            processing: true
-        });
         console.debug('[otf-deposit]', tx);
     } catch (ex) {
-        App.setOtfWallet({
+        App.setOtfWalletProcessing({
             processing: false
         });
         console.error(ex);
@@ -1159,11 +1159,10 @@ async function otfWithdraw(
     }
     if (processing) {
         return;
-    } else {
-        App.setOtfWallet({
-            processing: true
-        });
     }
+    App.setOtfWalletProcessing({
+        processing: true
+    });
     const otf_signer = await OtfManager.init();
     const otf_balance = await otf_signer.getBalance();
     let gas_limit = parseUnits('0');
@@ -1172,7 +1171,7 @@ async function otfWithdraw(
             to: x40(address), value: otf_balance
         });
     } catch (ex) {
-        App.setOtfWallet({
+        App.setOtfWalletProcessing({
             processing: false
         });
         console.error(ex);
@@ -1188,16 +1187,13 @@ async function otfWithdraw(
             to: x40(address), value
         });
         tx.wait(1).then(() => {
-            App.setOtfWallet({
+            App.setOtfWalletProcessing({
                 processing: false
             });
         });
-        App.setOtfWallet({
-            processing: true
-        });
         console.debug('[otf-withdraw]', tx);
     } catch (ex) {
-        App.setOtfWallet({
+        App.setOtfWalletProcessing({
             processing: false
         });
         console.error(ex);
@@ -1226,34 +1222,8 @@ function error(
     console.error(ex);
 }
 if (require.main === module) {
-    const mapper = ({
-        page, token,
-        mining, minting,
-        nfts, nfts_ui,
-        ppts, ppts_ui,
-        aft_wallet,
-        otf_wallet,
-    }: {
-        page: Page;
-        token: Token;
-        mining: Mining;
-        minting: Minting;
-        nfts: Nfts;
-        nfts_ui: NftsUi;
-        ppts: Nfts;
-        ppts_ui: PptsUi;
-        aft_wallet: AftWallet;
-        otf_wallet: OtfWallet;
-    }) => ({
-        page, token,
-        mining, minting,
-        nfts, nfts_ui,
-        ppts, ppts_ui,
-        aft_wallet,
-        otf_wallet,
-    });
+    const spa = createElement(connect((s: State) => s)(SPA));
     const $content = document.querySelector('content');
-    const spa = createElement(connect(mapper)(SPA));
     createRoot($content!).render(
         <Provider store={App.store}>
             <AddressProvider>{spa}</AddressProvider>

@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers, DeepPartial, Store, Unsubscribe } from 'redux';
 import { delayed } from '../functions';
 import { Parser } from '../parser';
-import { Action, addNft, addNonce, addPpt, decreaseAftWallet, clearMintingRow, clearMintingRows, increaseAftWallet, refresh, removeNft, removeNonce, removeNonceByAmount, removeNonces, removePpt, setAftWallet, setMiningSpeed, setMiningStatus, setMintingRow, setNft, setNftsUi, setOtfWallet, setPpt, setPptsUi, switchPage, switchToken } from '../redux/actions';
+import { Action, addNft, addNonce, addPpt, clearMintingRow, clearMintingRows, decreaseAftWallet, increaseAftWallet, refresh, removeNft, removeNonce, removeNonceByAmount, removeNonces, removePpt, setAftWallet, setMiningSpeed, setMiningStatus, setMintingRow, setNft, setNftsUi, setOtfWalletAddress, setOtfWalletAmount, setOtfWalletProcessing, setPpt, setPptsUi, switchPage, switchToken } from '../redux/actions';
 import { middleware } from '../redux/middleware';
 import { onAftWalledDecreased, OnAftWalletDecreased, onAftWalletIncreased, OnAftWalletIncreased, onNftAdded, OnNftAdded, onNftRemoved, OnNftRemoved, onNonceAdded, OnNonceAdded, onNonceRemoved, OnNonceRemoved, onPageSwitch, OnPageSwitch, onPptAdded, OnPptAdded, onPptRemoved, OnPptRemoved, onTokenSwitch, OnTokenSwitch } from '../redux/observers';
 import { aftWalletReducer, miningReducer, mintingReducer, nftsReducer, nftsUiReducer, noncesReducer, otfWalletReducer, pageReducer, pptsReducer, pptsUiReducer, refreshReducer, tokenReducer } from '../redux/reducers';
@@ -92,31 +92,31 @@ export class App {
         return onTokenSwitch(this.me.store, delayed(callback, ms));
     }
     public static setMiningSpeed(
-        mining_speed: Pick<State['mining'], 'speed'>
+        { speed }: Pick<State['mining'], 'speed'>
     ) {
-        this.me.store.dispatch(setMiningSpeed(mining_speed));
+        this.me.store.dispatch(setMiningSpeed({ speed }));
     }
     public static setMiningStatus(
-        mining_status: Pick<State['mining'], 'status'>
+        { status }: Pick<State['mining'], 'status'>
     ) {
-        this.me.store.dispatch(setMiningStatus(mining_status));
+        this.me.store.dispatch(setMiningStatus({ status }));
     }
     public static clearMintingRows() {
         this.me.store.dispatch(clearMintingRows());
     }
     public static clearMintingRow(
-        level: Level
+        { level }: { level: Level }
     ) {
         this.me.store.dispatch(clearMintingRow({ level }));
     }
     public static getMintingRow(
-        level: Level
+        { level }: { level: Level }
     ): MintingRow {
         const { minting } = this.me.store.getState();
         return minting.rows[level - 1];
     }
     public static setMintingRow(
-        level: Level, row: Partial<MintingRow>
+        { level, row }: { level: Level, row: Partial<MintingRow> }
     ) {
         this.me.store.dispatch(setMintingRow({ level, row }));
     }
@@ -418,10 +418,20 @@ export class App {
         const { otf_wallet } = this.me.store.getState();
         return otf_wallet;
     }
-    public static setOtfWallet(
-        otf_wallet: Partial<State['otf_wallet']>
+    public static setOtfWalletAddress(
+        { address }: Pick<State['otf_wallet'], 'address'>
     ) {
-        this.me.store.dispatch(setOtfWallet(otf_wallet));
+        this.me.store.dispatch(setOtfWalletAddress({ address }));
+    }
+    public static setOtfWalletAmount(
+        { amount }: Pick<State['otf_wallet'], 'amount'>
+    ) {
+        this.me.store.dispatch(setOtfWalletAmount({ amount }));
+    }
+    public static setOtfWalletProcessing(
+        { processing }: Pick<State['otf_wallet'], 'processing'>
+    ) {
+        this.me.store.dispatch(setOtfWalletProcessing({ processing }));
     }
     public static refresh() {
         this.me.store.dispatch(refresh());

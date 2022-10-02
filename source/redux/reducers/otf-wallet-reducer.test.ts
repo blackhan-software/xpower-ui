@@ -1,30 +1,36 @@
-import { otfWalletState, otfWalletReducer } from './otf-wallet-reducer';
-import { setOtfWallet } from '../actions';
+import { setOtfWalletAddress, setOtfWalletAmount, setOtfWalletProcessing } from '../actions';
+import { otfWalletReducer, otfWalletState } from './otf-wallet-reducer';
 
 describe('Store w/wallet-ui-reducer', () => {
-    it('should set-wallet-ui [otf.amount]', () => {
+    it('should set-otf-wallet [amount]', () => {
         const state_0 = otfWalletState();
-        const state_1 = otfWalletReducer(state_0, setOtfWallet({
-            amount: 1n
-        }));
+        const state_1 = otfWalletReducer(
+            state_0, setOtfWalletAmount({
+                amount: 1n
+            })
+        );
         expect(state_1).toMatchObject({
             ...otfWalletState(), amount: 1n
         });
     });
-    it('should set-wallet-ui [otf.address]', () => {
+    it('should set-otf-wallet [address]', () => {
         const state_0 = otfWalletState();
-        const state_1 = otfWalletReducer(state_0, setOtfWallet({
-            address: 0n
-        }));
+        const state_1 = otfWalletReducer(
+            state_0, setOtfWalletAddress({
+                address: 0n
+            })
+        );
         expect(state_1).toMatchObject({
             ...otfWalletState(), address: 0n
         });
     });
-    it('should set-wallet-ui [processing]', () => {
+    it('should set-otf-wallet [processing]', () => {
         const state_0 = otfWalletState();
-        const state_1 = otfWalletReducer(state_0, setOtfWallet({
-            processing: true
-        }));
+        const state_1 = otfWalletReducer(
+            state_0, setOtfWalletProcessing({
+                processing: true
+            })
+        );
         expect(state_1).toMatchObject({
             ...otfWalletState(), processing: true
         });

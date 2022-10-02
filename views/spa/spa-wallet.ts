@@ -48,8 +48,10 @@ Blockchain.onceConnect(async function initOtfWallet() {
     const [otf_address, otf_balance] = await Promise.all([
         otf_wallet.getAddress(), otf_wallet.getBalance()
     ]);
-    App.setOtfWallet({
-        address: BigInt(otf_address),
+    App.setOtfWalletAddress({
+        address: BigInt(otf_address)
+    });
+    App.setOtfWalletAmount({
         amount: otf_balance.toBigInt()
     });
 });
@@ -63,7 +65,9 @@ Blockchain.onceConnect(async function syncOtfWallet() {
         const otf_amount = otf_balance.toBigInt();
         const { amount } = App.getOtfWallet();
         if (amount !== otf_amount) {
-            App.setOtfWallet({ amount: otf_amount });
+            App.setOtfWalletAmount({
+                amount: otf_amount
+            });
         }
     }
 });

@@ -52,7 +52,9 @@ export function aftWalletReducer(
     }
     return aft_wallet;
 }
-function pack(amount: Amount, supply: Supply, { token }: { token: Token }) {
+function pack(
+    amount: Amount, supply: Supply, { token }: { token: Token }
+) {
     if (supply < amount) {
         throw new Error(`${token} supply=${supply} < amount=${amount}`);
     }
