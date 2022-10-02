@@ -3,19 +3,60 @@ import { Action } from '../actions/nfts-ui-actions';
 import { NftAmounts, NftDetails, NftFlags, NftLevels, NftMinter, NftsUi, NftToken, NftTokens } from '../types';
 
 export function nftsUiReducer(
-    nfts_ui: NftsUi = {
-        amounts: nftWrap(nftAmounts()),
-        details: nftWrap(nftDetails()),
-        minter: nftWrap(nftMinter()),
+    nfts_ui: NftsUi = nftsUiState(), action: Action
+): NftsUi {
+    switch (action.type) {
+        case 'nfts-ui/set-amounts': {
+            const { amounts: rhs } = action.payload;
+            const { amounts: lhs } = nfts_ui;
+            return {
+                ...nfts_ui, amounts: $.extend(true, {}, lhs, rhs)
+            };
+        }
+        case 'nfts-ui/set-details': {
+            const { details: rhs } = action.payload;
+            const { details: lhs } = nfts_ui;
+            return {
+                ...nfts_ui, details: $.extend(true, {}, lhs, rhs)
+            };
+        }
+        case 'nfts-ui/set-flags': {
+            const { flags: rhs } = action.payload;
+            const { flags: lhs } = nfts_ui;
+            return {
+                ...nfts_ui, flags: $.extend(true, {}, lhs, rhs)
+            };
+        }
+        case 'nfts-ui/set-minter': {
+            const { minter: rhs } = action.payload;
+            const { minter: lhs } = nfts_ui;
+            return {
+                ...nfts_ui, minter: $.extend(true, {}, lhs, rhs)
+            };
+        }
+        case 'nfts-ui/set-toggled': {
+            const { toggled: rhs } = action.payload;
+            const { toggled: lhs } = nfts_ui;
+            return {
+                ...nfts_ui, toggled: rhs ?? lhs
+            };
+        }
+        case 'nfts-ui/set': {
+            return $.extend(true, {}, nfts_ui, action.payload);
+        }
+        default: {
+            return nfts_ui;
+        }
+    }
+}
+export function nftsUiState() {
+    return {
+        amounts: nftAmounts(),
+        details: nftDetails(),
+        minter: nftMinter(),
         flags: nftFlags(),
         toggled: false
-    },
-    action: Action
-): NftsUi {
-    if (!action.type.startsWith('nfts-ui/set')) {
-        return nfts_ui;
-    }
-    return $.extend(true, {}, nfts_ui, action.payload);
+    };
 }
 export function nftWrap<WR extends Record<string, unknown>>(
     wrapped_record: WR
@@ -35,7 +76,7 @@ export function nftAmounts(
             }]
         )
     );
-    return amounts as NftAmounts;
+    return nftWrap(amounts as NftAmounts);
 }
 export function nftDetails(
     image = {
@@ -66,13 +107,13 @@ export function nftDetails(
             }])
         )])
     );
-    return details as NftDetails;
+    return nftWrap(details as NftDetails);
 }
 export function nftMinter() {
     const minter = {
         approval: null, status: null
     };
-    return minter as NftMinter;
+    return nftWrap(minter as NftMinter);
 }
 export function nftFlags(
     display = true, toggled = false

@@ -1,5 +1,5 @@
-import { NftIssue, NftLevel, NftToken } from './nfts';
 import { Address, Amount } from './base';
+import { NftIssue, NftLevel, NftToken } from './nfts';
 
 export type PptsUi = {
     amounts: Record<NftToken, PptAmounts>;

@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers, DeepPartial, Store, Unsubscribe } from 'redux';
 import { delayed } from '../functions';
 import { Parser } from '../parser';
-import { Action, addNft, addNonce, addPpt, clearMintingRow, clearMintingRows, decreaseAftWallet, increaseAftWallet, refresh, removeNft, removeNonce, removeNonceByAmount, removeNonces, removePpt, setAftWallet, setMiningSpeed, setMiningStatus, setMintingRow, setNft, setNftsUi, setOtfWalletAddress, setOtfWalletAmount, setOtfWalletProcessing, setPpt, setPptsUi, switchPage, switchToken } from '../redux/actions';
+import { Action, addNft, addNonce, addPpt, clearMintingRow, clearMintingRows, decreaseAftWallet, increaseAftWallet, refresh, removeNft, removeNonce, removeNonceByAmount, removeNonces, removePpt, setAftWallet, setMiningSpeed, setMiningStatus, setMintingRow, setNft, setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiMinter, setNftsUiToggled, setOtfWalletAddress, setOtfWalletAmount, setOtfWalletProcessing, setPpt, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiMinter, setPptsUiToggled, switchPage, switchToken } from '../redux/actions';
 import { middleware } from '../redux/middleware';
 import { onAftWalledDecreased, OnAftWalletDecreased, onAftWalletIncreased, OnAftWalletIncreased, onNftAdded, OnNftAdded, onNftRemoved, OnNftRemoved, onNonceAdded, OnNonceAdded, onNonceRemoved, OnNonceRemoved, onPageSwitch, OnPageSwitch, onPptAdded, OnPptAdded, onPptRemoved, OnPptRemoved, onTokenSwitch, OnTokenSwitch } from '../redux/observers';
 import { aftWalletReducer, miningReducer, mintingReducer, nftsReducer, nftsUiReducer, noncesReducer, otfWalletReducer, pageReducer, pptsReducer, pptsUiReducer, refreshReducer, tokenReducer } from '../redux/reducers';
@@ -124,19 +124,59 @@ export class App {
         const { nfts_ui } = this.me.store.getState();
         return nfts_ui;
     }
-    public static setNftsUi(
-        nfts_ui: DeepPartial<State['nfts_ui']>
+    public static setNftsUiAmounts(
+        { amounts }: DeepPartial<Pick<State['nfts_ui'], 'amounts'>>
     ) {
-        this.me.store.dispatch(setNftsUi(nfts_ui));
+        this.me.store.dispatch(setNftsUiAmounts({ amounts }));
+    }
+    public static setNftsUiDetails(
+        { details }: DeepPartial<Pick<State['nfts_ui'], 'details'>>
+    ) {
+        this.me.store.dispatch(setNftsUiDetails({ details }));
+    }
+    public static setNftsUiFlags(
+        { flags }: DeepPartial<Pick<State['nfts_ui'], 'flags'>>
+    ) {
+        this.me.store.dispatch(setNftsUiFlags({ flags }));
+    }
+    public static setNftsUiMinter(
+        { minter }: DeepPartial<Pick<State['nfts_ui'], 'minter'>>
+    ) {
+        this.me.store.dispatch(setNftsUiMinter({ minter }));
+    }
+    public static setNftsUiToggled(
+        { toggled }: DeepPartial<Pick<State['nfts_ui'], 'toggled'>>
+    ) {
+        this.me.store.dispatch(setNftsUiToggled({ toggled }));
     }
     public static getPptsUi(): State['ppts_ui'] {
         const { ppts_ui } = this.me.store.getState();
         return ppts_ui;
     }
-    public static setPptsUi(
-        ppts_ui: DeepPartial<State['ppts_ui']>
+    public static setPptsUiAmounts(
+        { amounts }: DeepPartial<Pick<State['ppts_ui'], 'amounts'>>
     ) {
-        this.me.store.dispatch(setPptsUi(ppts_ui));
+        this.me.store.dispatch(setPptsUiAmounts({ amounts }));
+    }
+    public static setPptsUiDetails(
+        { details }: DeepPartial<Pick<State['ppts_ui'], 'details'>>
+    ) {
+        this.me.store.dispatch(setPptsUiDetails({ details }));
+    }
+    public static setPptsUiFlags(
+        { flags }: DeepPartial<Pick<State['ppts_ui'], 'flags'>>
+    ) {
+        this.me.store.dispatch(setPptsUiFlags({ flags }));
+    }
+    public static setPptsUiMinter(
+        { minter }: DeepPartial<Pick<State['ppts_ui'], 'minter'>>
+    ) {
+        this.me.store.dispatch(setPptsUiMinter({ minter }));
+    }
+    public static setPptsUiToggled(
+        { toggled }: DeepPartial<Pick<State['ppts_ui'], 'toggled'>>
+    ) {
+        this.me.store.dispatch(setPptsUiToggled({ toggled }));
     }
     public static addNonce(
         nonce: Nonce, item: {

@@ -179,10 +179,13 @@ function $nfts(
             minter={nfts_ui.minter}
             toggled={nfts_ui.toggled}
             onNftList={(lhs, rhs) => {
-                App.setNftsUi({
-                    flags: lhs, amounts: { [nft_token]: rhs }
+                App.setNftsUiAmounts({
+                    amounts: { [nft_token]: rhs }
                 });
-                App.setPptsUi({
+                App.setNftsUiFlags({
+                    flags: lhs
+                });
+                App.setPptsUiFlags({
                     flags: lhs
                 });
             }}
@@ -198,7 +201,7 @@ function $nfts(
                         }
                     }
                 };
-                App.setNftsUi({ details });
+                App.setNftsUiDetails({ details });
             }}
             onNftSenderExpanded={(
                 nft_issue, nft_level, expanded
@@ -210,8 +213,8 @@ function $nfts(
                         }
                     }
                 };
-                App.setNftsUi({ details });
-                App.setPptsUi({ details });
+                App.setNftsUiDetails({ details });
+                App.setPptsUiDetails({ details });
             }}
             onNftAmountChanged={(
                 nft_issue, nft_level, value, valid
@@ -225,7 +228,7 @@ function $nfts(
                         }
                     }
                 };
-                App.setNftsUi({ details });
+                App.setNftsUiDetails({ details });
             }}
             onNftTargetChanged={(
                 nft_issue, nft_level, value, valid
@@ -239,7 +242,7 @@ function $nfts(
                         }
                     }
                 };
-                App.setNftsUi({ details });
+                App.setNftsUiDetails({ details });
             }}
             onNftTransfer={
                 (issue, level) => nftTransfer.bind(null, address)(
@@ -260,8 +263,10 @@ function $nfts(
                         }]
                     )
                 );
-                App.setNftsUi({ flags, toggled });
-                App.setPptsUi({ flags, toggled });
+                App.setNftsUiToggled({ toggled });
+                App.setNftsUiFlags({ flags });
+                App.setPptsUiToggled({ toggled });
+                App.setPptsUiFlags({ flags });
             }}
             token={token}
         />
@@ -287,11 +292,14 @@ function $ppts(
             minter={ppts_ui.minter}
             toggled={ppts_ui.toggled}
             onPptList={(lhs, rhs) => {
-                App.setNftsUi({
+                App.setNftsUiFlags({
                     flags: lhs
                 });
-                App.setPptsUi({
-                    flags: lhs, amounts: { [nft_token]: rhs }
+                App.setPptsUiFlags({
+                    flags: lhs
+                });
+                App.setPptsUiAmounts({
+                    amounts: { [nft_token]: rhs }
                 });
             }}
             onPptImageLoaded={(
@@ -306,7 +314,7 @@ function $ppts(
                         }
                     }
                 };
-                App.setPptsUi({ details });
+                App.setPptsUiDetails({ details });
             }}
             onPptClaimerExpanded={(
                 ppt_issue, ppt_level, expanded
@@ -320,8 +328,8 @@ function $ppts(
                         }
                     }
                 };
-                App.setNftsUi({ details });
-                App.setPptsUi({ details });
+                App.setNftsUiDetails({ details });
+                App.setPptsUiDetails({ details });
             }}
             onPptAmountChanged={(
                 nft_issue, nft_level, value, valid
@@ -335,7 +343,7 @@ function $ppts(
                         }
                     }
                 };
-                App.setPptsUi({ details });
+                App.setPptsUiDetails({ details });
             }}
             onPptTargetChanged={(
                 nft_issue, nft_level, value, valid
@@ -349,7 +357,7 @@ function $ppts(
                         }
                     }
                 };
-                App.setPptsUi({ details });
+                App.setPptsUiDetails({ details });
             }}
             onPptClaim={
                 (issue, level) => pptClaim.bind(null, address)(
@@ -373,8 +381,10 @@ function $ppts(
                         }]
                     )
                 );
-                App.setNftsUi({ flags, toggled });
-                App.setPptsUi({ flags, toggled });
+                App.setPptsUiToggled({ toggled });
+                App.setPptsUiFlags({ flags });
+                App.setNftsUiToggled({ toggled });
+                App.setNftsUiFlags({ flags });
             }}
             token={token}
         />
@@ -566,7 +576,7 @@ async function nftTransfer(
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        App.setNftsUi({
+        App.setNftsUiDetails({
             details: {
                 [nft_token]: {
                     [nft_level]: {
@@ -582,7 +592,7 @@ async function nftTransfer(
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        App.setNftsUi({
+        App.setNftsUiDetails({
             details: {
                 [nft_token]: {
                     [nft_level]: {
@@ -617,7 +627,7 @@ async function nftTransfer(
                 after: $sender_row
             });
         }
-        App.setNftsUi({
+        App.setNftsUiDetails({
             details: {
                 [nft_token]: {
                     [nft_level]: {
@@ -652,7 +662,7 @@ async function nftApprove(
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        App.setNftsUi({
+        App.setNftsUiMinter({
             minter: {
                 [Nft.token(token)]: {
                     approval: NftMinterApproval.approved
@@ -663,7 +673,7 @@ async function nftApprove(
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        App.setNftsUi({
+        App.setNftsUiMinter({
             minter: {
                 [Nft.token(token)]: {
                     approval: NftMinterApproval.approving
@@ -676,7 +686,7 @@ async function nftApprove(
             nft_contract.address, MAX_UINT256 - old_allowance
         );
     } catch (ex) {
-        App.setNftsUi({
+        App.setNftsUiMinter({
             minter: {
                 [Nft.token(token)]: {
                     approval: NftMinterApproval.error
@@ -713,7 +723,7 @@ async function nftBatchMint(
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        App.setNftsUi({
+        App.setNftsUiMinter({
             minter: {
                 [nft_token]: {
                     status: NftMinterStatus.minted
@@ -725,7 +735,7 @@ async function nftBatchMint(
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        App.setNftsUi({
+        App.setNftsUiMinter({
             minter: {
                 [nft_token]: {
                     status: NftMinterStatus.minting
@@ -735,7 +745,7 @@ async function nftBatchMint(
         nft_wallet.onTransferBatch(on_batch_tx);
         tx = await nft_wallet.mintBatch(levels, amounts);
     } catch (ex) {
-        App.setNftsUi({
+        App.setNftsUiMinter({
             minter: {
                 [nft_token]: {
                     status: NftMinterStatus.error
@@ -773,7 +783,7 @@ async function pptClaim(
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        App.setPptsUi({
+        App.setPptsUiDetails({
             details: {
                 [ppt_token]: {
                     [ppt_level]: {
@@ -790,7 +800,7 @@ async function pptClaim(
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        App.setPptsUi({
+        App.setPptsUiDetails({
             details: {
                 [ppt_token]: {
                     [ppt_level]: {
@@ -813,7 +823,7 @@ async function pptClaim(
             x40(address), core_id
         );
     } catch (ex: any) {
-        App.setPptsUi({
+        App.setPptsUiDetails({
             details: {
                 [ppt_token]: {
                     [ppt_level]: {
@@ -863,7 +873,7 @@ async function pptApprove(
                 approval: PptMinterApproval.approved
             }
         };
-        App.setPptsUi({ minter });
+        App.setPptsUiMinter({ minter });
     } else {
         const on_approval: OnApprovalForAll = (
             account, op, flag, ev
@@ -871,7 +881,7 @@ async function pptApprove(
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            App.setPptsUi({
+            App.setPptsUiMinter({
                 minter: {
                     [ppt_token]: {
                         approval: PptMinterApproval.approved
@@ -882,7 +892,7 @@ async function pptApprove(
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
-            App.setPptsUi({
+            App.setPptsUiMinter({
                 minter: {
                     [ppt_token]: {
                         approval: PptMinterApproval.approving
@@ -894,7 +904,7 @@ async function pptApprove(
                 await ppt_treasury.then((c) => c.address), true
             );
         } catch (ex) {
-            App.setPptsUi({
+            App.setPptsUiMinter({
                 minter: {
                     [ppt_token]: {
                         approval: PptMinterApproval.error
@@ -957,7 +967,7 @@ async function pptBatchMint(
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        App.setPptsUi({
+        App.setPptsUiMinter({
             minter: {
                 [ppt_token]: {
                     minter_status: PptMinterStatus.minted
@@ -971,7 +981,7 @@ async function pptBatchMint(
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        App.setPptsUi({
+        App.setPptsUiMinter({
             minter: {
                 [ppt_token]: {
                     minter_status: PptMinterStatus.minting
@@ -988,7 +998,7 @@ async function pptBatchMint(
             x40(address), ppt_ids, amounts
         );
     } catch (ex: any) {
-        App.setPptsUi({
+        App.setPptsUiMinter({
             minter: {
                 [ppt_token]: {
                     minter_status: PptMinterStatus.error
@@ -1050,7 +1060,7 @@ async function pptBatchBurn(
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        App.setPptsUi({
+        App.setPptsUiMinter({
             minter: {
                 [ppt_token]: {
                     burner_status: PptBurnerStatus.burned
@@ -1064,7 +1074,7 @@ async function pptBatchBurn(
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        App.setPptsUi({
+        App.setPptsUiMinter({
             minter: {
                 [ppt_token]: {
                     burner_status: PptBurnerStatus.burning
@@ -1081,7 +1091,7 @@ async function pptBatchBurn(
             x40(address), ppt_ids, amounts
         );
     } catch (ex: any) {
-        App.setPptsUi({
+        App.setPptsUiMinter({
             minter: {
                 [ppt_token]: {
                     burner_status: PptBurnerStatus.error

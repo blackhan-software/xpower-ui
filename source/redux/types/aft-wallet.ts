@@ -9,9 +9,9 @@ export type AftWallet = {
             supply: Supply;
         };
     };
-    /** set for more token(s) */
+    /** set of more token(s) */
     more?: Token[];
-    /** set for less token(s) */
+    /** set of less token(s) */
     less?: Token[];
 };
 export default AftWallet;

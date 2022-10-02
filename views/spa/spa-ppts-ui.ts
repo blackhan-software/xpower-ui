@@ -2,7 +2,7 @@ import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { PptTreasuryFactory } from '../../source/contract';
 import { buffered } from '../../source/functions';
-import { pptAmounts, pptWrap } from '../../source/redux/reducers';
+import { pptAmounts } from '../../source/redux/reducers';
 import { Address, Nft, NftIssue, NftLevel, NftLevels, NftToken, NftTokens, PptAmounts, PptDetails, PptMinterApproval, Token } from '../../source/redux/types';
 import { NftWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
@@ -12,11 +12,11 @@ import { ppt_href, ppt_meta } from '../ppts/ppts';
  */
 App.onNftChanged(buffered(() => {
     const nft_token = Nft.token(App.token);
-    App.setPptsUi({ ...ppt_amounts(nft_token) });
+    App.setPptsUiAmounts({ ...ppt_amounts(nft_token) });
 }));
 App.onPptChanged(buffered(() => {
     const nft_token = Nft.token(App.token);
-    App.setPptsUi({ ...ppt_amounts(nft_token) });
+    App.setPptsUiAmounts({ ...ppt_amounts(nft_token) });
 }));
 const ppt_amounts = (
     ppt_token: NftToken
@@ -35,7 +35,7 @@ const ppt_amounts = (
         }];
     });
     return {
-        amounts: Object.assign(pptWrap(pptAmounts()), {
+        amounts: Object.assign(pptAmounts(), {
             [ppt_token]: Object.fromEntries(entries)
         })
     };
@@ -51,7 +51,7 @@ App.event.on('toggle-level', ({
     const flags = Object.fromEntries(
         levels.map((l) => [l, { toggled: flag }])
     );
-    App.setPptsUi({ flags });
+    App.setPptsUiFlags({ flags });
 });
 /**
  * ui-details:
@@ -76,7 +76,7 @@ App.event.on('toggle-issue', ({
             )]
         )
     );
-    App.setPptsUi({ details });
+    App.setPptsUiDetails({ details });
 });
 /**
  * ui-{image,minter}:
@@ -90,11 +90,14 @@ Blockchain.onceConnect(async ({
             ppt_images.push(ppt_image(level, issue, token));
         }
     }
-    const ppt_minter = await Promise.all([
+    const [approval, ...images] = await Promise.all([
         ppt_approval(address, token), ...ppt_images
     ]);
-    App.setPptsUi(
-        ppt_minter.reduce((l, r) => $.extend(true, l, r))
+    App.setPptsUiMinter(
+        approval
+    );
+    App.setPptsUiDetails(
+        images.reduce((l, r) => $.extend(true, l, r))
     );
 }, {
     per: () => App.token
@@ -157,7 +160,7 @@ Promise.all([
             }
         }
         const ppt_details = await Promise.all([...ppt_images]);
-        App.setPptsUi(
+        App.setPptsUiDetails(
             ppt_details.reduce((l, r) => $.extend(true, l, r))
         );
     };

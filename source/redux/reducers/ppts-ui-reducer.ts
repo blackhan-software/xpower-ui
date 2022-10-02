@@ -3,19 +3,60 @@ import { Action } from '../actions/ppts-ui-actions';
 import { NftLevels, NftToken, NftTokens, PptAmounts, PptDetails, PptFlags, PptMinter, PptsUi } from '../types';
 
 export function pptsUiReducer(
-    ppts_ui: PptsUi = {
-        amounts: pptWrap(pptAmounts()),
-        details: pptWrap(pptDetails()),
-        minter: pptWrap(pptMinter()),
+    ppts_ui: PptsUi = pptsUiState(), action: Action
+): PptsUi {
+    switch (action.type) {
+        case 'ppts-ui/set-amounts': {
+            const { amounts: rhs } = action.payload;
+            const { amounts: lhs } = ppts_ui;
+            return {
+                ...ppts_ui, amounts: $.extend(true, {}, lhs, rhs)
+            };
+        }
+        case 'ppts-ui/set-details': {
+            const { details: rhs } = action.payload;
+            const { details: lhs } = ppts_ui;
+            return {
+                ...ppts_ui, details: $.extend(true, {}, lhs, rhs)
+            };
+        }
+        case 'ppts-ui/set-flags': {
+            const { flags: rhs } = action.payload;
+            const { flags: lhs } = ppts_ui;
+            return {
+                ...ppts_ui, flags: $.extend(true, {}, lhs, rhs)
+            };
+        }
+        case 'ppts-ui/set-minter': {
+            const { minter: rhs } = action.payload;
+            const { minter: lhs } = ppts_ui;
+            return {
+                ...ppts_ui, minter: $.extend(true, {}, lhs, rhs)
+            };
+        }
+        case 'ppts-ui/set-toggled': {
+            const { toggled: rhs } = action.payload;
+            const { toggled: lhs } = ppts_ui;
+            return {
+                ...ppts_ui, toggled: rhs ?? lhs
+            };
+        }
+        case 'ppts-ui/set': {
+            return $.extend(true, {}, ppts_ui, action.payload);
+        }
+        default: {
+            return ppts_ui;
+        }
+    }
+}
+export function pptsUiState() {
+    return {
+        amounts: pptAmounts(),
+        details: pptDetails(),
+        minter: pptMinter(),
         flags: pptFlags(),
         toggled: false
-    },
-    action: Action
-): PptsUi {
-    if (!action.type.startsWith('ppts-ui/set')) {
-        return ppts_ui;
-    }
-    return $.extend(true, {}, ppts_ui, action.payload);
+    };
 }
 export function pptWrap<WR extends Record<string, unknown>>(
     wrapped_record: WR
@@ -35,7 +76,7 @@ export function pptAmounts(
             }]
         )
     );
-    return amounts as PptAmounts;
+    return pptWrap(amounts as PptAmounts);
 }
 export function pptDetails(
     image = {
@@ -66,13 +107,13 @@ export function pptDetails(
             }])
         )])
     );
-    return details as PptDetails;
+    return pptWrap(details as PptDetails);
 }
 export function pptMinter() {
     const minter = {
         approval: null, minter_status: null, burner_status: null
     };
-    return minter as PptMinter;
+    return pptWrap(minter as PptMinter);
 }
 export function pptFlags(
     display = true, toggled = false

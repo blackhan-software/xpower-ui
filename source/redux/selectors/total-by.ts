@@ -2,8 +2,7 @@
 import { Address, Amount, BlockHash, Nonces, Token } from '../types';
 
 export function totalBy(
-    nonces: Nonces,
-    item: {
+    nonces: Nonces, item: {
         address: Address,
         amount: Amount,
         block_hash: BlockHash,

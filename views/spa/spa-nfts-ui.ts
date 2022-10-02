@@ -1,7 +1,7 @@
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { buffered } from '../../source/functions';
-import { nftAmounts, nftWrap } from '../../source/redux/reducers';
+import { nftAmounts } from '../../source/redux/reducers';
 import { Address, Amount, Balance, MID_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftTokens, Token } from '../../source/redux/types';
 import { MoeWallet, NftWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
@@ -10,10 +10,17 @@ import { nft_href, nft_meta } from '../nfts/nfts';
  * nfts-ui:
  */
 App.onAftWalletChanged(buffered((
-    token: Token, { amount: balance }: { amount: Amount }
+    token: Token, { amount }: { amount: Amount }
 ) => {
-    App.setNftsUi({ ...nft_amounts(token, balance) });
+    App.setNftsUiAmounts({ ...nft_amounts(token, amount) });
 }));
+App.onTokenSwitch((token) => {
+    const { items } = App.getAftWallet(token);
+    const amount = items[token]?.amount;
+    if (amount !== undefined) App.setNftsUiAmounts({
+        ...nft_amounts(token, amount)
+    });
+});
 const nft_amounts = (
     token: Token, balance: Balance
 ) => {
@@ -28,7 +35,7 @@ const nft_amounts = (
         }];
     });
     return {
-        amounts: Object.assign(nftWrap(nftAmounts()), {
+        amounts: Object.assign(nftAmounts(), {
             [nft_token]: Object.fromEntries(entries)
         })
     };
@@ -44,7 +51,7 @@ App.event.on('toggle-level', ({
     const flags = Object.fromEntries(
         levels.map((l) => [l, { toggled: flag }])
     );
-    App.setNftsUi({ flags });
+    App.setNftsUiFlags({ flags });
 });
 /**
  * ui-details:
@@ -69,7 +76,7 @@ App.event.on('toggle-issue', ({
             )]
         )
     );
-    App.setNftsUi({ details });
+    App.setNftsUiDetails({ details });
 });
 /**
  * ui-{image,minter}:
@@ -83,11 +90,14 @@ Blockchain.onceConnect(async ({
             nft_images.push(nft_image(level, issue, token));
         }
     }
-    const nft_minter = await Promise.all([
+    const [approval, ...images] = await Promise.all([
         nft_approval(address, token), ...nft_images
     ]);
-    App.setNftsUi(
-        nft_minter.reduce((l, r) => $.extend(true, l, r))
+    App.setNftsUiMinter(
+        approval
+    );
+    App.setNftsUiDetails(
+        images.reduce((l, r) => $.extend(true, l, r))
     );
 }, {
     per: () => App.token
@@ -151,7 +161,7 @@ Promise.all([
             }
         }
         const nft_details = await Promise.all([...nft_images]);
-        App.setNftsUi(
+        App.setNftsUiDetails(
             nft_details.reduce((l, r) => $.extend(true, l, r))
         );
     };
