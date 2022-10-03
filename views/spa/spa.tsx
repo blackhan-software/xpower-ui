@@ -7,15 +7,17 @@ import { AddressContext, AddressProvider } from '../../source/context';
 import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
 import { Alert, alert, Alerts, ancestor, globalRef, x40 } from '../../source/functions';
 import { HashManager, MiningManager } from '../../source/managers';
+import { removeNonce, removeNonceByAmount, setMintingRow, setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiMinter, setNftsUiToggled, setOtfWalletProcessing, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiMinter, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
 import { Address, AftWallet, Amount, Level, MAX_UINT256, Mining, MinterStatus, Minting, Nft, NftCoreId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, Nfts, NftSenderStatus, NftsUi, OtfWallet, Page, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, PptsUi, State, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfManager } from '../../source/wallet';
 import { Years } from '../../source/years';
 
+import { Dispatch } from '@reduxjs/toolkit';
 import React, { createElement, useContext } from 'react';
 import { createRoot } from 'react-dom/client';
-import { connect, Provider } from 'react-redux';
+import { connect, Provider, useDispatch } from 'react-redux';
 
 import { Avalanche } from '../../public/images/tsx';
 import { UiAbout } from '../about/about';
@@ -103,6 +105,7 @@ function $wallet(
     otf_wallet: OtfWallet
 ) {
     const [address] = useContext(AddressContext);
+    const dispatch = useDispatch();
     return <form id='wallet'
         className={page === Page.About ? 'd-none' : ''}
         onSubmit={(e) => e.preventDefault()}
@@ -112,9 +115,9 @@ function $wallet(
                 ...aft_wallet, address
             }}
             otf={{
-                ...otf_wallet,
-                onDeposit: otfDeposit.bind(null, address),
-                onWithdraw: otfWithdraw.bind(null, address)
+                onDeposit: otfDeposit(dispatch).bind(null, address),
+                onWithdraw: otfWithdraw(dispatch).bind(null, address),
+                ...otf_wallet
             }}
             token={token}
         />
@@ -135,6 +138,7 @@ function $home(
     mining: Mining, minting: Minting
 ) {
     const [address] = useContext(AddressContext);
+    const dispatch = useDispatch();
     if (page !== Page.Home) {
         return null;
     }
@@ -143,15 +147,15 @@ function $home(
     >
         <UiHome
             mining={{
-                onToggle: miningToggle.bind(null, address),
+                onToggle: miningToggle(dispatch).bind(null, address),
                 togglable: miningTogglable(mining),
-                onSpeed: miningSpeed.bind(null, address),
+                onSpeed: miningSpeed(dispatch).bind(null, address),
                 speedable: miningSpeedable(mining),
                 ...mining
             }}
             minting={{
-                onForget: mintingForget.bind(null, address),
-                onMint: mintingMint.bind(null, address),
+                onForget: mintingForget(dispatch).bind(null, address),
+                onMint: mintingMint(dispatch).bind(null, address),
                 ...minting
             }}
             speed={mining.speed}
@@ -164,6 +168,7 @@ function $nfts(
     nfts: Nfts, nfts_ui: NftsUi
 ) {
     const [address] = useContext(AddressContext);
+    const dispatch = useDispatch();
     if (page !== Page.Nfts) {
         return null;
     }
@@ -179,15 +184,15 @@ function $nfts(
             minter={nfts_ui.minter}
             toggled={nfts_ui.toggled}
             onNftList={(lhs, rhs) => {
-                App.setNftsUiAmounts({
+                dispatch(setNftsUiAmounts({
                     amounts: { [nft_token]: rhs }
-                });
-                App.setNftsUiFlags({
+                }));
+                dispatch(setNftsUiFlags({
                     flags: lhs
-                });
-                App.setPptsUiFlags({
+                }));
+                dispatch(setPptsUiFlags({
                     flags: lhs
-                });
+                }));
             }}
             onNftImageLoaded={(
                 nft_issue, nft_level
@@ -201,7 +206,7 @@ function $nfts(
                         }
                     }
                 };
-                App.setNftsUiDetails({ details });
+                dispatch(setNftsUiDetails({ details }));
             }}
             onNftSenderExpanded={(
                 nft_issue, nft_level, expanded
@@ -213,8 +218,8 @@ function $nfts(
                         }
                     }
                 };
-                App.setNftsUiDetails({ details });
-                App.setPptsUiDetails({ details });
+                dispatch(setNftsUiDetails({ details }));
+                dispatch(setPptsUiDetails({ details }));
             }}
             onNftAmountChanged={(
                 nft_issue, nft_level, value, valid
@@ -228,7 +233,7 @@ function $nfts(
                         }
                     }
                 };
-                App.setNftsUiDetails({ details });
+                dispatch(setNftsUiDetails({ details }));
             }}
             onNftTargetChanged={(
                 nft_issue, nft_level, value, valid
@@ -242,18 +247,18 @@ function $nfts(
                         }
                     }
                 };
-                App.setNftsUiDetails({ details });
+                dispatch(setNftsUiDetails({ details }));
             }}
             onNftTransfer={
-                (issue, level) => nftTransfer.bind(null, address)(
-                    token, issue, level
+                (issue, level) => nftTransfer(dispatch)(
+                    address, token, issue, level
                 )
             }
             onNftMinterApproval={
-                nftApprove.bind(null, address)
+                nftApprove(dispatch).bind(null, address)
             }
             onNftMinterBatchMint={
-                nftBatchMint.bind(null, address)
+                nftBatchMint(dispatch).bind(null, address)
             }
             onNftMinterToggled={(toggled) => {
                 const flags = Object.fromEntries(
@@ -263,10 +268,10 @@ function $nfts(
                         }]
                     )
                 );
-                App.setNftsUiToggled({ toggled });
-                App.setNftsUiFlags({ flags });
-                App.setPptsUiToggled({ toggled });
-                App.setPptsUiFlags({ flags });
+                dispatch(setNftsUiToggled({ toggled }));
+                dispatch(setNftsUiFlags({ flags }));
+                dispatch(setPptsUiToggled({ toggled }));
+                dispatch(setPptsUiFlags({ flags }));
             }}
             token={token}
         />
@@ -277,6 +282,7 @@ function $ppts(
     ppts: Nfts, ppts_ui: PptsUi
 ) {
     const [address] = useContext(AddressContext);
+    const dispatch = useDispatch();
     if (page !== Page.Ppts) {
         return null;
     }
@@ -292,15 +298,15 @@ function $ppts(
             minter={ppts_ui.minter}
             toggled={ppts_ui.toggled}
             onPptList={(lhs, rhs) => {
-                App.setNftsUiFlags({
+                dispatch(setNftsUiFlags({
                     flags: lhs
-                });
-                App.setPptsUiFlags({
+                }));
+                dispatch(setPptsUiFlags({
                     flags: lhs
-                });
-                App.setPptsUiAmounts({
+                }));
+                dispatch(setPptsUiAmounts({
                     amounts: { [nft_token]: rhs }
-                });
+                }));
             }}
             onPptImageLoaded={(
                 ppt_issue, ppt_level
@@ -314,7 +320,7 @@ function $ppts(
                         }
                     }
                 };
-                App.setPptsUiDetails({ details });
+                dispatch(setPptsUiDetails({ details }));
             }}
             onPptClaimerExpanded={(
                 ppt_issue, ppt_level, expanded
@@ -328,8 +334,8 @@ function $ppts(
                         }
                     }
                 };
-                App.setNftsUiDetails({ details });
-                App.setPptsUiDetails({ details });
+                dispatch(setNftsUiDetails({ details }));
+                dispatch(setPptsUiDetails({ details }));
             }}
             onPptAmountChanged={(
                 nft_issue, nft_level, value, valid
@@ -343,7 +349,7 @@ function $ppts(
                         }
                     }
                 };
-                App.setPptsUiDetails({ details });
+                dispatch(setPptsUiDetails({ details }));
             }}
             onPptTargetChanged={(
                 nft_issue, nft_level, value, valid
@@ -357,21 +363,21 @@ function $ppts(
                         }
                     }
                 };
-                App.setPptsUiDetails({ details });
+                dispatch(setPptsUiDetails({ details }));
             }}
             onPptClaim={
-                (issue, level) => pptClaim.bind(null, address)(
-                    token, issue, level
+                (issue, level) => pptClaim(dispatch)(
+                    address, token, issue, level
                 )
             }
             onPptMinterApproval={
-                pptApprove.bind(null, address)
+                pptApprove(dispatch).bind(null, address)
             }
             onPptMinterBatchMint={
-                pptBatchMint.bind(null, address)
+                pptBatchMint(dispatch).bind(null, address)
             }
             onPptMinterBatchBurn={
-                pptBatchBurn.bind(null, address)
+                pptBatchBurn(dispatch).bind(null, address)
             }
             onPptMinterToggled={(toggled) => {
                 const flags = Object.fromEntries(
@@ -381,10 +387,10 @@ function $ppts(
                         }]
                     )
                 );
-                App.setPptsUiToggled({ toggled });
-                App.setPptsUiFlags({ flags });
-                App.setNftsUiToggled({ toggled });
-                App.setNftsUiFlags({ flags });
+                dispatch(setPptsUiToggled({ toggled }));
+                dispatch(setPptsUiFlags({ flags }));
+                dispatch(setNftsUiToggled({ toggled }));
+                dispatch(setNftsUiFlags({ flags }));
             }}
             token={token}
         />
@@ -405,17 +411,17 @@ function $about(
 /**
  * mining:
  */
-function miningToggle(
+const miningToggle = (_: Dispatch) => (
     address: Address | null, token: Token
-) {
+) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
     MiningManager.toggle(address, { token });
 }
-function miningSpeed(
+const miningSpeed = (_: Dispatch) => (
     address: Address | null, token: Token, by: number
-) {
+) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -431,9 +437,9 @@ function miningSpeed(
 /**
  * minting:
  */
-async function mintingMint(
+const mintingMint = (dispatch: Dispatch) => async (
     address: Address | null, token: Token, level: Level
-) {
+) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -463,14 +469,16 @@ async function mintingMint(
             if (App.token !== token) {
                 return;
             }
-            const { tx_counter } = App.getMintingRow({ level });
-            if (tx_counter > 0) App.setMintingRow(
+            const { tx_counter } = App.getMintingRow({
+                level
+            });
+            if (tx_counter > 0) dispatch(setMintingRow(
                 { level, row: { tx_counter: tx_counter - 1 } }
-            );
+            ));
         };
-        App.setMintingRow(
+        dispatch(setMintingRow(
             { level, row: { status: MinterStatus.minting } }
-        );
+        ));
         const mint = await moe_wallet.mint(
             block_hash, nonce
         );
@@ -479,21 +487,21 @@ async function mintingMint(
         const { tx_counter } = App.getMintingRow(
             { level }
         );
-        App.setMintingRow({
+        dispatch(setMintingRow({
             level, row: {
                 status: MinterStatus.minted,
                 tx_counter: tx_counter + 1
             }
-        });
-        App.removeNonce(nonce, {
+        }));
+        dispatch(removeNonce(nonce, {
             address, block_hash, token
-        });
+        }));
     } catch (ex: any) {
-        App.setMintingRow({
+        dispatch(setMintingRow({
             level, row: {
                 status: MinterStatus.error
             }
-        });
+        }));
         /* eslint no-ex-assign: [off] */
         if (ex.error) {
             ex = ex.error;
@@ -516,9 +524,9 @@ async function mintingMint(
             if (ex.data && ex.data.message && ex.data.message.match(
                 /empty nonce-hash/i
             )) {
-                App.removeNonce(nonce, {
+                dispatch(removeNonce(nonce, {
                     address, block_hash, token
-                });
+                }));
             }
         }
         const $mint = globalRef<HTMLElement>(
@@ -529,9 +537,9 @@ async function mintingMint(
         });
     }
 }
-function mintingForget(
+const mintingForget = (dispatch: Dispatch) => (
     address: Address | null, token: Token, level: Level
-) {
+) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -542,16 +550,16 @@ function mintingForget(
         address, amount, token
     });
     for (const { item } of result) {
-        App.removeNonceByAmount(item);
+        dispatch(removeNonceByAmount(item));
     }
 }
 /**
  * nft-sender:
  */
-async function nftTransfer(
+const nftTransfer = (dispatch: Dispatch) => async (
     address: Address | null, token: Token,
     nft_issue: NftIssue, nft_level: NftLevel
-) {
+) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -576,7 +584,7 @@ async function nftTransfer(
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        App.setNftsUiDetails({
+        dispatch(setNftsUiDetails({
             details: {
                 [nft_token]: {
                     [nft_level]: {
@@ -587,12 +595,12 @@ async function nftTransfer(
                     }
                 }
             }
-        });
+        }));
     };
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        App.setNftsUiDetails({
+        dispatch(setNftsUiDetails({
             details: {
                 [nft_token]: {
                     [nft_level]: {
@@ -602,7 +610,7 @@ async function nftTransfer(
                     }
                 }
             }
-        });
+        }));
         nft_wallet.onTransferSingle(on_single_tx);
         tx = await nft_wallet.safeTransfer(
             target, core_id, amount
@@ -627,7 +635,7 @@ async function nftTransfer(
                 after: $sender_row
             });
         }
-        App.setNftsUiDetails({
+        dispatch(setNftsUiDetails({
             details: {
                 [nft_token]: {
                     [nft_level]: {
@@ -637,16 +645,16 @@ async function nftTransfer(
                     }
                 }
             }
-        });
+        }));
         console.error(ex);
     }
 }
 /**
  * nft-minter:
  */
-async function nftApprove(
+const nftApprove = (dispatch: Dispatch) => async (
     address: Address | null, token: Token
-) {
+) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -662,46 +670,46 @@ async function nftApprove(
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        App.setNftsUiMinter({
+        dispatch(setNftsUiMinter({
             minter: {
                 [Nft.token(token)]: {
                     approval: NftMinterApproval.approved
                 }
             }
-        });
+        }));
     };
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        App.setNftsUiMinter({
+        dispatch(setNftsUiMinter({
             minter: {
                 [Nft.token(token)]: {
                     approval: NftMinterApproval.approving
                 }
             }
-        });
+        }));
         moe_wallet.onApproval(on_approval);
         const nft_contract = await nft_wallet.contract;
         tx = await moe_wallet.increaseAllowance(
             nft_contract.address, MAX_UINT256 - old_allowance
         );
     } catch (ex) {
-        App.setNftsUiMinter({
+        dispatch(setNftsUiMinter({
             minter: {
                 [Nft.token(token)]: {
                     approval: NftMinterApproval.error
                 }
             }
-        });
+        }));
         const $button = document.querySelector<HTMLElement>(
             '#nft-batch-minting'
         );
         error(ex, { after: $button });
     }
 }
-async function nftBatchMint(
+const nftBatchMint = (dispatch: Dispatch) => async (
     address: Address | null, token: Token, list: NftMinterList
-) {
+) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -723,35 +731,35 @@ async function nftBatchMint(
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        App.setNftsUiMinter({
+        dispatch(setNftsUiMinter({
             minter: {
                 [nft_token]: {
                     status: NftMinterStatus.minted
                 }
             }
-        });
+        }));
     };
     const nft_wallet = new NftWallet(address, token);
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        App.setNftsUiMinter({
+        dispatch(setNftsUiMinter({
             minter: {
                 [nft_token]: {
                     status: NftMinterStatus.minting
                 }
             }
-        });
+        }));
         nft_wallet.onTransferBatch(on_batch_tx);
         tx = await nft_wallet.mintBatch(levels, amounts);
     } catch (ex) {
-        App.setNftsUiMinter({
+        dispatch(setNftsUiMinter({
             minter: {
                 [nft_token]: {
                     status: NftMinterStatus.error
                 }
             }
-        });
+        }));
         const $button = document.querySelector<HTMLElement>(
             '#nft-batch-minting'
         );
@@ -761,10 +769,10 @@ async function nftBatchMint(
 /**
  * ppt-claimer:
  */
-async function pptClaim(
+const pptClaim = (dispatch: Dispatch) => async (
     address: Address | null, token: Token,
     ppt_issue: NftIssue, ppt_level: NftLevel
-) {
+) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -783,7 +791,7 @@ async function pptClaim(
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        App.setPptsUiDetails({
+        dispatch(setPptsUiDetails({
             details: {
                 [ppt_token]: {
                     [ppt_level]: {
@@ -795,12 +803,12 @@ async function pptClaim(
                     }
                 }
             }
-        });
+        }));
     };
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        App.setPptsUiDetails({
+        dispatch(setPptsUiDetails({
             details: {
                 [ppt_token]: {
                     [ppt_level]: {
@@ -812,7 +820,7 @@ async function pptClaim(
                     }
                 }
             }
-        });
+        }));
         moe_treasury.then(
             (c) => c.on('Claim', on_claim_tx)
         );
@@ -823,7 +831,7 @@ async function pptClaim(
             x40(address), core_id
         );
     } catch (ex: any) {
-        App.setPptsUiDetails({
+        dispatch(setPptsUiDetails({
             details: {
                 [ppt_token]: {
                     [ppt_level]: {
@@ -835,7 +843,7 @@ async function pptClaim(
                     }
                 }
             }
-        });
+        }));
         const $ref = globalRef<HTMLElement>(
             `.ppt-claimer[core-id="${core_id}"]`
         );
@@ -851,9 +859,9 @@ async function pptClaim(
 /**
  * ppt-minter:
  */
-async function pptApprove(
+const pptApprove = (dispatch: Dispatch) => async (
     address: Address | null, token: Token
-) {
+) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -873,7 +881,7 @@ async function pptApprove(
                 approval: PptMinterApproval.approved
             }
         };
-        App.setPptsUiMinter({ minter });
+        dispatch(setPptsUiMinter({ minter }));
     } else {
         const on_approval: OnApprovalForAll = (
             account, op, flag, ev
@@ -881,36 +889,36 @@ async function pptApprove(
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            App.setPptsUiMinter({
+            dispatch(setPptsUiMinter({
                 minter: {
                     [ppt_token]: {
                         approval: PptMinterApproval.approved
                     }
                 }
-            });
+            }));
         };
         let tx: Transaction | undefined;
         Alerts.hide();
         try {
-            App.setPptsUiMinter({
+            dispatch(setPptsUiMinter({
                 minter: {
                     [ppt_token]: {
                         approval: PptMinterApproval.approving
                     }
                 }
-            });
+            }));
             nft_wallet.onApprovalForAll(on_approval);
             tx = await nft_wallet.setApprovalForAll(
                 await ppt_treasury.then((c) => c.address), true
             );
         } catch (ex) {
-            App.setPptsUiMinter({
+            dispatch(setPptsUiMinter({
                 minter: {
                     [ppt_token]: {
                         approval: PptMinterApproval.error
                     }
                 }
-            });
+            }));
             const $button = document.querySelector<HTMLElement>(
                 '#ppt-batch-minting'
             );
@@ -918,9 +926,9 @@ async function pptApprove(
         }
     }
 }
-async function pptBatchMint(
+const pptBatchMint = (dispatch: Dispatch) => async (
     address: Address | null, token: Token, list: PptMinterList
-) {
+) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -937,11 +945,15 @@ async function pptBatchMint(
             const issues = Array.from(Years()).reverse();
             let mint_amount = amount;
             for (const issue of issues) {
-                const ppt_total = App.getNftTotalBy({ level, issue });
+                const ppt_total = App.getNftTotalBy({
+                    level, issue
+                });
                 if (ppt_total.amount === 0n) {
                     continue;
                 }
-                const ppt_id = Nft.coreId({ level, issue });
+                const ppt_id = Nft.coreId({
+                    level, issue
+                });
                 if (mint_amount >= ppt_total.amount) {
                     ppt_mints.push({
                         ppt_id, amount: ppt_total.amount
@@ -967,13 +979,13 @@ async function pptBatchMint(
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        App.setPptsUiMinter({
+        dispatch(setPptsUiMinter({
             minter: {
                 [ppt_token]: {
                     minter_status: PptMinterStatus.minted
                 }
             }
-        });
+        }));
     };
     const ppt_treasury = PptTreasuryFactory({
         token
@@ -981,13 +993,13 @@ async function pptBatchMint(
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        App.setPptsUiMinter({
+        dispatch(setPptsUiMinter({
             minter: {
                 [ppt_token]: {
                     minter_status: PptMinterStatus.minting
                 }
             }
-        });
+        }));
         ppt_treasury.then(
             (c) => c?.on('StakeBatch', on_stake_batch)
         );
@@ -998,22 +1010,22 @@ async function pptBatchMint(
             x40(address), ppt_ids, amounts
         );
     } catch (ex: any) {
-        App.setPptsUiMinter({
+        dispatch(setPptsUiMinter({
             minter: {
                 [ppt_token]: {
                     minter_status: PptMinterStatus.error
                 }
             }
-        });
+        }));
         const $button = document.querySelector<HTMLElement>(
             '#ppt-batch-minting'
         );
         error(ex, { after: $button });
     }
 }
-async function pptBatchBurn(
+const pptBatchBurn = (dispatch: Dispatch) => async (
     address: Address | null, token: Token, list: PptMinterList
-) {
+) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -1030,11 +1042,15 @@ async function pptBatchBurn(
             const issues = Array.from(Years());
             let burn_amount = -amount;
             for (const issue of issues) {
-                const ppt_total = App.getPptTotalBy({ level, issue });
+                const ppt_total = App.getPptTotalBy({
+                    level, issue
+                });
                 if (ppt_total.amount === 0n) {
                     continue;
                 }
-                const ppt_id = Nft.coreId({ level, issue });
+                const ppt_id = Nft.coreId({
+                    level, issue
+                });
                 if (burn_amount >= ppt_total.amount) {
                     ppt_burns.push({
                         ppt_id, amount: ppt_total.amount
@@ -1060,13 +1076,13 @@ async function pptBatchBurn(
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        App.setPptsUiMinter({
+        dispatch(setPptsUiMinter({
             minter: {
                 [ppt_token]: {
                     burner_status: PptBurnerStatus.burned
                 }
             }
-        });
+        }));
     };
     const ppt_treasury = PptTreasuryFactory({
         token
@@ -1074,13 +1090,13 @@ async function pptBatchBurn(
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        App.setPptsUiMinter({
+        dispatch(setPptsUiMinter({
             minter: {
                 [ppt_token]: {
                     burner_status: PptBurnerStatus.burning
                 }
             }
-        });
+        }));
         ppt_treasury.then(
             (c) => c?.on('UnstakeBatch', on_unstake_batch)
         );
@@ -1091,13 +1107,13 @@ async function pptBatchBurn(
             x40(address), ppt_ids, amounts
         );
     } catch (ex: any) {
-        App.setPptsUiMinter({
+        dispatch(setPptsUiMinter({
             minter: {
                 [ppt_token]: {
                     burner_status: PptBurnerStatus.error
                 }
             }
-        });
+        }));
         const $button = document.querySelector<HTMLElement>(
             '#ppt-batch-minting'
         );
@@ -1107,18 +1123,18 @@ async function pptBatchBurn(
 /**
  * {aft,otf}-wallet:
  */
-async function otfDeposit(
+const otfDeposit = (dispatch: Dispatch) => async (
     address: Address | null, processing: boolean
-) {
+) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
     if (processing) {
         return;
     }
-    App.setOtfWalletProcessing({
+    dispatch(setOtfWalletProcessing({
         processing: true
-    });
+    }));
     const unit = parseUnits('1.0');
     const provider = new Web3Provider(await Blockchain.provider);
     const mmw_signer = provider.getSigner(x40(address));
@@ -1130,9 +1146,9 @@ async function otfDeposit(
             to: x40(address),
         });
     } catch (ex) {
-        App.setOtfWalletProcessing({
+        dispatch(setOtfWalletProcessing({
             processing: false
-        });
+        }));
         console.error(ex);
         return;
     }
@@ -1149,30 +1165,30 @@ async function otfDeposit(
             to: otf_address, value
         });
         tx.wait(1).then(() => {
-            App.setOtfWalletProcessing({
+            dispatch(setOtfWalletProcessing({
                 processing: false
-            });
+            }));
         });
         console.debug('[otf-deposit]', tx);
     } catch (ex) {
-        App.setOtfWalletProcessing({
+        dispatch(setOtfWalletProcessing({
             processing: false
-        });
+        }));
         console.error(ex);
     }
 }
-async function otfWithdraw(
+const otfWithdraw = (dispatch: Dispatch) => async (
     address: Address | null, processing: boolean
-) {
+) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
     if (processing) {
         return;
     }
-    App.setOtfWalletProcessing({
+    dispatch(setOtfWalletProcessing({
         processing: true
-    });
+    }));
     const otf_signer = await OtfManager.init();
     const otf_balance = await otf_signer.getBalance();
     let gas_limit = parseUnits('0');
@@ -1181,9 +1197,9 @@ async function otfWithdraw(
             to: x40(address), value: otf_balance
         });
     } catch (ex) {
-        App.setOtfWalletProcessing({
+        dispatch(setOtfWalletProcessing({
             processing: false
-        });
+        }));
         console.error(ex);
         return;
     }
@@ -1197,25 +1213,23 @@ async function otfWithdraw(
             to: x40(address), value
         });
         tx.wait(1).then(() => {
-            App.setOtfWalletProcessing({
+            dispatch(setOtfWalletProcessing({
                 processing: false
-            });
+            }));
         });
         console.debug('[otf-withdraw]', tx);
     } catch (ex) {
-        App.setOtfWalletProcessing({
+        dispatch(setOtfWalletProcessing({
             processing: false
-        });
+        }));
         console.error(ex);
     }
 }
-function error(
-    ex: any, options?: {
-        style?: Record<string, string>,
-        icon?: string, id?: string,
-        after?: HTMLElement | null
-    }
-) {
+function error(ex: any, options?: {
+    style?: Record<string, string>,
+    icon?: string, id?: string,
+    after?: HTMLElement | null
+}) {
     /* eslint no-ex-assign: [off] */
     if (ex.error) {
         ex = ex.error;
@@ -1232,11 +1246,11 @@ function error(
     console.error(ex);
 }
 if (require.main === module) {
-    const spa = createElement(connect((s: State) => s)(SPA));
+    const $spa = createElement(connect((s: State) => s)(SPA));
     const $content = document.querySelector('content');
     createRoot($content!).render(
         <Provider store={App.store}>
-            <AddressProvider>{spa}</AddressProvider>
+            <AddressProvider>{$spa}</AddressProvider>
         </Provider>
     );
 }

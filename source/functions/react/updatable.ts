@@ -1,6 +1,3 @@
-/* eslint @typescript-eslint/no-unused-vars: ["error", {
-    "varsIgnorePattern": "^_"
-}] */
 import { Constructor } from './constructor';
 import { DeepPartial } from 'redux';
 import { Component } from 'react';
