@@ -1,41 +1,23 @@
-import { DeepPartial } from 'redux';
-import { Level } from '../types';
-import { Minting, MintingRow } from '../types/minting';
+import { createAction, DeepPartial } from '@reduxjs/toolkit';
+import { Level, Minting, MintingRow } from '../types';
 
-export type ClearMintingRows = {
-    type: 'minting/clear-rows'
-};
-export const clearMintingRows = (
-): ClearMintingRows => ({
-    type: 'minting/clear-rows'
-});
-export type ClearMintingRow = {
-    type: 'minting/clear-row',
-    payload: { level: Level }
-};
-export const clearMintingRow = (
-    payload: { level: Level }
-): ClearMintingRow => ({
-    type: 'minting/clear-row', payload
-});
-export type SetMintingRow = {
-    type: 'minting/set-row',
-    payload: { level: Level, row: Partial<MintingRow> }
-};
-export const setMintingRow = (
-    payload: { level: Level, row: Partial<MintingRow> }
-): SetMintingRow => ({
-    type: 'minting/set-row', payload
-});
-export type SetMinting = {
-    type: 'minting/set',
-    payload: DeepPartial<Minting>
-};
-export const setMinting = (
-    payload: DeepPartial<Minting>
-): SetMinting => ({
-    type: 'minting/set', payload
-});
-export type Action =
-    ClearMintingRows | ClearMintingRow |
-    SetMintingRow | SetMinting;
+export const clearMintingRows = createAction(
+    'minting/clear-rows'
+);
+export const clearMintingRow = createAction(
+    'minting/clear-row', ({ level }: { level: Level }) => ({
+        payload: { level }
+    })
+);
+export const setMintingRow = createAction(
+    'minting/set-row', ({ level, row }: {
+        level: Level, row: Partial<MintingRow>
+    }) => ({
+        payload: { level, row }
+    })
+);
+export const setMinting = createAction(
+    'minting/set', (minting: DeepPartial<Minting>) => ({
+        payload: minting
+    })
+);

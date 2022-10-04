@@ -1,10 +1,9 @@
+import { AnyAction } from '@reduxjs/toolkit';
 import { Store, Unsubscribe } from 'redux';
 import { observe } from './observe';
 
-import { Nonce, Nonces, State, Empty, Token } from '../types';
-import { Address, Amount, BlockHash } from '../types';
-import { max, hex, x40 } from '../../functions';
-import { Action } from '../actions';
+import { hex, max, x40 } from '../../functions';
+import { Address, Amount, BlockHash, Empty, Nonce, Nonces, State, Token } from '../types';
 
 enum Sign {
     positive = +1,
@@ -52,7 +51,6 @@ const inc_total_by = (sign: Sign, { address, amount, token }: {
         return max(0n, TOTAL_BY[token][x_address][x_amount] -= amount);
     }
 };
-
 export type OnNonceAdded = (
     nonce: Nonce, item: {
         address: Address,
@@ -71,9 +69,8 @@ export type OnNonceRemoved = (
     },
     total_by: Amount, total: Amount
 ) => void;
-
 export function onNonceAdded(
-    store: Store<State, Action>, handler: OnNonceAdded
+    store: Store<State, AnyAction>, handler: OnNonceAdded
 ): Unsubscribe {
     const selector = (state: State) => state.nonces;
     const observer = observe<Nonces>(store)(
@@ -94,7 +91,7 @@ export function onNonceAdded(
     });
 }
 export function onNonceRemoved(
-    store: Store<State, Action>, handler: OnNonceRemoved
+    store: Store<State, AnyAction>, handler: OnNonceRemoved
 ): Unsubscribe {
     const selector = (state: State) => state.nonces;
     const observer = observe<Nonces>(store)(

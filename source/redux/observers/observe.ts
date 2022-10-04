@@ -1,9 +1,9 @@
+import { AnyAction } from '@reduxjs/toolkit';
 import { Store, Unsubscribe } from 'redux';
-import { Action } from '../actions'
 import { State } from '../types';
 
 export const observe = <S>(
-    store: Store<State, Action>
+    store: Store<State, AnyAction>
 ) => (
     selector: (state: State) => S, prev: S
 ) => (

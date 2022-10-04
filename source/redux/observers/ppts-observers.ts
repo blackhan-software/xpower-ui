@@ -1,10 +1,9 @@
-/* eslint @typescript-eslint/no-unused-vars: [off] */
+import { AnyAction } from '@reduxjs/toolkit';
 import { Store, Unsubscribe } from 'redux';
 import { observe } from './observe';
 
 import { NftFullId, Nfts, Empty } from '../types';
 import { Amount, Supply, State } from '../types';
-import { Action } from '../actions';
 
 export type OnPptAdded = (
     id: NftFullId,
@@ -18,7 +17,7 @@ export type OnPptRemoved = (
 ) => void;
 
 export function onPptAdded(
-    store: Store<State, Action>, handler: OnPptAdded
+    store: Store<State, AnyAction>, handler: OnPptAdded
 ): Unsubscribe {
     const selector = (state: State) => state.ppts;
     const observer = observe<Nfts>(store)(
@@ -48,7 +47,7 @@ export function onPptAdded(
     });
 }
 export function onPptRemoved(
-    store: Store<State, Action>, handler: OnPptRemoved
+    store: Store<State, AnyAction>, handler: OnPptRemoved
 ): Unsubscribe {
     const selector = (state: State) => state.ppts;
     const observer = observe<Nfts>(store)(

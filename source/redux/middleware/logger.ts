@@ -1,13 +1,11 @@
-/* eslint @typescript-eslint/no-unused-vars: [off] */
-import { AddNonce, RemoveNonce, RemoveNonceByAmount } from '../actions';
 import { Middleware } from 'redux';
+import * as actions from '../actions';
 
 const tracker: { now: number, nonce: number }[] = [];
 
-export const logger: Middleware = (store_api) => (next) => (action) => {
-    if (action.type === 'nonce/add') {
-        const add = action as AddNonce;
-        const { nonce, item: { amount, worker: index } } = add.payload;
+export const logger: Middleware = (_) => (next) => (action) => {
+    if (actions.addNonce.match(action)) {
+        const { nonce, item: { amount, worker: index } } = action.payload;
         const xnonce = nonce.toString(16);
         const { px, sx } = { px: xnonce.slice(0, 4), sx: xnonce.slice(-4) };
         const tms = performance.now();
@@ -18,21 +16,23 @@ export const logger: Middleware = (store_api) => (next) => (action) => {
         }
         const t = tracker[index || 0];
         const hms = tms - t.now > 0 ? (nonce - t.nonce) / (tms - t.now) : 0
-        console.log(`[${add.type}#${index}]`,
+        console.log(`[${action.type}#${index}]`,
             `0x${px}...${sx}`, '=>', amount, '[', hms.toFixed(3), 'H/ms', ']');
-    } else if (action.type === 'nonce/remove') {
-        const remove = action as RemoveNonce;
-        const { nonce } = remove.payload;
+        return next(action);
+    }
+    if (actions.removeNonce.match(action)) {
+        const { nonce } = action.payload;
         const xnonce = nonce.toString(16);
         const { px, sx } = { px: xnonce.slice(0, 4), sx: xnonce.slice(-4) };
-        console.log(`[${remove.type}]`, `0x${px}...${sx}`);
-    } else if (action.type === 'nonce/remove-by-amount') {
-        const remove_by_amount = action as RemoveNonceByAmount;
-        const { item: { amount } } = remove_by_amount.payload;
-        console.log(`[${remove_by_amount.type}]`, amount);
-    } else {
-        console.log(`[${action.type}]`, action.payload);
+        console.log(`[${action.type}]`, `0x${px}...${sx}`);
+        return next(action);
     }
+    if (actions.removeNonceByAmount.match(action)) {
+        const { item: { amount } } = action.payload;
+        console.log(`[${action.type}]`, amount);
+        return next(action);
+    }
+    console.log(`[${action.type}]`, action.payload);
     return next(action);
 };
 export default logger;

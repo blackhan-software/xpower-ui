@@ -1,20 +1,22 @@
 import { App } from '../../app';
-import { Action } from '../actions/mining-actions';
+
+import { Action } from '@reduxjs/toolkit';
+import * as actions from '../actions';
 import { Mining } from '../types';
 
 export function miningReducer(
     mining: Mining = miningState(), action: Action
 ): Mining {
-    switch (action.type) {
-        case 'mining/set-status':
-            return { ...mining, status: action.payload.status };
-        case 'mining/set-speed':
-            return { ...mining, speed: action.payload.speed };
-        case 'mining/set':
-            return $.extend(true, {}, mining, action.payload);
-        default:
-            return mining;
+    if (actions.setMiningStatus.match(action)) {
+        return { ...mining, status: action.payload.status };
     }
+    if (actions.setMiningSpeed.match(action)) {
+        return { ...mining, speed: action.payload.speed };
+    }
+    if (actions.setMining.match(action)) {
+        return $.extend(true, {}, mining, action.payload);
+    }
+    return mining;
 }
 export function miningState() {
     return { speed: App.speed, status: null };

@@ -1,14 +1,11 @@
-/* eslint @typescript-eslint/no-unused-vars: [off] */
-import { Action } from '../actions/nonces-actions';
+import { Action } from '@reduxjs/toolkit';
+import * as actions from '../actions';
 import { Nonce, Nonces, Empty } from '../types';
 
 export function noncesReducer(
     nonces = Empty<Nonces>(), action: Action
 ): Nonces {
-    if (!action.type.startsWith('nonces/')) {
-        return nonces;
-    }
-    if (action.type === 'nonces/add') {
+    if (actions.addNonce.match(action)) {
         const delta = [action.payload.nonce] as Nonce[];
         const items = {
             ...nonces.items, [action.payload.nonce]: {
@@ -17,7 +14,7 @@ export function noncesReducer(
         };
         return { items, more: delta };
     }
-    if (action.type === 'nonces/remove') {
+    if (actions.removeNonce.match(action)) {
         const delta = [action.payload.nonce] as Nonce[];
         const items = Object.fromEntries(
             Object.entries(nonces.items).filter(([
@@ -35,7 +32,7 @@ export function noncesReducer(
         );
         return { items, less: delta };
     }
-    if (action.type === 'nonces/remove-by-amount') {
+    if (actions.removeNonceByAmount.match(action)) {
         const delta = [] as Nonce[];
         const items = Object.fromEntries(
             Object.entries(nonces.items).filter(([
@@ -53,7 +50,7 @@ export function noncesReducer(
         );
         return { items, less: delta };
     }
-    if (action.type === 'nonces/remove-all') {
+    if (actions.removeNonces.match(action)) {
         const delta = [] as Nonce[];
         const items = Object.fromEntries(
             Object.entries(nonces.items).filter(([

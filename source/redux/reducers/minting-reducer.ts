@@ -1,34 +1,31 @@
 /* eslint @typescript-eslint/no-unused-vars: [off] */
 import { App } from '../../app';
 import { range } from '../../functions';
-import { Action } from '../actions/minting-actions';
+
+import { Action } from '@reduxjs/toolkit';
+import * as actions from '../actions';
 import { Level, Minting, MintingRow } from '../types';
 
 export function mintingReducer(
     minting: Minting = mintingState(), action: Action
 ): Minting {
-    switch (action.type) {
-        case 'minting/clear-rows':
-            return {
-                ...minting, rows: init()
-            };
-        case 'minting/clear-row':
-            return {
-                ...minting, rows: set(
-                    minting.rows, action.payload.level, empty()
-                )
-            };
-        case 'minting/set-row':
-            return {
-                ...minting, rows: set(
-                    minting.rows, action.payload.level, action.payload.row
-                )
-            };
-        case 'minting/set':
-            return $.extend(true, {}, minting, action.payload);
-        default:
-            return minting;
+    if (actions.clearMintingRows.match(action)) {
+        return { ...minting, rows: init() };
     }
+    if (actions.clearMintingRow.match(action)) {
+        const { level } = action.payload
+        const rows = set(minting.rows, level, empty());
+        return { ...minting, rows };
+    }
+    if (actions.setMintingRow.match(action)) {
+        const { level, row } = action.payload;
+        const rows = set(minting.rows, level, row);
+        return { ...minting, rows };
+    }
+    if (actions.setMinting.match(action)) {
+        return $.extend(true, {}, minting, action.payload);
+    }
+    return minting;
 }
 export function mintingState() {
     return { rows: init() };

@@ -1,32 +1,18 @@
-import { DeepPartial } from 'redux';
+import { createAction, DeepPartial } from '@reduxjs/toolkit';
 import { Mining } from '../types/mining';
 
-export type SetMiningSpeed = {
-    type: 'mining/set-speed',
-    payload: Pick<Mining, 'speed'>
-};
-export const setMiningSpeed = (
-    payload: Pick<Mining, 'speed'>
-): SetMiningSpeed => ({
-    type: 'mining/set-speed', payload
-});
-export type SetMiningStatus = {
-    type: 'mining/set-status',
-    payload: Pick<Mining, 'status'>
-};
-export const setMiningStatus = (
-    payload: Pick<Mining, 'status'>
-): SetMiningStatus => ({
-    type: 'mining/set-status', payload
-});
-export type SetMining = {
-    type: 'mining/set',
-    payload: DeepPartial<Mining>
-};
-export const setMining = (
-    payload: DeepPartial<Mining>
-): SetMining => ({
-    type: 'mining/set', payload
-});
-export type Action =
-    SetMiningSpeed | SetMiningStatus | SetMining;
+export const setMiningSpeed = createAction(
+    'mining/set-speed', ({ speed }: Pick<Mining, 'speed'>) => ({
+        payload: { speed }
+    })
+);
+export const setMiningStatus = createAction(
+    'mining/set-status', ({ status }: Pick<Mining, 'status'>) => ({
+        payload: { status }
+    })
+);
+export const setMining = createAction(
+    'mining/set', (mining: DeepPartial<Mining>) => ({
+        payload: mining
+    })
+);

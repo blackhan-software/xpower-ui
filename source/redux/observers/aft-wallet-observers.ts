@@ -1,9 +1,8 @@
-/* eslint @typescript-eslint/no-unused-vars: [off] */
+import { AnyAction } from '@reduxjs/toolkit';
 import { Store, Unsubscribe } from 'redux';
 import { observe } from './observe';
 
-import { Action } from '../actions';
-import { Amount, Empty, State, Supply, Token, AftWallet } from '../types';
+import { AftWallet, Amount, Empty, State, Supply, Token } from '../types';
 
 export type OnAftWalletIncreased = (
     token: Token, item: { amount: Amount, supply: Supply }
@@ -13,7 +12,7 @@ export type OnAftWalletDecreased = (
 ) => void;
 
 export function onAftWalletIncreased(
-    store: Store<State, Action>, handler: OnAftWalletIncreased
+    store: Store<State, AnyAction>, handler: OnAftWalletIncreased
 ): Unsubscribe {
     const selector = (state: State) => state.aft_wallet;
     const observer = observe<AftWallet>(store)(
@@ -30,7 +29,7 @@ export function onAftWalletIncreased(
     });
 }
 export function onAftWalletDecreased(
-    store: Store<State, Action>, handler: OnAftWalletDecreased
+    store: Store<State, AnyAction>, handler: OnAftWalletDecreased
 ): Unsubscribe {
     const selector = (state: State) => state.aft_wallet;
     const observer = observe<AftWallet>(store)(

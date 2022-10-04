@@ -1,88 +1,45 @@
+import { createAction } from '@reduxjs/toolkit';
 import { Address, Amount, BlockHash, Nonce, Token } from '../types';
 
-export type AddNonce = {
-    type: 'nonces/add', payload: {
-        nonce: Nonce, item: {
-            address: Address,
-            amount: Amount,
-            block_hash: BlockHash,
-            token: Token,
-            worker: number,
-        }
-    }
-};
-export const addNonce = (
-    nonce: Nonce, item: {
+export const addNonce = createAction(
+    'nonces/add', (nonce: Nonce, item: {
         address: Address,
         amount: Amount,
         block_hash: BlockHash,
         token: Token,
         worker: number,
-    }
-): AddNonce => ({
-    type: 'nonces/add', payload: {
-        nonce, item
-    }
-});
-export type RemoveNonce = {
-    type: 'nonces/remove', payload: {
-        nonce: Nonce, item: {
-            address: Address,
-            block_hash: BlockHash,
-            token: Token,
-        }
-    }
-};
-export const removeNonce = (
-    nonce: Nonce, item: {
+    }) => ({
+        payload: { nonce, item }
+    })
+);
+export const removeNonce = createAction(
+    'nonces/remove', (nonce: Nonce, item: {
         address: Address,
         block_hash: BlockHash,
         token: Token,
-    }
-): RemoveNonce => ({
-    type: 'nonces/remove', payload: {
-        nonce, item
-    }
-});
-export type RemoveNonceByAmount = {
-    type: 'nonces/remove-by-amount', payload: {
-        item: {
-            address: Address,
-            amount: Amount,
-            block_hash: BlockHash,
-            token: Token,
-        }
-    }
-};
-export const removeNonceByAmount = (
-    item: {
+    }) => ({
+        payload: { nonce, item }
+    })
+);
+export const removeNonceByAmount = createAction(
+    'nonces/remove-by-amount', (item: {
         address: Address,
         amount: Amount,
         block_hash: BlockHash,
         token: Token,
-    }
-): RemoveNonceByAmount => ({
-    type: 'nonces/remove-by-amount', payload: {
-        item
-    }
-});
-export type RemoveNonces = {
-    type: 'nonces/remove-all', payload: {
-        item: {
-            address: Address | null,
-            token: Token | null,
-        }
-    }
-};
-export const removeNonces = (
-    item?: {
+    }) => ({
+        payload: { item }
+    })
+);
+export const removeNonces = createAction(
+    'nonces/remove-all', (item?: {
         address: Address | null,
         token: Token | null,
-    }
-): RemoveNonces => ({
-    type: 'nonces/remove-all', payload: {
-        item: item ?? { address: null, token: null }
-    }
-});
-export type Action =
-    AddNonce | RemoveNonce | RemoveNonceByAmount | RemoveNonces;
+    }) => ({
+        payload: {
+            item: item ?? {
+                address: null, token: null
+            }
+        }
+    })
+);
