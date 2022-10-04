@@ -1,9 +1,8 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import './spa.scss';
 
-import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
-import { AddressContext, AddressProvider } from '../../source/context';
+import { AddressContext, AddressProvider, DebugContext, DebugProvider } from '../../source/context';
 import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
 import { Alert, alert, Alerts, ancestor, globalRef, x40 } from '../../source/functions';
 import { HashManager, MiningManager } from '../../source/managers';
@@ -55,7 +54,8 @@ type Props = {
 export function SPA(
     props: Props
 ) {
-    if (App.debug) {
+    const [debug] = useContext(DebugContext);
+    if (debug) {
         console.count('[app.render]');
     }
     const { aft_wallet, otf_wallet } = props;
@@ -466,7 +466,7 @@ const mintingMint = (dispatch: Dispatch) => async (
                 return;
             }
             moe_wallet.offTransfer(on_transfer);
-            if (App.token !== token) {
+            if (Store.getToken() !== token) {
                 return;
             }
             const { tx_counter } = Store.getMintingRow({
@@ -1250,7 +1250,9 @@ if (require.main === module) {
     const $content = document.querySelector('content');
     createRoot($content!).render(
         <Provider store={Store.store}>
-            <AddressProvider>{$spa}</AddressProvider>
+            <DebugProvider>
+                <AddressProvider>{$spa}</AddressProvider>
+            </DebugProvider>
         </Provider>
     );
 }

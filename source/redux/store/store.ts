@@ -33,6 +33,14 @@ export class Store {
     /* ========================================================================
      * Selectors:
      * ===================================================================== */
+    public static getPage() {
+        const { page } = this.me.store.getState();
+        return page;
+    }
+    public static getToken() {
+        const { token } = this.me.store.getState();
+        return token;
+    }
     public static getAftWallet(token?: Token) {
         const { aft_wallet } = this.me.store.getState();
         return walletFor(aft_wallet, token);
