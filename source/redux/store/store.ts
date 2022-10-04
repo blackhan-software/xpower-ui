@@ -1,9 +1,8 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { AnyAction, configureStore } from '@reduxjs/toolkit';
 import { combineReducers, Store as ReduxStore, Unsubscribe } from 'redux';
 
 import { delayed } from '../../functions';
 import { StateDb } from '../../state-db';
-import { Action } from '../actions';
 import { middleware } from '../middleware';
 import { onAftWalletDecreased, OnAftWalletDecreased, onAftWalletIncreased, OnAftWalletIncreased, onNftAdded, OnNftAdded, onNftRemoved, OnNftRemoved, onNonceAdded, OnNonceAdded, onNonceRemoved, OnNonceRemoved, onPageSwitch, OnPageSwitch, onPptAdded, onPptRemoved, onTokenSwitch, OnTokenSwitch } from '../observers';
 import { aftWalletReducer, miningReducer, mintingReducer, nftsReducer, nftsUiReducer, noncesReducer, otfWalletReducer, pageReducer, pptsReducer, pptsUiReducer, refreshReducer, tokenReducer } from '../reducers';
@@ -235,10 +234,10 @@ export class Store {
         }
         return this._db;
     }
-    private get store(): ReduxStore<State, Action> {
+    private get store(): ReduxStore<State, AnyAction> {
         return this._store;
     }
     private _db: StateDb | undefined;
-    private _store: ReduxStore<State, Action>;
+    private _store: ReduxStore<State, AnyAction>;
 }
 export default Store;

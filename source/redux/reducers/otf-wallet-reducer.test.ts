@@ -1,4 +1,4 @@
-import { setOtfWalletAddress, setOtfWalletAmount, setOtfWalletProcessing } from '../actions';
+import { setOtfWalletAddress, setOtfWalletAmount, setOtfWalletProcessing, setOtfWalletToggled } from '../actions';
 import { otfWalletReducer, otfWalletState } from './otf-wallet-reducer';
 
 describe('Store w/wallet-ui-reducer', () => {
@@ -33,6 +33,17 @@ describe('Store w/wallet-ui-reducer', () => {
         );
         expect(state_1).toMatchObject({
             ...otfWalletState(), processing: true
+        });
+    });
+    it('should set-otf-wallet [toggled]', () => {
+        const state_0 = otfWalletState();
+        const state_1 = otfWalletReducer(
+            state_0, setOtfWalletToggled({
+                toggled: true
+            })
+        );
+        expect(state_1).toMatchObject({
+            ...otfWalletState(), toggled: true
         });
     });
 });

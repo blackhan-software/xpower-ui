@@ -21,8 +21,6 @@ import { Action as PptsAction } from './ppts-actions';
 import { Action as PptsUiAction } from './ppts-ui-actions';
 import { Action as RefreshAction } from './refresh-actions';
 import { Action as TokenAction } from './token-actions';
-import { Action as AftWalletAction } from './aft-wallet-actions';
-import { Action as OftWalletAction } from './otf-wallet-actions';
 
 export type Action =
     PageAction |
@@ -34,7 +32,5 @@ export type Action =
     PptsAction |
     PptsUiAction |
     RefreshAction |
-    TokenAction |
-    AftWalletAction |
-    OftWalletAction
+    TokenAction
 ;

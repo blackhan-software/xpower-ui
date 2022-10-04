@@ -6,10 +6,8 @@ import React from 'react';
 import { Avalanche } from '../../public/images/tsx';
 
 type Props = OtfWallet & {
-    onDeposit?: (processing: boolean) => void;
-    onWithdraw?: (processing: boolean) => void;
-} & {
-    toggled: boolean;
+    onDeposit?: (processing: OtfWallet['processing']) => void;
+    onWithdraw?: (processing: OtfWallet['processing']) => void;
 }
 export function UiOtfWallet(
     props: Props

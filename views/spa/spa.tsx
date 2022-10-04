@@ -6,7 +6,7 @@ import { AddressContext, AddressProvider, DebugContext, DebugProvider } from '..
 import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
 import { Alert, alert, Alerts, ancestor, globalRef, x40 } from '../../source/functions';
 import { HashManager, MiningManager } from '../../source/managers';
-import { removeNonce, removeNonceByAmount, setMintingRow, setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiMinter, setNftsUiToggled, setOtfWalletProcessing, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiMinter, setPptsUiToggled } from '../../source/redux/actions';
+import { removeNonce, removeNonceByAmount, setMintingRow, setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiMinter, setNftsUiToggled, setOtfWalletProcessing, setOtfWalletToggled, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiMinter, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
 import { Store } from '../../source/redux/store';
 import { Address, AftWallet, Amount, Level, MAX_UINT256, Mining, MinterStatus, Minting, Nft, NftCoreId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, Nfts, NftSenderStatus, NftsUi, OtfWallet, Page, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, PptsUi, State, Token } from '../../source/redux/types';
@@ -115,6 +115,7 @@ function $wallet(
                 ...aft_wallet, address
             }}
             otf={{
+                onToggled: otfToggled(dispatch),
                 onDeposit: otfDeposit(dispatch).bind(null, address),
                 onWithdraw: otfWithdraw(dispatch).bind(null, address),
                 ...otf_wallet
@@ -1123,8 +1124,14 @@ const pptBatchBurn = (dispatch: Dispatch) => async (
 /**
  * {aft,otf}-wallet:
  */
+ const otfToggled = (dispatch: Dispatch) => (
+    toggled: OtfWallet['toggled']
+) => {
+    dispatch(setOtfWalletToggled({ toggled }))
+};
 const otfDeposit = (dispatch: Dispatch) => async (
-    address: Address | null, processing: boolean
+    address: OtfWallet['address'],
+    processing: OtfWallet['processing']
 ) => {
     if (!address) {
         throw new Error('missing selected-address');
@@ -1178,7 +1185,8 @@ const otfDeposit = (dispatch: Dispatch) => async (
     }
 }
 const otfWithdraw = (dispatch: Dispatch) => async (
-    address: Address | null, processing: boolean
+    address: OtfWallet['address'],
+    processing: OtfWallet['processing']
 ) => {
     if (!address) {
         throw new Error('missing selected-address');

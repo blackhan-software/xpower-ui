@@ -1,26 +1,23 @@
-import { Action } from '../actions/aft-wallet-actions';
-import { AftWallet, Token, Empty } from '../types';
-import { Amount, Supply } from '../types';
+import { Action } from '@reduxjs/toolkit';
+import * as actions from '../actions';
+import { AftWallet, Amount, Empty, Supply, Token } from '../types';
 
 export function aftWalletReducer(
     aft_wallet = Empty<AftWallet>(), action: Action
 ): AftWallet {
-    if (!action.type.startsWith('aft-wallet/')) {
-        return aft_wallet;
-    }
-    const items = { ...aft_wallet.items };
-    const token = action.payload.token;
-    if (action.type === 'aft-wallet/set') {
-        const s = action.payload.item.supply;
-        const a = action.payload.item.amount;
-        items[token] = pack(a, s, { token: token });
+    if (actions.setAftWallet.match(action)) {
+        const { token, item: { amount, supply } } = action.payload;
+        const items = { ...aft_wallet.items };
+        items[token] = pack(amount, supply, { token });
         return { items, more: [token] };
     }
-    if (action.type === 'aft-wallet/increase') {
+    if (actions.increaseAftWallet.match(action)) {
+        const { token, item } = action.payload;
+        const items = { ...aft_wallet.items };
         const item_old = items[token];
         const item_new = {
-            amount: action.payload.item?.amount ?? 1n,
-            supply: action.payload.item?.supply
+            amount: item?.amount ?? 1n,
+            supply: item?.supply
         };
         if (item_old) {
             const s = item_new.supply ?? item_old.supply + item_new.amount;
@@ -33,11 +30,13 @@ export function aftWalletReducer(
         }
         return { items, more: [token] };
     }
-    if (action.type === 'aft-wallet/decrease') {
+    if (actions.decreaseAftWallet.match(action)) {
+        const { token, item } = action.payload;
+        const items = { ...aft_wallet.items };
         const item_old = items[token];
         const item_new = {
-            amount: action.payload.item?.amount ?? 1n,
-            supply: action.payload.item?.supply
+            amount: item?.amount ?? 1n,
+            supply: item?.supply
         };
         if (item_old) {
             const s = item_new.supply ?? item_old.supply;

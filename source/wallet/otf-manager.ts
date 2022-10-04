@@ -2,7 +2,6 @@
 import { Global } from '../types';
 declare const global: Global;
 
-import { EventEmitter } from 'events';
 import { Blockchain } from '../blockchain';
 import { URLQuery } from '../url-query';
 
@@ -12,7 +11,7 @@ import { randomBytes } from '@ethersproject/random';
 import { parseUnits } from '@ethersproject/units';
 import { Contract, Wallet } from 'ethers';
 
-export class OtfManager extends EventEmitter {
+export class OtfManager {
     private static get me(): OtfManager {
         if (this._me === undefined) {
             this._me = new OtfManager();
@@ -27,24 +26,9 @@ export class OtfManager extends EventEmitter {
         return JSON.parse(item ?? 'false') || URLQuery.otfWallet;
     }
     public static set enabled(value: boolean) {
-        if (this.enabled !== value) {
-            this.me.emit('toggled', { toggled: value });
-        }
         URLQuery.otfWallet = value;
         const item = JSON.stringify(value);
         localStorage.setItem('otf-wallet:flag', item);
-    }
-    public static onToggled(
-        listener: ({ toggled }: { toggled: boolean }) => void
-    ) {
-        this.me.on('toggled', listener);
-        return listener;
-    }
-    public static unToggled(
-        listener: ({ toggled }: { toggled: boolean }) => void
-    ) {
-        this.me.removeListener('toggled', listener);
-        return listener;
     }
     public static async init(
         key = 'otf-wallet'

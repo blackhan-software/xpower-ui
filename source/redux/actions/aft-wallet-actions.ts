@@ -1,57 +1,27 @@
+import { createAction } from '@reduxjs/toolkit';
 import { Amount, Supply, Token } from '../types';
 
-export type SetAftWallet = {
-    type: 'aft-wallet/set', payload: {
-        token: Token, item: {
-            amount: Amount,
-            supply: Supply
-        }
-    }
-};
-export const setAftWallet = (
+export const setAftWallet = createAction('aft-wallet/set', (
     token: Token, item: {
-        amount: Amount,
-        supply: Supply
+        amount: Amount, // new-amount = amount
+        supply: Supply, // new-supply = supply
     }
-): SetAftWallet => ({
-    type: 'aft-wallet/set', payload: {
-        token, item
-    }
-});
-export type IncreaseAftWallet = {
-    type: 'aft-wallet/increase', payload: {
-        token: Token, item?: {
-            amount: Amount,
-            supply?: Supply
-        }
-    }
-};
-export const increaseAftWallet = (
+) => ({
+    payload: { token, item }
+}));
+export const increaseAftWallet = createAction('aft-wallet/increase', (
     token: Token, item?: {
         amount: Amount, // new-amount = old-amount + amount
         supply?: Supply // new-supply = supply ?? old-supply + amount
     }
-): IncreaseAftWallet => ({
-    type: 'aft-wallet/increase', payload: {
-        token, item
-    }
-});
-export type DecreaseAftWallet = {
-    type: 'aft-wallet/decrease', payload: {
-        token: Token, item?: {
-            amount: Amount,
-            supply?: Supply
-        }
-    }
-};
-export const decreaseAftWallet = (
+) => ({
+    payload: { token, item }
+}));
+export const decreaseAftWallet = createAction('aft-wallet/decrease', (
     token: Token, item?: {
         amount: Amount, // new-amount = old-amount - amount
         supply?: Supply // new-supply = supply ?? old-supply (*no* decrease!)
     }
-): DecreaseAftWallet => ({
-    type: 'aft-wallet/decrease', payload: {
-        token, item
-    }
-});
-export type Action = SetAftWallet | IncreaseAftWallet | DecreaseAftWallet;
+) => ({
+    payload: { token, item }
+}));
