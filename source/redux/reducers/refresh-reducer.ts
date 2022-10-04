@@ -1,13 +1,16 @@
-/* eslint @typescript-eslint/no-unused-vars: [off] */
-import { Action } from '../actions/refresh-actions';
+import { Action } from '@reduxjs/toolkit';
+import * as actions from '../actions';
 import { Refresh } from '../types';
 
 export function refreshReducer(
-    refresh: Refresh = { date: null }, action: Action
+    refresh: Refresh = refreshState(), action: Action
 ): Refresh {
-    if (!action.type.startsWith('refresh/by-date')) {
-        return refresh;
+    if (actions.refresh.match(action)) {
+        return { date: action.payload.date };
     }
-    return { date: action.payload.date };
+    return refresh;
+}
+export function refreshState() {
+    return { date: null };
 }
 export default refreshReducer;

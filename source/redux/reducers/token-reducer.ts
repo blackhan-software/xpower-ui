@@ -1,13 +1,18 @@
-import { Action } from '../actions/token-actions';
-import { Token } from '../types';
 import { App } from '../../app';
 
+import { Action } from '@reduxjs/toolkit';
+import * as actions from '../actions';
+import { Token } from '../types';
+
 export function tokenReducer(
-    token: Token = App.token, action: Action
+    token: Token = tokenState(), action: Action
 ): Token {
-    if (!action.type.startsWith('token/switch')) {
-        return token;
+    if (actions.switchToken.match(action)) {
+        return action.payload.token;
     }
-    return action.payload.token;
+    return token;
+}
+export function tokenState() {
+    return App.token;
 }
 export default tokenReducer;

@@ -1,13 +1,18 @@
-import { Action } from '../actions/page-actions';
-import { Page } from '../types';
 import { App } from '../../app';
 
+import { Action } from '@reduxjs/toolkit';
+import * as actions from '../actions';
+import { Page } from '../types';
+
 export function pageReducer(
-    page: Page = App.page, action: Action
+    page: Page = pageState(), action: Action
 ): Page {
-    if (!action.type.startsWith('page/switch')) {
-        return page;
+    if (actions.switchPage.match(action)) {
+        return action.payload.page;
     }
-    return action.payload.page;
+    return page;
+}
+export function pageState() {
+    return App.page;
 }
 export default pageReducer;

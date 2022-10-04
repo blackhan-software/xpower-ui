@@ -11,7 +11,6 @@ export * from './token-actions';
 export * from './aft-wallet-actions';
 export * from './otf-wallet-actions';
 
-import { Action as PageAction } from './page-actions';
 import { Action as MiningAction } from './mining-actions';
 import { Action as MintingAction } from './minting-actions';
 import { Action as NoncesAction } from './nonces-actions';
@@ -19,18 +18,13 @@ import { Action as NftsAction } from './nfts-actions';
 import { Action as NftsUiAction } from './nfts-ui-actions';
 import { Action as PptsAction } from './ppts-actions';
 import { Action as PptsUiAction } from './ppts-ui-actions';
-import { Action as RefreshAction } from './refresh-actions';
-import { Action as TokenAction } from './token-actions';
 
 export type Action =
-    PageAction |
     MiningAction |
     MintingAction |
     NoncesAction |
     NftsAction |
     NftsUiAction |
     PptsAction |
-    PptsUiAction |
-    RefreshAction |
-    TokenAction
+    PptsUiAction
 ;
