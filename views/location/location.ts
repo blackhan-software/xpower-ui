@@ -1,6 +1,6 @@
-import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { delayed } from '../../source/functions';
+import { Store } from '../../source/redux/store';
 import { Page } from '../../source/redux/types';
 import { URLQuery } from '../../source/url-query';
 
@@ -9,10 +9,10 @@ Blockchain.onceConnect(delayed(async function reloadLocation() {
     p.on('chainChanged', () => location.reload());
     p.on('accountsChanged', () => location.reload());
 }, 600));
-App.onTokenSwitch(function syncLocationSearch(token) {
+Store.onTokenSwitch(function syncLocationSearch(token) {
     URLQuery.token = token;
 });
-App.onPageSwitch(function syncLocationTitle(page, prev) {
+Store.onPageSwitch(function syncLocationTitle(page, prev) {
     const pathname = location.pathname
         .replace(new RegExp('/' + prev, 'i'), page);
     const titles: Record<Page, string> = {
@@ -26,7 +26,7 @@ App.onPageSwitch(function syncLocationTitle(page, prev) {
     const url = `${pathname}${location.search}`;
     history.pushState({ page: 1 }, title, url);
 });
-App.onPageSwitch(function syncLocationDescription(page) {
+Store.onPageSwitch(function syncLocationDescription(page) {
     const $meta = document.querySelector<HTMLMetaElement>(
         'meta[name="description"]'
     );

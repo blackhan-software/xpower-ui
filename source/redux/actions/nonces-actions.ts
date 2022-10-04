@@ -75,13 +75,13 @@ export type RemoveNonces = {
     }
 };
 export const removeNonces = (
-    item: {
+    item?: {
         address: Address | null,
         token: Token | null,
     }
 ): RemoveNonces => ({
     type: 'nonces/remove-all', payload: {
-        item
+        item: item ?? { address: null, token: null }
     }
 });
 export type Action =

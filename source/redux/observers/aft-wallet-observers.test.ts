@@ -3,7 +3,7 @@ import { combineReducers, Store } from 'redux';
 import { aftWalletReducer as aftWalletReducer } from '../reducers';
 
 import { Action, increaseAftWallet, decreaseAftWallet } from '../actions';
-import { onAftWalletIncreased, onAftWalledDecreased } from '.';
+import { onAftWalletIncreased, onAftWalletDecreased } from '.';
 import { State, Token } from '../types';
 
 describe('onAftWalletIncreased', () => {
@@ -38,7 +38,7 @@ describe('onAftWalletDecreased', () => {
                 serializableCheck: false
             })
         });
-        onAftWalledDecreased(store as Store<State, Action>, (t, i) => {
+        onAftWalletDecreased(store as Store<State, Action>, (t, i) => {
             expect(t).toEqual(Token.LOKI);
             expect(i.amount).toEqual(1n);
             expect(i.supply).toEqual(3n);

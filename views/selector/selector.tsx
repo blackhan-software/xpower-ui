@@ -1,8 +1,9 @@
 import './selector.scss';
 
-import { App } from '../../source/app';
-import { Tokenizer } from '../../source/token';
+import { switchToken } from '../../source/redux/actions';
+import { Store } from '../../source/redux/store';
 import { Token } from '../../source/redux/types';
+import { Tokenizer } from '../../source/token';
 
 import React, { MouseEvent } from 'react';
 import { Unsubscribe } from 'redux';
@@ -26,10 +27,10 @@ export class UiSelector extends React.Component<
         this.state = state();
     }
     componentDidMount() {
-        this.unTokenSwitch = App.onTokenSwitch(() => {
+        this.unTokenSwitch = Store.onTokenSwitch(() => {
             this.setState({ switching: true });
         });
-        this.unTokenSwitched = App.onTokenSwitched(() => {
+        this.unTokenSwitched = Store.onTokenSwitched(() => {
             this.setState({ switching: false });
         });
     }
@@ -74,7 +75,7 @@ export class UiSelector extends React.Component<
     ) {
         if (e.ctrlKey === false) {
             e.preventDefault();
-            App.switchToken(token);
+            Store.dispatch(switchToken(token));
         }
     }
     $spinner(

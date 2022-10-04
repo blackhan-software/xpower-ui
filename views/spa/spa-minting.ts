@@ -3,15 +3,16 @@ declare const global: Global;
 
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
-import { IntervalManager } from '../../source/managers';
-import { MiningManager } from '../../source/managers';
+import { IntervalManager, MiningManager } from '../../source/managers';
+import { clearMintingRows, removeNonces, setMintingRow } from '../../source/redux/actions';
+import { Store } from '../../source/redux/store';
 import { Page } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { OtfManager } from '../../source/wallet';
 /**
  * minting:
  */
-App.onNonceChanged(async function updateMinters(
+Store.onNonceChanged(async function updateMinters(
     nonce, { address, amount, token }, total
 ) {
     if (address !== await Blockchain.selectedAddress) {
@@ -21,41 +22,41 @@ App.onNonceChanged(async function updateMinters(
         return;
     }
     const level = Tokenizer.level(token, amount);
-    const { tx_counter } = App.getMintingRow({
+    const { tx_counter } = Store.getMintingRow({
         level
     });
     const min
         = Tokenizer.amount(token, App.level.min);
     const display
         = amount === min || total > 0n || tx_counter > 0n;
-    App.setMintingRow({
+    Store.dispatch(setMintingRow({
         level, row: {
             disabled: !total, display,
             nn_counter: Number(total / amount),
         }
-    });
+    }));
 });
-App.onTokenSwitch(function resetMinters() {
+Store.onTokenSwitch(function resetMinters() {
     if (Page.Home !== App.page) {
         return;
     }
-    App.clearMintingRows();
+    Store.dispatch(clearMintingRows());
 });
-App.onTokenSwitched(function forgetNonces() {
+Store.onTokenSwitched(function forgetNonces() {
     if (Page.Home !== App.page) {
         return;
     }
-    App.removeNonces();
+    Store.dispatch(removeNonces());
 });
-App.onPageSwitched(function forgetNonces(next, prev) {
+Store.onPageSwitched(function forgetNonces(next, prev) {
     if (Page.Home !== prev) {
         return;
     }
-    App.removeNonces();
+    Store.dispatch(removeNonces());
 });
 Blockchain.onceConnect(function forgetNonces() {
     const im = new IntervalManager({ start: true });
-    im.on('tick', () => App.removeNonces());
+    im.on('tick', () => Store.dispatch(removeNonces()));
 });
 Blockchain.onceConnect(function autoMint({
     address, token
@@ -76,8 +77,8 @@ Blockchain.onceConnect(function autoMint({
             clearInterval(global.MINTER_IID);
             delete global.MINTER_IID;
         }
-        if (running && App.auto_mint > 0) {
-            global.MINTER_IID = setInterval(on_tick, App.auto_mint);
+        if (running && App.autoMint > 0) {
+            global.MINTER_IID = setInterval(on_tick, App.autoMint);
         }
     });
     function on_tick() {

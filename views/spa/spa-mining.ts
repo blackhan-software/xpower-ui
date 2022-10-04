@@ -2,6 +2,8 @@ import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { x64 } from '../../source/functions';
 import { HashManager, IntervalManager, MiningManager } from '../../source/managers';
+import { setMiningSpeed, setMiningStatus } from '../../source/redux/actions';
+import { Store } from '../../source/redux/store';
 import { MinerStatus, Token, Tokens } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { MoeWallet, OnInit, OtfManager } from '../../source/wallet';
@@ -14,33 +16,33 @@ Blockchain.onceConnect(function setupMining({
     const miner = MiningManager.miner(address, {
         token
     });
-    miner.on('initializing', () =>
-        App.setMiningStatus({ status: MinerStatus.initializing }));
-    miner.on('initialized', () =>
-        App.setMiningStatus({ status: MinerStatus.initialized }));
-    miner.on('starting', () =>
-        App.setMiningStatus({ status: MinerStatus.starting }));
-    miner.on('started', () =>
-        App.setMiningStatus({ status: MinerStatus.started }));
-    miner.on('stopping', () =>
-        App.setMiningStatus({ status: MinerStatus.stopping }));
-    miner.on('stopped', () =>
-        App.setMiningStatus({ status: MinerStatus.stopped }));
-    miner.on('pausing', () =>
-        App.setMiningStatus({ status: MinerStatus.pausing }));
-    miner.on('paused', () =>
-        App.setMiningStatus({ status: MinerStatus.paused }));
-    miner.on('resuming', () =>
-        App.setMiningStatus({ status: MinerStatus.resuming }));
-    miner.on('resumed', () =>
-        App.setMiningStatus({ status: MinerStatus.resumed }));
-    miner.on('increased', (e) =>
-        App.setMiningSpeed({ speed: e.speed }));
-    miner.on('decreased', (e) =>
-        App.setMiningSpeed({ speed: e.speed }));
-    App.setMiningStatus({
-        status: MinerStatus.stopped
-    });
+    miner.on('initializing', () => Store.dispatch(
+        setMiningStatus({ status: MinerStatus.initializing })));
+    miner.on('initialized', () => Store.dispatch(
+        setMiningStatus({ status: MinerStatus.initialized })));
+    miner.on('starting', () => Store.dispatch(
+        setMiningStatus({ status: MinerStatus.starting })));
+    miner.on('started', () => Store.dispatch(
+        setMiningStatus({ status: MinerStatus.started })));
+    miner.on('stopping', () => Store.dispatch(
+        setMiningStatus({ status: MinerStatus.stopping })));
+    miner.on('stopped', () => Store.dispatch(
+        setMiningStatus({ status: MinerStatus.stopped })));
+    miner.on('pausing', () => Store.dispatch(
+        setMiningStatus({ status: MinerStatus.pausing })));
+    miner.on('paused', () => Store.dispatch(
+        setMiningStatus({ status: MinerStatus.paused })));
+    miner.on('resuming', () => Store.dispatch(
+        setMiningStatus({ status: MinerStatus.resuming })));
+    miner.on('resumed', () => Store.dispatch(
+        setMiningStatus({ status: MinerStatus.resumed })));
+    miner.on('increased', (e) => Store.dispatch(
+        setMiningSpeed({ speed: e.speed })));
+    miner.on('decreased', (e) => Store.dispatch(
+        setMiningSpeed({ speed: e.speed })));
+    Store.dispatch(
+        setMiningStatus({ status: MinerStatus.stopped })
+    );
 }, {
     per: () => App.token
 });
@@ -50,9 +52,9 @@ Blockchain.onConnect(function resetSpeed({
     const miner = MiningManager.miner(address, {
         token
     });
-    App.setMiningSpeed({ speed: miner.speed });
+    Store.dispatch(setMiningSpeed({ speed: miner.speed }));
 });
-App.onPageSwitch(async function stopMining() {
+Store.onPageSwitch(async function stopMining() {
     const address = await Blockchain.selectedAddress;
     if (address) {
         const miner = MiningManager.miner(address, {

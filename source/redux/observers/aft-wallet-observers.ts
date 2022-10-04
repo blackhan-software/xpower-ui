@@ -29,7 +29,7 @@ export function onAftWalletIncreased(
         }
     });
 }
-export function onAftWalledDecreased(
+export function onAftWalletDecreased(
     store: Store<State, Action>, handler: OnAftWalletDecreased
 ): Unsubscribe {
     const selector = (state: State) => state.aft_wallet;

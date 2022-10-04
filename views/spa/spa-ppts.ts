@@ -2,6 +2,8 @@ import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { MoeTreasuryFactory } from '../../source/contract';
 import { buffered, globalRef, x40 } from '../../source/functions';
+import { addPpt, removePpt, setPpt } from '../../source/redux/actions';
+import { Store } from '../../source/redux/store';
 import { Nft, NftFullId, NftLevels } from '../../source/redux/types';
 import { OnTransferBatch, OnTransferSingle, PptWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
@@ -24,11 +26,11 @@ Blockchain.onceConnect(async function initPpts({
         for (const level of levels) {
             const amount = balances[index];
             const supply = await supplies[index];
-            App.setPpt({
+            Store.dispatch(setPpt({
                 issue, level, token: ppt_token
             }, {
                 amount, supply
-            });
+            }));
             index += 1;
         }
     }
@@ -38,11 +40,11 @@ Blockchain.onceConnect(async function initPpts({
 Blockchain.onConnect(function syncPpts({
     token
 }) {
-    const ppts = App.getPptsBy({
+    const ppts = Store.getPptsBy({
         token: Nft.token(token)
     });
     for (const [id, ppt] of Object.entries(ppts.items)) {
-        App.setPpt(id as NftFullId, ppt);
+        Store.dispatch(setPpt(id as NftFullId, ppt));
     }
 });
 Blockchain.onceConnect(async function onPptSingleTransfers({
@@ -67,10 +69,14 @@ Blockchain.onceConnect(async function onPptSingleTransfers({
             token: nft_token
         });
         if (address === from) {
-            App.removePpt(nft_id, { amount: value });
+            Store.dispatch(removePpt(nft_id, {
+                amount: value
+            }));
         }
         if (address === to) {
-            App.addPpt(nft_id, { amount: value });
+            Store.dispatch(addPpt(nft_id, {
+                amount: value
+            }));
         }
     };
     const ppt_wallet = new PptWallet(address, token);
@@ -101,10 +107,14 @@ Blockchain.onceConnect(async function onPptBatchTransfers({
                 token: nft_token
             });
             if (address === from) {
-                App.removePpt(ppt_id, { amount: values[i] });
+                Store.dispatch(removePpt(ppt_id, {
+                    amount: values[i]
+                }));
             }
             if (address === to) {
-                App.addPpt(ppt_id, { amount: values[i] });
+                Store.dispatch(addPpt(ppt_id, {
+                    amount: values[i]
+                }));
             }
         }
     };
@@ -119,7 +129,7 @@ Blockchain.onceConnect(async function updateClaims() {
     });
     moe_treasury.provider.on('block', buffered(() => {
         const nft_token = Nft.token(App.token);
-        const { details } = App.getPptsUi();
+        const { details } = Store.getPptsUi();
         const by_token = details[nft_token];
         Object.entries(by_token).forEach(([
             nft_level, nft_issues

@@ -1,11 +1,11 @@
 /**
  * @jest-environment jsdom
  */
-import { MemoryStorage } from '../state-db/memory-storage';
-import { Global } from '../types';
+import { MemoryStorage } from '../../state-db/memory-storage';
+import { Global } from '../../types';
 declare const global: Global;
 
-import { App } from '.';
+import { Store } from './store';
 
 beforeEach(() => {
     global.document = {
@@ -14,10 +14,10 @@ beforeEach(() => {
     global.localStorage = new MemoryStorage();
 });
 afterEach(() => {
-    delete global.APP;
+    delete global.APP_STORE;
 });
-describe('Application', () => {
+describe('Store', () => {
     it('should have a singleton', () => {
-        expect(App['me']).toBeDefined();
+        expect(Store['me']).toBeDefined();
     });
 });

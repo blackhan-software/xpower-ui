@@ -1,9 +1,9 @@
 import './footer.scss';
 
-import { App } from '../../source/app/app';
-import { Blockchain } from '../../source/blockchain';
-import { ChainId } from '../../source/blockchain';
 import { capitalize } from '../../routes/functions';
+import { App } from '../../source/app/app';
+import { Blockchain, ChainId } from '../../source/blockchain';
+import { Store } from '../../source/redux/store';
 import { Token } from '../../source/redux/types';
 
 import React, { createElement } from 'react';
@@ -34,7 +34,7 @@ export class UiFooter extends React.Component<{
         };
     }
     componentDidMount() {
-        this.unTokenSwitch = App.onTokenSwitch(
+        this.unTokenSwitch = Store.onTokenSwitch(
             (token) => this.setState({ token})
         );
     }

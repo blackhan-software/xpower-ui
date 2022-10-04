@@ -3,6 +3,7 @@ import './connector.scss';
 import { App } from '../../source/app';
 import { Blockchain, ChainId } from '../../source/blockchain';
 import { buffered, mobile, Referable } from '../../source/functions';
+import { Store } from '../../source/redux/store';
 
 import React, { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -54,7 +55,7 @@ export class UiConnector extends Referable(
                 console.error(ex);
             }
         };
-        this.unTokenSwitch = App.onTokenSwitch(
+        this.unTokenSwitch = Store.onTokenSwitch(
             () => reset({ silent: true })
         );
         reset();

@@ -9,6 +9,7 @@ import { Alert, alert, Alerts, ancestor, globalRef, x40 } from '../../source/fun
 import { HashManager, MiningManager } from '../../source/managers';
 import { removeNonce, removeNonceByAmount, setMintingRow, setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiMinter, setNftsUiToggled, setOtfWalletProcessing, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiMinter, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
+import { Store } from '../../source/redux/store';
 import { Address, AftWallet, Amount, Level, MAX_UINT256, Mining, MinterStatus, Minting, Nft, NftCoreId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, Nfts, NftSenderStatus, NftsUi, OtfWallet, Page, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, PptsUi, State, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfManager } from '../../source/wallet';
@@ -39,7 +40,6 @@ import './spa-nfts-ui';
 import './spa-ppts';
 import './spa-ppts-ui';
 import './spa-wallet';
-
 type Props = {
     page: Page;
     token: Token;
@@ -450,7 +450,7 @@ const mintingMint = (dispatch: Dispatch) => async (
     if (!block_hash) {
         throw new Error('missing block-hash');
     }
-    const { nonce } = App.getNonceBy({
+    const { nonce } = Store.getNonceBy({
         address, amount, block_hash, token
     });
     if (!nonce) {
@@ -469,7 +469,7 @@ const mintingMint = (dispatch: Dispatch) => async (
             if (App.token !== token) {
                 return;
             }
-            const { tx_counter } = App.getMintingRow({
+            const { tx_counter } = Store.getMintingRow({
                 level
             });
             if (tx_counter > 0) dispatch(setMintingRow(
@@ -484,9 +484,9 @@ const mintingMint = (dispatch: Dispatch) => async (
         );
         console.debug('[mint]', mint);
         moe_wallet.onTransfer(on_transfer);
-        const { tx_counter } = App.getMintingRow(
-            { level }
-        );
+        const { tx_counter } = Store.getMintingRow({
+            level
+        });
         dispatch(setMintingRow({
             level, row: {
                 status: MinterStatus.minted,
@@ -546,7 +546,7 @@ const mintingForget = (dispatch: Dispatch) => (
     const amount = Tokenizer.amount(
         token, level
     );
-    const result = App.getNoncesBy({
+    const result = Store.getNoncesBy({
         address, amount, token
     });
     for (const { item } of result) {
@@ -569,7 +569,7 @@ const nftTransfer = (dispatch: Dispatch) => async (
     const core_id = Nft.coreId({
         issue: nft_issue, level: nft_level
     });
-    const { details } = App.getNftsUi();
+    const { details } = Store.getNftsUi();
     const by_token = details[nft_token];
     const by_level = by_token[nft_level];
     const by_issue = by_level[nft_issue];
@@ -945,7 +945,7 @@ const pptBatchMint = (dispatch: Dispatch) => async (
             const issues = Array.from(Years()).reverse();
             let mint_amount = amount;
             for (const issue of issues) {
-                const ppt_total = App.getNftTotalBy({
+                const ppt_total = Store.getNftTotalBy({
                     level, issue
                 });
                 if (ppt_total.amount === 0n) {
@@ -1042,7 +1042,7 @@ const pptBatchBurn = (dispatch: Dispatch) => async (
             const issues = Array.from(Years());
             let burn_amount = -amount;
             for (const issue of issues) {
-                const ppt_total = App.getPptTotalBy({
+                const ppt_total = Store.getPptTotalBy({
                     level, issue
                 });
                 if (ppt_total.amount === 0n) {
@@ -1249,7 +1249,7 @@ if (require.main === module) {
     const $spa = createElement(connect((s: State) => s)(SPA));
     const $content = document.querySelector('content');
     createRoot($content!).render(
-        <Provider store={App.store}>
+        <Provider store={Store.store}>
             <AddressProvider>{$spa}</AddressProvider>
         </Provider>
     );

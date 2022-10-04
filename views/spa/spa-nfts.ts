@@ -1,6 +1,8 @@
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { x40 } from '../../source/functions';
+import { addNft, removeNft, setNft } from '../../source/redux/actions';
+import { Store } from '../../source/redux/store';
 import { Nft, NftFullId, NftLevels } from '../../source/redux/types';
 import { NftWallet, OnTransferBatch, OnTransferSingle } from '../../source/wallet';
 import { Years } from '../../source/years';
@@ -12,7 +14,7 @@ Blockchain.onceConnect(async function initNfts({
 }) {
     let index = 0;
     const levels = Array.from(NftLevels());
-    const issues = Array.from(Years({ reverse: true}));
+    const issues = Array.from(Years({ reverse: true }));
     const wallet = new NftWallet(address, token);
     const balances = await wallet.balances({ issues, levels });
     const supplies = wallet.totalSupplies({ issues, levels });
@@ -23,11 +25,11 @@ Blockchain.onceConnect(async function initNfts({
         for (const level of levels) {
             const amount = balances[index];
             const supply = await supplies[index];
-            App.setNft({
+            Store.dispatch(setNft({
                 issue, level, token: nft_token
             }, {
                 amount, supply
-            });
+            }));
             index += 1;
         }
     }
@@ -37,11 +39,11 @@ Blockchain.onceConnect(async function initNfts({
 Blockchain.onConnect(function syncNfts({
     token
 }) {
-    const nfts = App.getNftsBy({
+    const nfts = Store.getNftsBy({
         token: Nft.token(token)
     });
     for (const [id, nft] of Object.entries(nfts.items)) {
-        App.setNft(id as NftFullId, nft);
+        Store.dispatch(setNft(id as NftFullId, nft));
     }
 });
 Blockchain.onceConnect(async function onNftSingleTransfers({
@@ -66,10 +68,14 @@ Blockchain.onceConnect(async function onNftSingleTransfers({
             token: nft_token
         });
         if (address === from) {
-            App.removeNft(nft_id, { amount: value });
+            Store.dispatch(removeNft(nft_id, {
+                amount: value
+            }));
         }
         if (address === to) {
-            App.addNft(nft_id, { amount: value });
+            Store.dispatch(addNft(nft_id, {
+                amount: value
+            }));
         }
     };
     const nft_wallet = new NftWallet(address, token);
@@ -100,10 +106,14 @@ Blockchain.onceConnect(async function onNftBatchTransfers({
                 token: nft_token
             });
             if (address === from) {
-                App.removeNft(nft_id, { amount: values[i] });
+                Store.dispatch(removeNft(nft_id, {
+                    amount: values[i]
+                }));
             }
             if (address === to) {
-                App.addNft(nft_id, { amount: values[i] });
+                Store.dispatch(addNft(nft_id, {
+                    amount: values[i]
+                }));
             }
         }
     };

@@ -1,6 +1,8 @@
 import './header.scss';
 
 import { App } from '../../source/app';
+import { switchPage } from '../../source/redux/actions';
+import { Store } from '../../source/redux/store';
 import { Page, Token } from '../../source/redux/types';
 
 import React, { createElement, MouseEvent } from 'react';
@@ -26,10 +28,10 @@ export class UiHeader extends React.Component<
         };
     }
     componentDidMount() {
-        this.unPageSwitch = App.onPageSwitch(
+        this.unPageSwitch = Store.onPageSwitch(
             (page) => this.setState({ page })
         );
-        this.unTokenSwitch = App.onTokenSwitch(
+        this.unTokenSwitch = Store.onTokenSwitch(
             (token) => this.setState({ token})
         );
     }
@@ -82,7 +84,7 @@ export class UiHeader extends React.Component<
             if (Page.None !== this.state.page) {
                 e.preventDefault();
             }
-            App.switchPage(page);
+            Store.dispatch(switchPage(page));
         }
     }
     $icon(

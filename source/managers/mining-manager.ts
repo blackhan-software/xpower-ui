@@ -1,13 +1,13 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
+import { HashManager, IntervalManager } from '.';
 import { App } from '../app';
-import { Tokenizer } from '../token';
 import { alert, Alert, Alerts } from '../functions';
-import { HashManager } from '.';
-import { IntervalManager } from '.';
-import { Address, Amount, Token } from '../redux/types';
-import { BlockHash } from '../redux/types';
-import { MoeWallet } from '../wallet';
 import { Miner } from '../miner';
+import { addNonce } from '../redux/actions';
+import { Store } from '../redux/store';
+import { Address, Amount, BlockHash, Token } from '../redux/types';
+import { Tokenizer } from '../token';
+import { MoeWallet } from '../wallet';
 
 export class MiningManager {
     static miner(
@@ -97,15 +97,14 @@ export class MiningManager {
             miner.start(block_hash, ({
                 amount, nonce, worker
             }) => {
-                if (amount >= min &&
-                    amount <= max) {
-                    App.addNonce(nonce, {
+                if (amount >= min && amount <= max) {
+                    Store.dispatch(addNonce(nonce, {
                         address,
                         amount,
                         block_hash,
                         token,
                         worker,
-                    });
+                    }));
                 }
             });
         }

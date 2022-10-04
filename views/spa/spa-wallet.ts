@@ -1,6 +1,8 @@
 import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { buffered, x40 } from '../../source/functions';
+import { setAftWallet, setOtfWalletAddress, setOtfWalletAmount } from '../../source/redux/actions';
+import { Store } from '../../source/redux/store';
 import { MoeWallet, OnTransfer, OtfManager } from '../../source/wallet';
 /**
  * aft-wallet:
@@ -12,7 +14,9 @@ Blockchain.onceConnect(async function initAftWallet({
     const [amount, supply] = await Promise.all([
         moe_wallet.balance, moe_wallet.supply
     ]);
-    App.setAftWallet(token, { amount, supply });
+    Store.dispatch(setAftWallet(
+        token, { amount, supply }
+    ));
 }, {
     per: () => App.token
 });
@@ -32,7 +36,9 @@ Blockchain.onceConnect(function syncAftWallet({
             const [amount, supply] = await Promise.all([
                 moe_wallet.balance, moe_wallet.supply
             ]);
-            App.setAftWallet(token, { amount, supply });
+            Store.dispatch(setAftWallet(
+                token, { amount, supply }
+            ));
         }
     };
     const moe_wallet = new MoeWallet(address, token);
@@ -48,12 +54,12 @@ Blockchain.onceConnect(async function initOtfWallet() {
     const [otf_address, otf_balance] = await Promise.all([
         otf_wallet.getAddress(), otf_wallet.getBalance()
     ]);
-    App.setOtfWalletAddress({
+    Store.dispatch(setOtfWalletAddress({
         address: BigInt(otf_address)
-    });
-    App.setOtfWalletAmount({
+    }));
+    Store.dispatch(setOtfWalletAmount({
         amount: otf_balance.toBigInt()
-    });
+    }));
 });
 Blockchain.onceConnect(async function syncOtfWallet() {
     const otf_wallet = await OtfManager.init();
@@ -63,11 +69,11 @@ Blockchain.onceConnect(async function syncOtfWallet() {
     async function on_block() {
         const otf_balance = await otf_wallet.getBalance();
         const otf_amount = otf_balance.toBigInt();
-        const { amount } = App.getOtfWallet();
+        const { amount } = Store.getOtfWallet();
         if (amount !== otf_amount) {
-            App.setOtfWalletAmount({
+            Store.dispatch(setOtfWalletAmount({
                 amount: otf_amount
-            });
+            }));
         }
     }
 });

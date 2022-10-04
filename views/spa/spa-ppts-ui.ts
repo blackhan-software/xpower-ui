@@ -2,7 +2,9 @@ import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { PptTreasuryFactory } from '../../source/contract';
 import { buffered } from '../../source/functions';
+import { setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiMinter } from '../../source/redux/actions';
 import { pptAmounts } from '../../source/redux/reducers';
+import { Store } from '../../source/redux/store';
 import { Address, Nft, NftIssue, NftLevel, NftLevels, NftToken, NftTokens, PptAmounts, PptDetails, PptMinterApproval, Token } from '../../source/redux/types';
 import { NftWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
@@ -10,13 +12,17 @@ import { ppt_href, ppt_meta } from '../ppts/ppts';
 /**
  * ppts-ui:
  */
-App.onNftChanged(buffered(() => {
+Store.onNftChanged(buffered(() => {
     const nft_token = Nft.token(App.token);
-    App.setPptsUiAmounts({ ...ppt_amounts(nft_token) });
+    Store.dispatch(setPptsUiAmounts({
+        ...ppt_amounts(nft_token)
+    }));
 }));
-App.onPptChanged(buffered(() => {
+Store.onPptChanged(buffered(() => {
     const nft_token = Nft.token(App.token);
-    App.setPptsUiAmounts({ ...ppt_amounts(nft_token) });
+    Store.dispatch(setPptsUiAmounts({
+        ...ppt_amounts(nft_token)
+    }));
 }));
 const ppt_amounts = (
     ppt_token: NftToken
@@ -24,10 +30,10 @@ const ppt_amounts = (
     const entries = Array.from(NftLevels()).map((nft_level): [
         NftLevel, PptAmounts[NftLevel]
     ] => {
-        const { amount: max } = App.getNftTotalBy({
+        const { amount: max } = Store.getNftTotalBy({
             level: nft_level, token: ppt_token
         });
-        const { amount: min } = App.getPptTotalBy({
+        const { amount: min } = Store.getPptTotalBy({
             level: nft_level, token: ppt_token
         });
         return [nft_level, {
@@ -51,7 +57,7 @@ App.event.on('toggle-level', ({
     const flags = Object.fromEntries(
         levels.map((l) => [l, { toggled: flag }])
     );
-    App.setPptsUiFlags({ flags });
+    Store.dispatch(setPptsUiFlags({ flags }));
 });
 /**
  * ui-details:
@@ -76,7 +82,7 @@ App.event.on('toggle-issue', ({
             )]
         )
     );
-    App.setPptsUiDetails({ details });
+    Store.dispatch(setPptsUiDetails({ details }));
 });
 /**
  * ui-{image,minter}:
@@ -93,12 +99,12 @@ Blockchain.onceConnect(async ({
     const [approval, ...images] = await Promise.all([
         ppt_approval(address, token), ...ppt_images
     ]);
-    App.setPptsUiMinter(
+    Store.dispatch(setPptsUiMinter(
         approval
-    );
-    App.setPptsUiDetails(
+    ));
+    Store.dispatch(setPptsUiDetails(
         images.reduce((l, r) => $.extend(true, l, r))
-    );
+    ));
 }, {
     per: () => App.token
 });
@@ -160,12 +166,12 @@ Promise.all([
             }
         }
         const ppt_details = await Promise.all([...ppt_images]);
-        App.setPptsUiDetails(
+        Store.dispatch(setPptsUiDetails(
             ppt_details.reduce((l, r) => $.extend(true, l, r))
-        );
+        ));
     };
     if (!installed || !avalanche) {
-        App.onTokenSwitch(ppt_images);
+        Store.onTokenSwitch(ppt_images);
         ppt_images(App.token);
     }
 });
