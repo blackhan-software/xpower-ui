@@ -1,4 +1,4 @@
-import { App } from '../../source/app';
+import { Bus } from '../../source/bus';
 import { ancestors, buffered } from '../../source/functions';
 import { Store } from '../../source/redux/store';
 const { Tooltip } = global.bootstrap;
@@ -16,17 +16,15 @@ Store.onTokenSwitched(function retitleTips(
         );
         if (title?.match(rx)) {
             $tip.setAttribute('title', title.replace(rx, token));
-            Tooltip.getInstance($tip)?.dispose();
-            Tooltip.getOrCreateInstance($tip);
         }
     })
 });
 global.addEventListener('load', () => {
-    App.event.emit('refresh-tips');
+    Bus.emit('refresh-tips');
 }, {
     once: true
 });
-App.event.on('refresh-tips', buffered((
+Bus.on('refresh-tips', buffered((
     flags?: { keep?: boolean }
 ) => {
     const $tips = document.querySelectorAll<HTMLElement>(

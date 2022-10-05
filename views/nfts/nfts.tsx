@@ -1,6 +1,6 @@
 import './nfts.scss';
 
-import { App } from '../../source/app';
+import { Bus } from '../../source/bus';
 import { Amount, Token } from '../../source/redux/types';
 import { NftMinter, NftMinterList } from '../../source/redux/types'
 import { NftAmounts, NftDetails, NftFlags } from '../../source/redux/types';
@@ -96,7 +96,7 @@ export function UiNfts(
     props: Props
 ) {
     useEffect(() => {
-        App.event.emit('refresh-tips');
+        Bus.emit('refresh-tips');
     }, []);
     const { nfts, token } = props;
     const nft_token = Nft.token(token);

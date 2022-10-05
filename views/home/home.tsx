@@ -1,6 +1,6 @@
 import './home.scss';
 
-import { App } from '../../source/app';
+import { Bus } from '../../source/bus';
 import { Level, MinerStatus, Minting, Token } from '../../source/redux/types';
 
 import React, { useEffect } from 'react';
@@ -31,7 +31,7 @@ export function UiHome(
     props: Props
 ) {
     useEffect(() => {
-        App.event.emit('refresh-tips');
+        Bus.emit('refresh-tips');
     }, []);
     const { status, togglable } = props.mining;
     const { speed, speedable } = props.mining;

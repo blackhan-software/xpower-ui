@@ -1,4 +1,4 @@
-import { App } from '../../../source/app';
+import { Bus } from '../../../source/bus';
 import React from 'react';
 
 type Props = {
@@ -41,7 +41,7 @@ export class UiPptToggle extends React.Component<
             : 'Show older NFTs';
     }
     componentDidUpdate() {
-        App.event.emit('refresh-tips');
+        Bus.emit('refresh-tips');
     }
 }
 export default UiPptToggle;

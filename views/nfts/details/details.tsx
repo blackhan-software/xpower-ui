@@ -1,4 +1,4 @@
-import { App } from '../../../source/app';
+import { Bus } from '../../../source/bus';
 import { Referable } from '../../../source/functions';
 import { Amount, Nft, NftDetails, NftIssue, NftLevel, Nfts, Supply, Token } from '../../../source/redux/types';
 import { Years } from '../../../source/years';
@@ -203,7 +203,7 @@ export class UiNftDetails extends Referable(
                 }
             })}
             onToggled={(toggled) => {
-                App.event.emit('toggle-issue', {
+                Bus.emit('toggle-issue', {
                     flag: toggled
                 });
             }}
@@ -271,7 +271,7 @@ export class UiNftDetails extends Referable(
                 this.props.onNftTransfer?.bind(this)
             }
             onToggled={(toggled) => {
-                App.event.emit('toggle-issue', {
+                Bus.emit('toggle-issue', {
                     flag: toggled
                 });
             }}

@@ -1,4 +1,4 @@
-import { App } from '../../source/app';
+import { Bus } from '../../source/bus';
 import { Blockchain } from '../../source/blockchain';
 import { buffered } from '../../source/functions';
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiMinter } from '../../source/redux/actions';
@@ -49,7 +49,7 @@ const nft_amounts = (
 /**
  * ui-list:
  */
-App.event.on('toggle-level', ({
+Bus.on('toggle-level', ({
     level, flag
 }) => {
     const levels = level !== undefined
@@ -62,7 +62,7 @@ App.event.on('toggle-level', ({
 /**
  * ui-details:
  */
-App.event.on('toggle-issue', ({
+Bus.on('toggle-issue', ({
     level, issue, flag
 }) => {
     const levels = level !== undefined

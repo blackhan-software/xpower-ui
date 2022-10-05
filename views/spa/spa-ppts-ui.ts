@@ -1,4 +1,4 @@
-import { App } from '../../source/app';
+import { Bus } from '../../source/bus';
 import { Blockchain } from '../../source/blockchain';
 import { PptTreasuryFactory } from '../../source/contract';
 import { buffered } from '../../source/functions';
@@ -49,7 +49,7 @@ const ppt_amounts = (
 /**
  * ui-list:
  */
-App.event.on('toggle-level', ({
+Bus.on('toggle-level', ({
     level, flag
 }) => {
     const levels = level !== undefined
@@ -62,7 +62,7 @@ App.event.on('toggle-level', ({
 /**
  * ui-details:
  */
-App.event.on('toggle-issue', ({
+Bus.on('toggle-issue', ({
     level, issue, flag
 }) => {
     const levels = level !== undefined

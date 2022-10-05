@@ -1,4 +1,4 @@
-import { App } from '../../../source/app';
+import { Bus } from '../../../source/bus';
 import { Miner } from '../../../source/miner';
 
 import React from 'react';
@@ -136,7 +136,7 @@ export class UiMiningSpeed extends React.Component<
         });
     }
     componentDidUpdate() {
-        App.event.emit('refresh-tips');
+        Bus.emit('refresh-tips');
     }
 }
 export default UiMiningSpeed;

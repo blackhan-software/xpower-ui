@@ -1,4 +1,4 @@
-import { App } from '../../../source/app';
+import { Bus } from '../../../source/bus';
 import { Token } from '../../../source/redux/types';
 import { PptMinterList } from '../../../source/redux/types';
 import { PptMinterApproval } from '../../../source/redux/types';
@@ -28,7 +28,7 @@ export function UiPptMinter(
     props: Props
 ) {
     useEffect(() => {
-        App.event.emit('refresh-tips');
+        Bus.emit('refresh-tips');
     });
     return <div
         className='btn-group ppt-batch-minter' role='group'

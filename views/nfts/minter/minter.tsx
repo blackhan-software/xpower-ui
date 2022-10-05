@@ -1,4 +1,4 @@
-import { App } from '../../../source/app';
+import { Bus } from '../../../source/bus';
 import { NftMinterApproval, NftMinterList, NftMinterStatus, Token } from '../../../source/redux/types';
 
 import React, { useEffect } from 'react';
@@ -18,7 +18,7 @@ export function UiNftMinter(
     props: Props
 ) {
     useEffect(() => {
-        App.event.emit('refresh-tips');
+        Bus.emit('refresh-tips');
     });
     return <div
         className='btn-group nft-batch-minter' role='group'

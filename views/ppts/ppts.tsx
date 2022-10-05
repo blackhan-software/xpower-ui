@@ -1,6 +1,6 @@
 import './ppts.scss';
 
-import { App } from '../../source/app';
+import { Bus } from '../../source/bus';
 import { Amount, Token } from '../../source/redux/types';
 import { PptMinter, PptMinterList } from '../../source/redux/types';
 import { PptAmounts, PptDetails, PptFlags } from '../../source/redux/types';
@@ -103,7 +103,7 @@ export function UiPpts(
     props: Props
 ) {
     useEffect(() => {
-        App.event.emit('refresh-tips');
+        Bus.emit('refresh-tips');
     }, []);
     const { ppts, token } = props;
     const ppt_token = Nft.token(token);

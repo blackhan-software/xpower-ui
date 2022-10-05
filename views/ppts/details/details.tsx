@@ -1,4 +1,4 @@
-import { App } from '../../../source/app';
+import { Bus } from '../../../source/bus';
 import { Blockchain } from '../../../source/blockchain';
 import { MoeTreasuryFactory } from '../../../source/contract';
 import { Referable, Updatable, x40 } from '../../../source/functions';
@@ -321,7 +321,7 @@ export class UiPptDetails extends Referable(Updatable(
                 }
             })}
             onToggled={(toggled) => {
-                App.event.emit('toggle-issue', {
+                Bus.emit('toggle-issue', {
                     flag: toggled
                 });
             }}
@@ -370,7 +370,7 @@ export class UiPptDetails extends Referable(Updatable(
                 this.props.onPptClaim?.bind(this)
             }
             onToggled={(toggled) => {
-                App.event.emit('toggle-issue', {
+                Bus.emit('toggle-issue', {
                     flag: toggled
                 });
             }}

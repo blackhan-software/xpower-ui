@@ -1,7 +1,7 @@
 import './amount';
 import './list.scss';
 
-import { App } from '../../../source/app';
+import { Bus } from '../../../source/bus';
 import { nftTotalBy } from '../../../source/redux/selectors';
 import { Amount, Nft, NftDetails, NftIssue, NftLevel, NftLevels, Nfts, Supply, Token } from '../../../source/redux/types';
 
@@ -52,7 +52,7 @@ export function UiNftList(
     props: Props
 ) {
     useEffect(() => {
-        App.event.emit('refresh-tips');
+        Bus.emit('refresh-tips');
     });
     const { token, list } = props;
     return <React.Fragment>
@@ -163,7 +163,7 @@ function $toggle(
 function toggle(
     nft_level: NftLevel, toggled: boolean
 ) {
-    App.event.emit('toggle-level', {
+    Bus.emit('toggle-level', {
         level: nft_level, flag: !toggled
     });
 }

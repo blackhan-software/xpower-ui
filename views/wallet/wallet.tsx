@@ -1,6 +1,6 @@
 import './wallet.scss';
 
-import { App } from '../../source/app';
+import { Bus } from '../../source/bus';
 import { globalRef } from '../../source/functions';
 import { Address, AftWallet, OtfWallet, Token } from '../../source/redux/types';
 import { OtfManager } from '../../source/wallet';
@@ -29,7 +29,7 @@ export function UiWallet(
         OtfManager.enabled = toggled;
     }, [toggled]);
     useEffect(() => {
-        App.event.emit('refresh-tips');
+        Bus.emit('refresh-tips');
     });
     return <>
         <UiAftWallet

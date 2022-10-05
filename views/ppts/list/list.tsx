@@ -1,7 +1,7 @@
 import './amount';
 import './list.scss';
 
-import { App } from '../../../source/app';
+import { Bus } from '../../../source/bus';
 import { pptTotalBy } from '../../../source/redux/selectors';
 import { Amount, Nft, NftIssue, NftLevel, NftLevels, Nfts, PptDetails, Supply, Token } from '../../../source/redux/types';
 
@@ -56,7 +56,7 @@ export function UiPptList(
     props: Props
 ) {
     useEffect(() => {
-        App.event.emit('refresh-tips');
+        Bus.emit('refresh-tips');
     });
     const { token, list } = props;
     return <React.Fragment>
@@ -170,7 +170,7 @@ function $toggle(
 function toggle(
     ppt_level: NftLevel, toggled: boolean
 ) {
-    App.event.emit('toggle-level', {
+    Bus.emit('toggle-level', {
         level: ppt_level, flag: !toggled
     });
 }
