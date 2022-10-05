@@ -134,9 +134,9 @@ export class Store {
      * Observers:
      * ===================================================================== */
     public static onPageSwitch(
-        callback: OnPageSwitch
+        callback: OnPageSwitch, ms = 0
     ) {
-        return onPageSwitch(this.me.store, callback);
+        return onPageSwitch(this.me.store, delayed(callback, ms));
     }
     public static onPageSwitched(
         callback: OnPageSwitch, ms = 600

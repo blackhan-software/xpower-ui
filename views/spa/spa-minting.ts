@@ -37,13 +37,13 @@ Store.onNonceChanged(async function updateMinters(
     }));
 });
 Store.onTokenSwitch(function resetMinters() {
-    if (Page.Home !== App.page) {
+    if (Page.Home !== Store.getPage()) {
         return;
     }
     Store.dispatch(clearMintingRows());
 });
 Store.onTokenSwitched(function forgetNonces() {
-    if (Page.Home !== App.page) {
+    if (Page.Home !== Store.getPage()) {
         return;
     }
     Store.dispatch(removeNonces());
