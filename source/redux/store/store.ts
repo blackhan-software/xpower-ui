@@ -9,7 +9,7 @@ import { middleware } from '../middleware';
 import { onAftWalletDecreased, OnAftWalletDecreased, onAftWalletIncreased, OnAftWalletIncreased, onNftAdded, OnNftAdded, onNftRemoved, OnNftRemoved, onNonceAdded, OnNonceAdded, onNonceRemoved, OnNonceRemoved, onPageSwitch, OnPageSwitch, onPptAdded, onPptRemoved, onTokenSwitch, OnTokenSwitch } from '../observers';
 import { aftWalletReducer, miningReducer, mintingReducer, nftsReducer, nftsUiReducer, noncesReducer, otfWalletReducer, pageReducer, pptsReducer, pptsUiReducer, refreshReducer, tokenReducer } from '../reducers';
 import { nftsBy, nftTotalBy, nonceBy, noncesBy, pptsBy, pptTotalBy, refreshed, walletFor } from '../selectors';
-import { Address, Amount, BlockHash, Level, MintingRow, NftFullId, NftIssue, NftLevel, NftToken, Nonce, State, Supply, Token } from '../types';
+import { Address, Amount, BlockHash, Level, NftFullId, NftIssue, NftLevel, NftToken, State, Token } from '../types';
 
 import { Global } from '../../types';
 declare const global: Global;
@@ -45,37 +45,22 @@ export class Store {
         const { aft_wallet } = this.me.store.getState();
         return walletFor(aft_wallet, token);
     }
-    public static getOtfWallet(): State['otf_wallet'] {
+    public static getOtfWallet() {
         const { otf_wallet } = this.me.store.getState();
         return otf_wallet;
     }
     public static getMintingRow(
         { level }: { level: Level; }
-    ): MintingRow {
+    ) {
         const { minting } = this.me.store.getState();
         return minting.rows[level - 1];
-    }
-    public static getNftsUi(): State['nfts_ui'] {
-        const { nfts_ui } = this.me.store.getState();
-        return nfts_ui;
-    }
-    public static getPptsUi(): State['ppts_ui'] {
-        const { ppts_ui } = this.me.store.getState();
-        return ppts_ui;
     }
     public static getNonceBy(query?: {
         address?: Address;
         amount?: Amount;
         block_hash?: BlockHash;
         token?: Token;
-    }, index = 0): Partial<{
-        nonce: Nonce; item: {
-            address: Address;
-            amount: Amount;
-            block_hash: BlockHash;
-            token: Token;
-        };
-    }> {
+    }, index = 0) {
         const { nonces } = this.me.store.getState();
         return nonceBy(nonces, query, index);
     }
@@ -84,16 +69,13 @@ export class Store {
         amount?: Amount;
         block_hash?: BlockHash;
         token?: Token;
-    }): Array<{
-        nonce: Nonce; item: {
-            address: Address;
-            amount: Amount;
-            block_hash: BlockHash;
-            token: Token;
-        };
-    }> {
+    }) {
         const { nonces } = this.me.store.getState();
         return noncesBy(nonces, query);
+    }
+    public static getNftsUi() {
+        const { nfts_ui } = this.me.store.getState();
+        return nfts_ui;
     }
     public static getNftsBy(nft: NftFullId | {
         issue?: NftIssue;
@@ -107,11 +89,13 @@ export class Store {
         issue?: NftIssue;
         level?: NftLevel;
         token?: NftToken;
-    }): {
-        amount: Amount; supply: Supply;
-    } {
+    }) {
         const { nfts } = this.me.store.getState();
         return nftTotalBy(nfts, nft);
+    }
+    public static getPptsUi() {
+        const { ppts_ui } = this.me.store.getState();
+        return ppts_ui;
     }
     public static getPptsBy(ppt: NftFullId | {
         issue?: NftIssue;
@@ -125,9 +109,7 @@ export class Store {
         issue?: NftIssue;
         level?: NftLevel;
         token?: NftToken;
-    }): {
-        amount: Amount; supply: Supply;
-    } {
+    }) {
         const { ppts } = this.me.store.getState();
         return pptTotalBy(ppts, ppt);
     }

@@ -1,16 +1,14 @@
 import './connector.scss';
 
 import { Blockchain, ChainId } from '../../source/blockchain';
-import { buffered, mobile, Referable } from '../../source/functions';
+import { delayed, globalRef, mobile } from '../../source/functions';
+import { Params } from '../../source/params';
 import { Store } from '../../source/redux/store';
 
-import React, { createElement } from 'react';
+import React, { createElement, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Unsubscribe } from 'redux';
 import { InfoCircle } from '../../public/images/tsx';
-import { Params } from '../../source/params';
 
-type Props = Record<string, never>;
 type State = {
     chain: Chain;
 }
@@ -21,147 +19,133 @@ enum Chain {
     CONNECTING,
     CONNECTED,
 }
-export class UiConnector extends Referable(
-    React.Component<Props, State>
-) {
-    constructor(
-        props: Props
-    ) {
-        super(props);
-        this.state = {
-            chain: Chain.CONNECTING
-        };
-    }
-    componentDidMount = buffered(() => {
-        const reset = async ({ silent } = { silent: false }) => {
-            if (!await Blockchain.isInstalled()) {
-                return this.setState({ chain: Chain.UNAVAILABLE });
-            }
-            if (!await Blockchain.isConnected()) {
-                return this.setState({ chain: Chain.UNCONNECTED });
-            }
-            if (!await Blockchain.isAvalanche()) {
-                return this.setState({ chain: Chain.WRONG_ID });
-            }
-            if (!silent) {
-                this.setState({ chain: Chain.CONNECTING });
-            }
-            try {
-                await Blockchain.connect();
-                this.setState({
-                    chain: Chain.CONNECTED
-                });
-            } catch (ex) {
-                console.error(ex);
-            }
-        };
-        this.unTokenSwitch = Store.onTokenSwitch(
-            () => reset({ silent: true })
-        );
-        reset();
-    }, ms())
-    componentWillUnmount() {
-        if (this.unTokenSwitch) {
-            this.unTokenSwitch();
-        }
-    }
-    render() {
-        return <div
-            className='btn-group connect-metamask' role='group'
-        >
-            {this.$connector()}
-            {this.$info()}
-        </div>;
-    }
-    $connector() {
-        const on_click = async () => {
-            if (this.state.chain === Chain.UNAVAILABLE) {
-                return open('https://metamask.io/download.html');
-            }
-            if (this.state.chain === Chain.WRONG_ID) {
-                await Blockchain.switchTo(
-                    ChainId.AVALANCHE_MAINNET
-                );
-                return location.reload();
-            }
-            if (this.state.chain === Chain.UNCONNECTED) {
-                return reload(600);
-            }
-        };
-        return <button
-            ref={this.ref('#connect-metamask')}
-            className='btn btn-outline-warning'
-            disabled={this.connecting}
-            id='connect-metamask'
-            onClick={on_click}
-            type='button'
-        >
-            {this.$spinner()}
-            {this.$text()}
-        </button>;
-    }
-    $spinner() {
-        return Spinner({ show: this.connecting, grow: true });
-    }
-    get connecting() {
-        return this.state.chain === Chain.CONNECTING;
-    }
-    $text() {
-        return <span className='text'>{this.label}</span>;
-    }
-    get label() {
-        switch (this.state.chain) {
-            case Chain.UNAVAILABLE:
-                return 'Install Metamask';
-            case Chain.WRONG_ID:
-                return 'Switch to Avalanche';
-            case Chain.UNCONNECTED:
-                return 'Connect to Metamask';
-            case Chain.CONNECTING:
-                return 'Connecting to Metamask…';
-            case Chain.CONNECTED:
-                return 'Connected to Metamask';
-        }
-    }
-    $info() {
-        return <button
-            className='btn btn-outline-warning info'
-            data-bs-toggle='tooltip' data-bs-placement='top'
-            title={this.tooltip} type='button'
-        >
-            <InfoCircle fill={true} />
-        </button>;
-    }
-    get tooltip() {
-        if (this.state.chain === Chain.UNAVAILABLE) {
-            return 'Install Metamask (and then reload the application)';
-        }
-        return 'Authorize your Metamask to be connected to';
-    }
-    componentDidUpdate = buffered(() => {
-        const $ref = this.ref<HTMLElement>(
-            '#connect-metamask'
-        );
-        if (this.state.chain !== Chain.CONNECTED) {
+export function UiConnector() {
+    const [chain, set_chain] = useState(
+        Chain.CONNECTING
+    );
+    useEffect(() => {
+        delayed(reset, ms())({ silent: false });
+    }, []);
+    useEffect(() => {
+        return Store.onTokenSwitch(() => reset());
+    }, []);
+    useEffect(() => {
+        if (chain !== Chain.CONNECTED) {
+            const $ref = globalRef<HTMLElement>(
+                '#connect-metamask'
+            );
             $ref.current?.focus();
         }
-        if (this.state.chain !== Chain.UNAVAILABLE) {
-            return;
+    });
+    const reset = async (
+        { silent } = { silent: true }
+    ) => {
+        if (!await Blockchain.isInstalled()) {
+            return set_chain(Chain.UNAVAILABLE);
         }
-    })
-    unTokenSwitch?: Unsubscribe;
+        if (!await Blockchain.isConnected()) {
+            return set_chain(Chain.UNCONNECTED);
+        }
+        if (!await Blockchain.isAvalanche()) {
+            return set_chain(Chain.WRONG_ID);
+        }
+        if (!silent) {
+            set_chain(Chain.CONNECTING);
+        }
+        try {
+            await Blockchain.connect();
+            set_chain(Chain.CONNECTED);
+        } catch (ex) {
+            console.error(ex);
+        }
+    };
+    return <div
+        className='btn-group connect-metamask' role='group'
+    >
+        {$connector(chain)}
+        {$info(chain)}
+    </div>;
 }
-function Spinner(
-    { show, grow }: { show: boolean, grow?: boolean }
+function $connector(
+    chain: State['chain']
 ) {
-    const classes = [
-        'spinner spinner-border spinner-border-sm',
-        'float-start', grow ? 'spinner-grow' : ''
-    ];
-    return <span
-        className={classes.join(' ')} role='status'
-        style={{ visibility: show ? 'visible' : 'hidden' }}
-    />;
+    const on_click = async () => {
+        if (chain === Chain.UNAVAILABLE) {
+            return open('https://metamask.io/download.html');
+        }
+        if (chain === Chain.WRONG_ID) {
+            await Blockchain.switchTo(
+                ChainId.AVALANCHE_MAINNET
+            );
+            return location.reload();
+        }
+        if (chain === Chain.UNCONNECTED) {
+            return reload(600);
+        }
+    };
+    return <button
+        ref={globalRef('#connect-metamask')}
+        className='btn btn-outline-warning'
+        disabled={connecting(chain)}
+        id='connect-metamask'
+        onClick={on_click}
+        type='button'
+    >
+        {$spinner(chain)}
+        {$text(chain)}
+    </button>;
+}
+function $spinner(
+    chain: State['chain']
+) {
+    return Spinner({
+        show: connecting(chain), grow: true
+    });
+}
+function connecting(
+    chain: State['chain']
+) {
+    return chain === Chain.CONNECTING;
+}
+function $text(
+    chain: State['chain']
+) {
+    return <span className='text'>{label(chain)}</span>;
+}
+function label(
+    chain: State['chain']
+) {
+    switch (chain) {
+        case Chain.UNAVAILABLE:
+            return 'Install Metamask';
+        case Chain.WRONG_ID:
+            return 'Switch to Avalanche';
+        case Chain.UNCONNECTED:
+            return 'Connect to Metamask';
+        case Chain.CONNECTING:
+            return 'Connecting to Metamask…';
+        case Chain.CONNECTED:
+            return 'Connected to Metamask';
+    }
+}
+function $info(
+    chain: State['chain']
+) {
+    return <button
+        className='btn btn-outline-warning info'
+        data-bs-toggle='tooltip' data-bs-placement='top'
+        title={tooltip(chain)} type='button'
+    >
+        <InfoCircle fill={true} />
+    </button>;
+}
+function tooltip(
+    chain: State['chain']
+) {
+    if (chain === Chain.UNAVAILABLE) {
+        return 'Install Metamask (and then reload the application)';
+    }
+    return 'Authorize your Metamask to be connected to';
 }
 function ms(
     fallback?: number
@@ -178,14 +162,11 @@ function reload(
     delta_ms: number
 ) {
     if (location.search) {
-        const match = location.search.match(
-            /reload-ms=([0-9]+)/
-        );
+        const rx = /reload-ms=([0-9]+)/;
+        const match = location.search.match(rx);
         if (match && match.length > 1) {
             location.search = location.search.replace(
-                /reload-ms=([0-9]+)/, `reload-ms=${
-                    delta_ms + Number(match[1])
-                }`
+                rx, `reload-ms=${delta_ms + Number(match[1])}`
             );
         } else {
             location.search += `&reload-ms=${delta_ms}`;
@@ -193,6 +174,18 @@ function reload(
     } else {
         location.search = `?reload-ms=${delta_ms}`;
     }
+}
+function Spinner(
+    { show, grow }: { show: boolean, grow?: boolean }
+) {
+    const classes = [
+        'spinner spinner-border spinner-border-sm',
+        'float-start', grow ? 'spinner-grow' : ''
+    ];
+    return <span
+        className={classes.join(' ')} role='status'
+        style={{ visibility: show ? 'visible' : 'hidden' }}
+    />;
 }
 if (require.main === module) {
     const $header = document.querySelector('form#connector');

@@ -1,7 +1,5 @@
-/* eslint @typescript-eslint/no-unused-vars: [off] */
-import { range } from '../../functions';
-
 import { Action } from '@reduxjs/toolkit';
+import { range } from '../../functions';
 import { Params } from '../../params';
 import * as actions from '../actions';
 import { Level, Minting, MintingRow } from '../types';

@@ -2,6 +2,7 @@
 import './spa.scss';
 
 import { Blockchain } from '../../source/blockchain';
+import { Bus } from '../../source/bus';
 import { AddressContext, AddressProvider, DebugContext, DebugProvider } from '../../source/context';
 import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
 import { Alert, alert, Alerts, ancestor, globalRef, leafKeys, x40 } from '../../source/functions';
@@ -32,7 +33,6 @@ import { Web3Provider } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import { Transaction } from 'ethers';
 
-import { Bus } from '../../source/bus';
 import './spa-mining';
 import './spa-minting';
 import './spa-nfts';
@@ -1164,6 +1164,7 @@ const otfDeposit = (dispatch: Dispatch) => async (
     const mmw_signer = provider.getSigner(x40(address));
     const mmw_balance = await mmw_signer.getBalance();
     let gas_limit = parseUnits('0');
+    Alerts.hide();
     try {
         gas_limit = await mmw_signer.estimateGas({
             value: mmw_balance.lt(unit) ? mmw_balance : unit,
@@ -1217,6 +1218,7 @@ const otfWithdraw = (dispatch: Dispatch) => async (
     const otf_signer = await OtfManager.init();
     const otf_balance = await otf_signer.getBalance();
     let gas_limit = parseUnits('0');
+    Alerts.hide();
     try {
         gas_limit = await otf_signer.estimateGas({
             to: x40(address), value: otf_balance
