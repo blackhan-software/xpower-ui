@@ -4,7 +4,7 @@ import './spa.scss';
 import { Blockchain } from '../../source/blockchain';
 import { AddressContext, AddressProvider, DebugContext, DebugProvider } from '../../source/context';
 import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
-import { Alert, alert, Alerts, ancestor, globalRef, x40 } from '../../source/functions';
+import { Alert, alert, Alerts, ancestor, globalRef, leafKeys, x40 } from '../../source/functions';
 import { HashManager, MiningManager } from '../../source/managers';
 import { removeNonce, removeNonceByAmount, setMintingRow, setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiMinter, setNftsUiToggled, setOtfWalletProcessing, setOtfWalletToggled, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiMinter, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
@@ -185,15 +185,21 @@ function $nfts(
             minter={nfts_ui.minter}
             toggled={nfts_ui.toggled}
             onNftList={(lhs, rhs) => {
-                dispatch(setNftsUiAmounts({
-                    amounts: { [nft_token]: rhs }
-                }));
-                dispatch(setNftsUiFlags({
-                    flags: lhs
-                }));
-                dispatch(setPptsUiFlags({
-                    flags: lhs
-                }));
+                const lhs_keys = leafKeys(lhs);
+                if (lhs_keys.length) {
+                    dispatch(setNftsUiFlags({
+                        flags: lhs
+                    }));
+                    dispatch(setPptsUiFlags({
+                        flags: lhs
+                    }));
+                }
+                const rhs_keys = leafKeys(rhs);
+                if (rhs_keys.length) {
+                    dispatch(setNftsUiAmounts({
+                        amounts: { [nft_token]: rhs }
+                    }));
+                }
             }}
             onNftImageLoaded={(
                 nft_issue, nft_level
@@ -287,7 +293,7 @@ function $ppts(
     if (page !== Page.Ppts) {
         return null;
     }
-    const nft_token = Nft.token(token);
+    const ppt_token = Nft.token(token);
     return <form
         id='ppts' onSubmit={(e) => e.preventDefault()}
     >
@@ -299,21 +305,27 @@ function $ppts(
             minter={ppts_ui.minter}
             toggled={ppts_ui.toggled}
             onPptList={(lhs, rhs) => {
-                dispatch(setNftsUiFlags({
-                    flags: lhs
-                }));
-                dispatch(setPptsUiFlags({
-                    flags: lhs
-                }));
-                dispatch(setPptsUiAmounts({
-                    amounts: { [nft_token]: rhs }
-                }));
+                const lhs_keys = leafKeys(lhs);
+                if (lhs_keys.length) {
+                    dispatch(setNftsUiFlags({
+                        flags: lhs
+                    }));
+                    dispatch(setPptsUiFlags({
+                        flags: lhs
+                    }));
+                }
+                const rhs_keys = leafKeys(rhs);
+                if (rhs_keys.length) {
+                    dispatch(setPptsUiAmounts({
+                        amounts: { [ppt_token]: rhs }
+                    }));
+                }
             }}
             onPptImageLoaded={(
                 ppt_issue, ppt_level
             ) => {
                 const details = {
-                    [nft_token]: {
+                    [ppt_token]: {
                         [ppt_level]: {
                             [ppt_issue]: {
                                 image: { loading: false }
@@ -327,7 +339,7 @@ function $ppts(
                 ppt_issue, ppt_level, expanded
             ) => {
                 const details = {
-                    [nft_token]: {
+                    [ppt_token]: {
                         [ppt_level]: {
                             [ppt_issue]: {
                                 expanded
@@ -342,7 +354,7 @@ function $ppts(
                 nft_issue, nft_level, value, valid
             ) => {
                 const details = {
-                    [nft_token]: {
+                    [ppt_token]: {
                         [nft_level]: {
                             [nft_issue]: {
                                 amount: { valid, value }
@@ -356,7 +368,7 @@ function $ppts(
                 nft_issue, nft_level, value, valid
             ) => {
                 const details = {
-                    [nft_token]: {
+                    [ppt_token]: {
                         [nft_level]: {
                             [nft_issue]: {
                                 target: { valid, value }
@@ -1124,7 +1136,7 @@ const pptBatchBurn = (dispatch: Dispatch) => async (
 /**
  * {aft,otf}-wallet:
  */
- const otfToggled = (dispatch: Dispatch) => (
+const otfToggled = (dispatch: Dispatch) => (
     toggled: OtfWallet['toggled']
 ) => {
     dispatch(setOtfWalletToggled({ toggled }))

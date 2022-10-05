@@ -1,6 +1,7 @@
 export * from './alert';
 export * from './big-int';
 export * from './buffered';
+export * from './deep-keys';
 export * from './delayed';
 export * from './dom';
 export * from './dom-query';
