@@ -87,7 +87,13 @@ function $pptMinter(
             className='btn-group ppt-minter' role='group'
             style={{ display: 'inline-flex' }}
         >
-            {$toggle(ppt_level, toggled)}
+            {$toggle(ppt_level, toggled, (toggled) => {
+                if (props.onPptList) {
+                    props.onPptList({
+                        [ppt_level]: { toggled }
+                    });
+                }
+            })}
             {$minter(ppt_level, amount)}
             {$balance(ppt_level, total_by)}
             <UiPptAmount
@@ -147,7 +153,8 @@ function $pptDetails(
     }
 }
 function $toggle(
-    ppt_level: NftLevel, toggled: boolean
+    ppt_level: NftLevel, toggled: boolean,
+    onToggled: (toggled: boolean) => void
 ) {
     const title = toggled
         ? `Hide ${Nft.nameOf(ppt_level)} NFTs`
@@ -158,7 +165,7 @@ function $toggle(
         <button type='button'
             className='btn btn-outline-warning toggle no-ellipsis'
             data-bs-placement='top' data-bs-toggle='tooltip'
-            onClick={() => toggle(ppt_level, toggled)}
+            onClick={() => onToggled(!toggled)}
             title={title}
         >
             <i className={
@@ -166,13 +173,6 @@ function $toggle(
             } />
         </button>
     </div>;
-}
-function toggle(
-    ppt_level: NftLevel, toggled: boolean
-) {
-    Bus.emit('toggle-level', {
-        level: ppt_level, flag: !toggled
-    });
 }
 function $minter(
     ppt_level: NftLevel, amount: Amount

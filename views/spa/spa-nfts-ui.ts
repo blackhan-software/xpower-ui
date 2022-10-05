@@ -1,7 +1,7 @@
-import { Bus } from '../../source/bus';
 import { Blockchain } from '../../source/blockchain';
+import { Bus } from '../../source/bus';
 import { buffered } from '../../source/functions';
-import { setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiMinter } from '../../source/redux/actions';
+import { setNftsUiAmounts, setNftsUiDetails, setNftsUiMinter } from '../../source/redux/actions';
 import { nftAmounts } from '../../source/redux/reducers';
 import { Store } from '../../source/redux/store';
 import { Address, Amount, Balance, MID_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftTokens, Token } from '../../source/redux/types';
@@ -46,19 +46,6 @@ const nft_amounts = (
         })
     };
 };
-/**
- * ui-list:
- */
-Bus.on('toggle-level', ({
-    level, flag
-}) => {
-    const levels = level !== undefined
-        ? [level] : Array.from(NftLevels());
-    const flags = Object.fromEntries(
-        levels.map((l) => [l, { toggled: flag }])
-    );
-    Store.dispatch(setNftsUiFlags({ flags }));
-});
 /**
  * ui-details:
  */

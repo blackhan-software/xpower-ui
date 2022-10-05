@@ -1,8 +1,8 @@
-import { Bus } from '../../source/bus';
 import { Blockchain } from '../../source/blockchain';
+import { Bus } from '../../source/bus';
 import { PptTreasuryFactory } from '../../source/contract';
 import { buffered } from '../../source/functions';
-import { setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiMinter } from '../../source/redux/actions';
+import { setPptsUiAmounts, setPptsUiDetails, setPptsUiMinter } from '../../source/redux/actions';
 import { pptAmounts } from '../../source/redux/reducers';
 import { Store } from '../../source/redux/store';
 import { Address, Nft, NftIssue, NftLevel, NftLevels, NftToken, NftTokens, PptAmounts, PptDetails, PptMinterApproval, Token } from '../../source/redux/types';
@@ -46,19 +46,6 @@ const ppt_amounts = (
         })
     };
 };
-/**
- * ui-list:
- */
-Bus.on('toggle-level', ({
-    level, flag
-}) => {
-    const levels = level !== undefined
-        ? [level] : Array.from(NftLevels());
-    const flags = Object.fromEntries(
-        levels.map((l) => [l, { toggled: flag }])
-    );
-    Store.dispatch(setPptsUiFlags({ flags }));
-});
 /**
  * ui-details:
  */

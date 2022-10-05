@@ -6,8 +6,8 @@ import { nftTotalBy } from '../../../source/redux/selectors';
 import { Amount, Nft, NftDetails, NftIssue, NftLevel, NftLevels, Nfts, Supply, Token } from '../../../source/redux/types';
 
 import React, { useEffect, useMemo } from 'react';
-import { UiNftAmount } from './amount';
 import { UiNftDetails } from '../details/details';
+import { UiNftAmount } from './amount';
 
 type Props = {
     nfts: Nfts;
@@ -83,7 +83,13 @@ function $nftMinter(
             className='btn-group nft-minter' role='group'
             style={{ display: 'inline-flex' }}
         >
-            {$toggle(nft_level, toggled)}
+            {$toggle(nft_level, toggled, (toggled) => {
+                if (props.onNftList) {
+                    props.onNftList({
+                        [nft_level]: { toggled }
+                    });
+                }
+            })}
             {$minter(nft_level, props.token)}
             {$balance(nft_level, total_by)}
             <UiNftAmount
@@ -140,7 +146,8 @@ function $nftDetails(
     }
 }
 function $toggle(
-    nft_level: NftLevel, toggled: boolean
+    nft_level: NftLevel, toggled: boolean,
+    onToggled: (toggled: boolean) => void
 ) {
     const title = toggled
         ? `Hide ${Nft.nameOf(nft_level)} NFTs`
@@ -151,7 +158,7 @@ function $toggle(
         <button type='button'
             className='btn btn-outline-warning toggle no-ellipsis'
             data-bs-placement='top' data-bs-toggle='tooltip'
-            onClick={() => toggle(nft_level, toggled)}
+            onClick={() => onToggled(!toggled)}
             title={title}
         >
             <i className={
@@ -159,13 +166,6 @@ function $toggle(
             } />
         </button>
     </div>;
-}
-function toggle(
-    nft_level: NftLevel, toggled: boolean
-) {
-    Bus.emit('toggle-level', {
-        level: nft_level, flag: !toggled
-    });
 }
 function $minter(
     nft_level: NftLevel, token: Token
