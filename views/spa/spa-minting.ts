@@ -18,7 +18,7 @@ Store.onNonceChanged(async function updateMinters(
     if (address !== await Blockchain.selectedAddress) {
         return;
     }
-    if (token !== App.token) {
+    if (token !== Store.getToken()) {
         return;
     }
     const level = Tokenizer.level(token, amount);
@@ -94,5 +94,5 @@ Blockchain.onceConnect(function autoMint({
         }
     }
 }, {
-    per: () => App.token
+    per: () => Store.getToken()
 });

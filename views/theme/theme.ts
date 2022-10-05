@@ -1,12 +1,6 @@
-import { App } from '../../source/app/app';
 import { Store } from '../../source/redux/store';
 import { Theme, theme } from '../../source/theme';
 
-document.onreadystatechange = function initTheme() {
-    if (document.readyState === 'complete') {
-        adapt(theme(App.token));
-    }
-};
 Store.onTokenSwitch(function syncTheme(token) {
     adapt(theme(token));
 });

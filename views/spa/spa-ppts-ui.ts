@@ -13,13 +13,13 @@ import { ppt_href, ppt_meta } from '../ppts/ppts';
  * ppts-ui:
  */
 Store.onNftChanged(buffered(() => {
-    const nft_token = Nft.token(App.token);
+    const nft_token = Nft.token(Store.getToken());
     Store.dispatch(setPptsUiAmounts({
         ...ppt_amounts(nft_token)
     }));
 }));
 Store.onPptChanged(buffered(() => {
-    const nft_token = Nft.token(App.token);
+    const nft_token = Nft.token(Store.getToken());
     Store.dispatch(setPptsUiAmounts({
         ...ppt_amounts(nft_token)
     }));
@@ -106,7 +106,7 @@ Blockchain.onceConnect(async ({
         images.reduce((l, r) => $.extend(true, l, r))
     ));
 }, {
-    per: () => App.token
+    per: () => Store.getToken()
 });
 const ppt_approval = async (
     address: Address, token: Token
@@ -172,6 +172,6 @@ Promise.all([
     };
     if (!installed || !avalanche) {
         Store.onTokenSwitch(ppt_images);
-        ppt_images(App.token);
+        ppt_images(Store.getToken());
     }
 });

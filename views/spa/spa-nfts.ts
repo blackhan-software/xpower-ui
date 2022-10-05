@@ -1,4 +1,3 @@
-import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { x40 } from '../../source/functions';
 import { addNft, removeNft, setNft } from '../../source/redux/actions';
@@ -34,7 +33,7 @@ Blockchain.onceConnect(async function initNfts({
         }
     }
 }, {
-    per: () => App.token
+    per: () => Store.getToken()
 });
 Blockchain.onConnect(function syncNfts({
     token
@@ -52,7 +51,7 @@ Blockchain.onceConnect(async function onNftSingleTransfers({
     const on_transfer: OnTransferSingle = async (
         op, from, to, id, value, ev
     ) => {
-        if (App.token !== token) {
+        if (Store.getToken() !== token) {
             return;
         }
         console.debug('[on:transfer-single]',
@@ -82,7 +81,7 @@ Blockchain.onceConnect(async function onNftSingleTransfers({
     const nft_wallet = new NftWallet(address, token);
     nft_wallet.onTransferSingle(on_transfer)
 }, {
-    per: () => App.token
+    per: () => Store.getToken()
 });
 Blockchain.onceConnect(async function onNftBatchTransfers({
     address, token
@@ -90,7 +89,7 @@ Blockchain.onceConnect(async function onNftBatchTransfers({
     const on_transfer: OnTransferBatch = async (
         op, from, to, ids, values, ev
     ) => {
-        if (App.token !== token) {
+        if (Store.getToken() !== token) {
             return;
         }
         console.debug('[on:transfer-batch]',
@@ -122,5 +121,5 @@ Blockchain.onceConnect(async function onNftBatchTransfers({
     const nft_wallet = new NftWallet(address, token);
     nft_wallet.onTransferBatch(on_transfer);
 }, {
-    per: () => App.token
+    per: () => Store.getToken()
 });

@@ -1,4 +1,3 @@
-import { App } from '../../source/app';
 import { Blockchain } from '../../source/blockchain';
 import { MoeTreasuryFactory } from '../../source/contract';
 import { buffered, globalRef, x40 } from '../../source/functions';
@@ -35,7 +34,7 @@ Blockchain.onceConnect(async function initPpts({
         }
     }
 }, {
-    per: () => App.token
+    per: () => Store.getToken()
 });
 Blockchain.onConnect(function syncPpts({
     token
@@ -53,7 +52,7 @@ Blockchain.onceConnect(async function onPptSingleTransfers({
     const on_transfer: OnTransferSingle = async (
         op, from, to, id, value, ev
     ) => {
-        if (App.token !== token) {
+        if (Store.getToken() !== token) {
             return;
         }
         console.debug('[on:transfer-single]',
@@ -83,7 +82,7 @@ Blockchain.onceConnect(async function onPptSingleTransfers({
     const ppt_wallet = new PptWallet(address, token);
     ppt_wallet.onTransferSingle(on_transfer)
 }, {
-    per: () => App.token
+    per: () => Store.getToken()
 });
 Blockchain.onceConnect(async function onPptBatchTransfers({
     address, token
@@ -91,7 +90,7 @@ Blockchain.onceConnect(async function onPptBatchTransfers({
     const on_transfer: OnTransferBatch = async (
         op, from, to, ids, values, ev
     ) => {
-        if (App.token !== token) {
+        if (Store.getToken() !== token) {
             return;
         }
         console.debug('[on:transfer-batch]',
@@ -123,14 +122,14 @@ Blockchain.onceConnect(async function onPptBatchTransfers({
     const ppt_wallet = new PptWallet(address, token);
     ppt_wallet.onTransferBatch(on_transfer);
 }, {
-    per: () => App.token
+    per: () => Store.getToken()
 });
 Blockchain.onceConnect(async function updateClaims() {
     const moe_treasury = await MoeTreasuryFactory({
-        token: App.token
+        token: Store.getToken()
     });
     moe_treasury.provider.on('block', buffered(() => {
-        const nft_token = Nft.token(App.token);
+        const nft_token = Nft.token(Store.getToken());
         const { details } = Store.getPptsUi();
         const by_token = details[nft_token];
         Object.entries(by_token).forEach(([

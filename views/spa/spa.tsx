@@ -39,6 +39,7 @@ import './spa-nfts-ui';
 import './spa-ppts';
 import './spa-ppts-ui';
 import './spa-wallet';
+
 type Props = {
     page: Page;
     token: Token;

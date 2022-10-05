@@ -106,7 +106,7 @@ Blockchain.onceConnect(async ({
         images.reduce((l, r) => $.extend(true, l, r))
     ));
 }, {
-    per: () => App.token
+    per: () => Store.getToken()
 });
 const nft_approval = async (
     address: Address, token: Token
@@ -173,6 +173,6 @@ Promise.all([
     };
     if (!installed || !avalanche) {
         Store.onTokenSwitch(nft_images);
-        nft_images(App.token);
+        nft_images(Store.getToken());
     }
 });
