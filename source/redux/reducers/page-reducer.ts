@@ -1,6 +1,6 @@
-import { App } from '../../app';
 
 import { Action } from '@reduxjs/toolkit';
+import { Params } from '../../params';
 import * as actions from '../actions';
 import { Page } from '../types';
 
@@ -13,6 +13,6 @@ export function pageReducer(
     return page;
 }
 export function pageState() {
-    return App.page;
+    return Params.page;
 }
 export default pageReducer;

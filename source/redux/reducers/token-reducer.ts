@@ -1,6 +1,6 @@
-import { App } from '../../app';
 
 import { Action } from '@reduxjs/toolkit';
+import { Params } from '../../params';
 import * as actions from '../actions';
 import { Token } from '../types';
 
@@ -13,6 +13,6 @@ export function tokenReducer(
     return token;
 }
 export function tokenState() {
-    return App.token;
+    return Params.token;
 }
 export default tokenReducer;

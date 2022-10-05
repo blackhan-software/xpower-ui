@@ -1,7 +1,6 @@
 import './footer.scss';
 
 import { capitalize } from '../../routes/functions';
-import { App } from '../../source/app';
 import { Blockchain, ChainId } from '../../source/blockchain';
 import { Store } from '../../source/redux/store';
 import { State, Token } from '../../source/redux/types';
@@ -10,6 +9,7 @@ import { Version } from '../../source/types';
 import React, { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import { connect, Provider } from 'react-redux';
+import { Params } from '../../source/params';
 
 type Props = {
     token: Token; version: Version;
@@ -176,7 +176,7 @@ async function addToken(
     }
 }
 if (require.main === module) {
-    const mapper = ({ token }: State) => ({ token, version: App.version });
+    const mapper = ({ token }: State) => ({ token, version: Params.version });
     const $ui_footer = createElement(connect(mapper)(UiFooter));
     const $footer = document.querySelector('footer');
     createRoot($footer!).render(

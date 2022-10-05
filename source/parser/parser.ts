@@ -1,16 +1,16 @@
 export class Parser {
-  static boolean(
-    text: string | undefined | null, fallback: boolean
-  ): boolean {
+  static boolean<F>(
+    text: string | undefined | null, fallback: F
+  ): boolean | F {
     try {
       return Boolean(JSON.parse(text || `${fallback}`));
     } catch {
       return fallback;
     }
   }
-  static number(
-    text: string | undefined | null, fallback: number
-  ): number {
+  static number<F>(
+    text: string | undefined | null, fallback: F
+  ): number | F {
     try {
       const parsed = JSON.parse(text || `${fallback}`);
       return typeof parsed === 'number' ? parsed : fallback;

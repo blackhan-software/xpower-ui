@@ -1,4 +1,4 @@
-import { App } from '../../app';
+import { Params } from '../../params';
 import { Amount, Supply, Year } from './base';
 
 export class Nft {
@@ -145,7 +145,7 @@ export enum NftLevel {
 }
 export type NftName = keyof typeof NftLevel;
 export function* NftLevels(
-    { max, min } = App.nftLevel
+    { max, min } = Params.nftLevel
 ) {
     for (const l in NftLevel) {
         const n = Number(l);

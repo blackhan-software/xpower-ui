@@ -1,14 +1,13 @@
 import './home.scss';
 
 import { App } from '../../source/app';
-import { Level, Token } from '../../source/redux/types';
-import { MinerStatus } from '../../source/redux/types';
-import { Minting } from '../../source/redux/types';
+import { Level, MinerStatus, Minting, Token } from '../../source/redux/types';
 
 import React, { useEffect } from 'react';
+import { Params } from '../../source/params';
 import { UiMining } from './mining/mining';
-export { UiMining };
 import { UiMinting } from './minting/minting';
+export { UiMining };
 export { UiMinting };
 
 type Props = {
@@ -51,7 +50,7 @@ export function UiHome(
             <UiMinting
                 onForget={props.minting.onForget}
                 onMint={props.minting.onMint}
-                level={App.level.min} rows={rows} token={token}
+                level={Params.level.min} rows={rows} token={token}
             />
         </div>
     </React.Fragment>;

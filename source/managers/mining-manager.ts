@@ -1,8 +1,8 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import { HashManager, IntervalManager } from '.';
-import { App } from '../app';
 import { alert, Alert, Alerts } from '../functions';
 import { Miner } from '../miner';
+import { Params } from '../params';
 import { addNonce } from '../redux/actions';
 import { Store } from '../redux/store';
 import { Address, Amount, BlockHash, Token } from '../redux/types';
@@ -15,7 +15,7 @@ export class MiningManager {
     ): Miner {
         if (this._miner[token] === undefined) {
             this._miner[token] = new Miner(
-                token, address, App.level.min, App.speed
+                token, address, Params.level.min, Params.speed
             );
         }
         return this._miner[token];
@@ -110,8 +110,8 @@ export class MiningManager {
         }
     }
     static range(token: Token): { min: Amount, max: Amount } {
-        const min = Tokenizer.amount(token, App.level.min);
-        const max = Tokenizer.amount(token, App.level.max);
+        const min = Tokenizer.amount(token, Params.level.min);
+        const max = Tokenizer.amount(token, Params.level.max);
         return { min, max };
     }
     static _miner = {} as Record<Token, Miner>;

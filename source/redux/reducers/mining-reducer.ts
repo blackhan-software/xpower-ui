@@ -1,6 +1,6 @@
-import { App } from '../../app';
 
 import { Action } from '@reduxjs/toolkit';
+import { Params } from '../../params';
 import * as actions from '../actions';
 import { Mining } from '../types';
 
@@ -19,6 +19,6 @@ export function miningReducer(
     return mining;
 }
 export function miningState() {
-    return { speed: App.speed, status: null };
+    return { speed: Params.speed, status: null };
 }
 export default miningReducer;

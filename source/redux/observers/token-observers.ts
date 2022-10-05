@@ -2,8 +2,8 @@ import { AnyAction } from '@reduxjs/toolkit';
 import { Store, Unsubscribe } from 'redux';
 import { observe } from './observe';
 
+import { Params } from '../../params';
 import { State, Token } from '../types';
-import { App } from '../../app';
 
 export type OnTokenSwitch = (
     next: Token, prev: Token
@@ -14,7 +14,7 @@ export function onTokenSwitch(
 ): Unsubscribe {
     const selector = (state: State) => state.token;
     const observer = observe<Token>(store)(
-        selector, App.token
+        selector, Params.token
     );
     return observer(handler);
 }

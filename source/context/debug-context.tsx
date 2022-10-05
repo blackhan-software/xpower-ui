@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
-import { App } from '../app';
+import { Params } from '../params';
 
 export const DebugContext = React.createContext<[
     boolean, Dispatch<SetStateAction<boolean>>
@@ -9,7 +9,7 @@ export const DebugContext = React.createContext<[
 export const DebugProvider = (
     props: { children: JSX.Element | JSX.Element[] }
 ) => {
-    const [debug, set_debug] = useState<boolean>(App.debug);
+    const [debug, set_debug] = useState<boolean>(Params.debug);
     return <DebugContext.Provider value={[debug, set_debug]}>
         {props.children}
     </DebugContext.Provider>;

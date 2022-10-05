@@ -2,14 +2,15 @@ import { AnyAction, configureStore } from '@reduxjs/toolkit';
 import { combineReducers, Store as ReduxStore, Unsubscribe } from 'redux';
 
 import { delayed } from '../../functions';
+import { Params } from '../../params';
 import { StateDb } from '../../state-db';
 import { middleware } from '../middleware';
+
 import { onAftWalletDecreased, OnAftWalletDecreased, onAftWalletIncreased, OnAftWalletIncreased, onNftAdded, OnNftAdded, onNftRemoved, OnNftRemoved, onNonceAdded, OnNonceAdded, onNonceRemoved, OnNonceRemoved, onPageSwitch, OnPageSwitch, onPptAdded, onPptRemoved, onTokenSwitch, OnTokenSwitch } from '../observers';
 import { aftWalletReducer, miningReducer, mintingReducer, nftsReducer, nftsUiReducer, noncesReducer, otfWalletReducer, pageReducer, pptsReducer, pptsUiReducer, refreshReducer, tokenReducer } from '../reducers';
 import { nftsBy, nftTotalBy, nonceBy, noncesBy, pptsBy, pptTotalBy, refreshed, walletFor } from '../selectors';
 import { Address, Amount, BlockHash, Level, MintingRow, NftFullId, NftIssue, NftLevel, NftToken, Nonce, State, Supply, Token } from '../types';
 
-import { App } from '../../app/app';
 import { Global } from '../../types';
 declare const global: Global;
 
@@ -23,8 +24,8 @@ export class Store {
     private static get me(): Store {
         if (global.APP_STORE === undefined) {
             global.APP_STORE = new Store({
-                clear: App.clear, clearAll: App.clearAll,
-                logger: App.logger, persist: App.persist
+                clear: Params.clear, clearAll: Params.clearAll,
+                logger: Params.logger, persist: Params.persist
             });
         }
         return global.APP_STORE;
@@ -189,18 +190,18 @@ export class Store {
         logger: boolean, persist: number
     }) {
         const reducer = combineReducers({
-            page: pageReducer,
-            token: tokenReducer,
-            nonces: noncesReducer,
+            aft_wallet: aftWalletReducer,
             mining: miningReducer,
             minting: mintingReducer,
             nfts: nftsReducer,
             nfts_ui: nftsUiReducer,
+            nonces: noncesReducer,
+            otf_wallet: otfWalletReducer,
+            page: pageReducer,
             ppts: pptsReducer,
             ppts_ui: pptsUiReducer,
             refresh: refreshReducer,
-            aft_wallet: aftWalletReducer,
-            otf_wallet: otfWalletReducer,
+            token: tokenReducer,
         });
         if (options.clear) {
             this.db.clear(options.persist);

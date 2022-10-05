@@ -1,6 +1,6 @@
-import { App } from '../app';
-import { Token } from '../redux/types';
 import { Version } from '../../source/types';
+import { Params } from '../params';
+import { Token } from '../redux/types';
 
 export function address({
     infix, token, version
@@ -8,7 +8,7 @@ export function address({
     infix: string, token: Token, version?: Version
 }): string {
     if (version === undefined) {
-        version = App.version;
+        version = Params.version;
     }
     const id = `#g-${token}_${infix}_${version}`;
     const address = $(id).data('value');

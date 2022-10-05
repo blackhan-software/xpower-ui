@@ -1,41 +1,41 @@
+export * from './aft-wallet';
 export * from './base';
 export * from './mining';
 export * from './minting';
 export * from './nfts';
 export * from './nfts-ui';
 export * from './nonces';
+export * from './otf-wallet';
 export * from './page';
 export * from './ppts-ui';
 export * from './refresh';
 export * from './token';
-export * from './aft-wallet';
-export * from './otf-wallet';
 
-import { Page } from './page';
-import { Token } from './token';
+import { AftWallet } from './aft-wallet';
 import { Mining } from './mining';
 import { Minting } from './minting';
 import { Nfts } from './nfts';
 import { NftsUi } from './nfts-ui';
 import { Nonces } from './nonces';
+import { OtfWallet } from './otf-wallet';
+import { Page } from './page';
 import { PptsUi } from './ppts-ui';
 import { Refresh } from './refresh';
-import { AftWallet } from './aft-wallet';
-import { OtfWallet } from './otf-wallet';
+import { Token } from './token';
 
 export type State = {
-    page: Page,
-    token: Token,
-    mining: Mining,
-    minting: Minting,
-    nfts: Nfts,
-    nfts_ui: NftsUi,
-    ppts: Nfts,
-    ppts_ui: PptsUi,
-    nonces: Nonces,
-    refresh: Refresh,
-    aft_wallet: AftWallet,
-    otf_wallet: OtfWallet,
+    aft_wallet: AftWallet;
+    mining: Mining;
+    minting: Minting;
+    nfts: Nfts;
+    nfts_ui: NftsUi;
+    nonces: Nonces;
+    otf_wallet: OtfWallet;
+    page: Page;
+    ppts: Nfts;
+    ppts_ui: PptsUi;
+    refresh: Refresh;
+    token: Token;
 };
 export function Empty<T extends {
     items: Record<string | number | symbol, unknown>

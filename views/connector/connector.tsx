@@ -9,6 +9,7 @@ import React, { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Unsubscribe } from 'redux';
 import { InfoCircle } from '../../public/images/tsx';
+import { Params } from '../../source/params';
 
 type Props = Record<string, never>;
 type State = {
@@ -171,7 +172,7 @@ function ms(
         fallback = mobile() ? 600 : 200;
     }
     const ms = Number(
-        App.params.get('ms') ?? fallback
+        Params.reloadMs ?? fallback
     );
     return !isNaN(ms) ? ms : fallback;
 }
@@ -179,16 +180,20 @@ function reload(
     delta_ms: number
 ) {
     if (location.search) {
-        const match = location.search.match(/ms=([0-9]+)/);
+        const match = location.search.match(
+            /reload-ms=([0-9]+)/
+        );
         if (match && match.length > 1) {
             location.search = location.search.replace(
-                /ms=([0-9]+)/, `ms=${delta_ms + Number(match[1])}`
+                /reload-ms=([0-9]+)/, `reload-ms=${
+                    delta_ms + Number(match[1])
+                }`
             );
         } else {
-            location.search += `&ms=${delta_ms}`;
+            location.search += `&reload-ms=${delta_ms}`;
         }
     } else {
-        location.search = `?ms=${delta_ms}`;
+        location.search = `?reload-ms=${delta_ms}`;
     }
 }
 if (require.main === module) {

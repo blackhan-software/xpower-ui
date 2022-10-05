@@ -1,8 +1,8 @@
 /* eslint @typescript-eslint/no-unused-vars: [off] */
-import { App } from '../../app';
 import { range } from '../../functions';
 
 import { Action } from '@reduxjs/toolkit';
+import { Params } from '../../params';
 import * as actions from '../actions';
 import { Level, Minting, MintingRow } from '../types';
 
@@ -38,7 +38,7 @@ const set = (
     );
 };
 const init = (
-    min_level: Level = App.level.min
+    min_level: Level = Params.level.min
 ): Minting['rows'] => {
     return Array.from(range(1, 65)).map((l) => empty({
         display: l === min_level
