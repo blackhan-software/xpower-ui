@@ -1,88 +1,43 @@
-import { NftFullId, NftIssue, NftToken, NftLevel } from '../types';
-import { Amount, Supply } from '../types';
+import { createAction } from '@reduxjs/toolkit';
+import { Amount, NftFullId, NftIssue, NftLevel, NftToken, Supply } from '../types';
 
-export type SetNft = {
-    type: 'nfts/set', payload: {
-        nft: NftFullId | {
-            token: NftToken,
-            issue: NftIssue,
-            level: NftLevel,
-        },
-        item: {
-            amount: Amount,
-            supply: Supply
-        }
-    }
-};
-export const setNft = (
+export const setNft = createAction('nfts/set', (
     nft: NftFullId | {
-        token: NftToken,
-        issue: NftIssue,
-        level: NftLevel,
+        token: NftToken;
+        issue: NftIssue;
+        level: NftLevel;
     },
     item: {
-        amount: Amount,
-        supply: Supply
+        amount: Amount; // new-amount = amount
+        supply: Supply; // new-supply = supply
     }
-): SetNft => ({
-    type: 'nfts/set', payload: {
-        nft, item
-    }
-});
-export type AddNft = {
-    type: 'nfts/add', payload: {
-        nft: NftFullId | {
-            token: NftToken,
-            issue: NftIssue,
-            level: NftLevel,
-        },
-        item?: {
-            amount: Amount,
-            supply?: Supply
-        }
-    }
-};
-export const addNft = (
+) => ({
+    payload: { nft, item }
+}));
+export const addNft = createAction('nfts/add', (
     nft: NftFullId | {
-        token: NftToken,
-        issue: NftIssue,
-        level: NftLevel,
+        token: NftToken;
+        issue: NftIssue;
+        level: NftLevel;
     },
     item?: {
-        amount: Amount, // new-amount = old-amount + amount
-        supply?: Supply // new-supply = supply ?? old-supply + amount
+        amount: Amount; // new-amount = old-amount + amount
+        supply?: Supply;// new-supply = supply ?? old-supply + amount
     }
-): AddNft => ({
-    type: 'nfts/add', payload: {
-        nft, item
-    }
-});
-export type RemoveNft = {
-    type: 'nfts/remove', payload: {
-        nft: NftFullId | {
-            token: NftToken,
-            issue: NftIssue,
-            level: NftLevel,
-        },
-        item?: {
-            amount: Amount,
-            supply?: Supply
-        }
-    }
-};
-export const removeNft = (
+) => ({
+    payload: { nft, item }
+}));
+export const removeNft = createAction('nfts/remove', (
     nft: NftFullId | {
-        token: NftToken,
-        issue: NftIssue,
-        level: NftLevel,
+        token: NftToken;
+        issue: NftIssue;
+        level: NftLevel;
     },
     item?: {
-        amount: Amount, // new-amount = old-amount - amount
-        supply?: Supply // new-supply = supply ?? old-supply (*no* decrease!)
+        amount: Amount; // new-amount = old-amount - amount
+        supply?: Supply;// new-supply = supply ?? old-supply - (0|amount)
+        kind?: 'transfer' | 'burn';
     }
-): RemoveNft => ({
-    type: 'nfts/remove', payload: {
-        nft, item
-    }
-});
-export type Action = SetNft | AddNft | RemoveNft;
+) => ({
+    payload: { nft, item }
+}));

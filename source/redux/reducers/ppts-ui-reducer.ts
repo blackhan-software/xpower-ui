@@ -1,53 +1,50 @@
+import { Action } from '@reduxjs/toolkit';
 import { Years } from '../../years';
-import { Action } from '../actions/ppts-ui-actions';
+import * as actions from '../actions';
 import { NftLevels, NftToken, NftTokens, PptAmounts, PptDetails, PptFlags, PptMinter, PptsUi } from '../types';
 
 export function pptsUiReducer(
     ppts_ui: PptsUi = pptsUiState(), action: Action
 ): PptsUi {
-    switch (action.type) {
-        case 'ppts-ui/set-amounts': {
-            const { amounts: rhs } = action.payload;
-            const { amounts: lhs } = ppts_ui;
-            return {
-                ...ppts_ui, amounts: $.extend(true, {}, lhs, rhs)
-            };
-        }
-        case 'ppts-ui/set-details': {
-            const { details: rhs } = action.payload;
-            const { details: lhs } = ppts_ui;
-            return {
-                ...ppts_ui, details: $.extend(true, {}, lhs, rhs)
-            };
-        }
-        case 'ppts-ui/set-flags': {
-            const { flags: rhs } = action.payload;
-            const { flags: lhs } = ppts_ui;
-            return {
-                ...ppts_ui, flags: $.extend(true, {}, lhs, rhs)
-            };
-        }
-        case 'ppts-ui/set-minter': {
-            const { minter: rhs } = action.payload;
-            const { minter: lhs } = ppts_ui;
-            return {
-                ...ppts_ui, minter: $.extend(true, {}, lhs, rhs)
-            };
-        }
-        case 'ppts-ui/set-toggled': {
-            const { toggled: rhs } = action.payload;
-            const { toggled: lhs } = ppts_ui;
-            return {
-                ...ppts_ui, toggled: rhs ?? lhs
-            };
-        }
-        case 'ppts-ui/set': {
-            return $.extend(true, {}, ppts_ui, action.payload);
-        }
-        default: {
-            return ppts_ui;
-        }
+    if (actions.setPptsUiAmounts.match(action)) {
+        const { amounts: rhs } = action.payload;
+        const { amounts: lhs } = ppts_ui;
+        return {
+            ...ppts_ui, amounts: $.extend(true, {}, lhs, rhs)
+        };
     }
+    if (actions.setPptsUiDetails.match(action)) {
+        const { details: rhs } = action.payload;
+        const { details: lhs } = ppts_ui;
+        return {
+            ...ppts_ui, details: $.extend(true, {}, lhs, rhs)
+        };
+    }
+    if (actions.setPptsUiFlags.match(action)) {
+        const { flags: rhs } = action.payload;
+        const { flags: lhs } = ppts_ui;
+        return {
+            ...ppts_ui, flags: $.extend(true, {}, lhs, rhs)
+        };
+    }
+    if (actions.setPptsUiMinter.match(action)) {
+        const { minter: rhs } = action.payload;
+        const { minter: lhs } = ppts_ui;
+        return {
+            ...ppts_ui, minter: $.extend(true, {}, lhs, rhs)
+        };
+    }
+    if (actions.setPptsUiToggled.match(action)) {
+        const { toggled: rhs } = action.payload;
+        const { toggled: lhs } = ppts_ui;
+        return {
+            ...ppts_ui, toggled: rhs ?? lhs
+        };
+    }
+    if (actions.setPptsUi.match(action)) {
+        return $.extend(true, {}, ppts_ui, action.payload);
+    }
+    return ppts_ui;
 }
 export function pptsUiState() {
     return {

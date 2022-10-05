@@ -69,6 +69,7 @@ Blockchain.onceConnect(async function onNftSingleTransfers({
         });
         if (address === from) {
             Store.dispatch(removeNft(nft_id, {
+                kind: to ? 'transfer' : 'burn',
                 amount: value
             }));
         }
@@ -107,6 +108,7 @@ Blockchain.onceConnect(async function onNftBatchTransfers({
             });
             if (address === from) {
                 Store.dispatch(removeNft(nft_id, {
+                    kind: to ? 'transfer' : 'burn',
                     amount: values[i]
                 }));
             }

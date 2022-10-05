@@ -1,29 +1,32 @@
-/* eslint @typescript-eslint/no-unused-vars: [off] */
-import { Amount, Supply, Empty } from '../types';
-import { Nfts, NftFullId, Nft } from '../types';
-import { Action } from '../actions/ppts-actions';
+import { Action } from '@reduxjs/toolkit';
+import * as actions from '../actions';
+import { Amount, Empty, Nft, NftFullId, NftIssue, NftLevel, Nfts, NftToken, Supply } from '../types';
 
+const fullId = (ppt: NftFullId | {
+    token: NftToken, issue: NftIssue, level: NftLevel
+}) => {
+    return typeof ppt !== 'string' ? Nft.fullId(ppt) : ppt;
+};
 export function pptsReducer(
     ppts = Empty<Nfts>(), action: Action
 ): Nfts {
-    if (!action.type.startsWith('ppts/')) {
-        return ppts;
-    }
-    const items = { ...ppts.items };
-    const id = typeof action.payload.nft !== 'string'
-        ? Nft.fullId(action.payload.nft)
-        : action.payload.nft;
-    if (action.type === 'ppts/set') {
-        const s = action.payload.item.supply;
-        const a = action.payload.item.amount;
+    if (actions.setPpt.match(action)) {
+        const { item, nft } = action.payload;
+        const items = { ...ppts.items };
+        const id = fullId(nft);
+        const s = item.supply;
+        const a = item.amount;
         items[id] = pack(a, s, { id });
         return { items, more: [id] };
     }
-    if (action.type === 'ppts/add') {
+    if (actions.addPpt.match(action)) {
+        const { item, nft } = action.payload;
+        const items = { ...ppts.items };
+        const id = fullId(nft);
         const item_old = items[id];
         const item_new = {
-            amount: action.payload.item?.amount ?? 1n,
-            supply: action.payload.item?.supply
+            amount: item?.amount ?? 1n,
+            supply: item?.supply
         };
         if (item_old) {
             const s = item_new.supply ?? item_old.supply + item_new.amount;
@@ -36,14 +39,18 @@ export function pptsReducer(
         }
         return { items, more: [id] };
     }
-    if (action.type === 'ppts/remove') {
+    if (actions.removePpt.match(action)) {
+        const { item, nft } = action.payload;
+        const items = { ...ppts.items };
+        const id = fullId(nft);
         const item_old = items[id];
         const item_new = {
-            amount: action.payload.item?.amount ?? 1n,
-            supply: action.payload.item?.supply
+            amount: item?.amount ?? 1n,
+            supply: item?.supply
         };
         if (item_old) {
-            const s = item_new.supply ?? item_old.supply - item_new.amount;
+            const delta = item?.kind === 'burn' ? item_new.amount : 0n;
+            const s = item_new.supply ?? item_old.supply - delta;
             const a = item_old.amount - item_new.amount;
             items[id] = pack(a, s, { id });
         } else {

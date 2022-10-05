@@ -155,7 +155,7 @@ describe('Store w/nfts-reducer (remove)', () => {
             amount: 1n, supply: 1n
         });
         const state_2 = nftsReducer(state_1, removeNft(id, {
-            amount: 1n
+            amount: 1n, kind: 'transfer'
         }));
         expect(state_2.items[id]).toEqual({
             amount: 0n, supply: 1n
@@ -174,7 +174,7 @@ describe('Store w/nfts-reducer (remove)', () => {
             amount: 1n, supply: 1n
         });
         const state_2 = nftsReducer(state_1, removeNft(id, {
-            amount: 1n, supply: 10n
+            amount: 1n, supply: 10n, kind: 'transfer'
         }));
         expect(state_2.items[id]).toEqual({
             amount: 0n, supply: 10n
@@ -192,7 +192,7 @@ describe('Store w/nfts-reducer (remove)', () => {
         let state_2;
         try {
             state_2 = nftsReducer(state_1, removeNft(id, {
-                amount: 2n, supply: 1n
+                amount: 2n, supply: 1n, kind: 'transfer'
             }));
         } catch (ex: any) {
             expect(ex.message).toBe(`NFT(${id}) supply=1 < amount=3`)
@@ -210,13 +210,13 @@ describe('Store w/nfts-reducer (remove)', () => {
             amount: 5n, supply: 5n
         });
         const state_2 = nftsReducer(state_1, removeNft(id, {
-            amount: 2n
+            amount: 2n, kind: 'transfer'
         }));
         expect(state_2.items[id]).toEqual({
             amount: 3n, supply: 5n
         });
         const state_3 = nftsReducer(state_2, removeNft(id, {
-            amount: 1n
+            amount: 1n, kind: 'transfer'
         }));
         expect(state_3.items[id]).toEqual({
             amount: 2n, supply: 5n
@@ -237,13 +237,13 @@ describe('Store w/nfts-reducer (remove)', () => {
             amount: 5n, supply: 5n
         });
         const state_2 = nftsReducer(state_1, removeNft(id, {
-            amount: 2n, supply: 4n
+            amount: 2n, supply: 4n, kind: 'transfer'
         }));
         expect(state_2.items[id]).toEqual({
             amount: 3n, supply: 4n
         });
         const state_3 = nftsReducer(state_2, removeNft(id, {
-            amount: 1n
+            amount: 1n, kind: 'transfer'
         }));
         expect(state_3.items[id]).toEqual({
             amount: 2n, supply: 4n
@@ -264,13 +264,13 @@ describe('Store w/nfts-reducer (remove)', () => {
             amount: 5n, supply: 5n
         });
         const state_2 = nftsReducer(state_1, removeNft(id, {
-            amount: 2n
+            amount: 2n, kind: 'transfer'
         }));
         expect(state_2.items[id]).toEqual({
             amount: 3n, supply: 5n
         });
         const state_3 = nftsReducer(state_2, removeNft(id, {
-            amount: 1n, supply: 4n
+            amount: 1n, supply: 4n, kind: 'transfer'
         }));
         expect(state_3.items[id]).toEqual({
             amount: 2n, supply: 4n
@@ -291,13 +291,13 @@ describe('Store w/nfts-reducer (remove)', () => {
             amount: 5n, supply: 5n
         });
         const state_2 = nftsReducer(state_1, removeNft(id, {
-            amount: 2n, supply: 4n
+            amount: 2n, supply: 4n, kind: 'transfer'
         }));
         expect(state_2.items[id]).toEqual({
             amount: 3n, supply: 4n
         });
         const state_3 = nftsReducer(state_2, removeNft(id, {
-            amount: 1n, supply: 3n
+            amount: 1n, supply: 3n, kind: 'transfer'
         }));
         expect(state_3.items[id]).toEqual({
             amount: 2n, supply: 3n

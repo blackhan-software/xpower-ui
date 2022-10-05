@@ -70,6 +70,7 @@ Blockchain.onceConnect(async function onPptSingleTransfers({
         });
         if (address === from) {
             Store.dispatch(removePpt(nft_id, {
+                kind: to ? 'transfer' : 'burn',
                 amount: value
             }));
         }
@@ -108,6 +109,7 @@ Blockchain.onceConnect(async function onPptBatchTransfers({
             });
             if (address === from) {
                 Store.dispatch(removePpt(ppt_id, {
+                    kind: to ? 'transfer' : 'burn',
                     amount: values[i]
                 }));
             }

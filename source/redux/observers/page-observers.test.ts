@@ -1,10 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { Action, configureStore } from '@reduxjs/toolkit';
 import { combineReducers, Store } from 'redux';
 import { pageReducer } from '../reducers';
 
-import { Action, switchPage } from '../actions';
-import { onPageSwitch } from './page-observers';
+import { switchPage } from '../actions';
 import { Page, State } from '../types';
+import { onPageSwitch } from './page-observers';
 
 describe('onPageSwitch', () => {
     it('should invoke handler (for switchPage)', () => {

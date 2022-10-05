@@ -1,9 +1,9 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { Action, configureStore } from '@reduxjs/toolkit';
 import { combineReducers, Store } from 'redux';
-import { aftWalletReducer as aftWalletReducer } from '../reducers';
+import { aftWalletReducer } from '../reducers';
 
-import { Action, increaseAftWallet, decreaseAftWallet } from '../actions';
-import { onAftWalletIncreased, onAftWalletDecreased } from '.';
+import { onAftWalletDecreased, onAftWalletIncreased } from '.';
+import { decreaseAftWallet, increaseAftWallet } from '../actions';
 import { State, Token } from '../types';
 
 describe('onAftWalletIncreased', () => {

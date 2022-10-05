@@ -155,7 +155,7 @@ describe('Store w/ppts-reducer (remove)', () => {
             amount: 1n, supply: 1n
         });
         const state_2 = pptsReducer(state_1, removePpt(id, {
-            amount: 1n
+            amount: 1n, kind: 'burn'
         }));
         expect(state_2.items[id]).toEqual({
             amount: 0n, supply: 0n
@@ -174,7 +174,7 @@ describe('Store w/ppts-reducer (remove)', () => {
             amount: 1n, supply: 1n
         });
         const state_2 = pptsReducer(state_1, removePpt(id, {
-            amount: 1n, supply: 10n
+            amount: 1n, supply: 10n, kind: 'burn'
         }));
         expect(state_2.items[id]).toEqual({
             amount: 0n, supply: 10n
@@ -192,7 +192,7 @@ describe('Store w/ppts-reducer (remove)', () => {
         let state_2;
         try {
             state_2 = pptsReducer(state_1, removePpt(id, {
-                amount: 2n, supply: 1n
+                amount: 2n, supply: 1n, kind: 'burn'
             }));
         } catch (ex: any) {
             expect(ex.message).toBe(`PPT(${id}) supply=1 < amount=3`)
@@ -210,13 +210,13 @@ describe('Store w/ppts-reducer (remove)', () => {
             amount: 5n, supply: 5n
         });
         const state_2 = pptsReducer(state_1, removePpt(id, {
-            amount: 2n
+            amount: 2n, kind: 'burn'
         }));
         expect(state_2.items[id]).toEqual({
             amount: 3n, supply: 3n
         });
         const state_3 = pptsReducer(state_2, removePpt(id, {
-            amount: 1n
+            amount: 1n, kind: 'burn'
         }));
         expect(state_3.items[id]).toEqual({
             amount: 2n, supply: 2n
@@ -237,13 +237,13 @@ describe('Store w/ppts-reducer (remove)', () => {
             amount: 5n, supply: 5n
         });
         const state_2 = pptsReducer(state_1, removePpt(id, {
-            amount: 2n, supply: 4n
+            amount: 2n, supply: 4n, kind: 'burn'
         }));
         expect(state_2.items[id]).toEqual({
             amount: 3n, supply: 4n
         });
         const state_3 = pptsReducer(state_2, removePpt(id, {
-            amount: 1n
+            amount: 1n, kind: 'burn'
         }));
         expect(state_3.items[id]).toEqual({
             amount: 2n, supply: 3n
@@ -264,13 +264,13 @@ describe('Store w/ppts-reducer (remove)', () => {
             amount: 5n, supply: 5n
         });
         const state_2 = pptsReducer(state_1, removePpt(id, {
-            amount: 2n
+            amount: 2n, kind: 'burn'
         }));
         expect(state_2.items[id]).toEqual({
             amount: 3n, supply: 3n
         });
         const state_3 = pptsReducer(state_2, removePpt(id, {
-            amount: 1n, supply: 3n
+            amount: 1n, supply: 3n, kind: 'burn'
         }));
         expect(state_3.items[id]).toEqual({
             amount: 2n, supply: 3n
@@ -291,13 +291,13 @@ describe('Store w/ppts-reducer (remove)', () => {
             amount: 5n, supply: 5n
         });
         const state_2 = pptsReducer(state_1, removePpt(id, {
-            amount: 2n, supply: 4n
+            amount: 2n, supply: 4n, kind: 'burn'
         }));
         expect(state_2.items[id]).toEqual({
             amount: 3n, supply: 4n
         });
         const state_3 = pptsReducer(state_2, removePpt(id, {
-            amount: 1n, supply: 3n
+            amount: 1n, supply: 3n, kind: 'burn'
         }));
         expect(state_3.items[id]).toEqual({
             amount: 2n, supply: 3n

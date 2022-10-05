@@ -1,9 +1,9 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { Action, configureStore } from '@reduxjs/toolkit';
 import { combineReducers, Store } from 'redux';
 import { noncesReducer } from '../reducers';
 
-import { Action, addNonce, removeNonce, removeNonceByAmount } from '../actions';
 import { onNonceAdded, onNonceRemoved } from '.';
+import { addNonce, removeNonce, removeNonceByAmount } from '../actions';
 import { State, Token } from '../types';
 
 describe('onNonceAdded', () => {

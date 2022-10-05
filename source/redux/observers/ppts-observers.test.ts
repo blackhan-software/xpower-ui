@@ -1,9 +1,9 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { Action, configureStore } from '@reduxjs/toolkit';
 import { combineReducers, Store } from 'redux';
 import { pptsReducer } from '../reducers';
 
-import { Action, addPpt, removePpt } from '../actions';
 import { onPptAdded, onPptRemoved } from '.';
+import { addPpt, removePpt } from '../actions';
 import { State } from '../types';
 
 describe('onNftAdded', () => {
@@ -55,7 +55,7 @@ describe('onNftRemoved', () => {
             amount: 2n, supply: 3n
         }));
         store.dispatch(removePpt(id, {
-            amount: 1n
+            amount: 1n, kind: 'burn'
         }));
     });
 });

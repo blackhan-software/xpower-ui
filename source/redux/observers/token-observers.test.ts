@@ -1,10 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { Action, configureStore } from '@reduxjs/toolkit';
 import { combineReducers, Store } from 'redux';
 import { tokenReducer } from '../reducers';
 
-import { Action, switchToken } from '../actions';
+import { switchToken } from '../actions';
+import { State, Token } from '../types';
 import { onTokenSwitch } from './token-observers';
-import { Token, State } from '../types';
 
 describe('onTokenSwitch', () => {
     it('should invoke handler (for switchToken)', () => {

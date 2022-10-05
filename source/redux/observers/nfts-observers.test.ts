@@ -1,9 +1,9 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { Action, configureStore } from '@reduxjs/toolkit';
 import { combineReducers, Store } from 'redux';
 import { nftsReducer } from '../reducers';
 
-import { Action, addNft, removeNft } from '../actions';
 import { onNftAdded, onNftRemoved } from '.';
+import { addNft, removeNft } from '../actions';
 import { State } from '../types';
 
 describe('onNftAdded', () => {
@@ -55,7 +55,7 @@ describe('onNftRemoved', () => {
             amount: 2n, supply: 3n
         }));
         store.dispatch(removeNft(id, {
-            amount: 1n
+            amount: 1n, kind: 'transfer'
         }));
     });
 });

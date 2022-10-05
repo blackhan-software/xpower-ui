@@ -1,88 +1,43 @@
-import { NftFullId, NftIssue, NftToken, NftLevel } from '../types';
-import { Amount, Supply } from '../types';
+import { createAction } from '@reduxjs/toolkit';
+import { Amount, NftFullId, NftIssue, NftLevel, NftToken, Supply } from '../types';
 
-export type SetPpt = {
-    type: 'ppts/set', payload: {
-        nft: NftFullId | {
-            token: NftToken,
-            issue: NftIssue,
-            level: NftLevel,
-        },
-        item: {
-            amount: Amount,
-            supply: Supply
-        }
-    }
-};
-export const setPpt = (
+export const setPpt = createAction('ppts/set', (
     nft: NftFullId | {
-        token: NftToken,
-        issue: NftIssue,
-        level: NftLevel,
+        token: NftToken;
+        issue: NftIssue;
+        level: NftLevel;
     },
     item: {
-        amount: Amount,
-        supply: Supply
+        amount: Amount; // new-amount = amount
+        supply: Supply; // new-supply = supply
     }
-): SetPpt => ({
-    type: 'ppts/set', payload: {
-        nft, item
-    }
-});
-export type AddPpt = {
-    type: 'ppts/add', payload: {
-        nft: NftFullId | {
-            token: NftToken,
-            issue: NftIssue,
-            level: NftLevel,
-        },
-        item?: {
-            amount: Amount,
-            supply?: Supply
-        }
-    }
-};
-export const addPpt = (
+) => ({
+    payload: { nft, item }
+}));
+export const addPpt = createAction('ppts/add', (
     nft: NftFullId | {
-        token: NftToken,
-        issue: NftIssue,
-        level: NftLevel,
+        token: NftToken;
+        issue: NftIssue;
+        level: NftLevel;
     },
     item?: {
-        amount: Amount, // new-amount = old-amount + amount
-        supply?: Supply // new-supply = supply ?? old-supply + amount
+        amount: Amount; // new-amount = old-amount + amount
+        supply?: Supply;// new-supply = supply ?? old-supply + amount
     }
-): AddPpt => ({
-    type: 'ppts/add', payload: {
-        nft, item
-    }
-});
-export type RemovePpt = {
-    type: 'ppts/remove', payload: {
-        nft: NftFullId | {
-            token: NftToken,
-            issue: NftIssue,
-            level: NftLevel,
-        },
-        item?: {
-            amount: Amount,
-            supply?: Supply
-        }
-    }
-};
-export const removePpt = (
+) => ({
+    payload: { nft, item }
+}));
+export const removePpt = createAction('ppts/remove', (
     nft: NftFullId | {
-        token: NftToken,
-        issue: NftIssue,
-        level: NftLevel,
+        token: NftToken;
+        issue: NftIssue;
+        level: NftLevel;
     },
     item?: {
-        amount: Amount, // new-amount = old-amount - amount
-        supply?: Supply // new-supply = supply ?? old-supply (*no* decrease!)
+        amount: Amount; // new-amount = old-amount - amount
+        supply?: Supply;// new-supply = supply ?? old-supply - (0|amount)
+        kind?: 'transfer' | 'burn';
     }
-): RemovePpt => ({
-    type: 'ppts/remove', payload: {
-        nft, item
-    }
-});
-export type Action = SetPpt | AddPpt | RemovePpt;
+) => ({
+    payload: { nft, item }
+}));
