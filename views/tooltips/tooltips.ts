@@ -19,21 +19,11 @@ Store.onTokenSwitched(function retitleTips(
         }
     })
 });
-global.addEventListener('load', () => {
-    Bus.emit('refresh-tips');
-}, {
-    once: true
-});
-Bus.on('refresh-tips', buffered((
-    flags?: { keep?: boolean }
-) => {
+Bus.on('refresh-tips', buffered(() => {
     const $tips = document.querySelectorAll<HTMLElement>(
         '[data-bs-toggle=tooltip]'
     );
     $tips.forEach(($tip) => {
-        if (!flags || !flags.keep) {
-            Tooltip.getInstance($tip)?.hide();
-        }
         if (refresh($tip)) {
             recreate($tip);
             resubscribe($tip);
@@ -52,14 +42,6 @@ Bus.on('refresh-tips', buffered((
         }) => {
             target?.removeEventListener('click', show);
             target?.addEventListener('click', hide, {
-                once: true
-            });
-        });
-        $tip.addEventListener('hidden.bs.tooltip', ({
-            target
-        }) => {
-            target?.removeEventListener('click', hide);
-            target?.addEventListener('click', show, {
                 once: true
             });
         });

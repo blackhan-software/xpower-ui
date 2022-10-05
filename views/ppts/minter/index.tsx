@@ -1,15 +1,10 @@
-import { Bus } from '../../../source/bus';
-import { Token } from '../../../source/redux/types';
-import { PptMinterList } from '../../../source/redux/types';
-import { PptMinterApproval } from '../../../source/redux/types';
-import { PptMinterStatus, PptBurnerStatus } from '../../../source/redux/types';
+import { PptBurnerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../../source/redux/types';
 
-import { UiPptBatchMinter } from './ppt-batch-minter';
-export { UiPptBatchMinter };
+import React from 'react';
 import { UiPptBatchBurner } from './ppt-batch-burner';
+export { UiPptBatchMinter };
+import { UiPptBatchMinter } from './ppt-batch-minter';
 export { UiPptBatchBurner };
-
-import React, { useEffect } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 
 type Props = {
@@ -27,9 +22,6 @@ type Props = {
 export function UiPptMinter(
     props: Props
 ) {
-    useEffect(() => {
-        Bus.emit('refresh-tips');
-    });
     return <div
         className='btn-group ppt-batch-minter' role='group'
     >

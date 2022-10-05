@@ -15,7 +15,7 @@ import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTrans
 import { Years } from '../../source/years';
 
 import { Dispatch } from '@reduxjs/toolkit';
-import React, { createElement, useContext } from 'react';
+import React, { createElement, useContext, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { connect, Provider, useDispatch } from 'react-redux';
 
@@ -32,6 +32,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import { Transaction } from 'ethers';
 
+import { Bus } from '../../source/bus';
 import './spa-mining';
 import './spa-minting';
 import './spa-nfts';
@@ -59,6 +60,9 @@ export function SPA(
     if (debug) {
         console.count('[app.render]');
     }
+    useEffect(() => {
+        Bus.emit('refresh-tips');
+    });
     const { aft_wallet, otf_wallet } = props;
     const { mining, minting } = props;
     const { nfts, nfts_ui } = props;

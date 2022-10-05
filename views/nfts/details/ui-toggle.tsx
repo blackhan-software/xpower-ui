@@ -1,4 +1,3 @@
-import { Bus } from '../../../source/bus';
 import React from 'react';
 
 type Props = {
@@ -39,9 +38,6 @@ export class UiNftToggle extends React.Component<
         return toggled
             ? 'Hide older NFTs'
             : 'Show older NFTs';
-    }
-    componentDidUpdate() {
-        Bus.emit('refresh-tips');
     }
 }
 export default UiNftToggle;

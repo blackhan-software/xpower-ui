@@ -1,13 +1,12 @@
 import './home.scss';
 
-import { Bus } from '../../source/bus';
 import { Level, MinerStatus, Minting, Token } from '../../source/redux/types';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Params } from '../../source/params';
 import { UiMining } from './mining/mining';
-import { UiMinting } from './minting/minting';
 export { UiMining };
+import { UiMinting } from './minting/minting';
 export { UiMinting };
 
 type Props = {
@@ -30,9 +29,6 @@ type Props = {
 export function UiHome(
     props: Props
 ) {
-    useEffect(() => {
-        Bus.emit('refresh-tips');
-    }, []);
     const { status, togglable } = props.mining;
     const { speed, speedable } = props.mining;
     const { rows } = props.minting;

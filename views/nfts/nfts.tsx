@@ -1,19 +1,12 @@
 import './nfts.scss';
 
-import { Bus } from '../../source/bus';
-import { Amount, Token } from '../../source/redux/types';
-import { NftMinter, NftMinterList } from '../../source/redux/types'
-import { NftAmounts, NftDetails, NftFlags } from '../../source/redux/types';
-import { Nft, Nfts, NftIssue, NftToken, NftLevel } from '../../source/redux/types';
+import { Amount, Nft, NftAmounts, NftDetails, NftFlags, NftIssue, NftLevel, NftMinter, NftMinterList, Nfts, NftToken, Token } from '../../source/redux/types';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { UiNftList } from './list/list';
 export { UiNftList };
-
-import { UiNftDetails } from './details/details';
-export { UiNftDetails };
-import { UiNftImage, nft_meta, nft_href } from './details/details';
-export { UiNftImage, nft_meta, nft_href };
+import { UiNftDetails, UiNftImage, nft_href, nft_meta } from './details/details';
+export { UiNftDetails, UiNftImage, nft_meta, nft_href };
 import { UiNftMinter } from './minter/minter';
 export { UiNftMinter };
 
@@ -95,9 +88,6 @@ function split(
 export function UiNfts(
     props: Props
 ) {
-    useEffect(() => {
-        Bus.emit('refresh-tips');
-    }, []);
     const { nfts, token } = props;
     const nft_token = Nft.token(token);
     const { flags, toggled } = props;

@@ -1,4 +1,3 @@
-import { Bus } from '../../../source/bus';
 import { Referable } from '../../../source/functions';
 import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
 
@@ -91,7 +90,6 @@ export class UiNftExpander extends Referable(
                 this.showSender($row.current);
             }
         }
-        Bus.emit('refresh-tips');
     }
     showTarget(
         $row: HTMLElement

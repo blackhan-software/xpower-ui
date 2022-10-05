@@ -1,4 +1,3 @@
-import { Bus } from '../../../source/bus';
 import { Blockchain } from '../../../source/blockchain';
 import { Nft, NftIssue, NftLevel, Token } from '../../../source/redux/types';
 import { NftWallet, NftWalletMock } from '../../../source/wallet';
@@ -65,9 +64,6 @@ export class UiNftImage extends React.Component<
         const name = Nft.nameOf(level);
         const id = Nft.coreId({ level, issue });
         return `Trade staked ${name} NFTs (level ${rank}/9 & ID #${id})`;
-    }
-    componentDidMount() {
-        Bus.emit('refresh-tips');
     }
 }
 function Spinner(

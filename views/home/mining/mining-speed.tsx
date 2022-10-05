@@ -1,9 +1,7 @@
-import { Bus } from '../../../source/bus';
 import { Miner } from '../../../source/miner';
 
 import React from 'react';
-import { DashCircle } from '../../../public/images/tsx';
-import { PlusCircle } from '../../../public/images/tsx';
+import { DashCircle, PlusCircle } from '../../../public/images/tsx';
 
 type Props = {
     disabled: boolean; speed: number;
@@ -134,9 +132,6 @@ export class UiMiningSpeed extends React.Component<
         $progressor?.addEventListener('wheel', this.onWheel.bind(this), {
             passive: false
         });
-    }
-    componentDidUpdate() {
-        Bus.emit('refresh-tips');
     }
 }
 export default UiMiningSpeed;

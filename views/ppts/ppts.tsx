@@ -1,19 +1,14 @@
 import './ppts.scss';
 
-import { Bus } from '../../source/bus';
-import { Amount, Token } from '../../source/redux/types';
-import { PptMinter, PptMinterList } from '../../source/redux/types';
-import { PptAmounts, PptDetails, PptFlags } from '../../source/redux/types';
-import { Nft, Nfts, NftIssue, NftToken, NftLevel } from '../../source/redux/types';
+import { Amount, Nft, NftIssue, NftLevel, Nfts, NftToken, PptAmounts, PptDetails, PptFlags, PptMinter, PptMinterList, Token } from '../../source/redux/types';
+import { ppt_href, ppt_meta } from './details/details';
+export { ppt_meta, ppt_href };
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { UiPptList } from './list/list';
 export { UiPptList };
-
-import { UiPptDetails } from './details/details';
-export { UiPptDetails };
-import { UiPptImage, ppt_meta, ppt_href } from './details/details';
-export { UiPptImage, ppt_meta, ppt_href };
+import { UiPptDetails, UiPptImage } from './details/details';
+export { UiPptDetails, UiPptImage };
 import { UiPptMinter } from './minter';
 export { UiPptMinter };
 
@@ -102,9 +97,6 @@ function split(
 export function UiPpts(
     props: Props
 ) {
-    useEffect(() => {
-        Bus.emit('refresh-tips');
-    }, []);
     const { ppts, token } = props;
     const ppt_token = Nft.token(token);
     const { flags, toggled } = props;

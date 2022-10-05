@@ -1,11 +1,10 @@
 import './amount';
 import './list.scss';
 
-import { Bus } from '../../../source/bus';
 import { nftTotalBy } from '../../../source/redux/selectors';
 import { Amount, Nft, NftDetails, NftIssue, NftLevel, NftLevels, Nfts, Supply, Token } from '../../../source/redux/types';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { UiNftDetails } from '../details/details';
 import { UiNftAmount } from './amount';
 
@@ -51,9 +50,6 @@ export type NftList = Record<NftLevel, {
 export function UiNftList(
     props: Props
 ) {
-    useEffect(() => {
-        Bus.emit('refresh-tips');
-    });
     const { token, list } = props;
     return <React.Fragment>
         <label className='form-label'>

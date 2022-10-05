@@ -1,6 +1,5 @@
 import './connector.scss';
 
-import { Bus } from '../../source/bus';
 import { Blockchain, ChainId } from '../../source/blockchain';
 import { buffered, mobile, Referable } from '../../source/functions';
 import { Store } from '../../source/redux/store';
@@ -149,7 +148,6 @@ export class UiConnector extends Referable(
         if (this.state.chain !== Chain.UNAVAILABLE) {
             return;
         }
-        Bus.emit('refresh-tips');
     })
     unTokenSwitch?: Unsubscribe;
 }

@@ -1,13 +1,12 @@
 import './amount';
 import './list.scss';
 
-import { Bus } from '../../../source/bus';
 import { pptTotalBy } from '../../../source/redux/selectors';
 import { Amount, Nft, NftIssue, NftLevel, NftLevels, Nfts, PptDetails, Supply, Token } from '../../../source/redux/types';
 
-import React, { useEffect, useMemo } from 'react';
-import { UiPptAmount } from './amount';
+import React, { useMemo } from 'react';
 import { UiPptDetails } from '../details/details';
+import { UiPptAmount } from './amount';
 
 type Props = {
     ppts: Nfts;
@@ -55,9 +54,6 @@ type PptList = Record<NftLevel, {
 export function UiPptList(
     props: Props
 ) {
-    useEffect(() => {
-        Bus.emit('refresh-tips');
-    });
     const { token, list } = props;
     return <React.Fragment>
         <label className='form-label'>
