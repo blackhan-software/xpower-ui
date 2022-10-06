@@ -44,14 +44,14 @@ Store.onTokenSwitch(function resetMinters() {
     }
     Store.dispatch(clearMintingRows());
 });
-Store.onTokenSwitched(function forgetNonces() {
-    if (Page.Home !== Store.getPage()) {
+Store.onPageSwitch(function forgetNonces(next, prev) {
+    if (Page.Home !== prev) {
         return;
     }
     Store.dispatch(removeNonces());
 });
-Store.onPageSwitched(function forgetNonces(next, prev) {
-    if (Page.Home !== prev) {
+Store.onTokenSwitch(function forgetNonces() {
+    if (Page.Home !== Store.getPage()) {
         return;
     }
     Store.dispatch(removeNonces());

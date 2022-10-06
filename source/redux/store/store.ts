@@ -132,7 +132,7 @@ export class Store {
         return onTokenSwitch(this.me.store, delayed(callback, ms));
     }
     public static onTokenSwitched(
-        callback: OnTokenSwitch, ms = 900
+        callback: OnTokenSwitch, ms = 600
     ) {
         return onTokenSwitch(this.me.store, delayed(callback, ms));
     }
