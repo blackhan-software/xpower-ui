@@ -1,3 +1,4 @@
+import { nomobi } from '../../../source/functions';
 import { Miner } from '../../../source/miner';
 
 import React from 'react';
@@ -31,6 +32,7 @@ export class UiMiningSpeed extends React.Component<
                 data-bs-placement='top' data-bs-toggle='tooltip'
                 disabled={!this.increasable(speed, disabled)}
                 onClick={this.increase.bind(this, speed, disabled)}
+                title={nomobi('Increase mining speed')}
             >
                 <PlusCircle fill={true} />
             </button>
@@ -62,6 +64,7 @@ export class UiMiningSpeed extends React.Component<
                 data-bs-toggle='tooltip' data-bs-placement='top'
                 disabled={!this.decreasable(speed, disabled)}
                 onClick={this.decrease.bind(this, speed, disabled)}
+                title={nomobi('Decrease mining speed')}
             >
                 <DashCircle fill={true} />
             </button>
@@ -120,12 +123,6 @@ export class UiMiningSpeed extends React.Component<
         return false;
     }
     componentDidMount = () => {
-        if (document.body.clientWidth > 576) {
-            const $inc = document.querySelector('#increase');
-            $inc?.setAttribute('title', 'Increase mining speed');
-            const $dec = document.querySelector('#decrease');
-            $dec?.setAttribute('title', 'Decrease mining speed');
-        }
         const $progressor = document.querySelector<HTMLElement>(
             '.progressor'
         );

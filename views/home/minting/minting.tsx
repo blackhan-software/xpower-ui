@@ -1,5 +1,5 @@
-import { globalRef, nice } from '../../../source/functions';
-import { Level, MinterStatus, Minting, MintingRow, NftLevels, Token } from '../../../source/redux/types';
+import { globalRef, nice, nomobi } from '../../../source/functions';
+import { Level, MinterStatus, Minting, MintingRow, Token } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
 
 import React, { useEffect, useState } from 'react';
@@ -27,19 +27,6 @@ export function UiMinting(
     }, [
         focus, status
     ]);
-    useEffect(/*set-title*/() => {
-        const title = 'Forget the tokens mined so far (w/o minting them)';
-        if (document.body.clientWidth > 576) {
-            for (const level of NftLevels()) {
-                const $ref = globalRef<HTMLElement>(
-                    `.forget[level="${level}"]`
-                );
-                if ($ref.current) {
-                    $ref.current.title = title;
-                }
-            }
-        }
-    }, []);
     return <React.Fragment>
         <label className='form-label'>
             Mined Amounts (not minted yet)
@@ -135,10 +122,10 @@ function $forget(
         row: MintingRow
     }
 ) {
+    const title = 'Forget the tokens mined so far (w/o minting them)';
     return <span
-        className='d-inline-block'
+        className='d-inline-block' title={nomobi(title)}
         data-bs-toggle='tooltip' data-bs-placement='top'
-        ref={globalRef(`.forget[level="${level}"]`)}
     >
         <button
             onClick={() => {

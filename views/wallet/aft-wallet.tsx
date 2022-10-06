@@ -1,4 +1,4 @@
-import { nice, nice_si, x40 } from '../../source/functions';
+import { nice, nice_si, nomobi, x40 } from '../../source/functions';
 import { Address, AftWallet, Token } from '../../source/redux/types';
 
 import React from 'react';
@@ -38,7 +38,7 @@ function $toggle(
         className='form-control input-group-text'
         data-bs-toggle='tooltip' data-bs-placement='top'
         onClick={onToggled?.bind(null, !toggled)}
-        role='button' title={title}
+        role='button' title={nomobi(title)}
     >
         <i className={icon} />
     </button>;
