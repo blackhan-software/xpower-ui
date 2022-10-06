@@ -47,7 +47,7 @@ export class UiPptAmount extends Referable(React.Component)<
         >
             <button type='button' aria-label="Decrease"
                 className='btn btn-outline-warning decrease'
-                onMouseDown={this.startDecrease.bind(this)}
+                onMouseDown={this.startDecreaseAndDecrease.bind(this)}
                 onMouseLeave={this.stopDecrease.bind(this)}
                 onMouseUp={this.stopDecrease.bind(this)}
                 onKeyDown={this.decreaseByKeyboard.bind(this)}
@@ -59,6 +59,12 @@ export class UiPptAmount extends Referable(React.Component)<
                 <DashCircle fill={true} />
             </button>
         </div>;
+    }
+    startDecreaseAndDecrease(
+        e: MouseEvent
+    ) {
+        this.startDecrease(e);
+        this.decrease(e);
     }
     startDecrease(
         e: MouseEvent | TouchEvent
@@ -76,7 +82,6 @@ export class UiPptAmount extends Referable(React.Component)<
                 this.decrease(e);
             }, 10);
         }, 600);
-        this.decrease(e);
     }
     stopDecrease() {
         if (global.PPT_TID_DECREASE) {
@@ -163,7 +168,7 @@ export class UiPptAmount extends Referable(React.Component)<
         >
             <button type='button' aria-label="Increase"
                 className='btn btn-outline-warning increase'
-                onMouseDown={this.startIncrease.bind(this)}
+                onMouseDown={this.startIncreaseAndIncrease.bind(this)}
                 onMouseLeave={this.stopIncrease.bind(this)}
                 onMouseUp={this.stopIncrease.bind(this)}
                 onKeyDown={this.increaseByKeyboard.bind(this)}
@@ -175,6 +180,12 @@ export class UiPptAmount extends Referable(React.Component)<
                 <PlusCircle fill={true} />
             </button>
         </div>;
+    }
+    startIncreaseAndIncrease(
+        e: MouseEvent
+    ) {
+        this.startIncrease(e);
+        this.increase(e);
     }
     startIncrease(
         e: MouseEvent | TouchEvent
@@ -192,7 +203,6 @@ export class UiPptAmount extends Referable(React.Component)<
                 this.increase(e);
             }, 10);
         }, 600);
-        this.increase(e);
     }
     stopIncrease() {
         if (global.PPT_TID_INCREASE) {
