@@ -53,7 +53,7 @@ export class Store {
         { level }: { level: Level; }
     ) {
         const { minting } = this.me.store.getState();
-        return minting.rows[level - 1];
+        return minting.rows[level];
     }
     public static getNonceBy(query?: {
         address?: Address;

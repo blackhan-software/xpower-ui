@@ -1,3 +1,5 @@
+import { Level } from "./nonces";
+
 export type MintingRow = {
     status: MinterStatus | null;
     disabled: boolean;
@@ -12,5 +14,5 @@ export enum MinterStatus {
 }
 export type Minting = {
     /** set on dispatching minting */
-    rows: MintingRow[];
+    rows: Record<Level, MintingRow>;
 };

@@ -31,16 +31,16 @@ export function mintingState() {
 const set = (
     rows: Minting['rows'], level: Level, new_row: Partial<MintingRow>
 ): Minting['rows'] => {
-    return rows.map((row, i) =>
-        (level !== i + 1) ? { ...row } : { ...row, ...new_row }
-    );
+    return { ...rows, [level]: { ...rows[level], ...new_row } };
 };
 const init = (
     min_level: Level = Params.level.min
 ): Minting['rows'] => {
-    return Array.from(range(1, 65)).map((l) => empty({
-        display: l === min_level
-    }));
+    return Object.fromEntries(
+        Array.from(range(1, 65)).map((l) => [l, empty({
+            display: l === min_level
+        })])
+    );
 };
 const empty = (
     row: Partial<MintingRow> = {}

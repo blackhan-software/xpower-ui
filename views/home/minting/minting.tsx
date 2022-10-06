@@ -13,7 +13,7 @@ export function UiMinting(
     { token, rows, onMint, onForget }: Props
 ) {
     const [focus, setFocus] = useState<Record<Level, boolean>>({});
-    const status = rows.map(({ status }) => status);
+    const status = Object.values(rows).map(({ status }) => status);
     useEffect(/*re-focus*/() => {
         const any_focused = Object.entries(focus).filter(
             ([level, focused]) => focused // eslint-disable-line
@@ -31,7 +31,7 @@ export function UiMinting(
         <label className='form-label'>
             Mined Amounts (not minted yet)
         </label>
-        {rows.map((row, i) => $mint(
+        {Object.values(rows).map((row, i) => $mint(
             { token, level: i + 1, row, onMint, onForget },
             (level, flag) => setFocus({ [level]: flag })
         )).filter((row) => row)}
