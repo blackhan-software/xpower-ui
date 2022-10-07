@@ -23,6 +23,7 @@ import { UiWallet } from '../wallet/wallet';
 
 import * as actions from './spa-actions';
 
+import './spa-location';
 import './spa-mining';
 import './spa-minting';
 import './spa-nfts';

@@ -15,7 +15,6 @@ const configuration = ({
         spa: [
             './library/index.ts',
             './views/theme/theme.ts',
-            './views/location/location.ts',
             './views/header/header.tsx',
             './views/spa/spa.tsx',
             './views/footer/footer.tsx',
