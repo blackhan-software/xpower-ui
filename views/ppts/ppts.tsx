@@ -1,16 +1,12 @@
 import './ppts.scss';
 
-import { Amount, Nft, NftIssue, NftLevel, Nfts, NftToken, PptAmounts, PptDetails, PptFlags, PptMinter, PptMinterList, Token } from '../../source/redux/types';
-import { ppt_href, ppt_meta } from './details/details';
-export { ppt_meta, ppt_href };
+import {
+    Amount, Nft, NftIssue, NftLevel, Nfts, NftToken, PptAmounts, PptDetails, PptFlags, PptMinter, PptMinterList, Token
+} from '../../source/redux/types';
 
 import React from 'react';
 import { UiPptList } from './list/list';
-export { UiPptList };
-import { UiPptDetails, UiPptImage } from './details/details';
-export { UiPptDetails, UiPptImage };
 import { UiPptMinter } from './minter';
-export { UiPptMinter };
 
 type Props = {
     token: Token; ppts: Nfts; flags: PptFlags;

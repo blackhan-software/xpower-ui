@@ -1,7 +1,8 @@
+import { AppState } from '../store';
 import { Nft, NftFullId, NftIssue, NftLevel, Nfts, NftToken } from '../types';
 
 export function nftsBy(
-    nfts: Nfts, nft?: NftFullId | {
+    { nfts }: Pick<AppState, 'nfts'>, nft?: NftFullId | {
         issue?: NftIssue,
         level?: NftLevel,
         token?: NftToken,

@@ -4,7 +4,8 @@ import { noncesReducer } from '../reducers';
 
 import { onNonceAdded, onNonceRemoved } from '.';
 import { addNonce, removeNonce, removeNonceByAmount } from '../actions';
-import { State, Token } from '../types';
+import { AppState } from '../store';
+import { Token } from '../types';
 
 describe('onNonceAdded', () => {
     const address = BigInt('0xabcd');
@@ -19,7 +20,7 @@ describe('onNonceAdded', () => {
                 serializableCheck: false
             })
         });
-        onNonceAdded(store as Store<State, Action>, (
+        onNonceAdded(store as Store<AppState, Action>, (
             n, i, t_by, t
         ) => {
             expect(n).toEqual(0xffff);
@@ -48,7 +49,7 @@ describe('onNonceRemoved', () => {
                 serializableCheck: false
             })
         });
-        onNonceRemoved(store as Store<State, Action>, (
+        onNonceRemoved(store as Store<AppState, Action>, (
             n, i, t_by, t
         ) => {
             expect(n).toEqual(0xffff);
@@ -75,7 +76,7 @@ describe('onNonceRemoved', () => {
                 serializableCheck: false
             })
         });
-        onNonceRemoved(store as Store<State, Action>, (
+        onNonceRemoved(store as Store<AppState, Action>, (
             n, i, t_by, t
         ) => {
             expect(n).toEqual(0xffff);

@@ -2,8 +2,8 @@ import './footer.scss';
 
 import { capitalize } from '../../routes/functions';
 import { Blockchain, ChainId } from '../../source/blockchain';
-import { Store } from '../../source/redux/store';
-import { State, Token } from '../../source/redux/types';
+import { AppState, Store } from '../../source/redux/store';
+import { Token } from '../../source/redux/types';
 import { Version } from '../../source/types';
 
 import React, { createElement } from 'react';
@@ -176,7 +176,7 @@ async function addToken(
     }
 }
 if (require.main === module) {
-    const mapper = ({ token }: State) => ({ token, version: Params.version });
+    const mapper = ({ token }: AppState) => ({ token, version: Params.version });
     const $ui_footer = createElement(connect(mapper)(UiFooter));
     const $footer = document.querySelector('footer');
     createRoot($footer!).render(

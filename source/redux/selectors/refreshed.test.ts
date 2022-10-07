@@ -1,33 +1,35 @@
 import { refreshed } from './refreshed';
 
 describe('refreshed', () => {
-    const date = null;
+    const state = { refresh: { date: null } };
     it('should return true', () => {
-        expect(refreshed({ date })).toEqual(true);
+        expect(refreshed(state)).toEqual(true);
     });
     it('should return false', () => {
-        expect(refreshed({ date })).toEqual(false);
+        expect(refreshed(state)).toEqual(false);
     });
     it('should return false (again)', () => {
-        expect(refreshed({ date })).toEqual(false);
+        expect(refreshed(state)).toEqual(false);
     });
     it('should return true', () => {
-        expect(refreshed({ date: new Date().toISOString() })).toEqual(true);
+        const state = { refresh: { date: new Date().toISOString() } };
+        expect(refreshed(state)).toEqual(true);
     });
 });
 
 describe('refreshed', () => {
-    const date = new Date().toISOString();
+    const state = { refresh: { date: new Date().toISOString() } };
     it('should return true', () => {
-        expect(refreshed({ date })).toEqual(true);
+        expect(refreshed(state)).toEqual(true);
     });
     it('should return false', () => {
-        expect(refreshed({ date })).toEqual(false);
+        expect(refreshed(state)).toEqual(false);
     });
     it('should return false (again)', () => {
-        expect(refreshed({ date })).toEqual(false);
+        expect(refreshed(state)).toEqual(false);
     });
     it('should return true', () => {
-        expect(refreshed({ date: new Date().toISOString() })).toEqual(true);
+        const state = { refresh: { date: new Date().toISOString() } };
+        expect(refreshed(state)).toEqual(true);
     });
 });

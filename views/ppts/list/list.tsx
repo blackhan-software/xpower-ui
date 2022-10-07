@@ -73,10 +73,11 @@ function $pptMinter(
     props: Props, ppt_level: NftLevel,
     { display, toggled, amount, max, min }: PptList[NftLevel]
 ) {
-    const total_by = useMemo(() => pptTotalBy(props.ppts, {
-        level: ppt_level, token: Nft.token(props.token)
+    const { ppts, token } = props;
+    const total_by = useMemo(() => pptTotalBy({ ppts }, {
+        level: ppt_level, token: Nft.token(token)
     }), [
-        props.ppts, ppt_level, props.token
+        ppts, ppt_level, token
     ]);
     if (display) {
         return <div

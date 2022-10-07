@@ -1,9 +1,9 @@
 /* eslint @typescript-eslint/no-unused-vars: [off] */
-import { Nft, NftFullId, NftIssue, NftLevel, Nfts, NftToken } from '../types';
-import { Amount, Supply } from '../types';
+import { AppState } from '../store';
+import { Amount, Nft, NftFullId, NftIssue, NftLevel, NftToken, Supply } from '../types';
 
 export function pptTotalBy(
-    ppts: Nfts, ppt?: NftFullId | {
+    { ppts }: Pick<AppState, 'ppts'>, ppt?: NftFullId | {
         issue?: NftIssue,
         level?: NftLevel,
         token?: NftToken,

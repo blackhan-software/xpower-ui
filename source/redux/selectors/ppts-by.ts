@@ -1,7 +1,8 @@
+import { AppState } from '../store';
 import { Nft, NftFullId, NftIssue, NftLevel, Nfts, NftToken } from '../types';
 
 export function pptsBy(
-    nfts: Nfts, nft?: NftFullId | {
+    { ppts }: Pick<AppState, 'ppts'>, nft?: NftFullId | {
         issue?: NftIssue,
         level?: NftLevel,
         token?: NftToken,
@@ -15,7 +16,7 @@ export function pptsBy(
         ? Nft.token(nft) : nft?.token;
     return {
         items: Object.fromEntries(
-            Object.entries(nfts.items).filter(([id]) => {
+            Object.entries(ppts.items).filter(([id]) => {
                 if (issue !== undefined && issue !== Nft.issue(id)) {
                     return false;
                 }

@@ -1,10 +1,10 @@
-import { Action, configureStore } from '@reduxjs/toolkit';
-import { combineReducers, Store } from 'redux';
+import { AnyAction, configureStore, Store } from '@reduxjs/toolkit';
+import { combineReducers } from 'redux';
 import { nftsReducer } from '../reducers';
 
 import { onNftAdded, onNftRemoved } from '.';
 import { addNft, removeNft } from '../actions';
-import { State } from '../types';
+import { AppState } from '../store';
 
 describe('onNftAdded', () => {
     const id = 'THOR:202103';
@@ -17,7 +17,7 @@ describe('onNftAdded', () => {
                 serializableCheck: false
             })
         });
-        onNftAdded(store as Store<State, Action>, (id, i, {
+        onNftAdded(store as Store<AppState, AnyAction>, (id, i, {
             amount: t_amount, supply: t_supply
         }) => {
             expect(id).toEqual('THOR:202103');
@@ -42,7 +42,7 @@ describe('onNftRemoved', () => {
                 serializableCheck: false
             })
         });
-        onNftRemoved(store as Store<State, Action>, (id, i, {
+        onNftRemoved(store as Store<AppState, AnyAction>, (id, i, {
             amount: t_amount, supply: t_supply
         }) => {
             expect(id).toEqual('LOKI:202206');

@@ -6,6 +6,7 @@ module.exports = {
   setupFiles: [
     './test/env-vars.ts',
     './test/$.extend.ts',
+    './test/local-storage.ts',
   ],
   testPathIgnorePatterns : ['\.js$']
 };

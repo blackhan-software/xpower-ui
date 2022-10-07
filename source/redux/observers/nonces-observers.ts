@@ -3,7 +3,8 @@ import { Store, Unsubscribe } from 'redux';
 import { observe } from './observe';
 
 import { hex, max, x40 } from '../../functions';
-import { Address, Amount, BlockHash, Empty, Nonce, Nonces, State, Token } from '../types';
+import { AppState } from '../store';
+import { Address, Amount, BlockHash, Empty, Nonce, Nonces, Token } from '../types';
 
 enum Sign {
     positive = +1,
@@ -70,9 +71,9 @@ export type OnNonceRemoved = (
     total_by: Amount, total: Amount
 ) => void;
 export function onNonceAdded(
-    store: Store<State, AnyAction>, handler: OnNonceAdded
+    store: Store<AppState, AnyAction>, handler: OnNonceAdded
 ): Unsubscribe {
-    const selector = (state: State) => state.nonces;
+    const selector = (state: AppState) => state.nonces;
     const observer = observe<Nonces>(store)(
         selector, Empty<Nonces>()
     );
@@ -91,9 +92,9 @@ export function onNonceAdded(
     });
 }
 export function onNonceRemoved(
-    store: Store<State, AnyAction>, handler: OnNonceRemoved
+    store: Store<AppState, AnyAction>, handler: OnNonceRemoved
 ): Unsubscribe {
-    const selector = (state: State) => state.nonces;
+    const selector = (state: AppState) => state.nonces;
     const observer = observe<Nonces>(store)(
         selector, Empty<Nonces>()
     );

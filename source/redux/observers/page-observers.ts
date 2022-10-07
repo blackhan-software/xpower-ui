@@ -3,16 +3,17 @@ import { Store, Unsubscribe } from 'redux';
 import { observe } from './observe';
 
 import { Params } from '../../params';
-import { Page, State } from '../types';
+import { AppState } from '../store';
+import { Page } from '../types';
 
 export type OnPageSwitch = (
     next: Page, prev: Page
 ) => void;
 
 export function onPageSwitch(
-    store: Store<State, AnyAction>, handler: OnPageSwitch
+    store: Store<AppState, AnyAction>, handler: OnPageSwitch
 ): Unsubscribe {
-    const selector = (state: State) => state.page;
+    const selector = (state: AppState) => state.page;
     const observer = observe<Page>(store)(
         selector, Params.page
     );

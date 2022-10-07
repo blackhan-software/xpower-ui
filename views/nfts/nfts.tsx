@@ -1,14 +1,12 @@
 import './nfts.scss';
 
-import { Amount, Nft, NftAmounts, NftDetails, NftFlags, NftIssue, NftLevel, NftMinter, NftMinterList, Nfts, NftToken, Token } from '../../source/redux/types';
+import {
+    Amount, Nft, NftAmounts, NftDetails, NftFlags, NftIssue, NftLevel, NftMinter, NftMinterList, Nfts, NftToken, Token
+} from '../../source/redux/types';
 
 import React from 'react';
 import { UiNftList } from './list/list';
-export { UiNftList };
-import { UiNftDetails, UiNftImage, nft_href, nft_meta } from './details/details';
-export { UiNftDetails, UiNftImage, nft_meta, nft_href };
 import { UiNftMinter } from './minter/minter';
-export { UiNftMinter };
 
 type Props = {
     token: Token; nfts: Nfts; flags: NftFlags;

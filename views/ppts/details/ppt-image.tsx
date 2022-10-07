@@ -1,9 +1,5 @@
-import { Blockchain } from '../../../source/blockchain';
-import { Nft, NftIssue, NftLevel, Token } from '../../../source/redux/types';
-import { PptWallet, PptWalletMock } from '../../../source/wallet';
-
 import React from 'react';
-import { PptImageMeta } from './ppt-image-meta';
+import { Nft, NftIssue, NftLevel, Token } from '../../../source/redux/types';
 
 type Props = {
     token: Token;
@@ -79,31 +75,5 @@ function Spinner(
         className='spinner spinner-border'
         role='status' style={style}
     />;
-}
-export async function ppt_meta({ level, issue, token }: {
-    level: NftLevel, issue: NftIssue, token: Token
-}) {
-    const address = await Blockchain.selectedAddress;
-    const avalanche = await Blockchain.isAvalanche();
-    return address && avalanche
-        ? await PptImageMeta.get(address, { level, issue, token })
-        : await PptImageMeta.get(null, { level, issue, token });
-}
-export async function ppt_href({ level, issue, token }: {
-    level: NftLevel, issue: NftIssue, token: Token
-}) {
-    const address = await Blockchain.selectedAddress;
-    const avalanche = await Blockchain.isAvalanche();
-    const ppt_wallet = address && avalanche
-        ? new PptWallet(address, token)
-        : new PptWalletMock(0n, token);
-    const ppt_id = Nft.coreId({ level, issue });
-    const supply = await ppt_wallet.totalSupply(ppt_id);
-    if (supply > 0) {
-        const ppt_contract = await ppt_wallet.contract;
-        const market = 'https://nftrade.com/assets/avalanche';
-        return new URL(`${market}/${ppt_contract.address}/${ppt_id}`);
-    }
-    return null;
 }
 export default UiPptImage;

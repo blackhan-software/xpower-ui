@@ -1,8 +1,8 @@
 import './header.scss';
 
 import { switchPage } from '../../source/redux/actions';
-import { Store } from '../../source/redux/store';
-import { Page, State, Token } from '../../source/redux/types';
+import { AppState, Store } from '../../source/redux/store';
+import { Page, Token } from '../../source/redux/types';
 
 import { Dispatch } from '@reduxjs/toolkit';
 import React, { createElement, MouseEvent } from 'react';
@@ -90,7 +90,7 @@ const labels: Record<Page, string> = {
     [Page.None]: '',
 }
 if (require.main === module) {
-    const mapper = ({ page, token }: State) => ({ page, token });
+    const mapper = ({ page, token }: AppState) => ({ page, token });
     const $ui_header = createElement(connect(mapper)(UiHeader));
     const $header = document.querySelector('header');
     createRoot($header!).render(

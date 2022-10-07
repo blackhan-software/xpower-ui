@@ -3,11 +3,12 @@ import { Bus } from '../../source/bus';
 import { buffered } from '../../source/functions';
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiMinter } from '../../source/redux/actions';
 import { nftAmounts } from '../../source/redux/reducers';
+import { aftWalletBy, tokenOf } from '../../source/redux/selectors';
 import { Store } from '../../source/redux/store';
 import { Address, Amount, Balance, MID_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftTokens, Token } from '../../source/redux/types';
-import { MoeWallet, NftWallet } from '../../source/wallet';
+import { MoeWallet, NftWallet, NftWalletMock } from '../../source/wallet';
 import { Years } from '../../source/years';
-import { nft_href, nft_meta } from '../nfts/nfts';
+import { NftImageMeta } from '../nfts/details/nft-image-meta';
 /**
  * nfts-ui:
  */
@@ -19,7 +20,7 @@ Store.onAftWalletChanged(buffered((
     }));
 }));
 Store.onTokenSwitch((token) => {
-    const { items } = Store.getAftWallet(token);
+    const { items } = aftWalletBy(Store.state, token);
     const amount = items[token]?.amount;
     if (amount !== undefined) {
         Store.dispatch(setNftsUiAmounts({
@@ -93,7 +94,7 @@ Blockchain.onceConnect(async ({
         images.reduce((l, r) => $.extend(true, l, r))
     ));
 }, {
-    per: () => Store.getToken()
+    per: () => tokenOf(Store.state)
 });
 const nft_approval = async (
     address: Address, token: Token
@@ -137,6 +138,32 @@ const nft_image = async (
         url_content
     });
 }
+async function nft_meta({ level, issue, token }: {
+    level: NftLevel, issue: NftIssue, token: Token
+}) {
+    const address = await Blockchain.selectedAddress;
+    const avalanche = await Blockchain.isAvalanche();
+    return address && avalanche
+        ? await NftImageMeta.get(address, { level, issue, token })
+        : await NftImageMeta.get(null, { level, issue, token });
+}
+async function nft_href({ level, issue, token }: {
+    level: NftLevel, issue: NftIssue, token: Token
+}) {
+    const address = await Blockchain.selectedAddress;
+    const avalanche = await Blockchain.isAvalanche();
+    const nft_wallet = address && avalanche
+        ? new NftWallet(address, token)
+        : new NftWalletMock(0n, token);
+    const nft_id = Nft.coreId({ level, issue });
+    const supply = await nft_wallet.totalSupply(nft_id);
+    if (supply > 0) {
+        const nft_contract = await nft_wallet.contract;
+        const market = 'https://nftrade.com/assets/avalanche';
+        return new URL(`${market}/${nft_contract.address}/${nft_id}`);
+    }
+    return null;
+}
 /**
  * ui-fallback: on no or wrong chain
  */
@@ -160,6 +187,6 @@ Promise.all([
     };
     if (!installed || !avalanche) {
         Store.onTokenSwitch(nft_images);
-        nft_images(Store.getToken());
+        nft_images(tokenOf(Store.state));
     }
 });

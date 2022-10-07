@@ -6,16 +6,18 @@ describe('nft-total-by', () => {
     const level = NftLevel.UNIT;
     const token = NftToken.ODIN;
     it('should return total = { amount: 0n, supply: 0n }', () => {
-        const total = nftTotalBy({ items: {} });
+        const total = nftTotalBy({ nfts: { items: {} } });
         expect(total).toEqual({
             amount: 0n, supply: 0n
         });
     });
     it('should return total = { amount: 1n, supply: 2n }', () => {
         const total = nftTotalBy({
-            items: {
-                'ODIN:202100': {
-                    amount: 1n, supply: 2n
+            nfts: {
+                items: {
+                    'ODIN:202100': {
+                        amount: 1n, supply: 2n
+                    }
                 }
             }
         }, {
@@ -27,12 +29,14 @@ describe('nft-total-by', () => {
     });
     it('should return total = { amount: 3n, supply: 6n }', () => {
         const total = nftTotalBy({
-            items: {
-                'ODIN:202100': {
-                    amount: 1n, supply: 2n
-                },
-                'ODIN:202103': {
-                    amount: 2n, supply: 4n
+            nfts: {
+                items: {
+                    'ODIN:202100': {
+                        amount: 1n, supply: 2n
+                    },
+                    'ODIN:202103': {
+                        amount: 2n, supply: 4n
+                    }
                 }
             }
         }, {

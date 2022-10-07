@@ -7,11 +7,9 @@ import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 import { UiNftAmount } from './nft-amount';
 import { UiNftExpander } from './nft-expander';
+import { UiNftImage } from './nft-image';
 import { UiNftSender } from './nft-sender';
 import { UiNftTarget } from './nft-target';
-
-import { nft_href, nft_meta, UiNftImage } from './nft-image';
-export { nft_href, nft_meta, UiNftImage };
 
 type Props = {
     nfts: Nfts;

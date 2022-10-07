@@ -1,6 +1,7 @@
 import { Blockchain } from '../../source/blockchain';
 import { x40 } from '../../source/functions';
 import { addNft, removeNft, setNft } from '../../source/redux/actions';
+import { nftsBy, tokenOf } from '../../source/redux/selectors';
 import { Store } from '../../source/redux/store';
 import { Nft, NftFullId, NftLevels } from '../../source/redux/types';
 import { NftWallet, OnTransferBatch, OnTransferSingle } from '../../source/wallet';
@@ -33,12 +34,12 @@ Blockchain.onceConnect(async function initNfts({
         }
     }
 }, {
-    per: () => Store.getToken()
+    per: () => tokenOf(Store.state)
 });
 Blockchain.onConnect(function syncNfts({
     token
 }) {
-    const nfts = Store.getNftsBy({
+    const nfts = nftsBy(Store.state, {
         token: Nft.token(token)
     });
     for (const [id, nft] of Object.entries(nfts.items)) {
@@ -51,7 +52,7 @@ Blockchain.onceConnect(async function onNftSingleTransfers({
     const on_transfer: OnTransferSingle = async (
         op, from, to, id, value, ev
     ) => {
-        if (Store.getToken() !== token) {
+        if (tokenOf(Store.state) !== token) {
             return;
         }
         console.debug('[on:transfer-single]',
@@ -81,7 +82,7 @@ Blockchain.onceConnect(async function onNftSingleTransfers({
     const nft_wallet = new NftWallet(address, token);
     nft_wallet.onTransferSingle(on_transfer)
 }, {
-    per: () => Store.getToken()
+    per: () => tokenOf(Store.state)
 });
 Blockchain.onceConnect(async function onNftBatchTransfers({
     address, token
@@ -89,7 +90,7 @@ Blockchain.onceConnect(async function onNftBatchTransfers({
     const on_transfer: OnTransferBatch = async (
         op, from, to, ids, values, ev
     ) => {
-        if (Store.getToken() !== token) {
+        if (tokenOf(Store.state) !== token) {
             return;
         }
         console.debug('[on:transfer-batch]',
@@ -121,5 +122,5 @@ Blockchain.onceConnect(async function onNftBatchTransfers({
     const nft_wallet = new NftWallet(address, token);
     nft_wallet.onTransferBatch(on_transfer);
 }, {
-    per: () => Store.getToken()
+    per: () => tokenOf(Store.state)
 });

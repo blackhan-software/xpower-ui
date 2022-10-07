@@ -6,16 +6,18 @@ describe('ppt-total-by', () => {
     const level = NftLevel.UNIT;
     const token = NftToken.ODIN;
     it('should return total = { amount: 0n, supply: 0n }', () => {
-        const total = pptTotalBy({ items: {} });
+        const total = pptTotalBy({ ppts: { items: {} } });
         expect(total).toEqual({
             amount: 0n, supply: 0n
         });
     });
     it('should return total = { amount: 1n, supply: 2n }', () => {
         const total = pptTotalBy({
-            items: {
-                'ODIN:202100': {
-                    amount: 1n, supply: 2n
+            ppts: {
+                items: {
+                    'ODIN:202100': {
+                        amount: 1n, supply: 2n
+                    }
                 }
             }
         }, {
@@ -27,12 +29,14 @@ describe('ppt-total-by', () => {
     });
     it('should return total = { amount: 3n, supply: 6n }', () => {
         const total = pptTotalBy({
-            items: {
-                'ODIN:202100': {
-                    amount: 1n, supply: 2n
-                },
-                'ODIN:202103': {
-                    amount: 2n, supply: 4n
+            ppts: {
+                items: {
+                    'ODIN:202100': {
+                        amount: 1n, supply: 2n
+                    },
+                    'ODIN:202103': {
+                        amount: 2n, supply: 4n
+                    }
                 }
             }
         }, {

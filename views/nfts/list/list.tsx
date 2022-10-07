@@ -69,10 +69,11 @@ function $nftMinter(
     props: Props, nft_level: NftLevel,
     { display, toggled, amount, max, min }: NftList[NftLevel]
 ) {
-    const total_by = useMemo(() => nftTotalBy(props.nfts, {
-        level: nft_level, token: Nft.token(props.token)
+    const { nfts, token } = props;
+    const total_by = useMemo(() => nftTotalBy({ nfts }, {
+        level: nft_level, token: Nft.token(token)
     }), [
-        props.nfts, nft_level, props.token
+        nfts, nft_level, token
     ]);
     if (display) {
         return <div

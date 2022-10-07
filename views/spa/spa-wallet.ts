@@ -1,6 +1,7 @@
 import { Blockchain } from '../../source/blockchain';
 import { buffered, x40 } from '../../source/functions';
 import { setAftWallet, setOtfWalletAddress, setOtfWalletAmount } from '../../source/redux/actions';
+import { otfWalletOf, tokenOf } from '../../source/redux/selectors';
 import { Store } from '../../source/redux/store';
 import { MoeWallet, OnTransfer, OtfManager } from '../../source/wallet';
 /**
@@ -17,7 +18,7 @@ Blockchain.onceConnect(async function initAftWallet({
         token, { amount, supply }
     ));
 }, {
-    per: () => Store.getToken()
+    per: () => tokenOf(Store.state)
 });
 Blockchain.onceConnect(function syncAftWallet({
     address, token
@@ -25,7 +26,7 @@ Blockchain.onceConnect(function syncAftWallet({
     const on_transfer: OnTransfer = async (
         from, to, amount
     ) => {
-        if (Store.getToken() !== token) {
+        if (tokenOf(Store.state) !== token) {
             return;
         }
         console.debug(
@@ -43,7 +44,7 @@ Blockchain.onceConnect(function syncAftWallet({
     const moe_wallet = new MoeWallet(address, token);
     moe_wallet.onTransfer(on_transfer);
 }, {
-    per: () => Store.getToken()
+    per: () => tokenOf(Store.state)
 });
 /**
  * otf-wallet:
@@ -68,7 +69,7 @@ Blockchain.onceConnect(async function syncOtfWallet() {
     async function on_block() {
         const otf_balance = await otf_wallet.getBalance();
         const otf_amount = otf_balance.toBigInt();
-        const { amount } = Store.getOtfWallet();
+        const { amount } = otfWalletOf(Store.state);
         if (amount !== otf_amount) {
             Store.dispatch(setOtfWalletAmount({
                 amount: otf_amount

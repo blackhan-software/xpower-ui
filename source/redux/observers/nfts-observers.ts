@@ -2,8 +2,8 @@ import { AnyAction } from '@reduxjs/toolkit';
 import { Store, Unsubscribe } from 'redux';
 import { observe } from './observe';
 
-import { NftFullId, Nfts, Empty } from '../types';
-import { Amount, Supply, State } from '../types';
+import { AppState } from '../store';
+import { Amount, Empty, NftFullId, Nfts, Supply } from '../types';
 
 export type OnNftAdded = (
     id: NftFullId,
@@ -17,9 +17,9 @@ export type OnNftRemoved = (
 ) => void;
 
 export function onNftAdded(
-    store: Store<State, AnyAction>, handler: OnNftAdded
+    store: Store<AppState, AnyAction>, handler: OnNftAdded
 ): Unsubscribe {
-    const selector = (state: State) => state.nfts;
+    const selector = (state: AppState) => state.nfts;
     const observer = observe<Nfts>(store)(
         selector, Empty<Nfts>()
     );
@@ -47,9 +47,9 @@ export function onNftAdded(
     });
 }
 export function onNftRemoved(
-    store: Store<State, AnyAction>, handler: OnNftRemoved
+    store: Store<AppState, AnyAction>, handler: OnNftRemoved
 ): Unsubscribe {
-    const selector = (state: State) => state.nfts;
+    const selector = (state: AppState) => state.nfts;
     const observer = observe<Nfts>(store)(
         selector, Empty<Nfts>()
     );

@@ -1,8 +1,9 @@
 /* eslint @typescript-eslint/no-unused-vars: [off] */
-import { Address, Amount, BlockHash, Nonce, Nonces, Token } from '../types';
+import { AppState } from '../store';
+import { Address, Amount, BlockHash, Nonce, Token } from '../types';
 
 export function noncesBy(
-    nonces: Nonces, item?: {
+    { nonces }: Pick<AppState, 'nonces'>, item?: {
         address?: Address,
         amount?: Amount,
         block_hash?: BlockHash,

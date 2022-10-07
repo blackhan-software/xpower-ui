@@ -1,5 +1,5 @@
-import { Bus } from '../../../source/bus';
 import { Blockchain } from '../../../source/blockchain';
+import { Bus } from '../../../source/bus';
 import { MoeTreasuryFactory } from '../../../source/contract';
 import { Referable, Updatable, x40 } from '../../../source/functions';
 import { Store } from '../../../source/redux/store';
@@ -12,10 +12,9 @@ import { UiPptClaimable } from './ppt-claimable';
 import { UiPptClaimed } from './ppt-claimed';
 import { UiPptClaimer } from './ppt-claimer';
 import { UiPptExpander } from './ppt-expander';
+import { UiPptImage } from './ppt-image';
 
 import { Unsubscribe } from 'redux';
-import { ppt_href, ppt_meta, UiPptImage } from './ppt-image';
-export { ppt_href, ppt_meta, UiPptImage };
 
 type Props = {
     ppts: Nfts;

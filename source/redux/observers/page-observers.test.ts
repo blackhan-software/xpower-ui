@@ -1,9 +1,10 @@
-import { Action, configureStore } from '@reduxjs/toolkit';
+import { AnyAction, configureStore } from '@reduxjs/toolkit';
 import { combineReducers, Store } from 'redux';
 import { pageReducer } from '../reducers';
 
 import { switchPage } from '../actions';
-import { Page, State } from '../types';
+import { AppState } from '../store';
+import { Page } from '../types';
 import { onPageSwitch } from './page-observers';
 
 describe('onPageSwitch', () => {
@@ -16,7 +17,7 @@ describe('onPageSwitch', () => {
                 serializableCheck: false
             })
         });
-        onPageSwitch(store as Store<State, Action>, (
+        onPageSwitch(store as Store<AppState, AnyAction>, (
             next, prev
         ) => {
             expect(next).toEqual(Page.About);

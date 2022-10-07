@@ -2,6 +2,7 @@ import { Blockchain } from '../../source/blockchain';
 import { x64 } from '../../source/functions';
 import { HashManager, IntervalManager, MiningManager } from '../../source/managers';
 import { setMiningSpeed, setMiningStatus } from '../../source/redux/actions';
+import { tokenOf } from '../../source/redux/selectors';
 import { Store } from '../../source/redux/store';
 import { MinerStatus, Token, Tokens } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
@@ -43,7 +44,7 @@ Blockchain.onceConnect(function setupMining({
         setMiningStatus({ status: MinerStatus.stopped })
     );
 }, {
-    per: () => Store.getToken()
+    per: () => tokenOf(Store.state)
 });
 Blockchain.onConnect(function resetSpeed({
     address, token
@@ -57,7 +58,7 @@ Store.onPageSwitch(async function stopMining() {
     const address = await Blockchain.selectedAddress;
     if (address) {
         const miner = MiningManager.miner(address, {
-            token: Store.getToken()
+            token: tokenOf(Store.state)
         });
         const running = miner.running;
         if (running) miner.stop();
@@ -95,7 +96,7 @@ Blockchain.onceConnect(function refreshBlockHash({
     const moe_wallet = new MoeWallet(address, token);
     moe_wallet.onInit(on_init);
 }, {
-    per: () => Store.getToken()
+    per: () => tokenOf(Store.state)
 });
 Blockchain.onceConnect(function restartMining({
     address
@@ -103,7 +104,7 @@ Blockchain.onceConnect(function restartMining({
     const im = new IntervalManager({ start: true });
     im.on('tick', async () => {
         const miner = MiningManager.miner(address, {
-            token: Store.getToken()
+            token: tokenOf(Store.state)
         });
         const running = miner.running;
         if (running) {
@@ -111,7 +112,7 @@ Blockchain.onceConnect(function restartMining({
         }
         if (running) {
             MiningManager.toggle(address, {
-                token: Store.getToken()
+                token: tokenOf(Store.state)
             });
         }
     });
@@ -133,7 +134,7 @@ Blockchain.onceConnect(function benchmarkMining({
         });
     });
 }, {
-    per: () => Store.getToken()
+    per: () => tokenOf(Store.state)
 });
 Blockchain.onceConnect(async function resumeMiningIf({
     address
@@ -143,7 +144,7 @@ Blockchain.onceConnect(async function resumeMiningIf({
             const otf_balance = await otf_wallet.getBalance();
             if (otf_balance.gt(OtfManager.threshold)) {
                 const miner = MiningManager.miner(address, {
-                    token: Store.getToken()
+                    token: tokenOf(Store.state)
                 });
                 if (miner.running) {
                     miner.resume();

@@ -4,22 +4,23 @@ import { PptTreasuryFactory } from '../../source/contract';
 import { buffered } from '../../source/functions';
 import { setPptsUiAmounts, setPptsUiDetails, setPptsUiMinter } from '../../source/redux/actions';
 import { pptAmounts } from '../../source/redux/reducers';
+import { nftTotalBy, pptTotalBy, tokenOf } from '../../source/redux/selectors';
 import { Store } from '../../source/redux/store';
 import { Address, Nft, NftIssue, NftLevel, NftLevels, NftToken, NftTokens, PptAmounts, PptDetails, PptMinterApproval, Token } from '../../source/redux/types';
-import { NftWallet } from '../../source/wallet';
+import { NftWallet, PptWallet, PptWalletMock } from '../../source/wallet';
 import { Years } from '../../source/years';
-import { ppt_href, ppt_meta } from '../ppts/ppts';
+import { PptImageMeta } from '../ppts/details/ppt-image-meta';
 /**
  * ppts-ui:
  */
 Store.onNftChanged(buffered(() => {
-    const nft_token = Nft.token(Store.getToken());
+    const nft_token = Nft.token(tokenOf(Store.state));
     Store.dispatch(setPptsUiAmounts({
         ...ppt_amounts(nft_token)
     }));
 }));
 Store.onPptChanged(buffered(() => {
-    const nft_token = Nft.token(Store.getToken());
+    const nft_token = Nft.token(tokenOf(Store.state));
     Store.dispatch(setPptsUiAmounts({
         ...ppt_amounts(nft_token)
     }));
@@ -30,10 +31,10 @@ const ppt_amounts = (
     const entries = Array.from(NftLevels()).map((nft_level): [
         NftLevel, PptAmounts[NftLevel]
     ] => {
-        const { amount: max } = Store.getNftTotalBy({
+        const { amount: max } = nftTotalBy(Store.state, {
             level: nft_level, token: ppt_token
         });
-        const { amount: min } = Store.getPptTotalBy({
+        const { amount: min } = pptTotalBy(Store.state, {
             level: nft_level, token: ppt_token
         });
         return [nft_level, {
@@ -93,7 +94,7 @@ Blockchain.onceConnect(async ({
         images.reduce((l, r) => $.extend(true, l, r))
     ));
 }, {
-    per: () => Store.getToken()
+    per: () => tokenOf(Store.state)
 });
 const ppt_approval = async (
     address: Address, token: Token
@@ -136,6 +137,32 @@ const ppt_image = async (
         url_content
     });
 }
+async function ppt_meta({ level, issue, token }: {
+    level: NftLevel, issue: NftIssue, token: Token
+}) {
+    const address = await Blockchain.selectedAddress;
+    const avalanche = await Blockchain.isAvalanche();
+    return address && avalanche
+        ? await PptImageMeta.get(address, { level, issue, token })
+        : await PptImageMeta.get(null, { level, issue, token });
+}
+async function ppt_href({ level, issue, token }: {
+    level: NftLevel, issue: NftIssue, token: Token
+}) {
+    const address = await Blockchain.selectedAddress;
+    const avalanche = await Blockchain.isAvalanche();
+    const ppt_wallet = address && avalanche
+        ? new PptWallet(address, token)
+        : new PptWalletMock(0n, token);
+    const ppt_id = Nft.coreId({ level, issue });
+    const supply = await ppt_wallet.totalSupply(ppt_id);
+    if (supply > 0) {
+        const ppt_contract = await ppt_wallet.contract;
+        const market = 'https://nftrade.com/assets/avalanche';
+        return new URL(`${market}/${ppt_contract.address}/${ppt_id}`);
+    }
+    return null;
+}
 /**
  * ui-fallback: on no or wrong chain
  */
@@ -159,6 +186,6 @@ Promise.all([
     };
     if (!installed || !avalanche) {
         Store.onTokenSwitch(ppt_images);
-        ppt_images(Store.getToken());
+        ppt_images(tokenOf(Store.state));
     }
 });

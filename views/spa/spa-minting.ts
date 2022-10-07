@@ -3,12 +3,13 @@ declare const global: Global;
 
 import { Blockchain } from '../../source/blockchain';
 import { IntervalManager, MiningManager } from '../../source/managers';
+import { Params } from '../../source/params';
 import { clearMintingRows, removeNonces, setMintingRow } from '../../source/redux/actions';
+import { mintingRowBy, pageOf, tokenOf } from '../../source/redux/selectors';
 import { Store } from '../../source/redux/store';
 import { Page } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { OtfManager } from '../../source/wallet';
-import { Params } from '../../source/params';
 /**
  * minting:
  */
@@ -18,13 +19,11 @@ Store.onNonceChanged(async function updateMinters(
     if (address !== await Blockchain.selectedAddress) {
         return;
     }
-    if (token !== Store.getToken()) {
+    if (token !== tokenOf(Store.state)) {
         return;
     }
     const level = Tokenizer.level(token, amount);
-    const { tx_counter } = Store.getMintingRow({
-        level
-    });
+    const { tx_counter } = mintingRowBy(Store.state, level);
     const min_amount = Tokenizer.amount(
         token, Params.level.min
     );
@@ -39,7 +38,7 @@ Store.onNonceChanged(async function updateMinters(
     }));
 });
 Store.onTokenSwitch(function resetMinters() {
-    if (Page.Home !== Store.getPage()) {
+    if (Page.Home !== pageOf(Store.state)) {
         return;
     }
     Store.dispatch(clearMintingRows());
@@ -51,7 +50,7 @@ Store.onPageSwitch(function forgetNonces(next, prev) {
     Store.dispatch(removeNonces());
 });
 Store.onTokenSwitch(function forgetNonces() {
-    if (Page.Home !== Store.getPage()) {
+    if (Page.Home !== pageOf(Store.state)) {
         return;
     }
     Store.dispatch(removeNonces());
@@ -97,5 +96,5 @@ Blockchain.onceConnect(function ({
         }
     }
 }, {
-    per: () => Store.getToken()
+    per: () => tokenOf(Store.state)
 });

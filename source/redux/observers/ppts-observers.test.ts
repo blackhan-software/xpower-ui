@@ -4,7 +4,7 @@ import { pptsReducer } from '../reducers';
 
 import { onPptAdded, onPptRemoved } from '.';
 import { addPpt, removePpt } from '../actions';
-import { State } from '../types';
+import { AppState } from '../store';
 
 describe('onNftAdded', () => {
     const id = 'THOR:202103';
@@ -17,7 +17,7 @@ describe('onNftAdded', () => {
                 serializableCheck: false
             })
         });
-        onPptAdded(store as Store<State, Action>, (id, i, {
+        onPptAdded(store as Store<AppState, Action>, (id, i, {
             amount: t_amount, supply: t_supply
         }) => {
             expect(id).toEqual('THOR:202103');
@@ -42,7 +42,7 @@ describe('onNftRemoved', () => {
                 serializableCheck: false
             })
         });
-        onPptRemoved(store as Store<State, Action>, (id, i, {
+        onPptRemoved(store as Store<AppState, Action>, (id, i, {
             amount: t_amount, supply: t_supply
         }) => {
             expect(id).toEqual('LOKI:202206');

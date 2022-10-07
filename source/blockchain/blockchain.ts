@@ -2,6 +2,7 @@
 /* eslint no-async-promise-executor: [off] */
 
 import { x40 } from '../functions';
+import { tokenOf } from '../redux/selectors';
 import { Store } from '../redux/store';
 import { Address, Token, TokenInfo, Tokens } from '../redux/types';
 import { Chain, ChainId } from './chain';
@@ -62,7 +63,8 @@ export class Blockchain extends EventEmitter {
             throw new Error('missing selected-address');
         }
         setTimeout(async () => this.emit('connect', {
-            address, chainId: await this.chainId, token: Store.getToken()
+            address, chainId: await this.chainId,
+            token: tokenOf(Store.state)
         }));
         return address;
     }

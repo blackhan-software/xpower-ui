@@ -1,11 +1,11 @@
 import { AnyAction } from '@reduxjs/toolkit';
 import { Store, Unsubscribe } from 'redux';
-import { State } from '../types';
+import { AppState } from '../store';
 
 export const observe = <S>(
-    store: Store<State, AnyAction>
+    store: Store<AppState, AnyAction>
 ) => (
-    selector: (state: State) => S, prev: S
+    selector: (state: AppState) => S, prev: S
 ) => (
     callback: (next: S, prev: S) => void
 ): Unsubscribe => {

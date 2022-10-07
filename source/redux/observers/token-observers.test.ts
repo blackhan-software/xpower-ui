@@ -1,9 +1,10 @@
-import { Action, configureStore } from '@reduxjs/toolkit';
+import { AnyAction, configureStore } from '@reduxjs/toolkit';
 import { combineReducers, Store } from 'redux';
 import { tokenReducer } from '../reducers';
 
 import { switchToken } from '../actions';
-import { State, Token } from '../types';
+import { AppState } from '../store';
+import { Token } from '../types';
 import { onTokenSwitch } from './token-observers';
 
 describe('onTokenSwitch', () => {
@@ -16,7 +17,7 @@ describe('onTokenSwitch', () => {
                 serializableCheck: false
             })
         });
-        onTokenSwitch(store as Store<State, Action>, (
+        onTokenSwitch(store as Store<AppState, AnyAction>, (
             next, prev
         ) => {
             expect(next).toEqual(Token.LOKI);
