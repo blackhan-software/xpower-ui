@@ -15,9 +15,12 @@ export type OnPptRemoved = (
     item: { amount: Amount, supply: Supply },
     total_by: { amount: Amount, supply: Supply }
 ) => void;
+export type OnPptChanged
+    = OnPptAdded | OnPptRemoved;
 
 export function onPptAdded(
-    store: Store<AppState, AnyAction>, handler: OnPptAdded
+    store: Store<AppState, AnyAction>,
+    handler: OnPptAdded
 ): Unsubscribe {
     const selector = (state: AppState) => state.ppts;
     const observer = observe<Nfts>(store)(
@@ -47,7 +50,8 @@ export function onPptAdded(
     });
 }
 export function onPptRemoved(
-    store: Store<AppState, AnyAction>, handler: OnPptRemoved
+    store: Store<AppState, AnyAction>,
+    handler: OnPptRemoved
 ): Unsubscribe {
     const selector = (state: AppState) => state.ppts;
     const observer = observe<Nfts>(store)(
@@ -76,3 +80,12 @@ export function onPptRemoved(
         }
     });
 }
+export function onPptChanged(
+    store: Store<AppState, AnyAction>,
+    handler: OnPptChanged
+): Unsubscribe {
+    const un_add = onPptAdded(store, handler);
+    const un_rem = onPptRemoved(store, handler);
+    return () => { un_add(); un_rem(); };
+}
+export default onPptChanged;

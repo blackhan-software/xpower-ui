@@ -52,6 +52,7 @@ const inc_total_by = (sign: Sign, { address, amount, token }: {
         return max(0n, TOTAL_BY[token][x_address][x_amount] -= amount);
     }
 };
+
 export type OnNonceAdded = (
     nonce: Nonce, item: {
         address: Address,
@@ -70,8 +71,12 @@ export type OnNonceRemoved = (
     },
     total_by: Amount, total: Amount
 ) => void;
+export type OnNonceChanged
+    = OnNonceAdded | OnNonceRemoved;
+
 export function onNonceAdded(
-    store: Store<AppState, AnyAction>, handler: OnNonceAdded
+    store: Store<AppState, AnyAction>,
+    handler: OnNonceAdded
 ): Unsubscribe {
     const selector = (state: AppState) => state.nonces;
     const observer = observe<Nonces>(store)(
@@ -92,7 +97,8 @@ export function onNonceAdded(
     });
 }
 export function onNonceRemoved(
-    store: Store<AppState, AnyAction>, handler: OnNonceRemoved
+    store: Store<AppState, AnyAction>,
+    handler: OnNonceRemoved
 ): Unsubscribe {
     const selector = (state: AppState) => state.nonces;
     const observer = observe<Nonces>(store)(
@@ -109,3 +115,12 @@ export function onNonceRemoved(
         }
     });
 }
+export function onNonceChanged(
+    store: Store<AppState, AnyAction>,
+    handler: OnNonceChanged
+): Unsubscribe {
+    const un_add = onNonceAdded(store, handler);
+    const un_rem = onNonceRemoved(store, handler);
+    return () => { un_add(); un_rem(); };
+}
+export default onNonceChanged;

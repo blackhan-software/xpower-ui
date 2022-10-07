@@ -3,10 +3,12 @@ import './connector.scss';
 import { Blockchain, ChainId } from '../../source/blockchain';
 import { delayed, globalRef, mobile } from '../../source/functions';
 import { Params } from '../../source/params';
-import { Store } from '../../source/redux/store';
+import { onTokenSwitch } from '../../source/redux/observers';
+import { AppState, Store } from '../../source/redux/store';
 
 import React, { createElement, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Provider, useStore } from 'react-redux';
 import { InfoCircle } from '../../public/images/tsx';
 
 type State = {
@@ -26,9 +28,10 @@ export function UiConnector() {
     useEffect(() => {
         delayed(reset, ms())({ silent: false });
     }, []);
+    const store = useStore<AppState>();
     useEffect(() => {
-        return Store.onTokenSwitch(() => reset());
-    }, []);
+        return onTokenSwitch(store, () => reset());
+    }, [store]);
     useEffect(() => {
         if (chain !== Chain.CONNECTED) {
             const $ref = globalRef<HTMLElement>(
@@ -188,7 +191,10 @@ function Spinner(
     />;
 }
 if (require.main === module) {
-    const $header = document.querySelector('form#connector');
-    createRoot($header!).render(createElement(UiConnector));
+    const $connector = document.querySelector('form#connector');
+    const $ui_connector = createElement(UiConnector);
+    createRoot($connector!).render(
+        <Provider store={Store.store}>{$ui_connector}</Provider>
+    );
 }
 export default UiConnector;

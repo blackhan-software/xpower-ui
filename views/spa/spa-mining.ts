@@ -2,6 +2,7 @@ import { Blockchain } from '../../source/blockchain';
 import { x64 } from '../../source/functions';
 import { HashManager, IntervalManager, MiningManager } from '../../source/managers';
 import { setMiningSpeed, setMiningStatus } from '../../source/redux/actions';
+import { onPageSwitch } from '../../source/redux/observers';
 import { tokenOf } from '../../source/redux/selectors';
 import { Store } from '../../source/redux/store';
 import { MinerStatus, Token, Tokens } from '../../source/redux/types';
@@ -54,7 +55,7 @@ Blockchain.onConnect(function resetSpeed({
     });
     Store.dispatch(setMiningSpeed({ speed: miner.speed }));
 });
-Store.onPageSwitch(async function stopMining() {
+onPageSwitch(Store.store, async function stopMining() {
     const address = await Blockchain.selectedAddress;
     if (address) {
         const miner = MiningManager.miner(address, {

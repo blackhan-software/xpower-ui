@@ -15,9 +15,12 @@ export type OnNftRemoved = (
     item: { amount: Amount, supply: Supply },
     total_by: { amount: Amount, supply: Supply }
 ) => void;
+export type OnNftChanged
+    = OnNftAdded | OnNftRemoved;
 
 export function onNftAdded(
-    store: Store<AppState, AnyAction>, handler: OnNftAdded
+    store: Store<AppState, AnyAction>,
+    handler: OnNftAdded
 ): Unsubscribe {
     const selector = (state: AppState) => state.nfts;
     const observer = observe<Nfts>(store)(
@@ -47,7 +50,8 @@ export function onNftAdded(
     });
 }
 export function onNftRemoved(
-    store: Store<AppState, AnyAction>, handler: OnNftRemoved
+    store: Store<AppState, AnyAction>,
+    handler: OnNftRemoved
 ): Unsubscribe {
     const selector = (state: AppState) => state.nfts;
     const observer = observe<Nfts>(store)(
@@ -76,3 +80,12 @@ export function onNftRemoved(
         }
     });
 }
+export function onNftChanged(
+    store: Store<AppState, AnyAction>,
+    handler: OnNftChanged
+): Unsubscribe {
+    const un_add = onNftAdded(store, handler);
+    const un_rem = onNftRemoved(store, handler);
+    return () => { un_add(); un_rem(); };
+}
+export default onNftAdded;

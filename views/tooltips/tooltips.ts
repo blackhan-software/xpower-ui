@@ -1,9 +1,10 @@
 import { Bus } from '../../source/bus';
 import { ancestors, buffered } from '../../source/functions';
+import { onTokenSwitch } from '../../source/redux/observers';
 import { Store } from '../../source/redux/store';
 const { Tooltip } = global.bootstrap;
 
-Store.onTokenSwitch(function retitleTips(
+onTokenSwitch(Store.store, function retitleTips(
     token, old_token
 ) {
     const $tips = document.querySelectorAll<HTMLElement>(

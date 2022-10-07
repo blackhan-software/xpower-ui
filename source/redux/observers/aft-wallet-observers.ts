@@ -11,9 +11,12 @@ export type OnAftWalletIncreased = (
 export type OnAftWalletDecreased = (
     token: Token, item: { amount: Amount, supply: Supply }
 ) => void;
+export type OnAftWalleChanged
+    = OnAftWalletIncreased | OnAftWalletDecreased;
 
 export function onAftWalletIncreased(
-    store: Store<AppState, AnyAction>, handler: OnAftWalletIncreased
+    store: Store<AppState, AnyAction>,
+    handler: OnAftWalletIncreased
 ): Unsubscribe {
     const selector = (state: AppState) => state.aft_wallet;
     const observer = observe<AftWallet>(store)(
@@ -30,7 +33,8 @@ export function onAftWalletIncreased(
     });
 }
 export function onAftWalletDecreased(
-    store: Store<AppState, AnyAction>, handler: OnAftWalletDecreased
+    store: Store<AppState, AnyAction>,
+    handler: OnAftWalletDecreased
 ): Unsubscribe {
     const selector = (state: AppState) => state.aft_wallet;
     const observer = observe<AftWallet>(store)(
@@ -46,3 +50,12 @@ export function onAftWalletDecreased(
         }
     });
 }
+export function onAftWalletChanged(
+    store: Store<AppState, AnyAction>,
+    handler: OnAftWalleChanged
+): Unsubscribe {
+    const un_add = onAftWalletIncreased(store, handler);
+    const un_rem = onAftWalletDecreased(store, handler);
+    return () => { un_add(); un_rem(); };
+}
+export default onAftWalletChanged;

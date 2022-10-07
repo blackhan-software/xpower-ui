@@ -1,7 +1,8 @@
+import { onTokenSwitch } from '../../source/redux/observers';
 import { Store } from '../../source/redux/store';
 import { Theme, theme } from '../../source/theme';
 
-Store.onTokenSwitch(function syncTheme(token) {
+onTokenSwitch(Store.store, function syncTheme(token) {
     adapt(theme(token));
 });
 function adapt(theme: Theme): void {

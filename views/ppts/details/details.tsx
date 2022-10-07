@@ -1,7 +1,9 @@
+import { Unsubscribe } from 'redux';
 import { Blockchain } from '../../../source/blockchain';
 import { Bus } from '../../../source/bus';
 import { MoeTreasuryFactory } from '../../../source/contract';
 import { Referable, Updatable, x40 } from '../../../source/functions';
+import { onPptChanged } from '../../../source/redux/observers';
 import { Store } from '../../../source/redux/store';
 import { Amount, Nft, NftFullId, NftIssue, NftLevel, NftLevels, Nfts, NftToken, NftTokens, PptDetails, Supply, Token } from '../../../source/redux/types';
 import { Years } from '../../../source/years';
@@ -14,7 +16,6 @@ import { UiPptClaimer } from './ppt-claimer';
 import { UiPptExpander } from './ppt-expander';
 import { UiPptImage } from './ppt-image';
 
-import { Unsubscribe } from 'redux';
 
 type Props = {
     ppts: Nfts;
@@ -83,7 +84,7 @@ export class UiPptDetails extends Referable(Updatable(
         this.state = state();
     }
     async componentDidMount() {
-        this.unPptChanged = Store.onPptChanged((
+        this.unPptChanged = onPptChanged(Store.store, (
             full_id: NftFullId
         ) => {
             const ppt_token = Nft.token(full_id);

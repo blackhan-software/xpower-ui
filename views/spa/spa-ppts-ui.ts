@@ -3,6 +3,7 @@ import { Bus } from '../../source/bus';
 import { PptTreasuryFactory } from '../../source/contract';
 import { buffered } from '../../source/functions';
 import { setPptsUiAmounts, setPptsUiDetails, setPptsUiMinter } from '../../source/redux/actions';
+import { onNftChanged, onPptChanged, onTokenSwitch } from '../../source/redux/observers';
 import { pptAmounts } from '../../source/redux/reducers';
 import { nftTotalBy, pptTotalBy, tokenOf } from '../../source/redux/selectors';
 import { Store } from '../../source/redux/store';
@@ -13,13 +14,13 @@ import { PptImageMeta } from '../ppts/details/ppt-image-meta';
 /**
  * ppts-ui:
  */
-Store.onNftChanged(buffered(() => {
+onNftChanged(Store.store, buffered(() => {
     const nft_token = Nft.token(tokenOf(Store.state));
     Store.dispatch(setPptsUiAmounts({
         ...ppt_amounts(nft_token)
     }));
 }));
-Store.onPptChanged(buffered(() => {
+onPptChanged(Store.store, buffered(() => {
     const nft_token = Nft.token(tokenOf(Store.state));
     Store.dispatch(setPptsUiAmounts({
         ...ppt_amounts(nft_token)
@@ -185,7 +186,7 @@ Promise.all([
         ));
     };
     if (!installed || !avalanche) {
-        Store.onTokenSwitch(ppt_images);
+        onTokenSwitch(Store.store, ppt_images);
         ppt_images(tokenOf(Store.state));
     }
 });

@@ -1,12 +1,13 @@
 import './selector.scss';
 
 import { switchToken } from '../../source/redux/actions';
-import { AppDispatch, Store } from '../../source/redux/store';
+import { onTokenSwitch, onTokenSwitched } from '../../source/redux/observers';
+import { AppDispatch, AppState } from '../../source/redux/store';
 import { Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 
 import React, { MouseEvent, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useStore } from 'react-redux';
 
 type Props = {
     token: Token;
@@ -17,21 +18,16 @@ type State = {
 export function UiSelector(
     { token }: Props
 ) {
+    const store = useStore<AppState>();
+    const dispatch = useDispatch();
+    useEffect(() => onTokenSwitch(
+        store, () => set_switching(true)), [store]
+    );
+    useEffect(() => onTokenSwitched(
+        store, () => set_switching(false)), [store]
+    );
     const [switching, set_switching]
         = useState<State['switching']>(false);
-    const dispatch = useDispatch();
-    useEffect(() => {
-        const unsubscribe_1 = Store.onTokenSwitch(() => {
-            set_switching(true);
-        });
-        const unsubscribe_2 = Store.onTokenSwitched(() => {
-            set_switching(false);
-        });
-        return () => {
-            unsubscribe_1();
-            unsubscribe_2();
-        };
-    }, []);
     return <div
         className='btn-group selectors' role='group'
     >

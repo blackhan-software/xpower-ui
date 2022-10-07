@@ -5,6 +5,7 @@ import { Blockchain } from '../../source/blockchain';
 import { IntervalManager, MiningManager } from '../../source/managers';
 import { Params } from '../../source/params';
 import { clearMintingRows, removeNonces, setMintingRow } from '../../source/redux/actions';
+import { onNonceChanged, onPageSwitch, onTokenSwitch } from '../../source/redux/observers';
 import { mintingRowBy, pageOf, tokenOf } from '../../source/redux/selectors';
 import { Store } from '../../source/redux/store';
 import { Page } from '../../source/redux/types';
@@ -13,7 +14,7 @@ import { OtfManager } from '../../source/wallet';
 /**
  * minting:
  */
-Store.onNonceChanged(async function updateMinters(
+onNonceChanged(Store.store, async function updateMinters(
     nonce, { address, amount, token }, total
 ) {
     if (address !== await Blockchain.selectedAddress) {
@@ -37,19 +38,19 @@ Store.onNonceChanged(async function updateMinters(
         }
     }));
 });
-Store.onTokenSwitch(function resetMinters() {
+onTokenSwitch(Store.store, function resetMinters() {
     if (Page.Home !== pageOf(Store.state)) {
         return;
     }
     Store.dispatch(clearMintingRows());
 });
-Store.onPageSwitch(function forgetNonces(next, prev) {
+onPageSwitch(Store.store, function forgetNonces(next, prev) {
     if (Page.Home !== prev) {
         return;
     }
     Store.dispatch(removeNonces());
 });
-Store.onTokenSwitch(function forgetNonces() {
+onTokenSwitch(Store.store, function forgetNonces() {
     if (Page.Home !== pageOf(Store.state)) {
         return;
     }

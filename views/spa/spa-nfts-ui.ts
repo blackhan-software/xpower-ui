@@ -2,6 +2,7 @@ import { Blockchain } from '../../source/blockchain';
 import { Bus } from '../../source/bus';
 import { buffered } from '../../source/functions';
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiMinter } from '../../source/redux/actions';
+import { onAftWalletChanged, onTokenSwitch } from '../../source/redux/observers';
 import { nftAmounts } from '../../source/redux/reducers';
 import { aftWalletBy, tokenOf } from '../../source/redux/selectors';
 import { Store } from '../../source/redux/store';
@@ -12,14 +13,14 @@ import { NftImageMeta } from '../nfts/details/nft-image-meta';
 /**
  * nfts-ui:
  */
-Store.onAftWalletChanged(buffered((
+onAftWalletChanged(Store.store, buffered((
     token: Token, { amount }: { amount: Amount }
 ) => {
     Store.dispatch(setNftsUiAmounts({
         ...nft_amounts(token, amount)
     }));
 }));
-Store.onTokenSwitch((token) => {
+onTokenSwitch(Store.store, (token) => {
     const { items } = aftWalletBy(Store.state, token);
     const amount = items[token]?.amount;
     if (amount !== undefined) {
@@ -186,7 +187,7 @@ Promise.all([
         ));
     };
     if (!installed || !avalanche) {
-        Store.onTokenSwitch(nft_images);
+        onTokenSwitch(Store.store, nft_images);
         nft_images(tokenOf(Store.state));
     }
 });

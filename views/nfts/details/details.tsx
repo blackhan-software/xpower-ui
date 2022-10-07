@@ -256,9 +256,9 @@ export class UiNftDetails extends Referable(
     $sender(
         nft_issue: NftIssue, nft_level: NftLevel
     ) {
-        const { token, details: matrix } = this.props;
-        const { amount, target } = matrix[nft_level][nft_issue];
-        const { toggled, sender } = matrix[nft_level][nft_issue];
+        const { token, details } = this.props;
+        const { amount, target } = details[nft_level][nft_issue];
+        const { toggled, sender } = details[nft_level][nft_issue];
         return <UiNftSender
             issue={nft_issue}
             level={nft_level}
