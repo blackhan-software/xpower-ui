@@ -2,7 +2,7 @@
 (function polyfill(parse: typeof JSON.parse) {
     JSON.parse = function (value: string) {
         return parse(value, (k, v) => {
-            if (typeof v === 'string' && v.match(/^[0-9]+n$/)) {
+            if (typeof v === 'string' && v.match(/^[+-]?[0-9]+n$/)) {
                 return BigInt(v.slice(0, -1));
             }
             return v;
