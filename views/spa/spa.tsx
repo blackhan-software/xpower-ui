@@ -149,7 +149,7 @@ function $home(
             mining={{
                 onToggle: (token) =>
                     dispatch(actions.miningToggle(address, token)),
-                togglable: miningTogglable(mining),
+                togglable: miningTogglable(mining, token),
                 onSpeed: (token, by) =>
                     dispatch(actions.miningSpeed(address, token, by)),
                 speedable: miningSpeedable(mining),
@@ -162,7 +162,7 @@ function $home(
                     dispatch(actions.mintingMint(address, token, level)),
                 ...minting
             }}
-            speed={mining.speed}
+            speed={mining.speed[token]}
             token={token}
         />
     </form>;

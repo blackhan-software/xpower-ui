@@ -1,6 +1,8 @@
 import { Mining, MinerStatus } from '../types';
 
-export function miningSpeedable({ status }: Pick<Mining, 'status'>) {
+export function miningSpeedable(
+    { status }: Pick<Mining, 'status'>
+) {
     switch (status) {
         case null:
             return false;

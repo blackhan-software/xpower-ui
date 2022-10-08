@@ -15,16 +15,16 @@ export class Miner extends EventEmitter {
         token: Token,
         /** address to mine for */
         address: Address,
+        /** speed to mine with */
+        speed = Miner.SPEED_DEFAULT,
         /** min. level to mine at */
         level: Level = 1,
-        /** speed to mine with */
-        speed = Miner.SPEED_DEFAULT
     ) {
         super();
         this._token = token;
         this._address = address;
-        this._level = level;
         this._speed = speed;
+        this._level = level;
         this.setMaxListeners(20);
     }
     public get running(): boolean {

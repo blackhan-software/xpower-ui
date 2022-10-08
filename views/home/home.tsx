@@ -1,20 +1,18 @@
 import './home.scss';
 
-import { Level, MinerStatus, Minting, Token } from '../../source/redux/types';
+import { Level, Mining, Minting, Token } from '../../source/redux/types';
 
 import React from 'react';
 import { Params } from '../../source/params';
 import { UiMining } from './mining/mining';
-export { UiMining };
 import { UiMinting } from './minting/minting';
-export { UiMinting };
 
 type Props = {
     mining: {
-        status: MinerStatus | null;
+        status: Mining['status'];
         togglable: boolean;
         onToggle?: (token: Token) => void;
-        speed: number;
+        speed: Mining['speed'];
         speedable: boolean;
         onSpeed?: (token: Token, by: number) => void;
     };
@@ -39,7 +37,8 @@ export function UiHome(
                 onToggle={props.mining.onToggle}
                 status={status} togglable={togglable}
                 onSpeed={props.mining.onSpeed}
-                speed={speed} speedable={speedable} token={token}
+                speed={speed[token]} speedable={speedable}
+                token={token}
             />
         </div>
         <div id='minting'>

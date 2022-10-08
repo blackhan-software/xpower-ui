@@ -1,3 +1,5 @@
+import { Token } from './token';
+
 export enum MinerStatus {
     initializing,
     initialized,
@@ -13,5 +15,5 @@ export enum MinerStatus {
 export type Mining = {
     /** set on dispatching mining */
     status: MinerStatus | null;
-    speed: number;
+    speed: Record<Token, number>;
 };

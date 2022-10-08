@@ -4,6 +4,7 @@ import { alert, Alert, Alerts } from '../functions';
 import { Miner } from '../miner';
 import { Params } from '../params';
 import { addNonce } from '../redux/actions';
+import { miningSpeedBy } from '../redux/selectors';
 import { Store } from '../redux/store';
 import { Address, Amount, BlockHash, Token } from '../redux/types';
 import { Tokenizer } from '../token';
@@ -14,8 +15,9 @@ export class MiningManager {
         address: Address, { token }: { token: Token }
     ): Miner {
         if (this._miner[token] === undefined) {
+            const speed = miningSpeedBy(Store.state, token);
             this._miner[token] = new Miner(
-                token, address, Params.level.min, Params.speed
+                token, address, speed, Params.level.min
             );
         }
         return this._miner[token];

@@ -2,7 +2,7 @@ import { Blockchain } from '../../source/blockchain';
 import { x64 } from '../../source/functions';
 import { HashManager, IntervalManager, MiningManager } from '../../source/managers';
 import { setMiningSpeed, setMiningStatus } from '../../source/redux/actions';
-import { onPageSwitch } from '../../source/redux/observers';
+import { onPageSwitch, onTokenSwitch } from '../../source/redux/observers';
 import { tokenOf } from '../../source/redux/selectors';
 import { Store } from '../../source/redux/store';
 import { MinerStatus, Token, Tokens } from '../../source/redux/types';
@@ -38,23 +38,24 @@ Blockchain.onceConnect(function setupMining({
     miner.on('resumed', () => Store.dispatch(
         setMiningStatus({ status: MinerStatus.resumed })));
     miner.on('increased', (e) => Store.dispatch(
-        setMiningSpeed({ speed: e.speed })));
+        setMiningSpeed({ speed: { [token]: e.speed } })));
     miner.on('decreased', (e) => Store.dispatch(
-        setMiningSpeed({ speed: e.speed })));
+        setMiningSpeed({ speed: { [token]: e.speed } })));
     Store.dispatch(
         setMiningStatus({ status: MinerStatus.stopped })
     );
 }, {
     per: () => tokenOf(Store.state)
 });
-Blockchain.onConnect(function resetSpeed({
-    address, token
-}) {
-    const miner = MiningManager.miner(address, {
-        token
-    });
-    Store.dispatch(setMiningSpeed({ speed: miner.speed }));
-});
+onTokenSwitch(Store.store, async function resetSpeed(token) {
+    const address = await Blockchain.selectedAddress;
+    if (address) {
+        const miner = MiningManager.miner(address, { token });
+        Store.dispatch(
+            setMiningSpeed({ speed: { [token]: miner.speed } })
+        );
+    }
+})
 onPageSwitch(Store.store, async function stopMining() {
     const address = await Blockchain.selectedAddress;
     if (address) {
@@ -72,9 +73,7 @@ Blockchain.onConnect(function stopMining({
         if (token === Token.HELA) {
             continue;
         }
-        const miner = MiningManager.miner(address, {
-            token
-        });
+        const miner = MiningManager.miner(address, { token });
         const running = miner.running;
         if (running) miner.stop();
     }
