@@ -1,12 +1,12 @@
 import './selector.scss';
 
 import { switchToken } from '../../source/redux/actions';
-import { Store } from '../../source/redux/store';
+import { AppDispatch, Store } from '../../source/redux/store';
 import { Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 
-import React, { MouseEvent } from 'react';
-import { Unsubscribe } from 'redux';
+import React, { MouseEvent, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 type Props = {
     token: Token;
@@ -14,109 +14,103 @@ type Props = {
 type State = {
     switching: boolean;
 }
-function state() {
-    return { switching: false };
+export function UiSelector(
+    { token }: Props
+) {
+    const [switching, set_switching]
+        = useState<State['switching']>(false);
+    const dispatch = useDispatch();
+    useEffect(() => {
+        const unsubscribe_1 = Store.onTokenSwitch(() => {
+            set_switching(true);
+        });
+        const unsubscribe_2 = Store.onTokenSwitched(() => {
+            set_switching(false);
+        });
+        return () => {
+            unsubscribe_1();
+            unsubscribe_2();
+        };
+    }, []);
+    return <div
+        className='btn-group selectors' role='group'
+    >
+        {$anchor(Token.THOR, token, switching, dispatch)}
+        {$anchor(Token.LOKI, token, switching, dispatch)}
+        {$anchor(Token.ODIN, token, switching, dispatch)}
+    </div>;
 }
-export class UiSelector extends React.Component<
-    Props, State
-> {
-    constructor(props: {
-        token: Token
-    }) {
-        super(props);
-        this.state = state();
+function $anchor(
+    my_token: Token, token: Token,
+    switching: boolean, dispatch: AppDispatch
+) {
+    const selector = `selector-${Tokenizer.lower(my_token)}`;
+    const active = token === my_token ? 'active' : '';
+    const disabled = switching ? 'pseudo-disabled' : '';
+    const classes = [
+        'btn btn-outline-warning', selector, active, disabled
+    ];
+    return <a type='button'
+        className={classes.join(' ')}
+        data-bs-toggle='tooltip'
+        data-bs-placement='top'
+        data-bs-fixed='true'
+        href={`?token=${my_token}`}
+        onClick={(e) => switchTo(e, my_token, dispatch)}
+    >
+        {$spinner(my_token, token, switching)}
+        {$image(my_token, token, switching)}
+        {$label(my_token)}
+    </a>;
+}
+function switchTo(
+    e: MouseEvent<HTMLAnchorElement>,
+    my_token: Token, dispatch: AppDispatch
+) {
+    if (e.ctrlKey === false) {
+        e.preventDefault();
     }
-    componentDidMount() {
-        this.unTokenSwitch = Store.onTokenSwitch(() => {
-            this.setState({ switching: true });
-        });
-        this.unTokenSwitched = Store.onTokenSwitched(() => {
-            this.setState({ switching: false });
-        });
+    if (e.ctrlKey === false) {
+        dispatch(switchToken(my_token));
     }
-    componentWillUnmount() {
-        if (this.unTokenSwitch) {
-            this.unTokenSwitch();
-        }
-    }
-    render() {
-        return <div
-            className='btn-group selectors' role='group'
-        >
-            {this.$anchor(Token.THOR)}
-            {this.$anchor(Token.LOKI)}
-            {this.$anchor(Token.ODIN)}
-        </div>;
-    }
-    $anchor(
-        token: Token
-    ) {
-        const selector = `selector-${Tokenizer.lower(token)}`;
-        const active = this.props.token === token ? 'active' : '';
-        const disabled = this.state.switching ? 'pseudo-disabled' : '';
-        const classes = [
-            'btn btn-outline-warning', selector, active, disabled
-        ];
-        return <a type='button'
-            className={classes.join(' ')}
-            data-bs-toggle='tooltip'
-            data-bs-placement='top'
-            data-bs-fixed='true'
-            href={`?token=${token}`}
-            onClick={(e) => this.switch(e, token)}
-        >
-            {this.$spinner(token)}
-            {this.$image(token)}
-            {this.$label(token)}
-        </a>;
-    }
-    switch(
-        e: MouseEvent<HTMLAnchorElement>, token: Token
-    ) {
-        if (e.ctrlKey === false) {
-            e.preventDefault();
-            Store.dispatch(switchToken(token));
-        }
-    }
-    $spinner(
-        token: Token
-    ) {
-        return Spinner({ show: this.show(token) });
-    }
-    $image(
-        token: Token
-    ) {
-        const token_lc = Tokenizer.lower(this.props.token);
-        const fixed_lc = Tokenizer.lower(token);
-        const classes = [
-            'float-sm-start', this.hide(token) ? 'd-none' : '', token_lc
-        ];
-        return <img
-            alt={token}
-            height={24} width={24}
-            className={classes.join(' ')}
-            src={`/images/svg/${fixed_lc}-black.svg`}
-        />;
-    }
-    $label(
-        token: Token
-    ) {
-        return <span className='d-none d-sm-inline'>{token}</span>;
-    }
-    show(
-        token: Token
-    ) {
-        const eq = this.props.token === token;
-        return eq && this.state.switching;
-    }
-    hide(
-        token: Token
-    ) {
-        const eq = this.props.token === token;
-        return eq && this.state.switching;
-    }
-    unTokenSwitch?: Unsubscribe;
-    unTokenSwitched?: Unsubscribe;
+}
+function $spinner(
+    my_token: Token, token: Token, switching: boolean
+) {
+    return Spinner({ show: show(my_token, token, switching) });
+}
+function $image(
+    my_token: Token, token: Token, switching: boolean
+) {
+    const token_lc = Tokenizer.lower(token);
+    const fixed_lc = Tokenizer.lower(my_token);
+    const classes = [
+        'float-sm-start', hide(my_token, token, switching)
+            ? 'd-none' : '', token_lc
+    ];
+    return <img
+        alt={my_token}
+        height={24} width={24}
+        className={classes.join(' ')}
+        src={`/images/svg/${fixed_lc}-black.svg`}
+    />;
+}
+function $label(
+    my_token: Token
+) {
+    return <span className='d-none d-sm-inline'>{my_token}</span>;
+}
+function show(
+    my_token: Token, token: Token, switching: boolean
+) {
+    const eq = token === my_token;
+    return eq && switching;
+}
+function hide(
+    my_token: Token, token: Token, switching: boolean
+) {
+    const eq = token === my_token;
+    return eq && switching;
 }
 function Spinner(
     state: { show: boolean }
