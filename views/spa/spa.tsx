@@ -6,7 +6,7 @@ import { leafKeys } from '../../source/functions';
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiToggled, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
 import { AppDispatch, AppState, Store } from '../../source/redux/store';
-import { AftWallet, Mining, Minting, Nft, NftLevels, Nfts, NftsUi, OtfWallet, Page, PptsUi, Token } from '../../source/redux/types';
+import { AftWallet, Mining, Minting, Nft, NftLevels, Nfts, NftsUi, NftTokens, OtfWallet, Page, PptsUi, Token } from '../../source/redux/types';
 
 import React, { createElement, useContext, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -217,13 +217,11 @@ function $nfts(
             onNftSenderExpanded={(
                 nft_issue, nft_level, expanded
             ) => {
-                const details = {
-                    [nft_token]: {
-                        [nft_level]: {
-                            [nft_issue]: { expanded }
-                        }
-                    }
-                };
+                const details = Object.fromEntries(
+                    Array.from(NftTokens()).map((t) => [t, {
+                        [nft_level]: { [nft_issue]: { expanded } }
+                    }])
+                );
                 dispatch(setNftsUiDetails({ details }));
                 dispatch(setPptsUiDetails({ details }));
             }}
@@ -331,15 +329,11 @@ function $ppts(
             onPptClaimerExpanded={(
                 ppt_issue, ppt_level, expanded
             ) => {
-                const details = {
-                    [ppt_token]: {
-                        [ppt_level]: {
-                            [ppt_issue]: {
-                                expanded
-                            }
-                        }
-                    }
-                };
+                const details = Object.fromEntries(
+                    Array.from(NftTokens()).map((t) => [t, {
+                        [ppt_level]: { [ppt_issue]: { expanded } }
+                    }])
+                );
                 dispatch(setNftsUiDetails({ details }));
                 dispatch(setPptsUiDetails({ details }));
             }}
