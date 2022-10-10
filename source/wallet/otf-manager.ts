@@ -3,7 +3,7 @@ import { Global } from '../types';
 declare const global: Global;
 
 import { Blockchain } from '../blockchain';
-import { URLQuery } from '../url-query';
+import { URLQuery } from '../params';
 
 import { NonceManager } from '@ethersproject/experimental';
 import { Web3Provider } from '@ethersproject/providers';

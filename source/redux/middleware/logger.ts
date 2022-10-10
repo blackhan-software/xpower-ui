@@ -1,9 +1,8 @@
-import { Middleware } from 'redux';
 import * as actions from '../actions';
-
+import { AppMiddleware } from '../store';
 const tracker: { now: number, nonce: number }[] = [];
 
-export const logger: Middleware = (_) => (next) => (action) => {
+export const Logger: AppMiddleware = (_) => (next) => (action) => {
     if (actions.addNonce.match(action)) {
         const { nonce, item: { amount, worker: index } } = action.payload;
         const xnonce = nonce.toString(16);
@@ -35,4 +34,4 @@ export const logger: Middleware = (_) => (next) => (action) => {
     console.log(`[${action.type}]`, action.payload);
     return next(action);
 };
-export default logger;
+export default Logger;

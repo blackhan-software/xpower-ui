@@ -14,28 +14,22 @@ const configuration = ({
     entry: {
         spa: [
             './library/index.ts',
-            './views/theme/theme.ts',
             './views/header/header.tsx',
             './views/spa/spa.tsx',
             './views/footer/footer.tsx',
-            './views/tooltips/tooltips.ts',
         ],
         error: [
             './library/index.ts',
-            './views/theme/theme.ts',
             './views/header/header.tsx',
             './views/error/error.ts',
             './views/footer/footer.tsx',
-            './views/tooltips/tooltips.ts',
         ],
         migrate: [
             './library/index.ts',
-            './views/theme/theme.ts',
             './views/header/header.tsx',
             './views/connector/connector.tsx',
             './views/migrate/index.ts',
             './views/footer/footer.tsx',
-            './views/tooltips/tooltips.ts',
         ],
         worker: [
             './source/miner/scripts/worker.ts',

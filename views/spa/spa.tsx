@@ -23,15 +23,6 @@ import { UiWallet } from '../wallet/wallet';
 
 import * as actions from './spa-actions';
 
-import './spa-location';
-import './spa-mining';
-import './spa-minting';
-import './spa-nfts';
-import './spa-nfts-ui';
-import './spa-ppts';
-import './spa-ppts-ui';
-import './spa-wallet';
-
 type Props = {
     page: Page;
     token: Token;

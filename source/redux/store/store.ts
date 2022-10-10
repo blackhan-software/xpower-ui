@@ -6,6 +6,7 @@ import { StateDb } from '../../state-db';
 import { middleware } from '../middleware';
 import * as reducers from '../reducers';
 import { refreshed } from '../selectors';
+import withServices from '../../services';
 
 const db = new StateDb(localStorage);
 if (Params.clear) {
@@ -14,7 +15,7 @@ if (Params.clear) {
 if (Params.clearAll) {
     db.clear();
 }
-const reducer = combineReducers({
+export const reducer = combineReducers({
     aft_wallet: reducers.aftWalletReducer,
     mining: reducers.miningReducer,
     minting: reducers.mintingReducer,
@@ -28,7 +29,7 @@ const reducer = combineReducers({
     refresh: reducers.refreshReducer,
     token: reducers.tokenReducer,
 });
-export const store = configureStore({
+const store = configureStore({
     reducer, middleware: (m) => m({
         /**
          * @todo: fix bigint check & re-enable!
@@ -48,4 +49,4 @@ if (Params.persist > 0) {
         }
     });
 }
-export default store;
+export default withServices(store);

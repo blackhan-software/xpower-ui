@@ -2,8 +2,8 @@
 /* eslint no-async-promise-executor: [off] */
 
 import { x40 } from '../functions';
-import { Params } from '../params';
 import { Address, Token, TokenInfo, Tokens } from '../redux/types';
+import { URLQuery } from '../params';
 import { Chain, ChainId } from './chain';
 
 import detectProvider from '@metamask/detect-provider';
@@ -63,7 +63,7 @@ export class Blockchain extends EventEmitter {
         }
         setTimeout(async () => this.emit('connect', {
             address, chainId: await this.chainId,
-            token: Params.token
+            token: URLQuery.token
         }));
         return address;
     }

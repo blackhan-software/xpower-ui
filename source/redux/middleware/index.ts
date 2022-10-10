@@ -1,16 +1,14 @@
-import { applyMiddleware, compose } from 'redux';
-import { logger } from './logger';
+import { applyMiddleware } from '@reduxjs/toolkit';
+import { Logger } from './logger';
 
-export function middleware<Ext, S>(configuration: {
+export function middleware(configuration: {
     /** flag for console logging */
     logger: boolean
 }) {
-    return [
-        compose(
-            configuration.logger
-                ? applyMiddleware<Ext, S>(logger)
-                : applyMiddleware<Ext, S>()
-        )
-    ];
+    const enhancers = [];
+    if (configuration.logger) {
+        enhancers.push(applyMiddleware(Logger));
+    }
+    return enhancers;
 }
 export default middleware;

@@ -33,6 +33,9 @@ export function nftLevel(params: URLSearchParams): {
     );
     return { min, max };
 }
+export function otfWallet(params: URLSearchParams): boolean {
+    return Parser.boolean(params.get('otf-wallet'), false);
+}
 export function logger(params: URLSearchParams): boolean {
     return Parser.boolean(params.get('logger'), false);
 }
@@ -43,6 +46,9 @@ export function persist(params: URLSearchParams): number {
 }
 export function reloadMs(params: URLSearchParams): number | null {
     return Parser.number(params.get('reload-ms'), null);
+}
+export function service(params: URLSearchParams, name: string): boolean {
+    return Parser.boolean(params.get(`${name}-service`), true);
 }
 export function speed(params: URLSearchParams): number {
     const element = global.document?.getElementById('g-mining-speed');
