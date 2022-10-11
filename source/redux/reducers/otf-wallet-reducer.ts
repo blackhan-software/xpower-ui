@@ -14,7 +14,7 @@ export function otfWalletReducer(
     if (actions.setOtfWalletProcessing.match(action)) {
         return { ...otf_wallet, processing: action.payload.processing };
     }
-    if (actions.setOtfWalletToggled.match(action)) {
+    if (actions.setOtfWalletToggle.match(action)) {
         return { ...otf_wallet, toggled: action.payload.toggled };
     }
     if (actions.setOtfWallet.match(action)) {

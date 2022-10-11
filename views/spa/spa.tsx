@@ -103,11 +103,11 @@ function $wallet(
             }}
             otf={{
                 onToggled: (toggled) =>
-                    dispatch(actions.otfToggled(toggled)),
+                    dispatch(actions.otfToggle({ toggled })),
                 onDeposit: (processing) =>
-                    dispatch(actions.otfDeposit(address, processing)),
+                    dispatch(actions.otfDeposit({ address, processing })),
                 onWithdraw: (processing) =>
-                    dispatch(actions.otfWithdraw(address, processing)),
+                    dispatch(actions.otfWithdraw({ address, processing })),
                 ...otf_wallet
             }}
             token={token}
@@ -139,18 +139,18 @@ function $home(
         <UiHome
             mining={{
                 onToggle: (token) =>
-                    dispatch(actions.miningToggle(address, token)),
+                    dispatch(actions.miningToggle({ address, token })),
                 togglable: miningTogglable(mining, token),
                 onSpeed: (token, by) =>
-                    dispatch(actions.miningSpeed(address, token, by)),
+                    dispatch(actions.miningSpeed({ address, token, by })),
                 speedable: miningSpeedable(mining),
                 ...mining
             }}
             minting={{
                 onForget: (token, level) =>
-                    dispatch(actions.mintingForget(address, token, level)),
+                    dispatch(actions.mintingForget({ address, token, level })),
                 onMint: (token, level) =>
-                    dispatch(actions.mintingMint(address, token, level)),
+                    dispatch(actions.mintingMint({ address, token, level })),
                 ...minting
             }}
             speed={mining.speed[token]}
@@ -245,13 +245,13 @@ function $nfts(
                 dispatch(setNftsUiDetails({ details }));
             }}
             onNftTransfer={(issue, level) =>
-                dispatch(actions.nftTransfer(address, token, issue, level))
+                dispatch(actions.nftsTransfer({ address, token, issue, level }))
             }
             onNftMinterApproval={(token) =>
-                dispatch(actions.nftApprove(address, token))
+                dispatch(actions.nftsApprove({ address, token }))
             }
             onNftMinterBatchMint={(token, list) =>
-                dispatch(actions.nftBatchMint(address, token, list))
+                dispatch(actions.nftsBatchMint({ address, token, list }))
             }
             onNftMinterToggled={(toggled) => {
                 const flags = Object.fromEntries(
@@ -357,16 +357,18 @@ function $ppts(
                 dispatch(setPptsUiDetails({ details }));
             }}
             onPptClaim={(issue, level) =>
-                dispatch(actions.pptClaim(address, token, issue, level))
+                dispatch(actions.pptsClaimRewards({
+                    address, token, issue, level
+                }))
             }
             onPptMinterApproval={(t) =>
-                dispatch(actions.pptApprove(address, t))
+                dispatch(actions.pptsApprove({ address, token: t }))
             }
             onPptMinterBatchMint={(token, list) =>
-                dispatch(actions.pptBatchMint(address, token, list))
+                dispatch(actions.pptsBatchMint({ address, token, list }))
             }
             onPptMinterBatchBurn={(token, list) =>
-                dispatch(actions.pptBatchBurn(address, token, list))
+                dispatch(actions.pptsBatchBurn({ address, token, list }))
             }
             onPptMinterToggled={(toggled) => {
                 const flags = Object.fromEntries(

@@ -1,8 +1,7 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-import { Dispatch } from '@reduxjs/toolkit';
-import { removeNonce, removeNonceByAmount, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggled, setPptsUiDetails, setPptsUiMinter } from '../../source/redux/actions';
+import { removeNonce, removeNonceByAmount, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter } from '../../source/redux/actions';
 import { mintingRowBy, nftTotalBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
-import { AppState } from '../../source/redux/store';
+import { AppThunk } from '../../source/redux/store';
 import { Address, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftCoreId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, NftSenderStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../source/redux/types';
 
 import { Blockchain } from '../../source/blockchain';
@@ -19,43 +18,36 @@ import { Transaction } from 'ethers';
 /**
  * mining:
  */
-export const miningToggle = (
+export const miningToggle = AppThunk('mining/toggle', (args: {
     address: Address | null, token: Token
-) => (
-    dispatch: Dispatch, getState: () => AppState
-) => {
+}, api) => {
+    const { address, token } = args;
     if (!address) {
         throw new Error('missing selected-address');
     }
-    MM({ dispatch, getState }).toggle({
-        address, token
-    });
-};
-export const miningSpeed = (
+    return MM(api).toggle({ address, token });
+});
+export const miningSpeed = AppThunk('mining/speed', (args: {
     address: Address | null, token: Token, by: number
-) => (
-    dispatch: Dispatch, getState: () => AppState
-) => {
+}, api) => {
+    const { address, token, by } = args;
     if (!address) {
         throw new Error('missing selected-address');
     }
-    const miner = MM({ dispatch, getState }).miner({
-        address, token
-    });
+    const miner = MM(api).miner({ address, token });
     if (by > 0) {
-        miner.increase(by * (+1));
+        return miner.increase(by * (+1));
     } else {
-        miner.decrease(by * (-1));
+        return miner.decrease(by * (-1));
     }
-};
+});
 /**
  * minting:
  */
-export const mintingMint = (
+export const mintingMint = AppThunk('minting/mint', async (args: {
     address: Address | null, token: Token, level: Level
-) => async (
-    dispatch: Dispatch, getState: () => AppState
-) => {
+}, api) => {
+    const { address, token, level } = args;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -66,7 +58,7 @@ export const mintingMint = (
     if (!block_hash) {
         throw new Error('missing block-hash');
     }
-    const { nonce } = nonceBy(getState(), {
+    const { nonce } = nonceBy(api.getState(), {
         address, amount, block_hash, token
     });
     if (!nonce) {
@@ -83,14 +75,14 @@ export const mintingMint = (
                 return;
             }
             moe_wallet.offTransfer(on_transfer);
-            if (getState().token !== token) {
+            if (api.getState().token !== token) {
                 return;
             }
             const { tx_counter } = mintingRowBy(
-                getState(), level
+                api.getState(), level
             );
             if (tx_counter > 0) {
-                dispatch(setMintingRow({
+                api.dispatch(setMintingRow({
                     level, row: { tx_counter: tx_counter - 1 }
                 }));
             }
@@ -102,12 +94,12 @@ export const mintingMint = (
         );
         console.debug('[mint]', tx);
         const { tx_counter } = mintingRowBy(
-            getState(), level
+            api.getState(), level
         );
-        dispatch(setMintingRow({
+        api.dispatch(setMintingRow({
             level, row: { tx_counter: tx_counter + 1 }
         }));
-        dispatch(removeNonce(nonce, {
+        api.dispatch(removeNonce(nonce, {
             address, block_hash, token
         }));
         set_status(MinterStatus.minted);
@@ -124,9 +116,7 @@ export const mintingMint = (
                 /gas required exceeds allowance/i
             )) {
                 if (OtfManager.enabled) {
-                    const miner = MM({ dispatch, getState }).miner({
-                        address, token
-                    });
+                    const miner = MM(api).miner({ address, token });
                     if (miner.running) {
                         miner.pause();
                     }
@@ -135,7 +125,7 @@ export const mintingMint = (
             if (ex.data && ex.data.message && ex.data.message.match(
                 /empty nonce-hash/i
             )) {
-                dispatch(removeNonce(nonce, {
+                api.dispatch(removeNonce(nonce, {
                     address, block_hash, token
                 }));
             }
@@ -148,36 +138,33 @@ export const mintingMint = (
         });
     }
     function set_status(status: MinterStatus) {
-        dispatch(setMintingRow({ level, row: { status } }));
+        api.dispatch(setMintingRow({ level, row: { status } }));
     }
-};
-export const mintingForget = (
+});
+export const mintingForget = AppThunk('minting/forget', (args: {
     address: Address | null, token: Token, level: Level
-) => (
-    dispatch: Dispatch, getState: () => AppState
-) => {
+}, api) => {
+    const { address, token, level } = args;
     if (!address) {
         throw new Error('missing selected-address');
     }
     const amount = Tokenizer.amount(
         token, level
     );
-    const result = noncesBy(getState(), {
+    const result = noncesBy(api.getState(), {
         address, amount, token
     });
     for (const { item } of result) {
-        dispatch(removeNonceByAmount(item));
+        api.dispatch(removeNonceByAmount(item));
     }
-};
+});
 /**
  * nft-sender:
  */
-export const nftTransfer = (
-    address: Address | null, token: Token,
-    nft_issue: NftIssue, nft_level: NftLevel
-) => async (
-    dispatch: Dispatch, getState: () => AppState
-) => {
+export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
+    address: Address | null, token: Token, issue: NftIssue, level: NftLevel
+}, api) => {
+    const { address, token, issue, level } = args;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -185,12 +172,12 @@ export const nftTransfer = (
         token
     );
     const core_id = Nft.coreId({
-        issue: nft_issue, level: nft_level
+        issue, level
     });
-    const { nfts_ui: { details } } = getState();
+    const { nfts_ui: { details } } = api.getState();
     const by_token = details[nft_token];
-    const by_level = by_token[nft_level];
-    const by_issue = by_level[nft_issue];
+    const by_level = by_token[level];
+    const by_issue = by_level[issue];
     const target = by_issue.target.value as Address;
     const amount = by_issue.amount.value as Amount;
     const nft_wallet = new NftWallet(
@@ -202,12 +189,14 @@ export const nftTransfer = (
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        dispatch(setNftsUiDetails({
+        api.dispatch(setNftsUiDetails({
             details: {
                 [nft_token]: {
-                    [nft_level]: {
-                        [nft_issue]: {
-                            amount: { valid: null, value: null },
+                    [level]: {
+                        [issue]: {
+                            amount: {
+                                valid: null, value: null
+                            }
                         }
                     }
                 }
@@ -247,25 +236,22 @@ export const nftTransfer = (
         console.error(ex);
     }
     function set_status(status: NftSenderStatus) {
-        dispatch(setNftsUiDetails({
+        api.dispatch(setNftsUiDetails({
             details: {
                 [nft_token]: {
-                    [nft_level]: {
-                        [nft_issue]: { sender: { status } }
-                    }
+                    [level]: { [issue]: { sender: { status } } }
                 }
             }
         }));
     }
-};
+});
 /**
  * nft-minter:
  */
-export const nftApprove = (
+export const nftsApprove = AppThunk('nfts/approve', async (args: {
     address: Address | null, token: Token
-) => async (
-    dispatch: Dispatch
-) => {
+}, api) => {
+    const { address, token } = args;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -300,16 +286,15 @@ export const nftApprove = (
         error(ex, { after: $button });
     }
     function set_approval(approval: NftMinterApproval) {
-        dispatch(setNftsUiMinter({
+        api.dispatch(setNftsUiMinter({
             minter: { [Nft.token(token)]: { approval } }
         }));
     }
-};
-export const nftBatchMint = (
+});
+export const nftsBatchMint = AppThunk('nfts/batch-mint', async (args: {
     address: Address | null, token: Token, list: NftMinterList
-) => async (
-    dispatch: Dispatch
-) => {
+}, api) => {
+    const { address, token, list } = args;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -349,28 +334,23 @@ export const nftBatchMint = (
         error(ex, { after: $button });
     }
     function set_status(status: NftMinterStatus) {
-        dispatch(setNftsUiMinter({
+        api.dispatch(setNftsUiMinter({
             minter: { [nft_token]: { status } }
         }));
     }
-};
+});
 /**
  * ppt-claimer:
  */
-export const pptClaim = (
-    address: Address | null, token: Token,
-    ppt_issue: NftIssue, ppt_level: NftLevel
-) => async (
-    dispatch: Dispatch
-) => {
+export const pptsClaimRewards = AppThunk('ppts/claim-rewards', async (args: {
+    address: Address | null, token: Token, issue: NftIssue, level: NftLevel
+}, api) => {
+    const { address, token, issue, level } = args;
     if (!address) {
         throw new Error('missing selected-address');
     }
-    const ppt_token = Nft.token(
-        token
-    );
     const core_id = Nft.coreId({
-        issue: ppt_issue, level: ppt_level
+        issue, level
     });
     const moe_treasury = MoeTreasuryFactory({
         token
@@ -410,27 +390,22 @@ export const pptClaim = (
         });
     }
     function set_status(status: PptClaimerStatus) {
-        dispatch(setPptsUiDetails({
+        api.dispatch(setPptsUiDetails({
             details: {
-                [ppt_token]: {
-                    [ppt_level]: {
-                        [ppt_issue]: {
-                            claimer: { status }
-                        }
-                    }
+                [Nft.token(token)]: {
+                    [level]: { [issue]: { claimer: { status } } }
                 }
             }
         }));
     }
-};
+});
 /**
  * ppt-minter:
  */
-export const pptApprove = (
+export const pptsApprove = AppThunk('ppts/approve', async (args: {
     address: Address | null, token: Token
-) => async (
-    dispatch: Dispatch
-) => {
+}, api) => {
+    const { address, token } = args;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -450,7 +425,7 @@ export const pptApprove = (
                 approval: PptMinterApproval.approved
             }
         };
-        dispatch(setPptsUiMinter({ minter }));
+        api.dispatch(setPptsUiMinter({ minter }));
     } else {
         const on_approval: OnApprovalForAll = (
             account, op, flag, ev
@@ -477,16 +452,15 @@ export const pptApprove = (
         }
     }
     function set_approval(approval: PptMinterApproval) {
-        dispatch(setPptsUiMinter({
+        api.dispatch(setPptsUiMinter({
             minter: { [ppt_token]: { approval } }
         }));
     }
-};
-export const pptBatchMint = (
+});
+export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
     address: Address | null, token: Token, list: PptMinterList
-) => async (
-    dispatch: Dispatch, getState: () => AppState
-) => {
+}, api) => {
+    const { address, token, list } = args;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -503,7 +477,7 @@ export const pptBatchMint = (
             const issues = Array.from(Years()).reverse();
             let mint_amount = amount;
             for (const issue of issues) {
-                const nft_total = nftTotalBy(getState(), {
+                const nft_total = nftTotalBy(api.getState(), {
                     level, issue
                 });
                 if (nft_total.amount === 0n) {
@@ -563,16 +537,15 @@ export const pptBatchMint = (
         error(ex, { after: $button });
     }
     function set_status(minter_status: PptMinterStatus) {
-        dispatch(setPptsUiMinter({
+        api.dispatch(setPptsUiMinter({
             minter: { [ppt_token]: { minter_status } }
         }));
     }
-};
-export const pptBatchBurn = (
+});
+export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
     address: Address | null, token: Token, list: PptMinterList
-) => async (
-    dispatch: Dispatch, getState: () => AppState
-) => {
+}, api) => {
+    const { address, token, list } = args;
     if (!address) {
         throw new Error('missing selected-address');
     }
@@ -589,7 +562,7 @@ export const pptBatchBurn = (
             const issues = Array.from(Years());
             let burn_amount = -amount;
             for (const issue of issues) {
-                const ppt_total = pptTotalBy(getState(), {
+                const ppt_total = pptTotalBy(api.getState(), {
                     level, issue
                 });
                 if (ppt_total.amount === 0n) {
@@ -649,34 +622,30 @@ export const pptBatchBurn = (
         error(ex, { after: $button });
     }
     function set_status(burner_status: PptBurnerStatus) {
-        dispatch(setPptsUiMinter({
+        api.dispatch(setPptsUiMinter({
             minter: { [ppt_token]: { burner_status } }
         }));
     }
-};
+});
 /**
  * {aft,otf}-wallet:
  */
-export const otfToggled = (
+export const otfToggle = AppThunk('otf-wallet/toggle', (args: {
     toggled: OtfWallet['toggled']
-) => (
-    dispatch: Dispatch
-) => {
-    dispatch(setOtfWalletToggled({ toggled }));
-};
-export const otfDeposit = (
-    address: OtfWallet['address'],
-    processing: OtfWallet['processing']
-) => async (
-    dispatch: Dispatch
-) => {
+}, api) => {
+    api.dispatch(setOtfWalletToggle(args));
+});
+export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
+    address: OtfWallet['address'], processing: OtfWallet['processing']
+}, api) => {
+    const { address, processing } = args;
     if (!address) {
         throw new Error('missing selected-address');
     }
     if (processing) {
         return;
     }
-    dispatch(setOtfWalletProcessing({
+    api.dispatch(setOtfWalletProcessing({
         processing: true
     }));
     const unit = parseUnits('1.0');
@@ -691,7 +660,7 @@ export const otfDeposit = (
             to: x40(address),
         });
     } catch (ex) {
-        dispatch(setOtfWalletProcessing({
+        api.dispatch(setOtfWalletProcessing({
             processing: false
         }));
         console.error(ex);
@@ -710,31 +679,29 @@ export const otfDeposit = (
             to: otf_address, value
         });
         tx.wait(1).then(() => {
-            dispatch(setOtfWalletProcessing({
+            api.dispatch(setOtfWalletProcessing({
                 processing: false
             }));
         });
         console.debug('[otf-deposit]', tx);
     } catch (ex) {
-        dispatch(setOtfWalletProcessing({
+        api.dispatch(setOtfWalletProcessing({
             processing: false
         }));
         console.error(ex);
     }
-};
-export const otfWithdraw = (
-    address: OtfWallet['address'],
-    processing: OtfWallet['processing']
-) => async (
-    dispatch: Dispatch
-) => {
+});
+export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
+    address: OtfWallet['address'], processing: OtfWallet['processing']
+}, api) => {
+    const { address, processing } = args;
     if (!address) {
         throw new Error('missing selected-address');
     }
     if (processing) {
         return;
     }
-    dispatch(setOtfWalletProcessing({
+    api.dispatch(setOtfWalletProcessing({
         processing: true
     }));
     const otf_signer = await OtfManager.init();
@@ -746,7 +713,7 @@ export const otfWithdraw = (
             to: x40(address), value: otf_balance
         });
     } catch (ex) {
-        dispatch(setOtfWalletProcessing({
+        api.dispatch(setOtfWalletProcessing({
             processing: false
         }));
         console.error(ex);
@@ -762,18 +729,18 @@ export const otfWithdraw = (
             to: x40(address), value
         });
         tx.wait(1).then(() => {
-            dispatch(setOtfWalletProcessing({
+            api.dispatch(setOtfWalletProcessing({
                 processing: false
             }));
         });
         console.debug('[otf-withdraw]', tx);
     } catch (ex) {
-        dispatch(setOtfWalletProcessing({
+        api.dispatch(setOtfWalletProcessing({
             processing: false
         }));
         console.error(ex);
     }
-};
+});
 /**
  * error-alert:
  */
