@@ -1,7 +1,6 @@
-import { Pager } from '../redux/types';
 import * as parsers from './parsers';
 
-export class Params {
+export class ROParams {
     public static get autoMint() {
         return parsers.autoMint(this._search);
     }
@@ -23,9 +22,6 @@ export class Params {
     public static get nftLevel() {
         return parsers.nftLevel(this._search);
     }
-    public static get page() {
-        return Pager.parse(global.location?.pathname ?? null);
-    }
     public static get persist() {
         return parsers.persist(this._search);
     }
@@ -35,20 +31,14 @@ export class Params {
     public static service(name: string) {
         return parsers.service(this._search, name);
     }
-    public static get speed() {
-        return parsers.speed(this._search);
-    }
-    public static get token() {
-        return parsers.token(this._search);
-    }
     public static get version() {
         return parsers.version(this._search);
     }
     /**
-     * @info initial search query at first load:
+     * @info initial location.search (of first load):
      */
     private static _search = new URLSearchParams(
         global.location?.search
     );
 }
-export default Params;
+export default ROParams;

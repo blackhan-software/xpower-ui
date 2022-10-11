@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
 
-import { Params } from '../../params';
+import { ROParams } from '../../params';
 import { StateDb } from '../../state-db';
 import { middleware } from '../middleware';
 import * as reducers from '../reducers';
@@ -9,10 +9,10 @@ import { refreshed } from '../selectors';
 import withServices from '../../services';
 
 const db = new StateDb(localStorage);
-if (Params.clear) {
-    db.clear(Params.persist);
+if (ROParams.clear) {
+    db.clear(ROParams.persist);
 }
-if (Params.clearAll) {
+if (ROParams.clearAll) {
     db.clear();
 }
 export const reducer = combineReducers({
@@ -37,15 +37,15 @@ const store = configureStore({
         serializableCheck: false
     }),
     enhancers: middleware({
-        logger: Params.logger
+        logger: ROParams.logger
     }),
-    preloadedState: db.load(Params.persist),
+    preloadedState: db.load(ROParams.persist),
 });
-if (Params.persist > 0) {
+if (ROParams.persist > 0) {
     store.subscribe(() => {
         const state = store.getState();
         if (refreshed(state) === false) {
-            db.save(Params.persist, state);
+            db.save(ROParams.persist, state);
         }
     });
 }

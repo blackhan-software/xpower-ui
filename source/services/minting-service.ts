@@ -3,8 +3,8 @@ declare const global: Global;
 
 import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
-import { IntervalManager, MiningManager } from '../managers';
-import { Params } from '../params';
+import { IntervalManager, MiningManager as MM } from '../managers';
+import { ROParams } from '../params';
 import { clearMintingRows, removeNonces, setMintingRow } from '../redux/actions';
 import { onNonceChanged, onPageSwitch, onTokenSwitch } from '../redux/observers';
 import { mintingRowBy, pageOf, tokenOf } from '../redux/selectors';
@@ -28,7 +28,7 @@ export const MintingService = (
         const level = Tokenizer.level(token, amount);
         const { tx_counter } = mintingRowBy(store.getState(), level);
         const min_amount = Tokenizer.amount(
-            token, Params.level.min
+            token, ROParams.level.min
         );
         const display =
             amount === min_amount ||
@@ -65,9 +65,7 @@ export const MintingService = (
     Blockchain.onceConnect(function autoMint({
         address, token
     }) {
-        const miner = MiningManager.miner(address, {
-            token
-        });
+        const miner = MM(store).miner({ address, token });
         miner.on('stopping', () => {
             if (global.MINTER_IID) {
                 clearInterval(global.MINTER_IID);
@@ -81,7 +79,7 @@ export const MintingService = (
                 clearInterval(global.MINTER_IID);
                 delete global.MINTER_IID;
             }
-            const auto_mint = Params.autoMint;
+            const auto_mint = ROParams.autoMint;
             if (running && auto_mint > 0) {
                 global.MINTER_IID = setInterval(on_tick, auto_mint);
             }

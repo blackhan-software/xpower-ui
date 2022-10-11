@@ -3,7 +3,7 @@ import { Global } from '../types';
 declare const global: Global;
 
 import { Blockchain } from '../blockchain';
-import { URLQuery } from '../params';
+import { RWParams } from '../params';
 
 import { NonceManager } from '@ethersproject/experimental';
 import { Web3Provider } from '@ethersproject/providers';
@@ -23,10 +23,10 @@ export class OtfManager {
     }
     public static get enabled(): boolean {
         const item = localStorage.getItem('otf-wallet:flag');
-        return JSON.parse(item ?? 'false') || URLQuery.otfWallet;
+        return JSON.parse(item ?? 'false') || RWParams.otfWallet;
     }
     public static set enabled(value: boolean) {
-        URLQuery.otfWallet = value;
+        RWParams.otfWallet = value;
         const item = JSON.stringify(value);
         localStorage.setItem('otf-wallet:flag', item);
     }

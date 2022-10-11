@@ -1,34 +1,41 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
+import { Dispatch, MiddlewareAPI } from '@reduxjs/toolkit';
 import { HashManager, IntervalManager } from '.';
 import { alert, Alert, Alerts } from '../functions';
 import { Miner } from '../miner';
-import { Params } from '../params';
+import { ROParams } from '../params';
 import { addNonce } from '../redux/actions';
 import { miningSpeedBy } from '../redux/selectors';
-import { Store } from '../redux/store';
+import { AppState } from '../redux/store';
 import { Address, Amount, BlockHash, Token } from '../redux/types';
 import { Tokenizer } from '../token';
 import { MoeWallet } from '../wallet';
 
-export class MiningManager {
-    static miner(
-        address: Address, { token }: { token: Token }
-    ): Miner {
-        if (this._miner[token] === undefined) {
-            const speed = miningSpeedBy(Store.state, token);
-            this._miner[token] = new Miner(
-                token, address, speed, Params.level.min
+MiningManager._miner = {} as Record<Token, Miner | undefined>;
+
+export function MiningManager(
+    api: MiddlewareAPI<Dispatch, AppState>
+): {
+    miner: (args: { address: Address; token: Token; }) => Miner;
+    toggle: (args: { address: Address; token: Token; }) => Promise<void>;
+} {
+    function my_miner({ address, token }: {
+        address: Address, token: Token
+    }): Miner {
+        let miner = MiningManager._miner[token];
+        if (miner === undefined) {
+            const speed = miningSpeedBy(api.getState(), token);
+            miner = MiningManager._miner[token] = new Miner(
+                token, address, speed, ROParams.level.min
             );
         }
-        return this._miner[token];
+        return miner;
     }
-    static async toggle(
-        address: Address, { token }: { token: Token }
-    ) {
+    async function my_toggle({ address, token }: {
+        address: Address, token: Token
+    }): Promise<void> {
         const token_lc = Tokenizer.lower(token);
-        const miner = this.miner(address, {
-            token
-        });
+        const miner = my_miner({ address, token });
         Alerts.hide();
         if (miner.running) {
             return await miner.stop();
@@ -92,7 +99,7 @@ export class MiningManager {
             address: Address, block_hash: BlockHash
         ) {
             miner.emit('initialized', { block_hash });
-            const { min, max } = MiningManager.range(token);
+            const { min, max } = range(token);
             if (miner.running) {
                 await miner.stop();
             }
@@ -100,7 +107,7 @@ export class MiningManager {
                 amount, nonce, worker
             }) => {
                 if (amount >= min && amount <= max) {
-                    Store.dispatch(addNonce(nonce, {
+                    api.dispatch(addNonce(nonce, {
                         address,
                         amount,
                         block_hash,
@@ -111,11 +118,11 @@ export class MiningManager {
             });
         }
     }
-    static range(token: Token): { min: Amount, max: Amount } {
-        const min = Tokenizer.amount(token, Params.level.min);
-        const max = Tokenizer.amount(token, Params.level.max);
-        return { min, max };
-    }
-    static _miner = {} as Record<Token, Miner>;
+    return { miner: my_miner, toggle: my_toggle };
+}
+function range(token: Token): { min: Amount, max: Amount } {
+    const min = Tokenizer.amount(token, ROParams.level.min);
+    const max = Tokenizer.amount(token, ROParams.level.max);
+    return { min, max };
 }
 export default MiningManager;

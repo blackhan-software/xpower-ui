@@ -3,7 +3,7 @@ import { Store, Unsubscribe } from 'redux';
 import { observe } from './observe';
 
 import { delayed } from '../../functions';
-import { Params } from '../../params';
+import { RWParams } from '../../params';
 import { AppState } from '../store';
 import { Token } from '../types';
 
@@ -17,7 +17,7 @@ export function onTokenSwitch(
 ): Unsubscribe {
     const selector = (state: AppState) => state.token;
     const observer = observe<Token>(store)(
-        selector, Params.token
+        selector, RWParams.token
     );
     return observer(delayed(handler, ms));
 }

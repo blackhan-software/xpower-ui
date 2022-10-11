@@ -1,5 +1,5 @@
 import { AnyAction, EnhancedStore, Middleware } from '@reduxjs/toolkit';
-import { Params } from '../params';
+import { ROParams } from '../params';
 import { AppState } from '../redux/store';
 
 import { LocationService } from './location-service';
@@ -20,34 +20,34 @@ export default <
 >(
     store: EnhancedStore<S, A, M>
 ) => {
-    if (Params.service('location')) {
+    if (ROParams.service('location')) {
         LocationService(store);
     }
-    if (Params.service('mining')) {
+    if (ROParams.service('mining')) {
         MiningService(store);
     }
-    if (Params.service('minting')) {
+    if (ROParams.service('minting')) {
         MintingService(store);
     }
-    if (Params.service('nfts')) {
+    if (ROParams.service('nfts')) {
         NftsService(store);
     }
-    if (Params.service('nfts-ui')) {
+    if (ROParams.service('nfts-ui')) {
         NftsUiService(store);
     }
-    if (Params.service('ppts')) {
+    if (ROParams.service('ppts')) {
         PptsService(store);
     }
-    if (Params.service('ppts-ui')) {
+    if (ROParams.service('ppts-ui')) {
         PptsUiService(store);
     }
-    if (Params.service('theme')) {
+    if (ROParams.service('theme')) {
         ThemeService(store);
     }
-    if (Params.service('tooltip')) {
+    if (ROParams.service('tooltip')) {
         TooltipService(store);
     }
-    if (Params.service('wallet')) {
+    if (ROParams.service('wallet')) {
         WalletService(store);
     }
     return store;

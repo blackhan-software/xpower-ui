@@ -1,5 +1,5 @@
 import { Version } from '../../source/types';
-import { Params } from '../params';
+import { ROParams } from '../params';
 import { Token } from '../redux/types';
 
 export function address({
@@ -8,7 +8,7 @@ export function address({
     infix: string, token: Token, version?: Version
 }): string {
     if (version === undefined) {
-        version = Params.version;
+        version = ROParams.version;
     }
     const id = `#g-${token}_${infix}_${version}`;
     const address = $(id).data('value');

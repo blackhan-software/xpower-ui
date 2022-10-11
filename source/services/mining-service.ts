@@ -1,7 +1,7 @@
 import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
 import { x64 } from '../functions';
-import { HashManager, IntervalManager, MiningManager } from '../managers';
+import { HashManager, IntervalManager, MiningManager as MM } from '../managers';
 import { setMiningSpeed, setMiningStatus } from '../redux/actions';
 import { onPageSwitch, onTokenSwitch } from '../redux/observers';
 import { tokenOf } from '../redux/selectors';
@@ -16,8 +16,8 @@ export const MiningService = (
     Blockchain.onceConnect(function setupMining({
         address, token
     }) {
-        const miner = MiningManager.miner(address, {
-            token
+        const miner = MM(store).miner({
+            address, token
         });
         miner.on('initializing', () => store.dispatch(
             setMiningStatus({ status: MinerStatus.initializing })));
@@ -52,7 +52,7 @@ export const MiningService = (
     onTokenSwitch(store, async function resetSpeed(token) {
         const address = await Blockchain.selectedAddress;
         if (address) {
-            const miner = MiningManager.miner(address, { token });
+            const miner = MM(store).miner({ address, token });
             store.dispatch(
                 setMiningSpeed({ speed: { [token]: miner.speed } })
             );
@@ -61,8 +61,8 @@ export const MiningService = (
     onPageSwitch(store, async function stopMining() {
         const address = await Blockchain.selectedAddress;
         if (address) {
-            const miner = MiningManager.miner(address, {
-                token: tokenOf(store.getState())
+            const miner = MM(store).miner({
+                address, token: tokenOf(store.getState())
             });
             const running = miner.running;
             if (running) miner.stop();
@@ -75,7 +75,9 @@ export const MiningService = (
             if (token === Token.HELA) {
                 continue;
             }
-            const miner = MiningManager.miner(address, { token });
+            const miner = MM(store).miner({
+                address, token
+            });
             const running = miner.running;
             if (running) miner.stop();
         }
@@ -105,26 +107,23 @@ export const MiningService = (
     }) {
         const im = new IntervalManager({ start: true });
         im.on('tick', async () => {
-            const miner = MiningManager.miner(address, {
-                token: tokenOf(store.getState())
+            const token = tokenOf(store.getState());
+            const miner = MM(store).miner({
+                address, token
             });
             const running = miner.running;
             if (running) {
                 await miner.stop();
             }
             if (running) {
-                MiningManager.toggle(address, {
-                    token: tokenOf(store.getState())
-                });
+                MM(store).toggle({ address, token });
             }
         });
     });
     Blockchain.onceConnect(function benchmarkMining({
         address, token
     }) {
-        const miner = MiningManager.miner(address, {
-            token
-        });
+        const miner = MM(store).miner({ address, token });
         miner.on('started', function (
             { now: beg_ms }: { now: number; }
         ) {
@@ -145,8 +144,8 @@ export const MiningService = (
             if (OtfManager.enabled) {
                 const otf_balance = await otf_wallet.getBalance();
                 if (otf_balance.gt(OtfManager.threshold)) {
-                    const miner = MiningManager.miner(address, {
-                        token: tokenOf(store.getState())
+                    const miner = MM(store).miner({
+                        address, token: tokenOf(store.getState())
                     });
                     if (miner.running) {
                         miner.resume();

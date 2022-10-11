@@ -8,7 +8,7 @@ import { Address, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftCoreId, NftI
 import { Blockchain } from '../../source/blockchain';
 import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
 import { Alert, alert, Alerts, ancestor, globalRef, x40 } from '../../source/functions';
-import { HashManager, MiningManager } from '../../source/managers';
+import { HashManager, MiningManager as MM } from '../../source/managers';
 import { Tokenizer } from '../../source/token';
 import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfManager } from '../../source/wallet';
 import { Years } from '../../source/years';
@@ -22,23 +22,25 @@ import { Transaction } from 'ethers';
 export const miningToggle = (
     address: Address | null, token: Token
 ) => (
-    _: Dispatch
+    dispatch: Dispatch, getState: () => AppState
 ) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
-    MiningManager.toggle(address, { token });
+    MM({ dispatch, getState }).toggle({
+        address, token
+    });
 };
 export const miningSpeed = (
     address: Address | null, token: Token, by: number
 ) => (
-    _: Dispatch
+    dispatch: Dispatch, getState: () => AppState
 ) => {
     if (!address) {
         throw new Error('missing selected-address');
     }
-    const miner = MiningManager.miner(address, {
-        token
+    const miner = MM({ dispatch, getState }).miner({
+        address, token
     });
     if (by > 0) {
         miner.increase(by * (+1));
@@ -122,8 +124,8 @@ export const mintingMint = (
                 /gas required exceeds allowance/i
             )) {
                 if (OtfManager.enabled) {
-                    const miner = MiningManager.miner(address, {
-                        token
+                    const miner = MM({ dispatch, getState }).miner({
+                        address, token
                     });
                     if (miner.running) {
                         miner.pause();

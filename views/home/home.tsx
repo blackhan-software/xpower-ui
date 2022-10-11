@@ -3,7 +3,7 @@ import './home.scss';
 import { Level, Mining, Minting, Token } from '../../source/redux/types';
 
 import React from 'react';
-import { Params } from '../../source/params';
+import { ROParams } from '../../source/params';
 import { UiMining } from './mining/mining';
 import { UiMinting } from './minting/minting';
 
@@ -45,7 +45,7 @@ export function UiHome(
             <UiMinting
                 onForget={props.minting.onForget}
                 onMint={props.minting.onMint}
-                level={Params.level.min} rows={rows} token={token}
+                level={ROParams.level.min} rows={rows} token={token}
             />
         </div>
     </React.Fragment>;

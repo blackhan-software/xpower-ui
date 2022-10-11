@@ -1,6 +1,6 @@
 import { Action } from '@reduxjs/toolkit';
 import { range } from '../../functions';
-import { Params } from '../../params';
+import { ROParams } from '../../params';
 import * as actions from '../actions';
 import { Level, Minting, MintingRow } from '../types';
 
@@ -34,7 +34,7 @@ const set = (
     return { ...rows, [level]: { ...rows[level], ...new_row } };
 };
 const init = (
-    min_level: Level = Params.level.min
+    min_level: Level = ROParams.level.min
 ): Minting['rows'] => {
     return Object.fromEntries(
         Array.from(range(1, 65)).map((l) => [l, empty({

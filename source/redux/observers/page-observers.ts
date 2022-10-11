@@ -3,7 +3,7 @@ import { Store, Unsubscribe } from 'redux';
 import { observe } from './observe';
 
 import { delayed } from '../../functions';
-import { Params } from '../../params';
+import { RWParams } from '../../params';
 import { AppState } from '../store';
 import { Page } from '../types';
 
@@ -17,7 +17,7 @@ export function onPageSwitch(
 ): Unsubscribe {
     const selector = (state: AppState) => state.page;
     const observer = observe<Page>(store)(
-        selector, Params.page
+        selector, RWParams.page
     );
     return observer(delayed(handler, ms));
 }

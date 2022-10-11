@@ -2,7 +2,7 @@ import './connector.scss';
 
 import { Blockchain, ChainId } from '../../source/blockchain';
 import { delayed, globalRef, mobile } from '../../source/functions';
-import { Params } from '../../source/params';
+import { ROParams } from '../../source/params';
 import { onTokenSwitch } from '../../source/redux/observers';
 import { AppState, Store } from '../../source/redux/store';
 
@@ -157,7 +157,7 @@ function ms(
         fallback = mobile() ? 600 : 200;
     }
     const ms = Number(
-        Params.reloadMs ?? fallback
+        ROParams.reloadMs ?? fallback
     );
     return !isNaN(ms) ? ms : fallback;
 }

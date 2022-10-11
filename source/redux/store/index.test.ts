@@ -12,10 +12,4 @@ describe('Store', () => {
     it('should have a store', () => {
         expect(Store.store).toBeDefined();
     });
-    it('should have a state', () => {
-        expect(Store.state).toBeDefined();
-    });
-    it('should have a dispatcher', () => {
-        expect(Store.dispatch).toBeDefined();
-    });
 });

@@ -9,7 +9,7 @@ import { Version } from '../../source/types';
 import React, { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import { connect, Provider } from 'react-redux';
-import { Params } from '../../source/params';
+import { ROParams } from '../../source/params';
 
 type Props = {
     token: Token; version: Version;
@@ -176,7 +176,7 @@ async function addToken(
     }
 }
 if (require.main === module) {
-    const mapper = ({ token }: AppState) => ({ token, version: Params.version });
+    const mapper = ({ token }: AppState) => ({ token, version: ROParams.version });
     const $ui_footer = createElement(connect(mapper)(UiFooter));
     const $footer = document.querySelector('footer');
     createRoot($footer!).render(

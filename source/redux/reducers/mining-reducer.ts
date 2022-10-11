@@ -1,5 +1,5 @@
 import { Action } from '@reduxjs/toolkit';
-import { Params } from '../../params';
+import { RWParams } from '../../params';
 import * as actions from '../actions';
 import { Mining, Tokens } from '../types';
 
@@ -26,7 +26,7 @@ export function miningReducer(
 export function miningState() {
     const speed = {} as Mining['speed'];
     for (const token of Tokens()) {
-        speed[token] = Params.speed;
+        speed[token] = RWParams.speed;
     }
     return { speed, status: null };
 }

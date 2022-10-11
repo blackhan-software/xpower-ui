@@ -21,8 +21,6 @@ export class Pager {
             const suffix = path.length
                 ? path[path.length - 1] : '';
             switch (suffix.toLowerCase()) {
-                case 'none':
-                    return Page.None;
                 case 'home':
                     return Page.Home;
                 case 'nfts':

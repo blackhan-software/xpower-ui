@@ -1,12 +1,12 @@
 import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
 import { delayed } from '../functions';
-import { MiningManager } from '../managers';
+import { MiningManager as MM } from '../managers';
+import { RWParams } from '../params';
 import { onPageSwitch, onTokenSwitch } from '../redux/observers';
 import { tokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { Page } from '../redux/types';
-import { URLQuery } from '../params';
 
 export const LocationService = (
     store: Store<AppState>
@@ -16,12 +16,10 @@ export const LocationService = (
         p.on('chainChanged', () => location.reload());
         p.on('accountsChanged', () => location.reload());
     }, 600));
-    onTokenSwitch(store, function syncLocationToken(token) {
-        URLQuery.token = token;
+    onPageSwitch(store, function syncLocationPath(page) {
+        RWParams.page = page;
     });
-    onPageSwitch(store, function syncLocationTitle(page, prev) {
-        const pathname = location.pathname
-            .replace(new RegExp('/' + prev, 'i'), page);
+    onPageSwitch(store, function syncLocationTitle(page) {
         const titles: Record<Page, string> = {
             [Page.None]: 'XPower',
             [Page.Home]: 'XPower',
@@ -30,8 +28,7 @@ export const LocationService = (
             [Page.About]: 'XPower: About',
         };
         const title = document.title = titles[page];
-        const url = `${pathname}${location.search}`;
-        history.pushState({ page: 1 }, title, url);
+        history.pushState({ page: 1 }, title);
     });
     onPageSwitch(store, function syncLocationDescription(page) {
         const $meta = document.querySelector<HTMLMetaElement>(
@@ -48,30 +45,33 @@ export const LocationService = (
             $meta.setAttribute('content', descriptions[page]);
         }
     });
-    Blockchain.onceConnect(function syncLocationSpeed({
-        address, token
-    }) {
-        const miner = MiningManager.miner(address, {
-            token
-        });
-        miner.on('increased', (e) => {
-            URLQuery.speed = e.speed;
-        });
-        miner.on('decreased', (e) => {
-            URLQuery.speed = e.speed;
-        });
-    }, {
-        per: () => tokenOf(store.getState())
+    onTokenSwitch(store, function syncLocationToken(token) {
+        RWParams.token = token;
     });
-    onTokenSwitch(store, async function syncLocationToken(token) {
+    onTokenSwitch(store, async function syncLocationSpeed(token) {
         const address = await Blockchain.selectedAddress;
         if (!address) {
             throw new Error('missing selected-address')
         }
-        const miner = MiningManager.miner(address, {
-            token
+        const miner = MM(store).miner({
+            address, token
         });
-        URLQuery.speed = miner.speed;
+        RWParams.speed = miner.speed;
+    });
+    Blockchain.onceConnect(function syncLocationSpeed({
+        address, token
+    }) {
+        const miner = MM(store).miner({
+            address, token
+        });
+        miner.on('increased', (e) => {
+            RWParams.speed = e.speed;
+        });
+        miner.on('decreased', (e) => {
+            RWParams.speed = e.speed;
+        });
+    }, {
+        per: () => tokenOf(store.getState())
     });
 };
 export default LocationService;
