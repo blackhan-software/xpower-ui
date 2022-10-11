@@ -163,7 +163,7 @@ export const NftsUiService = (
         const supply = await nft_wallet.totalSupply(nft_id);
         if (supply > 0) {
             const nft_contract = await nft_wallet.contract;
-            const market = 'https://nftrade.com/assets/avalanche';
+            const market = 'https://opensea.io/assets/avalanche';
             return new URL(`${market}/${nft_contract.address}/${nft_id}`);
         }
         return null;

@@ -162,7 +162,7 @@ export const PptsUiService = (
         const supply = await ppt_wallet.totalSupply(ppt_id);
         if (supply > 0) {
             const ppt_contract = await ppt_wallet.contract;
-            const market = 'https://nftrade.com/assets/avalanche';
+            const market = 'https://opensea.io/assets/avalanche';
             return new URL(`${market}/${ppt_contract.address}/${ppt_id}`);
         }
         return null;
