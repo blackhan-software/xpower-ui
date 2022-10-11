@@ -1,32 +1,17 @@
 import { Store } from '@reduxjs/toolkit';
 import { Bus } from '../bus';
 import { ancestors, buffered } from '../functions';
-import { onTokenSwitch } from '../redux/observers';
 import { AppState } from '../redux/store';
 
 export const TooltipService = (
-    store: Store<AppState>
+    _: Store<AppState>
 ) => {
     const { Tooltip } = global.bootstrap ?? {
         Tooltip: undefined
     };
-    onTokenSwitch(store, function retitleTips(
-        token, old_token
-    ) {
-        const $tips = document.querySelectorAll<HTMLElement>(
-            '[data-bs-toggle=tooltip]:not([data-bs-fixed])'
-        );
-        const rx = new RegExp(old_token, 'g');
-        $tips.forEach(($tip) => {
-            const title = $tip.getAttribute(
-                'data-bs-original-title'
-            );
-            if (title?.match(rx)) {
-                $tip.setAttribute('title', title.replace(rx, token));
-            }
-        })
-    });
-    Bus.on('refresh-tips', buffered(() => {
+    Bus.on('refresh-tips', buffered((
+        options: { force?: boolean } | undefined
+    ) => {
         const $tips = document.querySelectorAll<HTMLElement>(
             '[data-bs-toggle=tooltip]'
         );
@@ -37,7 +22,7 @@ export const TooltipService = (
             }
         });
         function refresh($tip: HTMLElement) {
-            return $tip.title.length > 0;
+            return options?.force || $tip.title.length > 0;
         }
         function recreate($tip: HTMLElement) {
             Tooltip.getInstance($tip)?.dispose();
