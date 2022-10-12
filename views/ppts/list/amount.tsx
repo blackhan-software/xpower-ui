@@ -1,10 +1,7 @@
-import { Global } from '../../../source/types';
-declare const global: Global;
-
-import { Referable } from '../../../source/functions';
+import { mobile, useBufferedIf } from '../../../source/functions';
 import { Amount, Nft, NftLevel } from '../../../source/redux/types';
 
-import React, { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
+import React, { KeyboardEvent, MouseEvent, TouchEvent, useEffect, useRef } from 'react';
 import { DashCircle, PlusCircle } from '../../../public/images/tsx';
 
 type Props = {
@@ -15,233 +12,181 @@ type Props = {
 type OnUpdate = (args: Omit<Props, 'onUpdate'> & {
     callback?: () => void
 }) => void;
-export class UiPptAmount extends Referable(React.Component)<
-    Props
-> {
-    componentDidMount() {
-        const $amount = this.ref<HTMLElement>('.amount');
-        $amount.current?.addEventListener(
-            'wheel', this.decreaseByWheel.bind(this), {
-                passive: false
-            }
+export function UiPptAmount(
+    props: Props
+) {
+    // set-delta: buffered invocation if argument is truthy!
+    const [delta, set_delta, set_delta_now] = useBufferedIf(
+        0n, (d) => Boolean(d), 600
+    );
+    useEffect(() => {
+        const tid = setTimeout(() =>
+            changeBy(props, delta) || set_delta_now(0n), 10
         );
-        $amount.current?.addEventListener(
-            'wheel', this.increaseByWheel.bind(this), {
-                passive: false
-            }
-        );
-    }
-    render() {
-        const { amount, max, min, level } = this.props;
-        return <React.Fragment>
-            {this.$decrease(amount > min)}
-            {this.$amount(amount, level)}
-            {this.$increase(amount < max)}
-        </React.Fragment>;
-    }
-    $decrease(
-        decreasable: boolean
-    ) {
-        return <div
-            className='btn-group' role='group'
+        return () => clearTimeout(tid);
+    }, [
+        props, delta, set_delta_now
+    ]);
+    return <React.Fragment>
+        {$decrease(props, set_delta)}
+        {$amount(props)}
+        {$increase(props, set_delta)}
+    </React.Fragment>;
+}
+function $decrease(
+    props: Props, set_delta: (value: Amount) => void
+) {
+    const start = (e: MouseEvent | TouchEvent) => {
+        set_delta(-delta(e)); changeBy(props, -delta(e));
+    };
+    const stop = () => {
+        set_delta(0n);
+    };
+    const { amount, min } = props;
+    const decreasable = amount > min;
+    return <div
+        className='btn-group' role='group'
+    >
+        <button type='button' aria-label="Decrease"
+            className='btn btn-outline-warning decrease'
+            onMouseDown={!mobile() ? start : undefined}
+            onMouseLeave={!mobile() ? stop : undefined}
+            onMouseUp={!mobile() ? stop : undefined}
+            onKeyDown={decreaseByKeyboard.bind(null, props)}
+            onTouchStart={mobile() ? start : undefined}
+            onTouchCancel={mobile() ? stop : undefined}
+            onTouchEnd={mobile() ? stop : undefined}
+            disabled={!decreasable}
         >
-            <button type='button' aria-label="Decrease"
-                className='btn btn-outline-warning decrease'
-                onMouseDown={this.startDecreaseAndDecrease.bind(this)}
-                onMouseLeave={this.stopDecrease.bind(this)}
-                onMouseUp={this.stopDecrease.bind(this)}
-                onKeyDown={this.decreaseByKeyboard.bind(this)}
-                onTouchStart={this.startDecrease.bind(this)}
-                onTouchCancel={this.stopDecrease.bind(this)}
-                onTouchEnd={this.stopDecrease.bind(this)}
-                disabled={!decreasable}
-            >
-                <DashCircle fill={true} />
-            </button>
-        </div>;
+            <DashCircle fill={true} />
+        </button>
+    </div>;
+}
+function decreaseByKeyboard(
+    props: Props, e: KeyboardEvent
+) {
+    if (e.code?.match(/space|enter/i)) {
+        changeBy(props, -delta(e));
     }
-    startDecreaseAndDecrease(
-        e: MouseEvent
-    ) {
-        this.startDecrease(e);
-        this.decrease(e);
+}
+function decreaseByWheel(
+    props: Props, e: WheelEvent
+) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.deltaY > 0) {
+        changeBy(props, -delta(e));
     }
-    startDecrease(
-        e: MouseEvent | TouchEvent
-    ) {
-        if (global.PPT_TID_DECREASE) {
-            clearTimeout(global.PPT_TID_DECREASE);
-            delete global.PPT_TID_DECREASE;
-        }
-        global.PPT_TID_DECREASE = setTimeout(() => {
-            if (global.PPT_IID_DECREASE) {
-                clearTimeout(global.PPT_IID_DECREASE);
-                delete global.PPT_IID_DECREASE;
-            }
-            global.PPT_IID_DECREASE = setInterval(() => {
-                this.decrease(e);
-            }, 10);
-        }, 600);
+}
+function $amount(
+    props: Props
+) {
+    const $ref = useRef<HTMLButtonElement>(null);
+    useEffect(() => {
+        const current = $ref.current;
+        const dbyw = decreaseByWheel.bind(null, props);
+        current?.addEventListener('wheel', dbyw, {
+            passive: false
+        });
+        const ibyw = increaseByWheel.bind(null, props);
+        current?.addEventListener('wheel', ibyw, {
+            passive: false
+        });
+        return () => {
+            current?.removeEventListener('wheel', dbyw);
+            current?.removeEventListener('wheel', ibyw);
+        };
+    }, [props, $ref]);
+    return <button type='button' ref={$ref}
+        className='btn btn-outline-warning amount'
+        data-bs-toggle='tooltip' data-bs-placement='top'
+        onClick={() => extremify(props)}
+        title={title(props)}
+    >{props.amount.toString()}</button>;
+}
+function title(
+    { amount, level }: Props
+) {
+    if (amount > 0) {
+        return `${Nft.nameOf(level)} NFTs to stake`;
+    } else if (amount < 0) {
+        return `${Nft.nameOf(level)} NFTs to unstake`;
+    } else {
+        return `${Nft.nameOf(level)} NFTs to (un)stake`;
     }
-    stopDecrease() {
-        if (global.PPT_TID_DECREASE) {
-            clearTimeout(global.PPT_TID_DECREASE);
-            delete global.PPT_TID_DECREASE;
-        }
-        if (global.PPT_IID_DECREASE) {
-            clearTimeout(global.PPT_IID_DECREASE);
-            delete global.PPT_IID_DECREASE;
-        }
+}
+function extremify(
+    { amount, level, max, min, onUpdate }: Props
+) {
+    if (onUpdate && (amount === max)) {
+        onUpdate({ amount: min, max, min, level });
     }
-    decrease(
-        e: KeyboardEvent | MouseEvent | TouchEvent | WheelEvent
-    ) {
-        const delta = e.ctrlKey ? 100n : e.shiftKey ? 10n : 1n;
-        const { amount, min, onUpdate } = this.props;
-        if (amount - delta >= min) {
-            if (onUpdate) onUpdate({
-                ...this.props, amount: amount - delta
-            });
-        } else {
-            this.stopDecrease();
-        }
+    if (onUpdate && (amount === min || amount < max)) {
+        onUpdate({ amount: max, max, min, level });
     }
-    decreaseByKeyboard(
-        e: KeyboardEvent
-    ) {
-        if (e.code?.match(/space|enter/i)) {
-            this.decrease(e);
-        }
-    }
-    decreaseByWheel(
-        e: WheelEvent
-    ) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.deltaY > 0) {
-            this.decrease(e);
-        }
-    }
-    $amount(
-        amount: Amount, nft_level: NftLevel
-    ) {
-        return <button type='button' ref={this.ref('.amount')}
-            className='btn btn-outline-warning amount'
-            data-bs-toggle='tooltip' data-bs-placement='top'
-            onClick={this.extremify.bind(this, amount, nft_level)}
-            title={this.title(amount, nft_level)}
-        >{amount.toString()}</button>;
-    }
-    title(
-        amount: Amount, nft_level: NftLevel
-    ) {
-        if (amount > 0) {
-            return `${Nft.nameOf(nft_level)} NFTs to stake`;
-        } else if (amount < 0) {
-            return `${Nft.nameOf(nft_level)} NFTs to unstake`;
-        } else {
-            return `${Nft.nameOf(nft_level)} NFTs to (un)stake`;
-        }
-    }
-    extremify(
-        amount: Amount, nft_level: NftLevel
-    ) {
-        const { max, min, onUpdate } = this.props;
-        if (amount === max) {
-            if (onUpdate) onUpdate({
-                amount: min, max, min,
-                level: nft_level
-            });
-        }
-        if (amount === min || amount < max) {
-            if (onUpdate) onUpdate({
-                amount: max, max, min,
-                level: nft_level
-            });
-        }
-    }
-    $increase(
-        increasable: boolean
-    ) {
-        return <div
-            className='btn-group' role='group'
+}
+function $increase(
+    props: Props, set_delta: (value: Amount) => void
+) {
+    const start = (e: MouseEvent | TouchEvent) => {
+        set_delta(delta(e)); changeBy(props, delta(e));
+    };
+    const stop = () => {
+        set_delta(0n);
+    };
+    const { amount, max } = props;
+    const increasable = amount < max;
+    return <div
+        className='btn-group' role='group'
+    >
+        <button type='button' aria-label="Increase"
+            className='btn btn-outline-warning increase'
+            onMouseDown={!mobile() ? start : undefined}
+            onMouseLeave={!mobile() ? stop : undefined}
+            onMouseUp={!mobile() ? stop : undefined}
+            onKeyDown={increaseByKeyboard.bind(null, props)}
+            onTouchStart={mobile() ? start : undefined}
+            onTouchCancel={mobile() ? stop : undefined}
+            onTouchEnd={mobile() ? stop : undefined}
+            disabled={!increasable}
         >
-            <button type='button' aria-label="Increase"
-                className='btn btn-outline-warning increase'
-                onMouseDown={this.startIncreaseAndIncrease.bind(this)}
-                onMouseLeave={this.stopIncrease.bind(this)}
-                onMouseUp={this.stopIncrease.bind(this)}
-                onKeyDown={this.increaseByKeyboard.bind(this)}
-                onTouchStart={this.startIncrease.bind(this)}
-                onTouchCancel={this.stopIncrease.bind(this)}
-                onTouchEnd={this.stopIncrease.bind(this)}
-                disabled={!increasable}
-            >
-                <PlusCircle fill={true} />
-            </button>
-        </div>;
+            <PlusCircle fill={true} />
+        </button>
+    </div>;
+}
+function increaseByKeyboard(
+    props: Props, e: KeyboardEvent
+) {
+    if (e.code?.match(/space|enter/i)) {
+        changeBy(props, delta(e));
     }
-    startIncreaseAndIncrease(
-        e: MouseEvent
+}
+function increaseByWheel(
+    props: Props, e: WheelEvent
+) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.deltaY < 0) {
+        changeBy(props, delta(e));
+    }
+}
+function changeBy(
+    props: Props, delta: Amount
+) {
+    const { amount, min, max, onUpdate } = props;
+    if (delta < 0n && amount + delta >= min ||
+        delta > 0n && amount + delta <= max
     ) {
-        this.startIncrease(e);
-        this.increase(e);
-    }
-    startIncrease(
-        e: MouseEvent | TouchEvent
-    ) {
-        if (global.PPT_TID_INCREASE) {
-            clearTimeout(global.PPT_TID_INCREASE);
-            delete global.PPT_TID_INCREASE;
+        if (onUpdate) {
+            onUpdate({ ...props, amount: amount + delta });
         }
-        global.PPT_TID_INCREASE = setTimeout(() => {
-            if (global.PPT_IID_INCREASE) {
-                clearTimeout(global.PPT_IID_INCREASE);
-                delete global.PPT_IID_INCREASE;
-            }
-            global.PPT_IID_INCREASE = setInterval(() => {
-                this.increase(e);
-            }, 10);
-        }, 600);
+        return true;
     }
-    stopIncrease() {
-        if (global.PPT_TID_INCREASE) {
-            clearTimeout(global.PPT_TID_INCREASE);
-            delete global.PPT_TID_INCREASE;
-        }
-        if (global.PPT_IID_INCREASE) {
-            clearTimeout(global.PPT_IID_INCREASE);
-            delete global.PPT_IID_INCREASE;
-        }
-    }
-    increase(
-        e: KeyboardEvent | MouseEvent | TouchEvent | WheelEvent
-    ) {
-        const delta = e.ctrlKey ? 100n : e.shiftKey ? 10n : 1n;
-        const { amount, max, onUpdate } = this.props;
-        if (amount + delta <= max) {
-            if (onUpdate) onUpdate({
-                ...this.props, amount: amount + delta
-            });
-        } else {
-            this.stopIncrease();
-        }
-    }
-    increaseByKeyboard(
-        e: KeyboardEvent
-    ) {
-        if (e.code?.match(/space|enter/i)) {
-            this.increase(e);
-        }
-    }
-    increaseByWheel(
-        e: WheelEvent
-    ) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.deltaY < 0) {
-            this.increase(e);
-        }
-    }
+    return false;
+}
+function delta(
+    e: { ctrlKey: boolean, shiftKey: boolean }
+) {
+    return e.ctrlKey ? 100n : e.shiftKey ? 10n : 1n;
 }
 export default UiPptAmount;
