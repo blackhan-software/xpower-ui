@@ -16,14 +16,17 @@ import { NftImageMeta } from '../../views/nfts/details/nft-image-meta';
 export const NftsUiService = (
     store: Store<AppState>
 ) => {
-    onAftWalletChanged(store, buffered((
+    /**
+     * nft-amounts:
+     */
+    onAftWalletChanged(store, buffered(function syncAmounts(
         token: Token, { amount }: { amount: Amount }
-    ) => {
+    ) {
         store.dispatch(setNftsUiAmounts({
             ...nft_amounts(token, amount)
         }));
     }));
-    onTokenSwitch(store, (token) => {
+    onTokenSwitch(store, function syncAmounts(token) {
         const { items } = aftWalletBy(store.getState(), token);
         const amount = items[token]?.amount;
         if (amount !== undefined) {
@@ -54,9 +57,9 @@ export const NftsUiService = (
     /**
      * ui-details:
      */
-    Bus.on('toggle-issue', ({
+    Bus.on('toggle-issue', function toggleDetails({
         level, issue, flag
-    }) => {
+    }) {
         const levels = level !== undefined
             ? [level] : Array.from(NftLevels());
         const issues = issue !== undefined
@@ -79,9 +82,9 @@ export const NftsUiService = (
     /**
      * ui-{image,minter}:
      */
-    Blockchain.onceConnect(async ({
+    Blockchain.onceConnect(async function initImagesAndMinter({
         address, token
-    }) => {
+    }) {
         const nft_images = [];
         for (const level of NftLevels()) {
             for (const issue of Years({ reverse: true })) {
@@ -174,9 +177,9 @@ export const NftsUiService = (
     Promise.all([
         Blockchain.isInstalled(),
         Blockchain.isAvalanche()
-    ]).then(([
+    ]).then(function initImages([
         installed, avalanche
-    ]) => {
+    ]) {
         const nft_images = async (token: Token) => {
             const nft_images = [];
             for (const level of NftLevels()) {

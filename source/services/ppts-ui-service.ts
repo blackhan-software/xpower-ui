@@ -17,13 +17,16 @@ import { PptImageMeta } from '../../views/ppts/details/ppt-image-meta';
 export const PptsUiService = (
     store: Store<AppState>
 ) => {
-    onNftChanged(store, buffered(() => {
+    /**
+     * ppt-amounts
+     */
+    onNftChanged(store, buffered(function syncAmounts() {
         const nft_token = Nft.token(tokenOf(store.getState()));
         store.dispatch(setPptsUiAmounts({
             ...ppt_amounts(nft_token)
         }));
     }));
-    onPptChanged(store, buffered(() => {
+    onPptChanged(store, buffered(function syncAmounts() {
         const nft_token = Nft.token(tokenOf(store.getState()));
         store.dispatch(setPptsUiAmounts({
             ...ppt_amounts(nft_token)
@@ -54,9 +57,9 @@ export const PptsUiService = (
     /**
      * ui-details:
      */
-    Bus.on('toggle-issue', ({
+    Bus.on('toggle-issue', function toggleDetails({
         level, issue, flag
-    }) => {
+    }) {
         const levels = level !== undefined
             ? [level] : Array.from(NftLevels());
         const issues = issue !== undefined
@@ -79,9 +82,9 @@ export const PptsUiService = (
     /**
      * ui-{image,minter}:
      */
-    Blockchain.onceConnect(async ({
+    Blockchain.onceConnect(async function initImagesAndMinter({
         address, token
-    }) => {
+    }) {
         const ppt_images = [];
         for (const level of NftLevels()) {
             for (const issue of Years({ reverse: true })) {
@@ -173,9 +176,9 @@ export const PptsUiService = (
     Promise.all([
         Blockchain.isInstalled(),
         Blockchain.isAvalanche()
-    ]).then(([
+    ]).then(function initImages([
         installed, avalanche
-    ]) => {
+    ]) {
         const ppt_images = async (token: Token) => {
             const ppt_images = [];
             for (const level of NftLevels()) {
