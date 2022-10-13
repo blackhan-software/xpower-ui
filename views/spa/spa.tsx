@@ -403,7 +403,7 @@ if (require.main === module) {
     const $spa = createElement(connect((s: AppState) => s)(SPA));
     const $content = document.querySelector('content');
     createRoot($content!).render(
-        <Provider store={Store.store}>
+        <Provider store={Store()}>
             <DebugProvider>
                 <AddressProvider>{$spa}</AddressProvider>
             </DebugProvider>

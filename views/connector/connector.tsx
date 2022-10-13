@@ -194,7 +194,7 @@ if (require.main === module) {
     const $connector = document.querySelector('form#connector');
     const $ui_connector = createElement(UiConnector);
     createRoot($connector!).render(
-        <Provider store={Store.store}>{$ui_connector}</Provider>
+        <Provider store={Store()}>{$ui_connector}</Provider>
     );
 }
 export default UiConnector;

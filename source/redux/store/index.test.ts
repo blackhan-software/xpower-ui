@@ -10,6 +10,6 @@ beforeEach(() => {
 });
 describe('Store', () => {
     it('should have a store', () => {
-        expect(Store.store).toBeDefined();
+        expect(Store()).toBeDefined();
     });
 });

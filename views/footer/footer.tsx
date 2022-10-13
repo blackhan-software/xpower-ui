@@ -180,7 +180,7 @@ if (require.main === module) {
     const $ui_footer = createElement(connect(mapper)(UiFooter));
     const $footer = document.querySelector('footer');
     createRoot($footer!).render(
-        <Provider store={Store.store}>{$ui_footer}</Provider>
+        <Provider store={Store()}>{$ui_footer}</Provider>
     );
 }
 export default UiFooter;

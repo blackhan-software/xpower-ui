@@ -94,7 +94,7 @@ if (require.main === module) {
     const $ui_header = createElement(connect(mapper)(UiHeader));
     const $header = document.querySelector('header');
     createRoot($header!).render(
-        <Provider store={Store.store}>{$ui_header}</Provider>
+        <Provider store={Store()}>{$ui_header}</Provider>
     );
 }
 export default UiHeader;

@@ -7,9 +7,7 @@ export type AppDispatch = typeof store.dispatch;
 export type AppMiddleware = Middleware<
     Record<string, unknown>, AppState
 >
-export class Store {
-    public static get store() {
-        return store;
-    }
+export function Store() {
+    return store;
 }
 export default Store;
