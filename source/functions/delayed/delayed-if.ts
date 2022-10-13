@@ -6,14 +6,16 @@ interface CancelableFunction<
     cancel: () => void;
 }
 /**
- * Returns a delayed and cancelable version for the provided function.
+ * Returns a delayed and cancelable version for the provided function,
+ * with conditional delaying based on the provided predicate.
  *
  * @param fn an arbitrary function
+ * @param iff predicate evaluator
  * @param ms delay in milliseconds
  * @returns a delayed function
  */
-export function delayed<F extends (...args: any[]) => any>(
-    fn: F, ms = 200
+export function delayedIf<F extends (...args: any[]) => any>(
+    fn: F, iff: (...args: Parameters<F>) => any, ms = 200
 ) {
     let id: ReturnType<typeof setTimeout>;
     const dn = function (
@@ -22,7 +24,7 @@ export function delayed<F extends (...args: any[]) => any>(
         return new Promise((resolve) => {
             id = setTimeout(() => resolve(
                 fn ? fn.apply(this, args) : undefined
-            ), ms);
+            ), iff(...args) ? ms : 0);
         });
     };
     (dn as CancelableFunction<F>).cancel = () => {
@@ -30,4 +32,4 @@ export function delayed<F extends (...args: any[]) => any>(
     };
     return dn as CancelableFunction<F>;
 }
-export default delayed;
+export default delayedIf;
