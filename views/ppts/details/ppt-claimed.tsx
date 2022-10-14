@@ -12,11 +12,6 @@ type Props = {
 export function UiPptClaimed(
     { issue, token, value }: Props
 ) {
-    return $amount(issue, token, value);
-}
-function $amount(
-    nft_issue: NftIssue, token: Token, value: Amount | null
-) {
     return <React.Fragment>
         <label className='form-label nft-claimed-label d-none d-sm-flex'>
             Claimed Amount
@@ -31,7 +26,7 @@ function $amount(
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Amount of claimed ${token} rewards so far (for ${nft_issue})`}
+                title={`Amount of claimed ${token} rewards so far (for ${issue})`}
             >
                 <InfoCircle fill={true} />
             </span>
