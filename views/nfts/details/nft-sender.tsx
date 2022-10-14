@@ -1,11 +1,9 @@
-import { Referable } from '../../../source/functions';
-import { Address, Amount, Token } from '../../../source/redux/types';
-import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
-import { NftSenderStatus } from '../../../source/redux/types';
+import { globalRef } from '../../../source/functions';
+import { Address, Amount, Nft, NftIssue, NftLevel, NftSenderStatus, Token } from '../../../source/redux/types';
 
 import React from 'react';
-import { UiNftToggle } from './ui-toggle';
 import { InfoCircle } from '../../../public/images/tsx';
+import { UiNftToggle } from './ui-toggle';
 
 type Props = {
     token: Token;
@@ -24,84 +22,72 @@ type Props = {
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
 }
-export class UiNftSender extends Referable(
-    React.Component<Props>
- ) {
-    render() {
-        const { level, issue } = this.props;
-        return this.$sender(issue, level);
+export function UiNftSender(
+    props: Props
+) {
+    const core_id = Nft.coreId({
+        issue: props.issue, level: props.level
+    });
+    return <div
+        className='btn-group nft-sender d-none d-sm-flex'
+        ref={globalRef(`.nft-sender[core-id="${core_id}"]`)}
+        role='group'
+    >
+        <UiNftToggle
+            toggled={props.toggled}
+            onToggled={props.onToggled}
+        />
+        {$button(props)}
+        {$info(props)}
+    </div>;
+}
+function $button(
+    props: Props
+) {
+    return <button type='button'
+        className='btn btn-outline-warning sender'
+        disabled={disabled(props)}
+        onClick={props.onTransfer?.bind(
+            null, props.issue, props.level
+        )}
+    >
+        {Spinner({
+            show: props.status === NftSenderStatus.sending, grow: true
+        })}
+        <span className='text'>{text(props)}</span>
+    </button>;
+}
+function text(
+    { level, status }: Props
+) {
+    return status === NftSenderStatus.sending
+        ? `Sending ${Nft.nameOf(level)} NFTs…`
+        : `Send ${Nft.nameOf(level)} NFTs`;
+}
+function disabled(
+    { amount, status, target }: Props
+) {
+    if (status === NftSenderStatus.sending) {
+        return true;
     }
-    $sender(
-        nft_issue: NftIssue, nft_level: NftLevel
-    ) {
-        const core_id = Nft.coreId({
-            issue: nft_issue, level: nft_level
-        });
-        return <div
-            className='btn-group nft-sender d-none d-sm-flex'
-            ref={this.globalRef(`.nft-sender[core-id="${core_id}"]`)}
-            role='group'
-        >
-            <UiNftToggle
-                toggled={this.props.toggled}
-                onToggled={this.props.onToggled?.bind(this)}
-            />
-            {this.$button(nft_issue, nft_level)}
-            {this.$info(nft_issue, nft_level)}
-        </div>;
+    if (target.valid !== true) {
+        return true;
     }
-    $button(
-        nft_issue: NftIssue, nft_level: NftLevel
-    ) {
-        const { status: status } = this.props;
-        return <button type='button'
-            className='btn btn-outline-warning sender'
-            disabled={this.disabled}
-            onClick={this.props.onTransfer?.bind(
-                this, nft_issue, nft_level
-            )}
-        >
-            {Spinner({
-                show: status === NftSenderStatus.sending, grow: true
-            })}
-            <span className='text'>
-                {this.text}
-            </span>
-        </button>;
+    if (amount.valid !== true) {
+        return true;
     }
-    get text() {
-        const { level } = this.props;
-        const { status: status } = this.props;
-        return status === NftSenderStatus.sending
-            ? `Sending ${Nft.nameOf(level)} NFTs…`
-            : `Send ${Nft.nameOf(level)} NFTs`;
-    }
-    get disabled() {
-        const { status } = this.props;
-        if (status === NftSenderStatus.sending) {
-            return true;
-        }
-        const { target } = this.props;
-        if (target.valid !== true) {
-            return true;
-        }
-        const { amount } = this.props;
-        if (amount.valid !== true) {
-            return true;
-        }
-        return false;
-    }
-    $info(
-        nft_issue: NftIssue, nft_level: NftLevel
-    ) {
-        return <button type='button'
-            className='btn btn-outline-warning info'
-            data-bs-placement='top' data-bs-toggle='tooltip'
-            title={`Send ${Nft.nameOf(nft_level)} NFTs to destination (for ${nft_issue})`}
-        >
-            <InfoCircle fill={true} />
-        </button>;
-    }
+    return false;
+}
+function $info(
+    { issue, level }: Props
+) {
+    return <button type='button'
+        className='btn btn-outline-warning info'
+        data-bs-placement='top' data-bs-toggle='tooltip'
+        title={`Send ${Nft.nameOf(level)} NFTs to destination (for ${issue})`}
+    >
+        <InfoCircle fill={true} />
+    </button>;
 }
 function Spinner(
     { show, grow }: { show: boolean, grow?: boolean }

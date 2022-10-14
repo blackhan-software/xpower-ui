@@ -1,5 +1,4 @@
-import { Amount, Nft } from '../../../source/redux/types';
-import { NftIssue, NftLevel } from '../../../source/redux/types';
+import { Amount, Nft, NftIssue, NftLevel } from '../../../source/redux/types';
 
 import React, { ChangeEvent, FormEvent } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
@@ -15,86 +14,87 @@ type Props = {
         valid: boolean | null
     ) => void;
 }
-export class UiNftAmount extends React.Component<
-    Props
-> {
-    render() {
-        const { issue, level, balance, value } = this.props;
-        return this.$amount(issue, level, balance, value);
-    }
-    $amount(
-        nft_issue: NftIssue, nft_level: NftLevel,
-        balance: Amount, value: Amount | null
-    ) {
-        const classes = [
-            'form-control', this.validity(this.props.valid)
-        ];
-        return <React.Fragment>
-            <label className='form-label nft-transfer-amount-label d-none d-sm-flex'>
-                Send Amount
-            </label>
-            <div className='input-group nft-transfer-amount d-none d-sm-flex'
-                role='group'
+export function UiNftAmount(
+    props: Props
+) {
+    return $amount(props);
+}
+function $amount(
+    props: Props
+) {
+    const classes = [
+        'form-control', validity(props)
+    ];
+    return <React.Fragment>
+        <label className='form-label nft-transfer-amount-label d-none d-sm-flex'>
+            Send Amount
+        </label>
+        <div className='input-group nft-transfer-amount d-none d-sm-flex'
+            role='group'
+        >
+            <input type='number'
+                className={classes.join(' ')}
+                disabled={!props.balance} min='0' placeholder='0'
+                onChange={onChange.bind(null, props)}
+                onInput={onChange.bind(null, props)}
+                style={{ cursor: cursor(props) }}
+                value={typeof props.value === 'bigint' ? props.value.toString() : ''}
+            />
+            <span className='input-group-text info'
+                data-bs-placement='top' data-bs-toggle='tooltip'
+                title={title(props)}
             >
-                <input type='number'
-                    className={classes.join(' ')}
-                    disabled={!balance} min='0' placeholder='0'
-                    onChange={this.onChange.bind(this)}
-                    onInput={this.onChange.bind(this)}
-                    style={{ cursor: this.cursor(balance) }}
-                    value={typeof value === 'bigint' ? value.toString() : ''}
-                />
-                <span className='input-group-text info'
-                    data-bs-placement='top' data-bs-toggle='tooltip'
-                    title={`Amount of minted ${Nft.nameOf(nft_level)} NFTs to send (for ${nft_issue})`}
-                >
-                    <InfoCircle fill={true} />
-                </span>
-            </div>
-        </React.Fragment>;
+                <InfoCircle fill={true} />
+            </span>
+        </div>
+    </React.Fragment>;
+}
+function cursor(
+    props: Props
+) {
+    return props.balance ? 'text' : 'not-allowed'
+}
+function validity(
+    props: Props
+) {
+    if (props.valid === true) {
+        return 'is-valid';
     }
-    cursor(
-        balance: Amount
-    ) {
-        return balance ? 'text' : 'not-allowed'
+    if (props.valid === false) {
+        return 'is-invalid';
     }
-    validity(
-        valid: boolean | null
-    ) {
-        if (valid === true) {
-            return 'is-valid';
-        }
-        if (valid === false) {
-            return 'is-invalid';
-        }
-        return '';
+    return '';
+}
+function onChange(
+    props: Props, e: ChangeEvent<HTMLInputElement> | FormEvent<HTMLInputElement>
+) {
+    if (typeof props.onAmountChanged !== 'function') {
+        return;
     }
-    onChange(
-        e: ChangeEvent<HTMLInputElement> | FormEvent<HTMLInputElement>
-    ) {
-        if (typeof this.props.onAmountChanged !== 'function') {
-            return;
-        }
-        const $target = e.target as HTMLInputElement;
-        let value: Amount | null;
-        try {
-            if ($target.value.match(/0x/i) === null) {
-                value = BigInt($target.value);
-            } else {
-                value = 0n;
-            }
-        } catch (ex) {
-            value = null;
-        }
-        if (value === null || !$target.value) {
-            this.props.onAmountChanged(value, null);
-        } else if (
-            value > 0 && value <= this.props.balance
-        ) {
-            this.props.onAmountChanged(value, true);
+    const $target = e.target as HTMLInputElement;
+    let value: Amount | null;
+    try {
+        if ($target.value.match(/0x/i) === null) {
+            value = BigInt($target.value);
         } else {
-            this.props.onAmountChanged(value, false);
+            value = 0n;
         }
+    } catch (ex) {
+        value = null;
     }
+    if (value === null || !$target.value) {
+        props.onAmountChanged(value, null);
+    } else if (
+        value > 0 && value <= props.balance
+    ) {
+        props.onAmountChanged(value, true);
+    } else {
+        props.onAmountChanged(value, false);
+    }
+}
+function title(
+    props: Props
+) {
+    return `Amount of minted ${Nft.nameOf(props.level)} NFTs to send (for ${props.issue})`;
 }
 export default UiNftAmount;
