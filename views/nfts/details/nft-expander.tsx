@@ -1,7 +1,7 @@
-import { Referable } from '../../../source/functions';
+import { globalRef } from '../../../source/functions';
 import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 
 type Props = {
@@ -12,116 +12,115 @@ type Props = {
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
 }
-export class UiNftExpander extends Referable(
-    React.Component<Props>
+export function UiNftExpander(
+    props: Props
 ) {
-    render() {
-        const { expanded, toggled } = this.props;
-        return this.$expander(expanded, toggled);
-    }
-    $expander(
-        expanded: boolean | null, toggled: boolean
-    ) {
-        const classes = [
-            'btn-group', 'nft-sender-expander',
-            expanded ? 'd-none' : 'd-sm-none'
-        ];
-        return <div
-            className={classes.join(' ')} role='group'
-            style={{ marginTop: '1em', width: '100%' }}
-        >
-            <button type='button'
-                className='btn btn-outline-warning toggle-old no-ellipsis'
-                data-bs-placement='top' data-bs-toggle='tooltip'
-                onClick={this.toggle.bind(this, toggled)}
-                title={this.title(toggled)}
-            >
-                <i className={
-                    toggled ? 'bi-eye-slash-fill' : 'bi-eye-fill'
-                } />
-            </button>
-            <button type='button'
-                className='btn btn-outline-warning sender-expander'
-                onClick={this.expand.bind(this)}
-            >
-                <i className='bi-chevron-down' />
-            </button>
-            <button type='button'
-                className='btn btn-outline-warning info'
-                data-bs-placement='top' data-bs-toggle='tooltip'
-                style={{ width: '43px' }}
-                title='Show send to & amount'
-            >
-                <InfoCircle fill={true} />
-            </button>
-        </div>;
-    }
-    title(
-        toggled: boolean
-    ) {
-        return toggled
-            ? 'Hide older NFTs'
-            : 'Show older NFTs';
-    }
-    toggle(
-        toggled: boolean
-    ) {
-        if (this.props.onToggled) {
-            this.props.onToggled(!toggled);
-        }
-    }
-    expand() {
-        if (this.props.onExpanded) {
-            this.props.onExpanded(true);
-        }
-    }
-    componentDidUpdate() {
-        if (this.props.expanded) {
+    useEffect(() => {
+        if (props.expanded) {
             const core_id = Nft.coreId({
-                issue: this.props.issue,
-                level: this.props.level
+                issue: props.issue,
+                level: props.level
             });
-            const $row = this.globalRef<HTMLElement>(
+            const $row = globalRef<HTMLElement>(
                 `:nft.row[core-id="${core_id}"]`
             );
             if ($row.current) {
-                this.showTarget($row.current);
-                this.showAmount($row.current);
-                this.showSender($row.current);
+                showTarget($row.current);
+                showAmount($row.current);
+                showSender($row.current);
             }
         }
+    }, [props]);
+    return $expander(props);
+}
+function $expander(
+    props: Props
+) {
+    const classes = [
+        'btn-group', 'nft-sender-expander',
+        props.expanded ? 'd-none' : 'd-sm-none'
+    ];
+    return <div
+        className={classes.join(' ')} role='group'
+        style={{ marginTop: '1em', width: '100%' }}
+    >
+        <button type='button'
+            className='btn btn-outline-warning toggle-old no-ellipsis'
+            data-bs-placement='top' data-bs-toggle='tooltip'
+            onClick={toggle.bind(null, props)}
+            title={title(props)}
+        >
+            <i className={
+                props.toggled ? 'bi-eye-slash-fill' : 'bi-eye-fill'
+            } />
+        </button>
+        <button type='button'
+            className='btn btn-outline-warning sender-expander'
+            onClick={expand.bind(null, props)}
+        >
+            <i className='bi-chevron-down' />
+        </button>
+        <button type='button'
+            className='btn btn-outline-warning info'
+            data-bs-placement='top' data-bs-toggle='tooltip'
+            style={{ width: '43px' }}
+            title='Show send to & amount'
+        >
+            <InfoCircle fill={true} />
+        </button>
+    </div>;
+}
+function title(
+    { toggled }: Props
+) {
+    return toggled
+        ? 'Hide older NFTs'
+        : 'Show older NFTs';
+}
+function toggle(
+    { toggled, onToggled }: Props
+) {
+    if (onToggled) {
+        onToggled(!toggled);
     }
-    showTarget(
-        $row: HTMLElement
-    ) {
-        const $target_label = $row.querySelector<HTMLElement>(
-            '.nft-transfer-to-label'
-        );
-        const $target = $row.querySelector<HTMLElement>(
-            '.nft-transfer-to'
-        );
-        $target_label?.classList.remove('d-none');
-        $target?.classList.remove('d-none');
+}
+function expand(
+    { onExpanded }: Props
+) {
+    if (onExpanded) {
+        onExpanded(true);
     }
-    showAmount(
-        $row: HTMLElement
-    ) {
-        const $amount_label = $row.querySelector<HTMLElement>(
-            '.nft-transfer-amount-label'
-        );
-        const $amount = $row.querySelector<HTMLElement>(
-            '.nft-transfer-amount'
-        );
-        $amount_label?.classList.remove('d-none');
-        $amount?.classList.remove('d-none');
-    }
-    showSender(
-        $row: HTMLElement
-    ) {
-        const $sender = $row.querySelector<HTMLElement>(
-            '.nft-sender'
-        );
-        $sender?.classList.remove('d-none');
-    }
+}
+function showTarget(
+    $row: HTMLElement
+) {
+    const $target_label = $row.querySelector<HTMLElement>(
+        '.nft-transfer-to-label'
+    );
+    const $target = $row.querySelector<HTMLElement>(
+        '.nft-transfer-to'
+    );
+    $target_label?.classList.remove('d-none');
+    $target?.classList.remove('d-none');
+}
+function showAmount(
+    $row: HTMLElement
+) {
+    const $amount_label = $row.querySelector<HTMLElement>(
+        '.nft-transfer-amount-label'
+    );
+    const $amount = $row.querySelector<HTMLElement>(
+        '.nft-transfer-amount'
+    );
+    $amount_label?.classList.remove('d-none');
+    $amount?.classList.remove('d-none');
+}
+function showSender(
+    $row: HTMLElement
+) {
+    const $sender = $row.querySelector<HTMLElement>(
+        '.nft-sender'
+    );
+    $sender?.classList.remove('d-none');
 }
 export default UiNftExpander;
