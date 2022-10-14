@@ -13,57 +13,52 @@ type Props = {
 } & {
     onLoaded?: () => void;
 }
-export class UiPptImage extends React.Component<
-    Props
-> {
-    render() {
-        const { url_market, loading } = this.props;
-        const { level, issue } = this.props;
-        return <div
-            className='nft-image-wrap'
-        >
-            <a target='_blank' href={url_market ?? undefined}>
-                {Spinner({ loading })}{this.$image(level, issue)}
-            </a>
-        </div>;
-    }
-    $image(
-        level: NftLevel, issue: NftIssue
-    ) {
-        const { url_content } = this.props;
-        const { url_market } = this.props;
-        const { toggled } = this.props;
-        const cursor = url_market ? 'pointer' : 'default';
-        const display = url_content && toggled ? 'block' : 'none';
-        const title = this.title(level, issue);
-        return <img
-            className='img-fluid nft-image'
-            data-bs-placement='top'
-            data-bs-toggle='tooltip'
-            loading='lazy'
-            onLoad={this.onLoaded.bind(this)}
-            src={url_content ?? ''}
-            style={{ cursor, display }}
-            title={title}
-        />;
-    }
-    onLoaded() {
-        if (this.props.onLoaded) {
-            this.props.onLoaded();
-        }
-        this.setState({ loading: false })
-    }
-    title(
-        level: NftLevel, issue: NftIssue
-    ) {
-        const rank = Nft.rankOf(level);
-        const name = Nft.nameOf(level);
-        const id = Nft.coreId({ level, issue });
-        return `Trade staked ${name} NFTs (level ${rank}/9 & ID #${id})`;
+export function UiPptImage(
+    props: Props
+) {
+    const { url_market } = props;
+    return <div
+        className='nft-image-wrap'
+    >
+        <a target='_blank' href={url_market ?? undefined}>
+            {Spinner(props)}{$image(props)}
+        </a>
+    </div>;
+}
+function $image(
+    props: Props
+) {
+    const { toggled, url_content, url_market } = props;
+    const cursor = url_market ? 'pointer' : 'default';
+    const display = url_content && toggled ? 'block' : 'none';
+    return <img
+        className='img-fluid nft-image'
+        data-bs-placement='top'
+        data-bs-toggle='tooltip'
+        loading='lazy'
+        onLoad={onLoaded.bind(null, props)}
+        src={url_content ?? ''}
+        style={{ cursor, display }}
+        title={title(props)}
+    />;
+}
+function onLoaded(
+    props: Props
+) {
+    if (props.onLoaded) {
+        props.onLoaded();
     }
 }
+function title(
+    { level, issue }: Props
+) {
+    const rank = Nft.rankOf(level);
+    const name = Nft.nameOf(level);
+    const id = Nft.coreId({ level, issue });
+    return `Trade staked ${name} NFTs (level ${rank}/9 & ID #${id})`;
+}
 function Spinner(
-    { loading }: { loading: boolean }
+    { loading }: Props
 ) {
     const style = {
         color: 'var(--xp-powered)',
