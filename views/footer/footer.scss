@@ -95,3 +95,36 @@ footer {
     color: var(--xp-powered);
     user-select: none;
 }
+footer {
+    @keyframes fadeOut {
+        0% { opacity: 100%; }
+        66% { opacity: 100%; }
+        100% { opacity: 4%; }
+    }
+    nav.underlay {
+        animation: fadeOut 1s;
+        opacity: 4%;
+    }
+    @keyframes fadeIn {
+        0% { opacity: 0%; }
+        66% { opacity: 0%; }
+        100% { opacity: 100%; }
+    }
+    nav.overlay {
+        animation: fadeIn 1s;
+        opacity: 100%;
+    }
+    nav.overlay {
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+    }
+    nav {
+        height: 48px;
+    }
+    a.consent {
+        color: var(--xp-powered);
+    }
+    position: relative;
+}

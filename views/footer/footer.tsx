@@ -6,7 +6,7 @@ import { AppState, Store } from '../../source/redux/store';
 import { Token } from '../../source/redux/types';
 import { Version } from '../../source/types';
 
-import React, { createElement } from 'react';
+import React, { createElement, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { connect, Provider } from 'react-redux';
 import { ROParams } from '../../source/params';
@@ -15,32 +15,46 @@ type Props = {
     token: Token; version: Version;
 }
 export function UiFooter(
-    { token, version }: Props
+    props: Props
 ) {
-    const host = hostname();
-    const year = new Date().getFullYear();
+    const [ok, set_ok] = useState(
+        Boolean(localStorage.getItem('ui-footer:ok'))
+    );
+    useEffect(
+        () => { ok && localStorage.setItem('ui-footer:ok', '1'); }, [ok]
+    );
+    return <React.StrictMode>
+        {$underlay(props, ok)}
+        {$overlay(props, ok, {
+            consent: set_ok
+        })}
+    </React.StrictMode>;
+}
+function $underlay(
+    props: Props,  ok: boolean
+) {
     const classes = [
         'navbar', 'px-2 py-0'
     ];
-    return <React.StrictMode>
-        <nav className={
-            classes.join(' ')
-        }>
-            <ul className='navbar-nav'>
-                {$copyright(year, host)}
-            </ul>
-            <ul className='navbar-nav d-flex flex-row ml-auto'>
-                {$migrate(token)}
-                {$contract(token, version)}
-                {$addToken(token, version)}
-                {$github()}
-                {$discord()}
-                {$telegram()}
-                {$twitter()}
-                {$avalanche()}
-            </ul>
-        </nav>
-    </React.StrictMode>;
+    const host = hostname();
+    const year = new Date().getFullYear();
+    return <nav className={
+        [...classes, !ok ? 'underlay' : ''].join(' ')
+    }>
+        <ul className='navbar-nav'>
+            {$copyright(year, host)}
+        </ul>
+        <ul className='navbar-nav d-flex flex-row ml-auto'>
+            {$migrate(props)}
+            {$contract(props)}
+            {$addToken(props)}
+            {$github()}
+            {$discord()}
+            {$telegram()}
+            {$twitter()}
+            {$avalanche()}
+        </ul>
+    </nav>;
 }
 function $copyright(year: number, host: string) {
     return <li className='nav-item'>
@@ -49,7 +63,7 @@ function $copyright(year: number, host: string) {
         <span className='d-none d-sm-inline'>{' ' + host}</span>
     </li>;
 }
-function $migrate(token: Token) {
+function $migrate({ token }: Props) {
     return <li className='nav-item pb-1 pt-1 pe-1'>
         <a className='nav-link link-light lower migrate'
             data-bs-toggle='tooltip' data-bs-placement='top'
@@ -60,7 +74,7 @@ function $migrate(token: Token) {
         </a>
     </li>;
 }
-function $contract(token: Token, version: Version) {
+function $contract({ token, version }: Props) {
     return <li className='nav-item pb-1 pt-1 pe-1'>
         <a className='nav-link link-light lower smart-contract'
             data-bs-toggle='tooltip' data-bs-placement='top'
@@ -72,7 +86,7 @@ function $contract(token: Token, version: Version) {
         </a>
     </li>;
 }
-function $addToken(token: Token, version: Version) {
+function $addToken({ token, version }: Props) {
     return <li className='nav-item pb-1 pt-1 pe-1'>
         <a className='nav-link link-light lower add-token'
             data-bs-toggle='tooltip' data-bs-placement='top'
@@ -199,6 +213,43 @@ async function addToken(
     } else {
         open('https://metamask.io/download.html');
     }
+}
+function $overlay(
+    props: Props, ok: boolean, { consent }: {
+        consent: (ok: boolean) => void
+    }
+) {
+    const classes = [
+        'navbar', 'px-2 py-0'
+    ];
+    if (ok === false) {
+        return <nav className={[...classes, 'overlay'].join(' ')}>
+            <ul className='navbar-nav'>
+                {$cookies()}
+            </ul>
+            <ul className='navbar-nav d-flex flex-row ml-auto'>
+                {$consent(consent)}
+            </ul>
+        </nav>;
+    }
+    return null;
+}
+function $cookies(
+    href = 'https://cookie-consent.app.forthe.top/why-websites-use-cookies/'
+) {
+    return <li className='nav-item'>
+        › We use cookies<span className='d-none d-sm-inline'>&nbsp;to improve your experience</span>; <a className='consent' href={href} target='_blank'>see more</a>.
+    </li>;
+}
+function $consent(
+    consent: (ok: boolean) => void
+) {
+    return <li className='nav-item'>
+        <button
+            className='btn btn-outline-warning'
+            onClick={() => consent(true)} type='button'
+        >OK</button>
+    </li>;
 }
 if (require.main === module) {
     const mapper = ({ token }: AppState) => ({ token, version: ROParams.version });
