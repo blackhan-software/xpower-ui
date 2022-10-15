@@ -105,4 +105,4 @@ http://localhost:3000?logger=true
 
 ## Copyright
 
- © 2022 [XPowerMine.com](https://www.xpowermine.com)
+ © 2022 [XPowermine.com](https://www.xpowermine.com)
