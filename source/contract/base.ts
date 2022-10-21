@@ -2,6 +2,9 @@ import { Contract, ContractInterface, Signer } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { Blockchain } from '../blockchain';
 
+import { Global } from '../types';
+declare const global: Global;
+
 export class Base {
     public constructor(
         address: string, abi: ContractInterface
@@ -17,7 +20,12 @@ export class Base {
     }
     public async connect(pos?: Web3Provider | Signer): Promise<Contract> {
         if (pos == undefined) {
-            pos = new Web3Provider(await Blockchain.provider);
+            pos = global.WEB3_PROVIDER = new Web3Provider(
+                await Blockchain.provider
+            );
+            if (await Blockchain.isAvalanche()) {
+                pos._pollingInterval = 600; // ms
+            }
             return this.contract.connect(pos.getSigner());
         }
         return this.contract.connect(pos);
