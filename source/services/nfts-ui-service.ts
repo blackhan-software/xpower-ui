@@ -7,7 +7,7 @@ import { onAftWalletChanged, onTokenSwitch } from '../redux/observers';
 import { nftAmounts } from '../redux/reducers';
 import { aftWalletBy, tokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Address, Amount, Balance, MID_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftTokens, Token } from '../redux/types';
+import { Address, Amount, MID_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftTokens, Token } from '../redux/types';
 import { MoeWallet, NftWallet, NftWalletMock } from '../wallet';
 import { Years } from '../years';
 
@@ -23,29 +23,30 @@ export const NftsUiService = (
         token: Token, { amount }: { amount: Amount }
     ) {
         store.dispatch(setNftsUiAmounts({
-            ...nft_amounts(token, amount)
+            ...nft_amounts(token, { amount })
         }));
     }));
     onTokenSwitch(store, function syncAmounts(token) {
         const { items } = aftWalletBy(store.getState(), token);
-        const amount = items[token]?.amount;
-        if (amount !== undefined) {
+        const item = items[token];
+        if (item !== undefined) {
             store.dispatch(setNftsUiAmounts({
-                ...nft_amounts(token, amount)
+                ...nft_amounts(token, item)
             }));
         }
     });
     const nft_amounts = (
-        token: Token, balance: Balance
+        token: Token, { amount }: { amount: Amount }
     ) => {
+        const balance = amount / BigInt(1e18);
         const nft_token = Nft.token(token);
         const entries = Array.from(NftLevels()).map((nft_level): [
             NftLevel, NftAmounts[NftLevel]
         ] => {
             const remainder = balance % 10n ** (BigInt(nft_level) + 3n);
-            const amount = remainder / 10n ** BigInt(nft_level);
+            const nft_amount = remainder / 10n ** BigInt(nft_level);
             return [nft_level, {
-                amount, max: amount, min: 0n
+                amount: nft_amount, max: nft_amount, min: 0n
             }];
         });
         return {

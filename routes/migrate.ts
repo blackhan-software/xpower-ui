@@ -8,18 +8,18 @@ export const router = express.Router();
 
 /** GET migration page. */
 router.get('/', (req, res) => {
-  const { THOR_IMAGE_V4a } = env;
-  assert(THOR_IMAGE_V4a, 'missing THOR_IMAGE_V4a');
-  const { LOKI_IMAGE_V4a } = env;
-  assert(LOKI_IMAGE_V4a, 'missing LOKI_IMAGE_V4a');
-  const { ODIN_IMAGE_V4a } = env;
-  assert(ODIN_IMAGE_V4a, 'missing ODIN_IMAGE_V4a');
+  const { THOR_MOE_IMAGE_V5a } = env;
+  assert(THOR_MOE_IMAGE_V5a, 'missing THOR_MOE_IMAGE_V5a');
+  const { LOKI_MOE_IMAGE_V5a } = env;
+  assert(LOKI_MOE_IMAGE_V5a, 'missing LOKI_MOE_IMAGE_V5a');
+  const { ODIN_MOE_IMAGE_V5a } = env;
+  assert(ODIN_MOE_IMAGE_V5a, 'missing ODIN_MOE_IMAGE_V5a');
   res.render('migrate/index.pig', {
-    DESCRIPTION: 'Upgrade old XPower tokens to v4',
+    DESCRIPTION: 'Upgrade old XPower tokens to v5',
     TITLE: 'XPower: Migrate', ...env_of(req),
-    THOR_IMAGE: THOR_IMAGE_V4a,
-    LOKI_IMAGE: LOKI_IMAGE_V4a,
-    ODIN_IMAGE: ODIN_IMAGE_V4a,
+    THOR_MOE_IMAGE: THOR_MOE_IMAGE_V5a,
+    LOKI_MOE_IMAGE: LOKI_MOE_IMAGE_V5a,
+    ODIN_MOE_IMAGE: ODIN_MOE_IMAGE_V5a,
   });
 });
 export default router;

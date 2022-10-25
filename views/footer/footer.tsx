@@ -2,17 +2,17 @@ import './footer.scss';
 
 import { capitalize } from '../../routes/functions';
 import { Blockchain, ChainId } from '../../source/blockchain';
+import { ROParams } from '../../source/params';
 import { AppState, Store } from '../../source/redux/store';
-import { Token } from '../../source/redux/types';
+import { Page, Token } from '../../source/redux/types';
 import { Version } from '../../source/types';
 
 import React, { createElement, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { connect, Provider } from 'react-redux';
-import { ROParams } from '../../source/params';
 
 type Props = {
-    token: Token; version: Version;
+    page: Page, token: Token; version: Version;
 }
 export function UiFooter(
     props: Props
@@ -24,14 +24,16 @@ export function UiFooter(
         () => { ok && localStorage.setItem('ui-footer:ok', '1'); }, [ok]
     );
     return <React.StrictMode>
-        {$underlay(props, ok)}
-        {$overlay(props, ok, {
-            consent: set_ok
+        {$underlay({
+            ...props, ok
+        })}
+        {$overlay({
+            ...props, ok, set_ok
         })}
     </React.StrictMode>;
 }
 function $underlay(
-    props: Props,  ok: boolean
+    props: Props & { ok: boolean }
 ) {
     const classes = [
         'navbar', 'px-2 py-0'
@@ -39,7 +41,7 @@ function $underlay(
     const host = hostname();
     const year = new Date().getFullYear();
     return <nav className={
-        [...classes, !ok ? 'underlay' : ''].join(' ')
+        [...classes, !props.ok ? 'underlay' : ''].join(' ')
     }>
         <ul className='navbar-nav'>
             {$copyright(year, host)}
@@ -47,7 +49,8 @@ function $underlay(
         <ul className='navbar-nav d-flex flex-row ml-auto'>
             {$migrate(props)}
             {$contract(props)}
-            {$addToken(props)}
+            {$addMoeToken(props)}
+            {$addSovToken(props)}
             {$github()}
             {$discord()}
             {$telegram()}
@@ -86,17 +89,35 @@ function $contract({ token, version }: Props) {
         </a>
     </li>;
 }
-function $addToken({ token, version }: Props) {
-    return <li className='nav-item pb-1 pt-1 pe-1'>
-        <a className='nav-link link-light lower add-token'
-            data-bs-toggle='tooltip' data-bs-placement='top'
-            title={`Add the ${token} token to your Metamask`}
-            href='#' onClick={addToken.bind(null, token, version)}
-        >
-            <i className='bi bi-plus-square-fill'></i>
-            <i className='bi bi-plus-square'></i>
-        </a>
-    </li>;
+function $addMoeToken({ page, token, version }: Props) {
+    if (page !== Page.Ppts) {
+        return <li className='nav-item pb-1 pt-1 pe-1'>
+            <a className='nav-link link-light lower add-token'
+                data-bs-toggle='tooltip' data-bs-placement='top'
+                title={`Add the ${token} token to your Metamask`}
+                href='#' onClick={addMoeToken.bind(null, token, version)}
+            >
+                <i className='bi bi-plus-square-fill'></i>
+                <i className='bi bi-plus-square'></i>
+            </a>
+        </li>;
+    }
+    return null;
+}
+function $addSovToken({ page, token, version }: Props) {
+    if (page === Page.Ppts) {
+        return <li className='nav-item pb-1 pt-1 pe-1'>
+            <a className='nav-link link-light lower add-token'
+                data-bs-toggle='tooltip' data-bs-placement='top'
+                title={`Add the a${token} token to your Metamask`}
+                href='#' onClick={addSovToken.bind(null, token, version)}
+            >
+                <i className='bi bi-plus-square-fill'></i>
+                <i className='bi bi-plus-square'></i>
+            </a>
+        </li>;
+    }
+    return null;
 }
 function $github() {
     return <li className='nav-item pb-1 pt-1 pe-1'>
@@ -183,7 +204,7 @@ function contractUrl(
     const address = String($address?.dataset.value);
     return `https://snowtrace.io/address/${address}`;
 }
-async function addToken(
+async function addMoeToken(
     token: Token, version: Version
 ) {
     if (await Blockchain.isInstalled()) {
@@ -191,21 +212,50 @@ async function addToken(
             const $moe = document.getElementById(
                 `g-${token}_MOE_${version}`
             );
-            const moe = BigInt($moe?.dataset.value as string);
             const $symbol = document.getElementById(
-                `g-${token}_SYMBOL_${version}`
+                `g-${token}_MOE_SYMBOL_${version}`
             );
-            const symbol = String($symbol?.dataset.value);
             const $decimals = document.getElementById(
-                `g-${token}_DECIMALS_${version}`
+                `g-${token}_MOE_DECIMALS_${version}`
             );
-            const decimals = Number($decimals?.dataset.value);
             const $image = document.getElementById(
-                `g-${token}_IMAGE_${version}`
+                `g-${token}_MOE_IMAGE_${version}`
             );
-            const image = $image?.dataset.value;
             Blockchain.addToken({
-                address: moe, symbol, decimals, image
+                address: BigInt($moe?.dataset.value as string),
+                symbol: String($symbol?.dataset.value),
+                decimals: Number($decimals?.dataset.value),
+                image: String($image?.dataset.value)
+            });
+        } else {
+            Blockchain.switchTo(ChainId.AVALANCHE_MAINNET);
+        }
+    } else {
+        open('https://metamask.io/download.html');
+    }
+}
+async function addSovToken(
+    token: Token, version: Version
+) {
+    if (await Blockchain.isInstalled()) {
+        if (await Blockchain.isAvalanche()) {
+            const $sov = document.getElementById(
+                `g-${token}_SOV_${version}`
+            );
+            const $symbol = document.getElementById(
+                `g-${token}_SOV_SYMBOL_${version}`
+            );
+            const $decimals = document.getElementById(
+                `g-${token}_SOV_DECIMALS_${version}`
+            );
+            const $image = document.getElementById(
+                `g-${token}_SOV_IMAGE_${version}`
+            );
+            Blockchain.addToken({
+                address: BigInt($sov?.dataset.value as string),
+                symbol: String($symbol?.dataset.value),
+                decimals: Number($decimals?.dataset.value),
+                image: String($image?.dataset.value)
             });
         } else {
             Blockchain.switchTo(ChainId.AVALANCHE_MAINNET);
@@ -215,20 +265,18 @@ async function addToken(
     }
 }
 function $overlay(
-    props: Props, ok: boolean, { consent }: {
-        consent: (ok: boolean) => void
-    }
+    props: Props & { ok: boolean, set_ok: (ok: boolean) => void },
 ) {
     const classes = [
         'navbar', 'px-2 py-0'
     ];
-    if (ok === false) {
+    if (props.ok === false) {
         return <nav className={[...classes, 'overlay'].join(' ')}>
             <ul className='navbar-nav'>
                 {$cookies()}
             </ul>
             <ul className='navbar-nav d-flex flex-row ml-auto'>
-                {$consent(consent)}
+                {$consent(props.set_ok)}
             </ul>
         </nav>;
     }
@@ -242,17 +290,19 @@ function $cookies(
     </li>;
 }
 function $consent(
-    consent: (ok: boolean) => void
+    set_ok: (ok: boolean) => void
 ) {
     return <li className='nav-item'>
         <button
             className='btn btn-outline-warning'
-            onClick={() => consent(true)} type='button'
+            onClick={() => set_ok(true)} type='button'
         >OK</button>
     </li>;
 }
 if (require.main === module) {
-    const mapper = ({ token }: AppState) => ({ token, version: ROParams.version });
+    const mapper = ({ page, token }: AppState) => ({
+        page, token, version: ROParams.version
+    });
     const $ui_footer = createElement(connect(mapper)(UiFooter));
     const $footer = document.querySelector('footer');
     createRoot($footer!).render(

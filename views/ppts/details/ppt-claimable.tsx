@@ -22,7 +22,7 @@ export function UiPptClaimable(
             <input type='text'
                 className='form-control'
                 placeholder='0' readOnly
-                value={typeof value === 'bigint' ? nice(value) : ''}
+                value={typeof value === 'bigint' ? nice(value, { base: 1e18 }) : ''}
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'

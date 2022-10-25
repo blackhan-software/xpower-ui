@@ -69,7 +69,9 @@ export function version(params: URLSearchParams): Version {
             return 'v3b';
         case 'v4a':
             return 'v4a';
+        case 'v5a':
+            return 'v5a';
         default:
-            return 'v4a';
+            return 'v5a';
     }
 }

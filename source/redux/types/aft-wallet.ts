@@ -2,7 +2,7 @@ import { Amount, Supply } from './base';
 import { Token } from './token';
 
 export type AftWallet = {
-    /** token => { amount, supply } */
+    /** token => { amount, supply, decimals } */
     items: {
         [token in Token]?: {
             amount: Amount;

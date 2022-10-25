@@ -56,13 +56,18 @@ function $address(
 function $balance(
     { token, wallet }: Props
 ) {
-    const item = wallet[token];
+    const amount = amountOf({ token, wallet });
     return <input type='text' readOnly
         className='form-control' id='aft-wallet-balance'
         data-bs-toggle='tooltip' data-bs-placement='top'
-        title={`${nice(item?.amount ?? 0n)} ${token}`}
-        value={nice_si(item?.amount ?? 0n)}
+        title={`${nice(amount, { base: 1e18 })} ${token}`}
+        value={nice_si(amount, { base: 1e18 })}
     />;
+}
+function amountOf(
+    { token, wallet }: Pick<Props, 'token' | 'wallet'>
+) {
+    return wallet[token]?.amount ?? 0n;
 }
 function $info(
     { token }: Props

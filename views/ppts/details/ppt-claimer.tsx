@@ -93,7 +93,7 @@ function aprOf(
     { issue, level }: Props
 ) {
     const now_year = new Date().getFullYear();
-    return level + (now_year - issue) / 1000;
+    return level / 3 + (now_year - issue) ** 2 / 1000;
 }
 function Spinner(
     { show, grow }: { show: boolean, grow?: boolean }

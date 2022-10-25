@@ -1,7 +1,7 @@
 import { OnApproval as on_approval } from '../contract';
 import { OnTransfer as on_transfer } from '../contract';
 import { BigNumber, Contract, Transaction, Event } from 'ethers';
-import { Address, Allowance, Amount, Balance, Supply } from '../redux/types';
+import { Address, Allowance, Amount, Balance, Decimals, Supply } from '../redux/types';
 
 import { x40 } from '../functions';
 
@@ -99,6 +99,10 @@ export abstract class ERC20Wallet {
     get supply(): Promise<Supply> {
         const supply = this.contract.then((c) => c?.totalSupply());
         return supply.then((s: BigNumber) => s.toBigInt());
+    }
+    get decimals(): Promise<Decimals> {
+        const decimals = this.contract.then((c) => c?.decimals());
+        return decimals.then((d: number) => d);
     }
     abstract get contract(): Promise<Contract>;
     protected readonly _address: string;

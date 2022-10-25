@@ -17,7 +17,7 @@ export function aftWalletReducer(
         const item_old = items[token];
         const item_new = {
             amount: item?.amount ?? 1n,
-            supply: item?.supply
+            supply: item?.supply,
         };
         if (item_old) {
             const s = item_new.supply ?? item_old.supply + item_new.amount;
