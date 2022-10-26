@@ -1,8 +1,8 @@
 import './spa.scss';
 
 import { Bus } from '../../source/bus';
-import { AddressContext, AddressProvider, DebugContext, DebugProvider } from '../../source/context';
 import { leafKeys } from '../../source/functions';
+import { AddressContext, AddressProvider, DebugContext, DebugProvider } from '../../source/react';
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiToggled, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
 import { AppDispatch, AppState, Store } from '../../source/redux/store';

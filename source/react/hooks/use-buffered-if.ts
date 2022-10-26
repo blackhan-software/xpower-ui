@@ -1,6 +1,6 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import React, { useMemo, useState } from 'react';
-import { bufferedIf } from '../../buffered';
+import { bufferedIf } from '../../functions/buffered';
 /**
  * Returns a stateful value and a *conditionally buffered* function to
  * update it; plus the original setter to instantly update the value.

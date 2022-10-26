@@ -1,6 +1,6 @@
 import './wallet.scss';
 
-import { globalRef } from '../../source/functions';
+import { globalRef } from '../../source/react';
 import { Address, AftWallet, OtfWallet, Token } from '../../source/redux/types';
 import { OtfManager } from '../../source/wallet';
 

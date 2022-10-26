@@ -6,8 +6,9 @@ import { Address, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftCoreId, NftI
 
 import { Blockchain } from '../../source/blockchain';
 import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
-import { Alert, alert, Alerts, ancestor, globalRef, x40 } from '../../source/functions';
+import { Alert, alert, Alerts, ancestor, x40 } from '../../source/functions';
 import { HashManager, MiningManager as MM } from '../../source/managers';
+import { globalRef } from '../../source/react';
 import { Tokenizer } from '../../source/token';
 import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfManager } from '../../source/wallet';
 import { Years } from '../../source/years';

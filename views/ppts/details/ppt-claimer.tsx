@@ -1,4 +1,4 @@
-import { globalRef } from '../../../source/functions';
+import { globalRef } from '../../../source/react';
 import { Amount, Nft, NftIssue, NftLevel, PptClaimerStatus, Token } from '../../../source/redux/types';
 
 import React from 'react';

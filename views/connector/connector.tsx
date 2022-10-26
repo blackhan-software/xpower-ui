@@ -1,8 +1,9 @@
 import './connector.scss';
 
 import { Blockchain, ChainId } from '../../source/blockchain';
-import { delayed, globalRef, mobile } from '../../source/functions';
+import { delayed, mobile } from '../../source/functions';
 import { ROParams } from '../../source/params';
+import { globalRef } from '../../source/react';
 import { onTokenSwitch } from '../../source/redux/observers';
 import { AppState, Store } from '../../source/redux/store';
 

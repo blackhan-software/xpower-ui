@@ -1,6 +1,6 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import React, { useMemo, useState } from 'react';
-import { delayedIf } from '../../delayed';
+import { delayedIf } from '../../functions/delayed';
 /**
  * Returns a stateful value and a *conditionally delayed* function to
  * update it; plus the original setter to instantly update the value.

@@ -1,4 +1,5 @@
-import { globalRef, nice, nice_si, x40 } from '../../source/functions';
+import { nice, nice_si, x40 } from '../../source/functions';
+import { globalRef } from '../../source/react';
 import { Amount, OtfWallet } from '../../source/redux/types';
 import { OtfManager } from '../../source/wallet';
 

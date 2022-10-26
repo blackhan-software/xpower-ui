@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { Blockchain } from '../blockchain';
-import { Address } from '../redux/types';
+import { Blockchain } from '../../blockchain';
+import { Address } from '../../redux/types';
 
 export const AddressContext = React.createContext<[
     Address | null, Dispatch<SetStateAction<Address | null>>

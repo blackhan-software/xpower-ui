@@ -1,7 +1,8 @@
 import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
 import { MoeTreasuryFactory } from '../contract';
-import { buffered, globalRef, x40 } from '../functions';
+import { buffered, x40 } from '../functions';
+import { globalRef } from '../react';
 import { addPpt, removePpt, setPpt } from '../redux/actions';
 import { pptsBy, tokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';

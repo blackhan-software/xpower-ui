@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
-import { ROParams } from '../params';
+import { ROParams } from '../../params';
 
 export const DebugContext = React.createContext<[
     boolean, Dispatch<SetStateAction<boolean>>

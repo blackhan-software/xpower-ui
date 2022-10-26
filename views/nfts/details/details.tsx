@@ -1,5 +1,5 @@
 import { Bus } from '../../../source/bus';
-import { globalRef } from '../../../source/functions';
+import { globalRef } from '../../../source/react';
 import { Amount, Nft, NftDetails, NftIssue, NftLevel, Nfts, Supply, Token } from '../../../source/redux/types';
 import { Years } from '../../../source/years';
 

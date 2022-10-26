@@ -1,4 +1,5 @@
-import { mobile, useBufferedIf } from '../../../source/functions';
+import { mobile } from '../../../source/functions';
+import { useBufferedIf } from '../../../source/react';
 import { Amount, Nft, NftLevel } from '../../../source/redux/types';
 
 import React, { KeyboardEvent, MouseEvent, TouchEvent, useEffect, useRef } from 'react';

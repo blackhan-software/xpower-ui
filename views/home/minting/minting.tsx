@@ -1,4 +1,5 @@
-import { globalRef, nice, nomobi } from '../../../source/functions';
+import { nice, nomobi } from '../../../source/functions';
+import { globalRef } from '../../../source/react';
 import { Level, MinterStatus, Minting, MintingRow, Token } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
 

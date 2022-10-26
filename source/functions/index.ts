@@ -13,6 +13,5 @@ export * from './nice';
 export * from './queued';
 export * from './random';
 export * from './range';
-export * from './react';
 export * from './testing';
 export * from './trim';

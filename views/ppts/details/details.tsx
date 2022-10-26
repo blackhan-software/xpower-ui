@@ -1,6 +1,7 @@
 import { Bus } from '../../../source/bus';
 import { MoeTreasuryFactory } from '../../../source/contract';
-import { globalRef, x40 } from '../../../source/functions';
+import { x40 } from '../../../source/functions';
+import { AddressContext, globalRef } from '../../../source/react';
 import { onPptChanged } from '../../../source/redux/observers';
 import { AppState } from '../../../source/redux/store';
 import { Address, Amount, Nft, NftFullId, NftIssue, NftLevel, NftLevels, Nfts, NftToken, NftTokens, PptDetails, Supply, Token } from '../../../source/redux/types';
@@ -9,7 +10,6 @@ import { Years } from '../../../source/years';
 import React, { useContext, useEffect, useState } from 'react';
 import { useStore } from 'react-redux';
 import { InfoCircle } from '../../../public/images/tsx';
-import { AddressContext } from '../../../source/context';
 import { UiPptClaimable } from './ppt-claimable';
 import { UiPptClaimed } from './ppt-claimed';
 import { UiPptClaimer } from './ppt-claimer';
