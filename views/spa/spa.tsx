@@ -110,6 +110,7 @@ function $wallet(
                     dispatch(actions.otfWithdraw({ address, processing })),
                 ...otf_wallet
             }}
+            page={page}
             token={token}
         />
     </form>;

@@ -1,7 +1,7 @@
 import './wallet.scss';
 
 import { globalRef } from '../../source/react';
-import { Address, AftWallet, OtfWallet, Token } from '../../source/redux/types';
+import { Address, AftWallet, OtfWallet, Page, Token } from '../../source/redux/types';
 import { OtfManager } from '../../source/wallet';
 
 import React, { useEffect } from 'react';
@@ -18,10 +18,11 @@ type Props = {
         onDeposit?: (processing: OtfWallet['processing']) => void;
         onWithdraw?: (processing: OtfWallet['processing']) => void;
     };
+    page: Page;
     token: Token;
 }
 export function UiWallet(
-    { aft, otf, token }: Props
+    { aft, otf, page, token }: Props
 ) {
     const toggled = otf.toggled ?? OtfManager.enabled;
     useEffect(() => {
@@ -29,8 +30,12 @@ export function UiWallet(
     }, [toggled]);
     return <>
         <UiAftWallet
-            wallet={aft.items} address={aft.address} token={token}
-            toggled={toggled} onToggled={otf.onToggled}
+            address={aft.address}
+            page={page}
+            toggled={toggled}
+            token={token}
+            onToggled={otf.onToggled}
+            wallet={aft.items}
         ></UiAftWallet>
         <CSSTransition
             nodeRef={globalRef<HTMLElement>('#otf-wallet')}
