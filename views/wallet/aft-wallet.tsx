@@ -1,40 +1,51 @@
-import { nice, nice_si, nomobi, x40 } from '../../source/functions';
-import { Address, AftWallet, Page, Token } from '../../source/redux/types';
-
-import React, { useEffect, useState } from 'react';
-import { XPower } from '../../public/images/tsx';
 import { Bus } from '../../source/bus';
+import { nice, nice_si, nomobi, x40 } from '../../source/functions';
+import { switchToken } from '../../source/redux/actions';
+import { AppDispatch } from '../../source/redux/store';
+import { Address, AftWallet, AftWalletBurner, Amount, Token } from '../../source/redux/types';
+import { Tokenizer } from '../../source/token';
+
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { Fire, XPower } from '../../public/images/tsx';
 
 type Props = {
     address: Address | null;
-    page: Page;
+    onBurn?: (token: Token, amount: Amount) => void;
     token: Token;
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
-    wallet: AftWallet['items'];
+    wallet: AftWallet;
 }
 export function UiAftWallet(
     props: Props
 ) {
-    const [aged, set_aged] = useState(
-        props.page === Page.Ppts
-    );
-    useEffect(() => {
+    const dispatch = useDispatch<AppDispatch>();
+    const aged = props.token.startsWith('a');
+    const set_aged = (aged: boolean) => {
+        if (aged) {
+            dispatch(switchToken(Tokenizer.aify(props.token)));
+        } else {
+            dispatch(switchToken(Tokenizer.xify(props.token)));
+        }
         Bus.emit('refresh-tips');
-    }, [aged])
+    };
     return <div id='aft-wallet'>
         <label className='form-label'>
             Wallet Address and {props.token} Balance
         </label>
         <div className='input-group wallet-address'>
-            {$toggle(props)}
+            {$otfToggle(props)}
             {$address(props)}
-            {$balance({ ...props, aged })}
-            {$info({ ...props, aged, set_aged })}
+            {$sovBurner(props)}
+            {$balance(props)}
+            {$sovToggle({
+                ...props, aged, set_aged
+            })}
         </div>
     </div>;
 }
-function $toggle(
+function $otfToggle(
     { toggled, onToggled }: Props
 ) {
     const icon = toggled
@@ -61,38 +72,100 @@ function $address(
         value={x40(address ?? 0n)}
     />;
 }
-function $balance(
-    { aged, token, wallet }: Props & { aged: boolean }
+function $sovBurner(
+    { token, wallet, onBurn }: Props
 ) {
-    const prefix = aged ? 'a' : '';
-    const amount = wallet[token]?.amount ?? 0n;
+    const amount = wallet.items[token]?.amount ?? 0n;
+    const burning = is_burning(wallet) ? 'burning' : '';
+    const disabled = amount == 0n ? 'disabled' : '';
+    const outer_classes = [
+        'form-control input-group-text', disabled, burning
+    ];
+    const inner_classes = [
+        'spinner spinner-border spinner-border-sm', 'float-start'
+    ];
+    return <button
+        className={outer_classes.join(' ')}
+        data-bs-toggle='tooltip' data-bs-placement='top'
+        id='aft-wallet-burner' onClick={on_click} role='tooltip'
+        title={title(token)}
+    >
+        <span
+            className={inner_classes.join(' ')} role='status'
+        />
+        <Fire />
+    </button>;
+    function is_burning(
+        wallet: Props['wallet']
+    ) {
+        return wallet.burner === AftWalletBurner.burning;
+    }
+    function on_click(e: React.MouseEvent) {
+        if (disabled) {
+            e.defaultPrevented = true;
+            e.stopPropagation();
+            return;
+        }
+        if (onBurn) {
+            const text = prompt(
+                `Really? Confirm the amount of ${token} tokens to burn:`,
+                nice(amount, { base: 1e18, precision: 18 })
+            );
+            if (typeof text !== 'string') {
+                return;
+            }
+            const input = Number(text.replace(/['_]/, ''));
+            if (isNaN(input) || input === 0) {
+                return;
+            }
+            const value = BigInt(1e18 * input);
+            if (value < amount) {
+                onBurn(token, value);
+            } else {
+                onBurn(token, amount);
+            }
+        }
+    }
+    function title(token: Token) {
+        const atoken = Tokenizer.aify(token);
+        const xtoken = Tokenizer.xify(token);
+        return token.startsWith('a')
+            ? `Burn your ${atoken} to *unwrap* ${xtoken} tokens`
+            : `Burn your ${xtoken}`;
+    }
+}
+function $balance(
+    { token, wallet }: Props
+) {
+    const amount = wallet.items[token]?.amount ?? 0n;
     return <input type='text' readOnly
         className='form-control' id='aft-wallet-balance'
         data-bs-toggle='tooltip' data-bs-placement='top'
-        title={`${nice(amount, { base: 1e18 })} ${prefix}${token}`}
+        title={`${nice(amount, { base: 1e18 })} ${token}`}
         value={nice_si(amount, { base: 1e18 })}
     />;
 }
-function $info(
+function $sovToggle(
     { token, aged, set_aged }: Props & {
         aged: boolean, set_aged: (aged: boolean) => void
     }
 ) {
     const title = aged
-        ? `Balance of proof-of-work a${token} tokens`
+        ? `Balance of aged proof-of-work ${token} tokens`
         : `Balance of proof-of-work ${token} tokens`;
-    return <button role='tooltip'
+    return <button
         className='form-control input-group-text info'
         data-bs-toggle='tooltip' data-bs-placement='top'
+        id='aft-wallet-sov-toggle' role='tooltip'
         title={title} onClick={() => set_aged(!aged)}
     >
-        <XPower token={token} style={aged ? {
-            border: '1px solid var(--xp-powered)',
-            borderRadius: '9px',
+        <XPower token={Tokenizer.xify(token)} style={aged ? {
+            border: '2px solid var(--xp-powered)',
+            borderRadius: '10px',
             filter: 'invert(1)',
-            height: '18px',
-            width: '18px',
-        }:{}} />
+            height: '20px',
+            width: '20px',
+        } : {}} />
     </button>;
 }
 export default UiAftWallet;

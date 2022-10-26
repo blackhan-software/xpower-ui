@@ -1,14 +1,13 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-import { Version } from '../../../source/types';
-import { Global } from '../../../source/types';
+import { Global, Version } from '../../../source/types';
 declare const global: Global;
 
 import { BigNumber, Contract } from 'ethers';
 import { NftLevel, Token } from '../../redux/types';
-import { MAX_YEAR } from '../../years';
 import { Tokenizer } from '../../token';
-import { XPowerNft } from './xpower-nft';
+import { MAX_YEAR } from '../../years';
 import { address } from '../address';
+import { XPowerNft } from './xpower-nft';
 
 export async function XPowerNftFactory({
     token, version
@@ -16,14 +15,16 @@ export async function XPowerNftFactory({
     token: Token, version?: Version
 }): Promise<Contract> {
     const contract = new XPowerNft(address({
-        infix: 'NFT', token, version
+        infix: 'NFT', token: Tokenizer.xify(token), version
     }));
     return global.XPOWER_NFT = await contract.connect();
 }
 export async function XPowerNftMockFactory({ token }: {
     token: Token
 }): Promise<Contract> {
-    const token_lc = Tokenizer.lower(token);
+    const token_lc = Tokenizer.lower(
+        Tokenizer.xify(token)
+    );
     const mock = {
         totalSupply: (/*id:string*/) => {
             return BigNumber.from(0);

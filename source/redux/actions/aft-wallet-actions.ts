@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { Amount, Supply, Token } from '../types';
+import { AftWallet, Amount, Supply, Token } from '../types';
 
 export const setAftWallet = createAction('aft-wallet/set', (
     token: Token, item: {
@@ -25,3 +25,5 @@ export const decreaseAftWallet = createAction('aft-wallet/decrease', (
 ) => ({
     payload: { token, item }
 }));
+export const setAftWalletBurner
+    = createAction<Pick<AftWallet, 'burner'>>('aft-wallet/set-burner');

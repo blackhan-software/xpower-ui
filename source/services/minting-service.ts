@@ -7,7 +7,7 @@ import { IntervalManager, MiningManager as MM } from '../managers';
 import { ROParams } from '../params';
 import { clearMintingRows, removeNonces, setMintingRow } from '../redux/actions';
 import { onNonceChanged, onPageSwitch, onTokenSwitch } from '../redux/observers';
-import { mintingRowBy, pageOf, tokenOf } from '../redux/selectors';
+import { mintingRowBy, pageOf, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { Page } from '../redux/types';
 import { Tokenizer } from '../token';
@@ -22,7 +22,7 @@ export const MintingService = (
         if (address !== await Blockchain.selectedAddress) {
             return;
         }
-        if (token !== tokenOf(store.getState())) {
+        if (token !== xtokenOf(store.getState())) {
             return;
         }
         const level = Tokenizer.level(token, amount);
@@ -97,7 +97,7 @@ export const MintingService = (
             }
         }
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
     });
 }
 export default MintingService;

@@ -22,9 +22,17 @@ describe('env_of_home', () => {
                 SELECT0R_ODIN: '',
                 SELECT0R_THOR: 'active',
             }, ...{
-                TOKEN: "THOR",
-                Token: "Thor",
-                token: "thor",
+                TOKEN: 'THOR',
+                token: 'thor',
+                Token: 'Thor',
+            }, ...{
+                aTOKEN: 'aTHOR',
+                atoken: 'athor',
+                aToken: 'aThor',
+            }, ...{
+                xTOKEN: 'THOR',
+                xtoken: 'thor',
+                xToken: 'Thor',
             }, ...{
                 XP_POWERED: "--xp-yellow",
                 XP_POWERED_DARK: "--xp-yellow-dark",

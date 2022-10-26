@@ -12,12 +12,20 @@ div#aft-wallet
       data-bs-toggle="tooltip" data-bs-placement="top"
       readonly title="Wallet address" type="text"
     )
+    button.form-control.input-group-text#aft-wallet-burner(
+      data-bs-toggle="tooltip" data-bs-placement="top" disabled="disabled"
+      role="tooltip" title="Burn your {{TOKEN}}"
+    )
+      span.spinner.spinner-border.spinner-border-sm.float-start(
+        role="status"
+      )
+      include ../../public/images/pug/fire.svg.pug
     input#aft-wallet-balance.form-control(
       data-bs-toggle="tooltip" data-bs-placement="top"
       placeholder="0" readonly type="text"
       title=`Balance of proof-of-work {{TOKEN}} tokens`
     )
-    button.form-control.input-group-text.info(
+    button.form-control.input-group-text.info#aft-wallet-sov-toggle(
       data-bs-toggle="tooltip" data-bs-placement="top"
       role="tooltip" title="Wallet address & balance of {{TOKEN}} tokens"
     )

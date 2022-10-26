@@ -22,6 +22,7 @@ import { UiSelector } from '../selector/selector';
 import { UiWallet } from '../wallet/wallet';
 
 import * as actions from './spa-actions';
+import Tokenizer from '../../source/token';
 
 type Props = {
     page: Page;
@@ -99,6 +100,8 @@ function $wallet(
     >
         <UiWallet
             aft={{
+                onBurn: (token, amount) =>
+                    dispatch(actions.aftBurn({ address, token, amount })),
                 ...aft_wallet, address
             }}
             otf={{
@@ -110,7 +113,6 @@ function $wallet(
                     dispatch(actions.otfWithdraw({ address, processing })),
                 ...otf_wallet
             }}
-            page={page}
             token={token}
         />
     </form>;
@@ -129,6 +131,7 @@ function $home(
     page: Page, token: Token,
     mining: Mining, minting: Minting
 ) {
+    const xtoken = Tokenizer.xify(token);
     const [address] = useContext(AddressContext);
     const dispatch = useDispatch<AppDispatch>();
     if (page !== Page.Home) {
@@ -141,7 +144,7 @@ function $home(
             mining={{
                 onToggle: (token) =>
                     dispatch(actions.miningToggle({ address, token })),
-                togglable: miningTogglable(mining, token),
+                togglable: miningTogglable(mining, xtoken),
                 onSpeed: (token, by) =>
                     dispatch(actions.miningSpeed({ address, token, by })),
                 speedable: miningSpeedable(mining),
@@ -154,8 +157,8 @@ function $home(
                     dispatch(actions.mintingMint({ address, token, level })),
                 ...minting
             }}
-            speed={mining.speed[token]}
-            token={token}
+            speed={mining.speed[xtoken]}
+            token={xtoken}
         />
     </form>;
 }
@@ -168,7 +171,8 @@ function $nfts(
     if (page !== Page.Nfts) {
         return null;
     }
-    const nft_token = Nft.token(token);
+    const xtoken = Tokenizer.xify(token);
+    const nft_token = Nft.token(xtoken);
     return <form
         id='nfts' onSubmit={(e) => e.preventDefault()}
     >
@@ -246,7 +250,7 @@ function $nfts(
                 dispatch(setNftsUiDetails({ details }));
             }}
             onNftTransfer={(issue, level) =>
-                dispatch(actions.nftsTransfer({ address, token, issue, level }))
+                dispatch(actions.nftsTransfer({ address, token: xtoken, issue, level }))
             }
             onNftMinterApproval={(token) =>
                 dispatch(actions.nftsApprove({ address, token }))
@@ -267,7 +271,7 @@ function $nfts(
                 dispatch(setPptsUiToggled({ toggled }));
                 dispatch(setPptsUiFlags({ flags }));
             }}
-            token={token}
+            token={xtoken}
         />
     </form>;
 }
@@ -280,7 +284,8 @@ function $ppts(
     if (page !== Page.Ppts) {
         return null;
     }
-    const ppt_token = Nft.token(token);
+    const xtoken = Tokenizer.xify(token);
+    const ppt_token = Nft.token(xtoken);
     return <form
         id='ppts' onSubmit={(e) => e.preventDefault()}
     >
@@ -359,7 +364,7 @@ function $ppts(
             }}
             onPptClaim={(issue, level) =>
                 dispatch(actions.pptsClaimRewards({
-                    address, token, issue, level
+                    address, token: xtoken, issue, level
                 }))
             }
             onPptMinterApproval={(t) =>
@@ -384,7 +389,7 @@ function $ppts(
                 dispatch(setNftsUiToggled({ toggled }));
                 dispatch(setNftsUiFlags({ flags }));
             }}
-            token={token}
+            token={xtoken}
         />
     </form>;
 }
@@ -394,10 +399,11 @@ function $about(
     if (page !== Page.About) {
         return null;
     }
+    const xtoken = Tokenizer.xify(token);
     return <form
         id='about' onSubmit={(e) => e.preventDefault()}
     >
-        <UiAbout token={token} />
+        <UiAbout token={xtoken} />
     </form>;
 }
 if (require.main === module) {

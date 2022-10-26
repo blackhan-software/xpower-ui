@@ -8,14 +8,24 @@ import { Request } from 'express';
 export const env_of = (req: Request): Record<string, string> => {
   const params = new URLSearchParams(req.query as any);
   const token = Tokenizer.token(params.get('token'));
+  const xtoken = Tokenizer.xify(token);
+  const atoken = Tokenizer.aify(token);
   const token_lc = Tokenizer.lower(token);
+  const xtoken_lc = Tokenizer.lower(xtoken);
+  const atoken_lc = Tokenizer.lower(atoken);
   return {
     ...{
       TOKEN: token,
       token: token_lc,
       Token: capitalize(token_lc),
+      xTOKEN: xtoken,
+      xtoken: xtoken_lc,
+      xToken: capitalize(xtoken_lc),
+      aTOKEN: atoken,
+      atoken: atoken_lc,
+      aToken: 'a' + capitalize(atoken_lc.slice(1))
     }, ...{
-      ...theme(token),
+      ...theme(xtoken),
       ...header_page(req),
       ...otf_wallet(req),
       ...selector_token(req)

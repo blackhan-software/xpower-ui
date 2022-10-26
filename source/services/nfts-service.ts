@@ -2,7 +2,7 @@ import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
 import { x40 } from '../functions';
 import { addNft, removeNft, setNft } from '../redux/actions';
-import { nftsBy, tokenOf } from '../redux/selectors';
+import { nftsBy, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { Nft, NftFullId, NftLevels } from '../redux/types';
 import { NftWallet, OnTransferBatch, OnTransferSingle } from '../wallet';
@@ -36,7 +36,7 @@ export const NftsService = (
             }
         }
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
     });
     Blockchain.onConnect(function syncNfts({
         token
@@ -54,7 +54,7 @@ export const NftsService = (
         const on_transfer: OnTransferSingle = async (
             op, from, to, id, value, ev
         ) => {
-            if (tokenOf(store.getState()) !== token) {
+            if (xtokenOf(store.getState()) !== token) {
                 return;
             }
             console.debug('[on:transfer-single]',
@@ -84,7 +84,7 @@ export const NftsService = (
         const nft_wallet = new NftWallet(address, token);
         nft_wallet.onTransferSingle(on_transfer)
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(async function onNftBatchTransfers({
         address, token
@@ -92,7 +92,7 @@ export const NftsService = (
         const on_transfer: OnTransferBatch = async (
             op, from, to, ids, values, ev
         ) => {
-            if (tokenOf(store.getState()) !== token) {
+            if (xtokenOf(store.getState()) !== token) {
                 return;
             }
             console.debug('[on:transfer-batch]',
@@ -124,7 +124,7 @@ export const NftsService = (
         const nft_wallet = new NftWallet(address, token);
         nft_wallet.onTransferBatch(on_transfer);
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
     });
 }
 export default NftsService;

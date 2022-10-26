@@ -4,7 +4,7 @@ import { delayed } from '../functions';
 import { MiningManager as MM } from '../managers';
 import { RWParams } from '../params';
 import { onPageSwitch, onTokenSwitch } from '../redux/observers';
-import { tokenOf } from '../redux/selectors';
+import { xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { Page } from '../redux/types';
 
@@ -71,7 +71,7 @@ export const LocationService = (
             RWParams.speed = e.speed;
         });
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
     });
 };
 export default LocationService;

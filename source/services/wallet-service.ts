@@ -1,34 +1,50 @@
 import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
 import { buffered, x40 } from '../functions';
-import { MoeWallet, OnTransfer, OtfManager } from '../wallet';
 import { setAftWallet, setOtfWalletAddress, setOtfWalletAmount } from '../redux/actions';
-import { otfWalletOf, tokenOf } from '../redux/selectors';
+import { atokenOf, otfWalletOf, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
+import { Tokenizer } from '../token';
+import { MoeWallet, OnTransfer, OtfManager, SovWallet } from '../wallet';
 
 export const WalletService = (
     store: Store<AppState>
 ) => {
-    Blockchain.onceConnect(async function initAftWallet({
+    Blockchain.onceConnect(async function initMoeWallet({
         address, token
     }) {
-        const moe_wallet = new MoeWallet(address, token);
+        const xtoken = Tokenizer.xify(token);
+        const moe_wallet = new MoeWallet(address, xtoken);
         const [amount, supply] = await Promise.all([
             moe_wallet.balance, moe_wallet.supply
         ]);
         store.dispatch(setAftWallet(
-            token, { amount, supply }
+            xtoken, { amount, supply }
         ));
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
     });
-    Blockchain.onceConnect(function syncAftWallet({
+    Blockchain.onceConnect(async function initMoeWallet({
+        address, token
+    }) {
+        const atoken = Tokenizer.aify(token);
+        const sov_wallet = new SovWallet(address, atoken);
+        const [amount, supply] = await Promise.all([
+            sov_wallet.balance, sov_wallet.supply
+        ]);
+        store.dispatch(setAftWallet(
+            atoken, { amount, supply }
+        ));
+    }, {
+        per: () => xtokenOf(store.getState())
+    });
+    Blockchain.onceConnect(function syncMoeWallet({
         address, token
     }) {
         const on_transfer: OnTransfer = async (
             from, to, amount
         ) => {
-            if (tokenOf(store.getState()) !== token) {
+            if (xtokenOf(store.getState()) !== xtoken) {
                 return;
             }
             console.debug(
@@ -39,14 +55,42 @@ export const WalletService = (
                     moe_wallet.balance, moe_wallet.supply
                 ]);
                 store.dispatch(setAftWallet(
-                    token, { amount, supply }
+                    xtoken, { amount, supply }
                 ));
             }
         };
-        const moe_wallet = new MoeWallet(address, token);
+        const xtoken = Tokenizer.xify(token);
+        const moe_wallet = new MoeWallet(address, xtoken);
         moe_wallet.onTransfer(on_transfer);
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
+    });
+    Blockchain.onceConnect(function syncSovWallet({
+        address, token
+    }) {
+        const on_transfer: OnTransfer = async (
+            from, to, amount
+        ) => {
+            if (atokenOf(store.getState()) !== atoken) {
+                return;
+            }
+            console.debug(
+                '[on:transfer]', x40(from), x40(to), amount
+            );
+            if (address === from || address === to) {
+                const [amount, supply] = await Promise.all([
+                    sov_wallet.balance, sov_wallet.supply
+                ]);
+                store.dispatch(setAftWallet(
+                    atoken, { amount, supply }
+                ));
+            }
+        };
+        const atoken = Tokenizer.aify(token);
+        const sov_wallet = new SovWallet(address, atoken);
+        sov_wallet.onTransfer(on_transfer);
+    }, {
+        per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(async function initOtfWallet() {
         const otf_wallet = await OtfManager.init();

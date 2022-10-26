@@ -6,7 +6,7 @@ import { buffered } from '../functions';
 import { setPptsUiAmounts, setPptsUiDetails, setPptsUiMinter } from '../redux/actions';
 import { onNftChanged, onPptChanged, onTokenSwitch } from '../redux/observers';
 import { pptAmounts } from '../redux/reducers';
-import { nftTotalBy, pptTotalBy, tokenOf } from '../redux/selectors';
+import { nftTotalBy, pptTotalBy, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { Address, Nft, NftIssue, NftLevel, NftLevels, NftToken, NftTokens, PptAmounts, PptDetails, PptMinterApproval, Token } from '../redux/types';
 import { NftWallet, PptWallet, PptWalletMock } from '../wallet';
@@ -21,13 +21,13 @@ export const PptsUiService = (
      * ppt-amounts
      */
     onNftChanged(store, buffered(function syncAmounts() {
-        const nft_token = Nft.token(tokenOf(store.getState()));
+        const nft_token = Nft.token(xtokenOf(store.getState()));
         store.dispatch(setPptsUiAmounts({
             ...ppt_amounts(nft_token)
         }));
     }));
     onPptChanged(store, buffered(function syncAmounts() {
-        const nft_token = Nft.token(tokenOf(store.getState()));
+        const nft_token = Nft.token(xtokenOf(store.getState()));
         store.dispatch(setPptsUiAmounts({
             ...ppt_amounts(nft_token)
         }));
@@ -101,7 +101,7 @@ export const PptsUiService = (
             images.reduce((l, r) => $.extend(true, l, r))
         ));
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
     });
     const ppt_approval = async (
         address: Address, token: Token
@@ -193,7 +193,7 @@ export const PptsUiService = (
         };
         if (!installed || !avalanche) {
             onTokenSwitch(store, ppt_images);
-            ppt_images(tokenOf(store.getState()));
+            ppt_images(xtokenOf(store.getState()));
         }
     });
 }

@@ -41,12 +41,12 @@ function $transmitter(
         direction({ amount }),
     ];
     const inner_classes = [
-        'spinner spinner-border spinner-border-sm',
-        'float-start'
+        'spinner spinner-border spinner-border-sm', 'float-start'
     ];
-    return <button id='otf-wallet-transfer'
+    return <button
         className={outer_classes.join(' ')}
         data-bs-toggle='tooltip' data-bs-placement='top'
+        id='otf-wallet-transfer'
         onClick={transact.bind(null, props)}
         title={title({ amount })}
     >

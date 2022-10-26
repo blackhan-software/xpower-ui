@@ -5,7 +5,7 @@ import { buffered } from '../functions';
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiMinter } from '../redux/actions';
 import { onAftWalletChanged, onTokenSwitch } from '../redux/observers';
 import { nftAmounts } from '../redux/reducers';
-import { aftWalletBy, tokenOf } from '../redux/selectors';
+import { aftWalletBy, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { Address, Amount, MID_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftTokens, Token } from '../redux/types';
 import { MoeWallet, NftWallet, NftWalletMock } from '../wallet';
@@ -102,7 +102,7 @@ export const NftsUiService = (
             images.reduce((l, r) => $.extend(true, l, r))
         ));
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
     });
     const nft_approval = async (
         address: Address, token: Token
@@ -195,7 +195,7 @@ export const NftsUiService = (
         };
         if (!installed || !avalanche) {
             onTokenSwitch(store, nft_images);
-            nft_images(tokenOf(store.getState()));
+            nft_images(xtokenOf(store.getState()));
         }
     });
 }

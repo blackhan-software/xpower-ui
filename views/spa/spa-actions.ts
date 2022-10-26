@@ -1,8 +1,8 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-import { removeNonce, removeNonceByAmount, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter } from '../../source/redux/actions';
+import { removeNonce, removeNonceByAmount, setAftWalletBurner, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter, switchToken } from '../../source/redux/actions';
 import { mintingRowBy, nftTotalBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
 import { AppThunk } from '../../source/redux/store';
-import { Address, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftCoreId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, NftSenderStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../source/redux/types';
+import { Address, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftCoreId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, NftSenderStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../source/redux/types';
 
 import { Blockchain } from '../../source/blockchain';
 import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
@@ -10,11 +10,12 @@ import { Alert, alert, Alerts, ancestor, x40 } from '../../source/functions';
 import { HashManager, MiningManager as MM } from '../../source/managers';
 import { globalRef } from '../../source/react';
 import { Tokenizer } from '../../source/token';
-import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfManager } from '../../source/wallet';
+import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfManager, SovWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
 
 import { Web3Provider } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
+import { AnyAction } from '@reduxjs/toolkit';
 import { Transaction } from 'ethers';
 /**
  * mining:
@@ -54,7 +55,7 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
     }
     const amount = Tokenizer.amount(token, level);
     const block_hash = HashManager.latestHash({
-        slot: Tokenizer.lower(token)
+        slot: Tokenizer.xify(token)
     });
     if (!block_hash) {
         throw new Error('missing block-hash');
@@ -391,6 +392,12 @@ export const pptsClaimRewards = AppThunk('ppts/claim-rewards', async (args: {
         });
     }
     function set_status(status: PptClaimerStatus) {
+        if (status === PptClaimerStatus.claimed) {
+            const state = api.getState();
+            if (!state.token.startsWith('a')) {
+                api.dispatch(switchToken(Tokenizer.aify(state.token)));
+            }
+        }
         api.dispatch(setPptsUiDetails({
             details: {
                 [Nft.token(token)]: {
@@ -629,7 +636,83 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
     }
 });
 /**
- * {aft,otf}-wallet:
+ * aft-wallet:
+ */
+ export const aftBurn = AppThunk('aft/burn', async (args: {
+    address: Address | null, token: Token, amount: Amount
+}, api) => {
+    const action = args.token.startsWith('a')
+        ? aftBurnAPower(args) : aftBurnXPower(args);
+    api.dispatch(action as unknown as AnyAction);
+});
+export const aftBurnAPower = AppThunk('aft/burn-apower', async (args: {
+    address: Address | null, token: Token, amount: Amount
+}, api) => {
+    const { address, token, amount } = args;
+    if (!address) {
+        throw new Error('missing selected-address');
+    }
+    if (!token.startsWith('a')) {
+        throw new Error('APower token required');
+    }
+    const sov_wallet = new SovWallet(address, token);
+    const on_transfer_tx: OnTransfer = async (
+        from, to, amount, ev
+    ) => {
+        if (ev.transactionHash !== tx?.hash) {
+            return;
+        }
+        set_status(AftWalletBurner.burned);
+    };
+    let tx: Transaction | undefined;
+    Alerts.hide();
+    try {
+        set_status(AftWalletBurner.burning);
+        sov_wallet.onTransfer(on_transfer_tx);
+        tx = await sov_wallet.burn(amount);
+    } catch (ex: any) {
+        set_status(AftWalletBurner.error);
+        console.error(ex);
+    }
+    function set_status(burner_status: AftWalletBurner) {
+        api.dispatch(setAftWalletBurner({ burner: burner_status }));
+    }
+});
+export const aftBurnXPower = AppThunk('aft/burn-xpower', async (args: {
+    address: Address | null, token: Token, amount: Amount
+}, api) => {
+    const { address, token, amount } = args;
+    if (!address) {
+        throw new Error('missing selected-address');
+    }
+    if (token.startsWith('a')) {
+        throw new Error('XPower token required');
+    }
+    const moe_wallet = new MoeWallet(address, token);
+    const on_transfer_tx: OnTransfer = async (
+        from, to, amount, ev
+    ) => {
+        if (ev.transactionHash !== tx?.hash) {
+            return;
+        }
+        set_status(AftWalletBurner.burned);
+    };
+    let tx: Transaction | undefined;
+    Alerts.hide();
+    try {
+        set_status(AftWalletBurner.burning);
+        moe_wallet.onTransfer(on_transfer_tx);
+        tx = await moe_wallet.burn(amount);
+    } catch (ex: any) {
+        set_status(AftWalletBurner.error);
+        console.error(ex);
+    }
+    function set_status(burner_status: AftWalletBurner) {
+        api.dispatch(setAftWalletBurner({ burner: burner_status }));
+    }
+});
+/**
+ * otf-wallet:
  */
 export const otfToggle = AppThunk('otf-wallet/toggle', (args: {
     toggled: OtfWallet['toggled']
@@ -684,7 +767,6 @@ export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
                 processing: false
             }));
         });
-        console.debug('[otf-deposit]', tx);
     } catch (ex) {
         api.dispatch(setOtfWalletProcessing({
             processing: false
@@ -734,7 +816,6 @@ export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
                 processing: false
             }));
         });
-        console.debug('[otf-withdraw]', tx);
     } catch (ex) {
         api.dispatch(setOtfWalletProcessing({
             processing: false

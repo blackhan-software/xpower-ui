@@ -4,7 +4,7 @@ import { MoeTreasuryFactory } from '../contract';
 import { buffered, x40 } from '../functions';
 import { globalRef } from '../react';
 import { addPpt, removePpt, setPpt } from '../redux/actions';
-import { pptsBy, tokenOf } from '../redux/selectors';
+import { pptsBy, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { Nft, NftFullId, NftLevels } from '../redux/types';
 import { OnTransferBatch, OnTransferSingle, PptWallet } from '../wallet';
@@ -38,7 +38,7 @@ export const PptsService = (
             }
         }
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
     });
     Blockchain.onConnect(function syncPpts({
         token
@@ -56,7 +56,7 @@ export const PptsService = (
         const on_transfer: OnTransferSingle = async (
             op, from, to, id, value, ev
         ) => {
-            if (tokenOf(store.getState()) !== token) {
+            if (xtokenOf(store.getState()) !== token) {
                 return;
             }
             console.debug('[on:transfer-single]',
@@ -86,7 +86,7 @@ export const PptsService = (
         const ppt_wallet = new PptWallet(address, token);
         ppt_wallet.onTransferSingle(on_transfer)
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(async function onPptBatchTransfers({
         address, token
@@ -94,7 +94,7 @@ export const PptsService = (
         const on_transfer: OnTransferBatch = async (
             op, from, to, ids, values, ev
         ) => {
-            if (tokenOf(store.getState()) !== token) {
+            if (xtokenOf(store.getState()) !== token) {
                 return;
             }
             console.debug('[on:transfer-batch]',
@@ -126,14 +126,14 @@ export const PptsService = (
         const ppt_wallet = new PptWallet(address, token);
         ppt_wallet.onTransferBatch(on_transfer);
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(async function updateClaims() {
         const moe_treasury = await MoeTreasuryFactory({
-            token: tokenOf(store.getState())
+            token: xtokenOf(store.getState())
         });
         moe_treasury.provider.on('block', buffered(() => {
-            const nft_token = Nft.token(tokenOf(store.getState()));
+            const nft_token = Nft.token(xtokenOf(store.getState()));
             const { details } = store.getState().ppts_ui;
             const by_token = details[nft_token];
             Object.entries(by_token).forEach(([

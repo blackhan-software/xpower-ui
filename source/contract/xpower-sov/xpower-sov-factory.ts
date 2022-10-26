@@ -5,16 +5,16 @@ import { Contract } from 'ethers';
 import { Token } from '../../redux/types';
 import { Tokenizer } from '../../token';
 import { address } from '../address';
-import { XPowerMoe } from './xpower-moe';
+import { XPowerSov } from './xpower-sov';
 
-export async function XPowerMoeFactory({
+export async function XPowerSovFactory({
     token, version
 }: {
     token: Token, version?: Version
 }): Promise<Contract> {
-    const contract = new XPowerMoe(address({
-        infix: 'MOE', token: Tokenizer.xify(token), version
+    const contract = new XPowerSov(address({
+        infix: 'SOV', token: Tokenizer.xify(token), version
     }));
-    return global.XPOWER_MOE = await contract.connect();
+    return global.XPOWER_SOV = await contract.connect();
 }
-export default XPowerMoeFactory;
+export default XPowerSovFactory;

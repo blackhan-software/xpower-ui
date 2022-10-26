@@ -7,16 +7,19 @@ export type Theme = {
 export function theme(token: Token): Theme {
     switch (token) {
         case Token.THOR:
+        case Token.aTHOR:
             return {
                 XP_POWERED: '--xp-yellow',
                 XP_POWERED_DARK: '--xp-yellow-dark'
             };
         case Token.LOKI:
+        case Token.aLOKI:
             return {
                 XP_POWERED: '--xp-lime',
                 XP_POWERED_DARK: '--xp-lime-dark'
             };
         case Token.ODIN:
+        case Token.aODIN:
             return {
                 XP_POWERED: '--xp-cyan',
                 XP_POWERED_DARK: '--xp-cyan-dark'

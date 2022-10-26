@@ -12,15 +12,44 @@ div#aft-wallet {
       width: 42px;
     }
     button#otf-wallet-toggle:hover {
-      border: 1px solid var(--xp-powered);
-      border-right: 1px solid var(--xp-dimgray);
+      border-bottom: 1px solid var(--xp-powered);
+      border-left: 1px solid var(--xp-powered);
+      border-top: 1px solid var(--xp-powered);
       background-color: var(--xp-dimgray);
       color: var(--xp-powered);
     }
     input#aft-wallet-address {
       cursor: text;
       text-align: center;
-      width: calc(100% - 192px);
+      width: calc(100% - 234px);
+    }
+    button#aft-wallet-burner:hover:not(.disabled):not(.burning) {
+      border-bottom: 1px solid var(--xp-powered);
+      border-top: 1px solid var(--xp-powered);
+      background-color: var(--xp-dimgray);
+      color: var(--xp-powered);
+    }
+    button#aft-wallet-burner.burning {
+      .spinner {
+        display: block;
+      }
+      svg {
+        display: none;
+      }
+      cursor: default;
+    }
+    button#aft-wallet-burner.disabled {
+      svg {
+        opacity: 0.5;
+      }
+      cursor: default;
+    }
+    button#aft-wallet-burner {
+      .spinner {
+        display: none;
+      }
+      color: var(--xp-dimgray);
+      width: 42px;
     }
     input#aft-wallet-balance {
       text-align: center;
@@ -29,10 +58,17 @@ div#aft-wallet {
     input {
       font-size: smaller;
     }
-    button.info {
+    button#aft-wallet-sov-toggle {
       img {
         border-radius: 8px;
       }
+    }
+    button#aft-wallet-sov-toggle:hover {
+      border-bottom: 1px solid var(--xp-powered);
+      border-right: 1px solid var(--xp-powered);
+      border-top: 1px solid var(--xp-powered);
+      background-color: var(--xp-dimgray);
+      color: var(--xp-powered);
     }
   }
 }

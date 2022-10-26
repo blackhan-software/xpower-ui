@@ -6,6 +6,34 @@ export enum Token {
     ODIN = 'ODIN',
     HELA = 'HELA',
 }
+export enum Token {
+    aTHOR = 'aTHOR',
+    aLOKI = 'aLOKI',
+    aODIN = 'aODIN',
+    aHELA = 'aHELA',
+}
+export function XTokens(): Set<Token> {
+    const ref = Token as typeof Token & {
+        _set?: Set<Token>
+    };
+    if (ref._set === undefined) {
+        ref._set = new Set(Object.values(Token).filter((t) => {
+            return !t.startsWith('a');
+        }));
+    }
+    return ref._set;
+}
+export function ATokens(): Set<Token> {
+    const ref = Token as typeof Token & {
+        _set?: Set<Token>
+    };
+    if (ref._set === undefined) {
+        ref._set = new Set(Object.values(Token).filter((t) => {
+            return t.startsWith('a');
+        }));
+    }
+    return ref._set;
+}
 export function Tokens(): Set<Token> {
     const ref = Token as typeof Token & {
         _set?: Set<Token>

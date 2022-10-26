@@ -27,6 +27,11 @@ export abstract class ERC20Wallet {
         }
         this._address = address;
     }
+    async burn(
+        amount: Amount
+    ): Promise<Transaction> {
+        return this.contract.then((c) => c?.burn(amount));
+    }
     async allowance(
         address: Address | string, spender_address: Address | string
     ): Promise<Allowance> {

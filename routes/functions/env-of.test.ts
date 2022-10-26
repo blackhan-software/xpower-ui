@@ -21,10 +21,18 @@ describe('env_of', () => {
                 SELECT0R_LOKI: '',
                 SELECT0R_ODIN: '',
                 SELECT0R_THOR: 'active',
-                TOKEN: 'THOR',
             }, ...{
+                TOKEN: 'THOR',
                 token: 'thor',
                 Token: 'Thor',
+            }, ...{
+                aTOKEN: 'aTHOR',
+                atoken: 'athor',
+                aToken: 'aThor',
+            }, ...{
+                xTOKEN: 'THOR',
+                xtoken: 'thor',
+                xToken: 'Thor',
             }, ...{
                 XP_POWERED: '--xp-yellow',
                 XP_POWERED_DARK: '--xp-yellow-dark',

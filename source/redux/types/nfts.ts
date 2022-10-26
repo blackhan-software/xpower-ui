@@ -12,12 +12,16 @@ export class Nft {
         const [prefix] = id.split(':');
         switch (prefix.toLowerCase()) {
             case 'thor':
+            case 'athor':
                 return NftToken.THOR;
             case 'loki':
+            case 'aloki':
                 return NftToken.LOKI;
             case 'odin':
+            case 'aodin':
                 return NftToken.ODIN;
             case 'hela':
+            case 'ahela':
                 return NftToken.HELA;
         }
         throw new Error(`unknown token for "${id}"`);

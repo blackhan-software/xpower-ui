@@ -6,6 +6,12 @@ enum TokenLower {
     ODIN = 'odin',
     HELA = 'hela',
 }
+enum TokenLower {
+    aTHOR = 'athor',
+    aLOKI = 'aloki',
+    aODIN = 'aodin',
+    aHELA = 'ahela',
+}
 export class Tokenizer {
     public static token(value: string | null): Token {
         if (typeof value === 'string') {
@@ -20,6 +26,14 @@ export class Tokenizer {
                     return Token.ODIN;
                 case 'hela':
                     return Token.HELA;
+                case 'athor':
+                    return Token.aTHOR;
+                case 'aloki':
+                    return Token.aLOKI;
+                case 'aodin':
+                    return Token.aODIN;
+                case 'ahela':
+                    return Token.aHELA;
             }
         }
         return Token.THOR;
@@ -34,10 +48,18 @@ export class Tokenizer {
                 return TokenLower.ODIN;
             case Token.HELA:
                 return TokenLower.HELA;
+            case Token.aTHOR:
+                return TokenLower.aTHOR;
+            case Token.aLOKI:
+                return TokenLower.aLOKI;
+            case Token.aODIN:
+                return TokenLower.aODIN;
+            case Token.aHELA:
+                return TokenLower.aHELA;
         }
     }
     public static amount(token: Token, level: Level): Amount {
-        switch (token) {
+        switch (this.xify(token)) {
             case Token.THOR:
                 return BigInt(level);
             case Token.LOKI:
@@ -49,7 +71,7 @@ export class Tokenizer {
         }
     }
     public static level(token: Token, amount: Amount): Level {
-        switch (token) {
+        switch (this.xify(token)) {
             case Token.THOR:
                 return Number(amount);
             case Token.LOKI:
@@ -58,6 +80,38 @@ export class Tokenizer {
                 return (amount + 1n).toString(16).length - 1;
             case Token.HELA:
                 throw new Error('not applicable');
+        }
+    }
+    public static xify(token: Token) {
+        switch (token) {
+            case Token.THOR:
+            case Token.aTHOR:
+                return Token.THOR;
+            case Token.LOKI:
+            case Token.aLOKI:
+                return Token.LOKI;
+            case Token.ODIN:
+            case Token.aODIN:
+                return Token.ODIN;
+            case Token.HELA:
+            case Token.aHELA:
+                return Token.HELA;
+        }
+    }
+    public static aify(token: Token) {
+        switch (token) {
+            case Token.THOR:
+            case Token.aTHOR:
+                return Token.aTHOR;
+            case Token.LOKI:
+            case Token.aLOKI:
+                return Token.aLOKI;
+            case Token.ODIN:
+            case Token.aODIN:
+                return Token.aODIN;
+            case Token.HELA:
+            case Token.aHELA:
+                return Token.aHELA;
         }
     }
 }

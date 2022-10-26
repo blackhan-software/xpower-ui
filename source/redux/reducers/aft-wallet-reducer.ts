@@ -1,15 +1,20 @@
 import { Action } from '@reduxjs/toolkit';
 import * as actions from '../actions';
-import { AftWallet, Amount, Empty, Supply, Token } from '../types';
+import { AftWallet, Amount, Supply, Token } from '../types';
 
+export function initialState() {
+    return { items: {}, burner: null } as AftWallet;
+}
 export function aftWalletReducer(
-    aft_wallet = Empty<AftWallet>(), action: Action
+    aft_wallet = initialState(), action: Action
 ): AftWallet {
     if (actions.setAftWallet.match(action)) {
         const { token, item: { amount, supply } } = action.payload;
         const items = { ...aft_wallet.items };
         items[token] = pack(amount, supply, { token });
-        return { items, more: [token] };
+        return {
+            ...aft_wallet, items, more: [token], less: undefined
+        };
     }
     if (actions.increaseAftWallet.match(action)) {
         const { token, item } = action.payload;
@@ -28,7 +33,9 @@ export function aftWalletReducer(
             const a = item_new.amount;
             items[token] = pack(a, s, { token: token });
         }
-        return { items, more: [token] };
+        return {
+            ...aft_wallet, items, more: [token], less: undefined
+        };
     }
     if (actions.decreaseAftWallet.match(action)) {
         const { token, item } = action.payload;
@@ -47,7 +54,15 @@ export function aftWalletReducer(
             const a = 0n - item_new.amount;
             items[token] = pack(a, s, { token: token });
         }
-        return { items, less: [token] };
+        return {
+            ...aft_wallet, items, less: [token], more: undefined
+        };
+    }
+    if (actions.setAftWalletBurner.match(action)) {
+        return {
+            ...aft_wallet, more: undefined, less: undefined,
+            burner: action.payload.burner
+        };
     }
     return aft_wallet;
 }

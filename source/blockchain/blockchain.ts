@@ -2,7 +2,7 @@
 /* eslint no-async-promise-executor: [off] */
 
 import { x40 } from '../functions';
-import { Address, Token, TokenInfo, Tokens } from '../redux/types';
+import { Address, Token, TokenInfo, XTokens } from '../redux/types';
 import { RWParams } from '../params';
 import { Chain, ChainId } from './chain';
 
@@ -155,7 +155,7 @@ export class Blockchain extends EventEmitter {
             return () => { this.off('connect', listener); }
         }
         if (context.tokens === undefined) {
-            context.tokens = new Set(Tokens());
+            context.tokens = new Set(XTokens());
         }
         const handlers = [] as Array<(options: Connect) => void>;
         for (const token of context.tokens) {

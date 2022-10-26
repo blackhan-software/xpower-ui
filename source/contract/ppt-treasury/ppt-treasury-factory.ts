@@ -1,11 +1,11 @@
-import { Version } from '../../../source/types';
-import { Global } from '../../../source/types';
+import { Global, Version } from '../../../source/types';
 declare const global: Global;
 
 import { Contract } from 'ethers';
 import { Token } from '../../redux/types';
-import { PptTreasury } from './ppt-treasury';
+import { Tokenizer } from '../../token';
 import { address } from '../address';
+import { PptTreasury } from './ppt-treasury';
 
 export async function PptTreasuryFactory({
     token, version
@@ -13,7 +13,7 @@ export async function PptTreasuryFactory({
     token: Token, version?: Version
 }): Promise<Contract> {
     const contract = new PptTreasury(address({
-        infix: 'PPT_TREASURY', version, token
+        infix: 'PPT_TREASURY', token: Tokenizer.xify(token), version
     }));
     return global.PPT_TREASURY = await contract.connect();
 }

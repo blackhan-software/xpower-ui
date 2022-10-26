@@ -12,12 +12,12 @@ export const ThemeService = (
     function adapt(theme: Theme): void {
         const root = document.querySelector(':root') as HTMLElement;
         if (root) {
-            root.style.setProperty('--xp-powered', `var(
-            ${theme.XP_POWERED}
-        )`);
-            root.style.setProperty('--xp-powered-dark', `var(
-            ${theme.XP_POWERED_DARK}
-        )`);
+            root.style.setProperty(
+                '--xp-powered', `var(${theme.XP_POWERED})`
+            );
+            root.style.setProperty(
+                '--xp-powered-dark', `var(${theme.XP_POWERED_DARK})`
+            );
         }
     }
 };

@@ -1,9 +1,13 @@
+import { Tokenizer } from '../../token';
 import { AppState } from '../store';
-import { Token } from '../types';
 
-export function tokenOf(
+export function xtokenOf(
     { token }: Pick<AppState, 'token'>
-): Token {
-    return token;
+) {
+    return Tokenizer.xify(token);
 }
-export default tokenOf;
+export function atokenOf(
+    { token }: Pick<AppState, 'token'>
+) {
+    return Tokenizer.aify(token);
+}

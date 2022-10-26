@@ -4,9 +4,9 @@ import { x64 } from '../functions';
 import { HashManager, IntervalManager, MiningManager as MM } from '../managers';
 import { setMiningSpeed, setMiningStatus } from '../redux/actions';
 import { onPageSwitch, onTokenSwitch } from '../redux/observers';
-import { tokenOf } from '../redux/selectors';
+import { xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { MinerStatus, Token, Tokens } from '../redux/types';
+import { MinerStatus, Token, XTokens } from '../redux/types';
 import { Tokenizer } from '../token';
 import { MoeWallet, OnInit, OtfManager } from '../wallet';
 
@@ -47,7 +47,7 @@ export const MiningService = (
             setMiningStatus({ status: MinerStatus.stopped })
         );
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
     });
     onTokenSwitch(store, async function resetSpeed(token) {
         const address = await Blockchain.selectedAddress;
@@ -62,7 +62,7 @@ export const MiningService = (
         const address = await Blockchain.selectedAddress;
         if (address) {
             const miner = MM(store).miner({
-                address, token: tokenOf(store.getState())
+                address, token: xtokenOf(store.getState())
             });
             const running = miner.running;
             if (running) miner.stop();
@@ -71,7 +71,7 @@ export const MiningService = (
     Blockchain.onConnect(function stopMining({
         address
     }) {
-        for (const token of Tokens()) {
+        for (const token of XTokens()) {
             if (token === Token.HELA) {
                 continue;
             }
@@ -92,22 +92,21 @@ export const MiningService = (
             } else {
                 return;
             }
-            const token_lc = Tokenizer.lower(token);
             HashManager.set(block_hash, timestamp, {
-                slot: token_lc
+                slot: Tokenizer.xify(token)
             });
         };
         const moe_wallet = new MoeWallet(address, token);
         moe_wallet.onInit(on_init);
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(function restartMining({
         address
     }) {
         const im = new IntervalManager({ start: true });
         im.on('tick', async () => {
-            const token = tokenOf(store.getState());
+            const token = xtokenOf(store.getState());
             const miner = MM(store).miner({
                 address, token
             });
@@ -135,7 +134,7 @@ export const MiningService = (
             });
         });
     }, {
-        per: () => tokenOf(store.getState())
+        per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(async function resumeMiningIf({
         address
@@ -145,7 +144,7 @@ export const MiningService = (
                 const otf_balance = await otf_wallet.getBalance();
                 if (otf_balance.gt(OtfManager.threshold)) {
                     const miner = MM(store).miner({
-                        address, token: tokenOf(store.getState())
+                        address, token: xtokenOf(store.getState())
                     });
                     if (miner.running) {
                         miner.resume();

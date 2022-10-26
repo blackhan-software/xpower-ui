@@ -13,5 +13,12 @@ export type AftWallet = {
     more?: Token[];
     /** set of less token(s) */
     less?: Token[];
-};
+} & {
+    burner: AftWalletBurner | null;
+}
+export enum AftWalletBurner {
+    burning = 'burning',
+    burned = 'burned',
+    error = 'error'
+}
 export default AftWallet;

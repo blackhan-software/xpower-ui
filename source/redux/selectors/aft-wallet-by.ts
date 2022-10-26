@@ -12,6 +12,6 @@ export function aftWalletBy(
             return true;
         })
     );
-    return { items };
+    return { ...aft_wallet, items };
 }
 export default aftWalletBy;

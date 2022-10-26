@@ -1,4 +1,4 @@
-import { AftWallet, Empty, Token } from '../types';
+import { AftWallet, AftWalletBurner, Empty, Token } from '../types';
 import { aftWalletBy } from './aft-wallet-by';
 
 describe('aft-wallet-by', () => {
@@ -14,7 +14,8 @@ describe('aft-wallet-by', () => {
                 [Token.LOKI]: { amount: 1n, supply: 2n },
                 [Token.ODIN]: { amount: 2n, supply: 3n },
                 [Token.HELA]: { amount: 3n, supply: 4n },
-            }
+            },
+            burner: AftWalletBurner.burned
         };
         const aft_wallet_by = aftWalletBy({ aft_wallet });
         expect(aft_wallet_by).toEqual(aft_wallet);
@@ -26,15 +27,14 @@ describe('aft-wallet-by', () => {
                 [Token.LOKI]: { amount: 1n, supply: 2n },
                 [Token.ODIN]: { amount: 2n, supply: 3n },
                 [Token.HELA]: { amount: 3n, supply: 4n },
-            }
+            },
+            burner: AftWalletBurner.burned
         };
         const aft_wallet_by = aftWalletBy(
             { aft_wallet }, Token.THOR
         );
-        expect(aft_wallet_by).toEqual({
-            items: {
-                [Token.THOR]: { amount: 0n, supply: 1n },
-            }
+        expect(aft_wallet_by.items).toEqual({
+            [Token.THOR]: { amount: 0n, supply: 1n },
         });
     });
     it('should return wallet for LOKI only', () => {
@@ -43,15 +43,14 @@ describe('aft-wallet-by', () => {
                 [Token.LOKI]: { amount: 1n, supply: 2n },
                 [Token.ODIN]: { amount: 2n, supply: 3n },
                 [Token.HELA]: { amount: 3n, supply: 4n },
-            }
+            },
+            burner: AftWalletBurner.burned
         };
         const aft_wallet_by = aftWalletBy(
             { aft_wallet }, Token.LOKI
         );
-        expect(aft_wallet_by).toEqual({
-            items: {
-                [Token.LOKI]: { amount: 1n, supply: 2n },
-            }
+        expect(aft_wallet_by.items).toEqual({
+            [Token.LOKI]: { amount: 1n, supply: 2n },
         });
     });
     it('should return wallet for ODIN only', () => {
@@ -59,30 +58,28 @@ describe('aft-wallet-by', () => {
             items: {
                 [Token.ODIN]: { amount: 2n, supply: 3n },
                 [Token.HELA]: { amount: 3n, supply: 4n },
-            }
+            },
+            burner: AftWalletBurner.burned
         };
         const aft_wallet_by = aftWalletBy(
             { aft_wallet }, Token.ODIN
         );
-        expect(aft_wallet_by).toEqual({
-            items: {
-                [Token.ODIN]: { amount: 2n, supply: 3n },
-            }
+        expect(aft_wallet_by.items).toEqual({
+            [Token.ODIN]: { amount: 2n, supply: 3n },
         });
     });
     it('should return wallet for HELA only', () => {
         const aft_wallet = {
             items: {
                 [Token.HELA]: { amount: 3n, supply: 4n },
-            }
+            },
+            burner: AftWalletBurner.burned
         };
         const aft_wallet_by = aftWalletBy(
             { aft_wallet }, Token.HELA
         );
-        expect(aft_wallet_by).toEqual({
-            items: {
-                [Token.HELA]: { amount: 3n, supply: 4n },
-            }
+        expect(aft_wallet_by.items).toEqual({
+            [Token.HELA]: { amount: 3n, supply: 4n },
         });
     });
 });
