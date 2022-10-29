@@ -42,16 +42,16 @@ describe('nice', () => {
 });
 describe('nice_si', () => {
     it('should return a number w/si suffixes', () => {
-        expect(filters.nice_si(1_234_567.890)).toEqual("1.234M");
-        expect(filters.nice_si(123_456.789)).toEqual("123.456K");
-        expect(filters.nice_si(12_345.678)).toEqual("12.345K");
-        expect(filters.nice_si(1_234.567)).toEqual("1.234K");
+        expect(filters.nice_si(1_234_567.890)).toEqual("1.235M");
+        expect(filters.nice_si(123_456.789)).toEqual("123.457K");
+        expect(filters.nice_si(12_345.678)).toEqual("12.346K");
+        expect(filters.nice_si(1_234.567)).toEqual("1.235K");
         expect(filters.nice_si(123.456)).toEqual("123.456");
         expect(filters.nice_si(12.345)).toEqual("12.345");
         expect(filters.nice_si(1.234)).toEqual("1.234");
     });
     it('should return a number w/si suffixes', () => {
-        expect(filters.nice_si(1_234_567n)).toEqual("1.234M");
+        expect(filters.nice_si(1_234_567n)).toEqual("1.235M");
         expect(filters.nice_si(123_456n)).toEqual("123.456K");
         expect(filters.nice_si(12_345n)).toEqual("12.345K");
         expect(filters.nice_si(1_234n)).toEqual("1.234K");
