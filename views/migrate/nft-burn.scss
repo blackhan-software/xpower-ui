@@ -1,0 +1,14 @@
+form.burn-nft {
+  div.burn-empty-nft {
+    button.burn-empty-nft {
+      text-align: center;
+      width: calc(100% - 42px);
+    }
+    .info > svg {
+      position: relative;
+      top: -1px;
+    }
+    margin-bottom: 0.5em;
+    width: 100%;
+  }
+}

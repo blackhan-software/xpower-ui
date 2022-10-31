@@ -1,17 +1,114 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import './nft-migrate.scss';
 
-import { Blockchain } from '../../source/blockchain';
 import { BigNumber } from 'ethers';
-import { Alerts, Alert, alert, x40 } from '../../source/functions';
+import { Blockchain } from '../../source/blockchain';
+import { PptTreasuryFactory, XPowerNftFactory, XPowerPptFactory } from '../../source/contract';
+import { Alert, alert, Alerts, x40 } from '../../source/functions';
 import { Nft, NftLevels, Token } from '../../source/redux/types';
-import { XPowerNftFactory } from '../../source/contract';
 import { Years } from '../../source/years';
 
 Blockchain.onConnect(function enableAllowanceButton() {
-    const $approve = $('.approve-allowance-nft');
-    $approve.prop('disabled', false);
+    const $approve_nft = $('.approve-allowance-nft:not([data-source=v4a])');
+    $approve_nft.prop('disabled', false);
+    const $unstake_ppt = $('.unstake-ppt');
+    $unstake_ppt.prop('disabled', false);
 });
+$('button.unstake-ppt').on('click', async function unstakeTokens(e) {
+    const $unstake = $(e.target);
+    const $unstake_ppt = $unstake.parents('form.unstake-ppt');
+    const $allowance_nft = $unstake_ppt.next('form.allowance-nft');
+    if ($unstake.hasClass('thor')) {
+        await unstake(Token.THOR, {
+            $unstake, $approve: $allowance_nft.find(
+                '.approve-allowance-nft.thor'
+            )
+        });
+    }
+    if ($unstake.hasClass('loki')) {
+        await unstake(Token.LOKI, {
+            $unstake, $approve: $allowance_nft.find(
+                '.approve-allowance-nft.loki'
+            )
+        });
+    }
+    if ($unstake.hasClass('odin')) {
+        await unstake(Token.ODIN, {
+            $unstake, $approve: $allowance_nft.find(
+                '.approve-allowance-nft.odin'
+            )
+        });
+    }
+});
+async function unstake(token: Token, { $unstake, $approve }: {
+    $unstake: JQuery<HTMLElement>, $approve: JQuery<HTMLElement>
+}) {
+    const address = await Blockchain.selectedAddress;
+    if (!address) {
+        throw new Error('missing selected-address');
+    }
+    const src_version = $unstake.data('source');
+    if (!src_version) {
+        throw new Error('missing data-source');
+    }
+    const src_xpower = await XPowerPptFactory({
+        token, version: src_version
+    });
+    console.debug(
+        `[${src_version}:contract]`, src_xpower.address
+    );
+    const ids = Nft.coreIds({
+        issues: Array.from(Years()),
+        levels: Array.from(NftLevels())
+    });
+    const accounts = ids.map(() => {
+        return x40(address);
+    });
+    const src_balances: BigNumber[] = await src_xpower.balanceOfBatch(
+        accounts, ids
+    );
+    console.debug(
+        `[${src_version}:balances]`, src_balances.map((b) => b.toString())
+    );
+    const src_zero = src_balances.reduce((acc, b) => acc && b.isZero(), true);
+    if (src_zero) {
+        alert(
+            `NFTs have already been unstaked; you can continue now.`,
+            Alert.info, { after: $unstake.parent('div')[0] }
+        );
+        $approve.prop('disabled', false);
+        return;
+    }
+    const src_treasury = await PptTreasuryFactory({
+        token, version: src_version
+    });
+    console.debug(
+        `[${src_version}:contract]`, src_treasury.address
+    );
+    Alerts.hide();
+    try {
+        const nz = filter(ids, src_balances, { zero: false });
+        await src_treasury.unstakeBatch(
+            x40(address), nz.ids, nz.balances
+        );
+        alert(
+            `NFTs have successfully been unstaked; you can continue now.`,
+            Alert.success, { after: $unstake.parent('div')[0] }
+        );
+        $approve.prop('disabled', false);
+        return;
+    } catch (ex: any) {
+        if (ex.message) {
+            if (ex.data && ex.data.message) {
+                ex.message = `${ex.message} [${ex.data.message}]`;
+            }
+            alert(ex.message, Alert.warning, {
+                after: $unstake.parent('div')[0]
+            });
+        }
+        console.error(ex);
+    }
+}
 $('button.approve-allowance-nft').on('click', async function approveTokens(e) {
     const $approve = $(e.target);
     const $allowance_nft = $approve.parents('form.allowance-nft');
@@ -71,7 +168,21 @@ async function approve(token: Token, { $approve, $execute }: {
     console.debug(
         `[${src_version}:approved]`, src_approved
     );
-    if (src_approved) {
+    const ids = Nft.coreIds({
+        issues: Array.from(Years()),
+        levels: Array.from(NftLevels())
+    });
+    const accounts = ids.map(() => {
+        return x40(address);
+    });
+    const src_balances: BigNumber[] = await src_xpower.balanceOfBatch(
+        accounts, ids
+    );
+    console.debug(
+        `[${src_version}:balances]`, src_balances.map((b) => b.toString())
+    );
+    const src_zero = src_balances.reduce((acc, b) => acc && b.isZero(), true);
+    if (src_approved || src_zero) {
         alert(
             `NFTs have already been approved for; you can migrate now.`,
             Alert.info, { after: $approve.parent('div')[0] }
@@ -141,18 +252,6 @@ async function migrate(token: Token, { $execute }: {
     console.debug(
         `[${tgt_version}:contract]`, tgt_xpower.address
     );
-    const src_approved = await src_xpower.isApprovedForAll(
-        x40(address), tgt_xpower.address
-    );
-    if (src_approved === false) {
-        alert(
-            `Old NFTs have not been approved for! ` +
-            `Did your approval transaction actually get confirmed? ` +
-            `Wait a little bit and then retry.`,
-            Alert.warning, { after: $execute.parent('div')[0] }
-        );
-        return;
-    }
     const ids = Nft.coreIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels())
@@ -174,6 +273,18 @@ async function migrate(token: Token, { $execute }: {
         );
         return;
     }
+    const src_approved = await src_xpower.isApprovedForAll(
+        x40(address), tgt_xpower.address
+    );
+    if (src_approved === false) {
+        alert(
+            `Old NFTs have not been approved for! ` +
+            `Did your approval transaction actually get confirmed? ` +
+            `Wait a little bit and then retry.`,
+            Alert.warning, { after: $execute.parent('div')[0] }
+        );
+        return;
+    }
     const nz = filter(ids, src_balances, { zero: false });
     Alerts.hide();
     try {
@@ -190,73 +301,6 @@ async function migrate(token: Token, { $execute }: {
             }
             alert(ex.message, Alert.warning, {
                 after: $execute.parent('div')[0]
-            });
-        }
-        console.error(ex);
-    }
-}
-$('button.burn-empty-nft').on('click', async function burnEmpty(e) {
-    const $burn = $(e.target);
-    if ($burn.hasClass('thor')) {
-        await burn(Token.THOR, { $burn });
-    }
-    if ($burn.hasClass('loki')) {
-        await burn(Token.LOKI, { $burn });
-    }
-    if ($burn.hasClass('odin')) {
-        await burn(Token.ODIN, { $burn });
-    }
-});
-async function burn(token: Token, { $burn }: {
-    $burn: JQuery<HTMLElement>
-}) {
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
-    }
-    const src_version = $burn.data('source');
-    if (!src_version) {
-        throw new Error('missing data-source');
-    }
-    const src_xpower = await XPowerNftFactory({
-        token, version: src_version
-    });
-    console.debug(
-        `[${src_version}:contract]`, src_xpower.address
-    );
-    const ids = Nft.coreIds({
-        issues: Array.from(Years()),
-        levels: Array.from(NftLevels())
-    });
-    const accounts = ids.map(() => {
-        return x40(address);
-    });
-    const v3a_balances: BigNumber[] = await src_xpower.balanceOfBatch(
-        accounts, ids
-    );
-    console.debug(
-        `[${src_version}:balances]`, v3a_balances.map((b) => b.toString())
-    );
-    const zz = filter(ids, v3a_balances, {
-        zero: true
-    });
-    Alerts.hide();
-    try {
-        await src_xpower.burnBatch(
-            x40(address), zz.ids, zz.balances
-        );
-        alert(
-            `Your old empty NFTs have successfully been burned! ;)`,
-            Alert.success, { id: 'success', after: $burn.parent('div')[0] }
-        );
-        return;
-    } catch (ex: any) {
-        if (ex.message) {
-            if (ex.data && ex.data.message) {
-                ex.message = `${ex.message} [${ex.data.message}]`;
-            }
-            alert(ex.message, Alert.warning, {
-                after: $burn.parent('div')[0]
             });
         }
         console.error(ex);

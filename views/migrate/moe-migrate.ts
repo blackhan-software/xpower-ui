@@ -3,7 +3,7 @@ import './moe-migrate.scss';
 
 import { Blockchain } from '../../source/blockchain';
 import { XPowerMoeFactory } from '../../source/contract';
-import { Alerts, Alert, alert, x40 } from '../../source/functions';
+import { Alert, alert, Alerts, x40 } from '../../source/functions';
 import { Token } from '../../source/redux/types';
 
 Blockchain.onConnect(function enableAllowanceButton() {

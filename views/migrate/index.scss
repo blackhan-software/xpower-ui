@@ -2,3 +2,24 @@
 @import "../header/header.scss";
 @import "../connector/connector.scss";
 @import "../footer/footer.scss";
+
+content > h2 {
+    background-color: #24292d;
+    border-radius: 4px;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 0.5em;
+}
+content > h2::before, h2::before {
+    content: '> '
+}
+content > .header-anchor, .header-anchor {
+    color: var(--xp-powered, yellow);
+    float: right;
+    opacity: 5%;
+    text-decoration: none;
+}
+content > .header-anchor:hover, .header-anchor:hover {
+    color: var(--xp-powered, yellow);
+    opacity: 100%;
+}

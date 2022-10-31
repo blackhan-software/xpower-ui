@@ -1,0 +1,14 @@
+form.claim-moe {
+  div.claim-moe {
+    button.claim-moe {
+      width: calc(100% - 42px);
+      text-align: center;
+    }
+    .info > svg {
+      position: relative;
+      top: -1px;
+    }
+    margin-bottom: 0.5em;
+    width: 100%;
+  }
+}

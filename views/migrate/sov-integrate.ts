@@ -1,17 +1,17 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-import './moe-integrate.scss';
+import './sov-integrate.scss';
 
 import { Blockchain, ChainId } from '../../source/blockchain';
 import { Alert, alert, Alerts } from '../../source/functions';
 import { Token } from '../../source/redux/types';
 
-$('button.add-moe.thor').on('click', (e) => addToken(e, {
+$('button.add-sov.thor').on('click', (e) => addToken(e, {
     token: Token.THOR
 }));
-$('button.add-moe.loki').on('click', (e) => addToken(e, {
+$('button.add-sov.loki').on('click', (e) => addToken(e, {
     token: Token.LOKI
 }));
-$('button.add-moe.odin').on('click', (e) => addToken(e, {
+$('button.add-sov.odin').on('click', (e) => addToken(e, {
     token: Token.ODIN
 }));
 async function addToken(
@@ -21,13 +21,13 @@ async function addToken(
     if (await Blockchain.isInstalled()) {
         if (await Blockchain.isAvalanche()) {
             const address: string = $(
-                `#g-${token}_MOE_${tgt_version}`).data('value');
+                `#g-${token}_SOV_${tgt_version}`).data('value');
             const symbol: string = $(
-                `#g-${token}_MOE_SYMBOL_${tgt_version}`).data('value');
+                `#g-${token}_SOV_SYMBOL_${tgt_version}`).data('value');
             const decimals: string = $(
-                `#g-${token}_MOE_DECIMALS_${tgt_version}`).data('value');
+                `#g-${token}_SOV_DECIMALS_${tgt_version}`).data('value');
             const image: string = $(
-                `#g-${token}_MOE_IMAGE_${tgt_version}`).data('value');
+                `#g-${token}_SOV_IMAGE_${tgt_version}`).data('value');
             Alerts.hide();
             try {
                 await Blockchain.addToken({

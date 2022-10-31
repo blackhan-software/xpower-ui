@@ -1,0 +1,36 @@
+//-
+//- [v4a to v5a]
+//-
+form.claim-moe
+  label.form-label
+    | Claiming of Rewards [v4]
+  div.btn-group.claim-moe.thor(role="group")
+    button.claim-moe.thor.btn.btn-outline-warning(
+      type="button" data-source="v4a" data-target="v5a" disabled
+    )
+      | Claim THOR Rewards
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Claim the old THOR rewards"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.claim-moe.loki(role="group")
+    button.claim-moe.loki.btn.btn-outline-warning(
+      type="button" data-source="v4a" data-target="v5a" disabled
+    )
+      | Claim LOKI Rewards
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Claim the old LOKI rewards"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.claim-moe.odin(role="group")
+    button.claim-moe.odin.btn.btn-outline-warning(
+      type="button" data-source="v4a" data-target="v5a" disabled
+    )
+      | Claim ODIN Rewards
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Claim the old ODIN rewards"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
