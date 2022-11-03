@@ -29,6 +29,31 @@ footer {
             display: block;
         }
     }
+    a.avalanche {
+        img.red {
+            display: none;
+        }
+    }
+    a.avalanche:hover {
+        img.fff {
+            display: none;
+        }
+        img.red {
+            display: inline-block;
+        }
+    }
+    a.discord {
+        svg:hover {
+            background-color: #5865f2;
+            border-radius: 2px;
+            color: white;
+            padding: 2px;
+        }
+        svg {
+            position: relative;
+            top: -1px;
+        }
+    }
     a.migrate {
         i.bi-capslock {
             display: none;
@@ -55,31 +80,6 @@ footer {
             display: block;
         }
     }
-    a.discord {
-        svg:hover {
-            background-color: #5865f2;
-            border-radius: 2px;
-            color: white;
-            padding: 2px;
-        }
-        svg {
-            position: relative;
-            top: -1px;
-        }
-    }
-    a.avalanche {
-        img.red {
-            display: none;
-        }
-    }
-    a.avalanche:hover {
-        img.fff {
-            display: none;
-        }
-        img.red {
-            display: block;
-        }
-    }
     a.telegram {
         svg:hover {
             background-color: white;
@@ -90,6 +90,19 @@ footer {
     a.twitter {
         svg:hover {
             color: #55acee;
+        }
+    }
+    a.youtube {
+        svg.red {
+            display: none;
+        }
+    }
+    a.youtube:hover {
+        svg.fff {
+            display: none;
+        }
+        svg.red {
+            display: inline-block;
         }
     }
     color: var(--xp-powered);
