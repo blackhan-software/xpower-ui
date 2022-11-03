@@ -10,6 +10,7 @@ import { capitalize } from '../../routes/functions';
 import { ensure, link, script } from '../../source/functions';
 
 import React, { useEffect, useState } from 'react';
+import { ROParams } from '../../source/params';
 
 type markdownIt = (options: any) => {
     use: (plugin: any, options?: any) => void;
@@ -29,7 +30,7 @@ export function UiAbout(
         '#md-content'
     );
     const [html, setHtml] = useState(() => {
-        return $md_content ? $md_content.innerHTML : ''
+        return !ROParams.debug && $md_content ? $md_content.innerHTML : ''
     });
     useEffect(/*set-anchor*/() => {
         const anchor = location.hash;
@@ -40,7 +41,8 @@ export function UiAbout(
             return;
         }
         const md_url = about_url(url);
-        const md = sessionStorage.getItem(md_url) ?? '';
+        const md = !ROParams.debug
+            ? sessionStorage.getItem(md_url) ?? '' : '';
         if (md.length) {
             renderMarkdown(md, token).then(
                 (html) => setHtml(html)
