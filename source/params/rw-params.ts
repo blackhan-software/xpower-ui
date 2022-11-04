@@ -46,20 +46,25 @@ export class RWParams {
         const search = global.location?.search;
         return new URLSearchParams(search);
     }
-    private static push({ search, pathname }: {
-        search?: URLSearchParams, pathname?: string
+    private static hash() {
+        return global.location?.hash ?? '';
+    }
+    private static push({ pathname, search, hash }: {
+        pathname?: string, search?: URLSearchParams, hash?: string
     }) {
-        if (search === undefined) {
-            search = this.search();
-        }
         if (pathname === undefined) {
             pathname = location.pathname;
         }
-        const string = search.toString();
-        const prefix = string.length ? '?' : '';
+        if (search === undefined) {
+            search = this.search();
+        }
+        if (hash === undefined) {
+            hash = this.hash();
+        }
+        const search_px = `${search}`.length ? '?' : '';
         const [data, title, url] = [
             { page: 1 }, document.title,
-            `${pathname}${prefix}${search}`
+            `${pathname}${search_px}${search}${hash}`
         ];
         history.pushState(data, title, url);
     }
