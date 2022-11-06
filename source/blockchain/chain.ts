@@ -2,6 +2,7 @@ export enum ChainId {
     AVALANCHE_MAINNET = '0xa86a',   // 43114
     AVALANCHE_FUJI = '0xa869',      // 43113
     AVALANCHE_LOCAL = '0xa868',     // 43112
+    HARDHAT = '0x7a69',             // 31337
 }
 export class Chain {
     public constructor(id: ChainId) {
@@ -15,6 +16,8 @@ export class Chain {
                 return 'Avalanche Fuji Testnet';
             case ChainId.AVALANCHE_LOCAL:
                 return 'Avalanche Localhost';
+            case ChainId.HARDHAT:
+                return 'Hardhat Localhost';
         }
     }
     public get id(): ChainId {
@@ -32,6 +35,12 @@ export class Chain {
                     symbol: 'AVAX',
                     decimals: 18
                 };
+            case ChainId.HARDHAT:
+                return {
+                    name: 'ETH',
+                    symbol: 'ETH',
+                    decimals: 18
+                };
         }
     }
     public get rpcUrls(): string[] {
@@ -42,6 +51,8 @@ export class Chain {
                 return ['https://api.avax-test.network/ext/bc/C/rpc'];
             case ChainId.AVALANCHE_LOCAL:
                 return ['http://localhost:9650/ext/bc/C/rpc'];
+            case ChainId.HARDHAT:
+                return ['http://localhost:8545'];
         }
     }
     public get explorerUrls(): string[] {
@@ -51,6 +62,8 @@ export class Chain {
             case ChainId.AVALANCHE_FUJI:
                 return ['https://testnet.snowtrace.io'];
             case ChainId.AVALANCHE_LOCAL:
+                return [];
+            case ChainId.HARDHAT:
                 return [];
         }
     }

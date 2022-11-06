@@ -95,6 +95,9 @@ export class Blockchain extends EventEmitter {
         if (id === ChainId.AVALANCHE_LOCAL) {
             return true;
         }
+        if (id === ChainId.HARDHAT) {
+            return true;
+        }
         return false;
     }
     public static async switchTo(id: ChainId) {
