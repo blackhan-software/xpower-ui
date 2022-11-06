@@ -158,31 +158,31 @@ assert(LOKI_PPT_V5a, 'missing LOKI_PPT_V5a env variable');
 const ODIN_PPT_V5a = process.env.ODIN_PPT_V5a ?? ''; /** @todo: add mainnet address */
 assert(ODIN_PPT_V5a, 'missing ODIN_PPT_V5a env variable');
 // PPT treasury contract addresses
-const THOR_PPT_TREASURY_V4a = process.env.THOR_PPT_TREASURY_V4a ?? '0xD7B2568cE0f91fcB0A8AeFC60DaE64E3350656c3';
-assert(THOR_PPT_TREASURY_V4a, 'missing THOR_PPT_TREASURY_V4a env variable');
-const LOKI_PPT_TREASURY_V4a = process.env.LOKI_PPT_TREASURY_V4a ?? '0xEe231E251b5A422cCF9514fAc1362A0a06463CeD';
-assert(LOKI_PPT_TREASURY_V4a, 'missing LOKI_PPT_TREASURY_V4a env variable');
-const ODIN_PPT_TREASURY_V4a = process.env.ODIN_PPT_TREASURY_V4a ?? '0x2610862b07B2998C6CBb8C56FbFCEA8C94Bb8ffe';
-assert(ODIN_PPT_TREASURY_V4a, 'missing ODIN_PPT_TREASURY_V4a env variable');
-const THOR_PPT_TREASURY_V5a = process.env.THOR_PPT_TREASURY_V5a ?? ''; /** @todo: add mainnet address */
-assert(THOR_PPT_TREASURY_V5a, 'missing THOR_PPT_TREASURY_V5a env variable');
-const LOKI_PPT_TREASURY_V5a = process.env.LOKI_PPT_TREASURY_V5a ?? ''; /** @todo: add mainnet address */
-assert(LOKI_PPT_TREASURY_V5a, 'missing LOKI_PPT_TREASURY_V5a env variable');
-const ODIN_PPT_TREASURY_V5a = process.env.ODIN_PPT_TREASURY_V5a ?? ''; /** @todo: add mainnet address */
-assert(ODIN_PPT_TREASURY_V5a, 'missing ODIN_PPT_TREASURY_V5a env variable');
+const THOR_PTY_V4a = process.env.THOR_PTY_V4a ?? '0xD7B2568cE0f91fcB0A8AeFC60DaE64E3350656c3';
+assert(THOR_PTY_V4a, 'missing THOR_PTY_V4a env variable');
+const LOKI_PTY_V4a = process.env.LOKI_PTY_V4a ?? '0xEe231E251b5A422cCF9514fAc1362A0a06463CeD';
+assert(LOKI_PTY_V4a, 'missing LOKI_PTY_V4a env variable');
+const ODIN_PTY_V4a = process.env.ODIN_PTY_V4a ?? '0x2610862b07B2998C6CBb8C56FbFCEA8C94Bb8ffe';
+assert(ODIN_PTY_V4a, 'missing ODIN_PTY_V4a env variable');
+const THOR_PTY_V5a = process.env.THOR_PTY_V5a ?? ''; /** @todo: add mainnet address */
+assert(THOR_PTY_V5a, 'missing THOR_PTY_V5a env variable');
+const LOKI_PTY_V5a = process.env.LOKI_PTY_V5a ?? ''; /** @todo: add mainnet address */
+assert(LOKI_PTY_V5a, 'missing LOKI_PTY_V5a env variable');
+const ODIN_PTY_V5a = process.env.ODIN_PTY_V5a ?? ''; /** @todo: add mainnet address */
+assert(ODIN_PTY_V5a, 'missing ODIN_PTY_V5a env variable');
 // MOE treasury contract addresses
-const THOR_MOE_TREASURY_V4a = process.env.THOR_MOE_TREASURY_V4a ?? '0xA2433ff916457694af1Edfe499Bd61d67312Ac8a';
-assert(THOR_MOE_TREASURY_V4a, 'missing THOR_MOE_TREASURY_V4a env variable');
-const LOKI_MOE_TREASURY_V4a = process.env.LOKI_MOE_TREASURY_V4a ?? '0x5823605b4d9548124E3a01f011d0834982D2b4fc';
-assert(LOKI_MOE_TREASURY_V4a, 'missing LOKI_MOE_TREASURY_V4a env variable');
-const ODIN_MOE_TREASURY_V4a = process.env.ODIN_MOE_TREASURY_V4a ?? '0x8C1568BeE37C650fbee29A53BB36a9CE34e7ff73';
-assert(ODIN_MOE_TREASURY_V4a, 'missing ODIN_MOE_TREASURY_V4a env variable');
-const THOR_MOE_TREASURY_V5a = process.env.THOR_MOE_TREASURY_V5a ?? ''; /** @todo: add mainnet address */
-assert(THOR_MOE_TREASURY_V5a, 'missing THOR_MOE_TREASURY_V5a env variable');
-const LOKI_MOE_TREASURY_V5a = process.env.LOKI_MOE_TREASURY_V5a ?? ''; /** @todo: add mainnet address */
-assert(LOKI_MOE_TREASURY_V5a, 'missing LOKI_MOE_TREASURY_V5a env variable');
-const ODIN_MOE_TREASURY_V5a = process.env.ODIN_MOE_TREASURY_V5a ?? ''; /** @todo: add mainnet address */
-assert(ODIN_MOE_TREASURY_V5a, 'missing ODIN_MOE_TREASURY_V5a env variable');
+const THOR_MTY_V4a = process.env.THOR_MTY_V4a ?? '0xA2433ff916457694af1Edfe499Bd61d67312Ac8a';
+assert(THOR_MTY_V4a, 'missing THOR_MTY_V4a env variable');
+const LOKI_MTY_V4a = process.env.LOKI_MTY_V4a ?? '0x5823605b4d9548124E3a01f011d0834982D2b4fc';
+assert(LOKI_MTY_V4a, 'missing LOKI_MTY_V4a env variable');
+const ODIN_MTY_V4a = process.env.ODIN_MTY_V4a ?? '0x8C1568BeE37C650fbee29A53BB36a9CE34e7ff73';
+assert(ODIN_MTY_V4a, 'missing ODIN_MTY_V4a env variable');
+const THOR_MTY_V5a = process.env.THOR_MTY_V5a ?? ''; /** @todo: add mainnet address */
+assert(THOR_MTY_V5a, 'missing THOR_MTY_V5a env variable');
+const LOKI_MTY_V5a = process.env.LOKI_MTY_V5a ?? ''; /** @todo: add mainnet address */
+assert(LOKI_MTY_V5a, 'missing LOKI_MTY_V5a env variable');
+const ODIN_MTY_V5a = process.env.ODIN_MTY_V5a ?? ''; /** @todo: add mainnet address */
+assert(ODIN_MTY_V5a, 'missing ODIN_MTY_V5a env variable');
 // SOV contract addresses
 const THOR_SOV_V5a = process.env.THOR_SOV_V5a ?? ''; /** @todo: add mainnet address */
 assert(THOR_SOV_V5a, 'missing THOR_SOV_V5a env variable');
@@ -306,18 +306,18 @@ export default {
     THOR_PPT_V5a,
     LOKI_PPT_V5a,
     ODIN_PPT_V5a,
-    THOR_PPT_TREASURY_V4a,
-    LOKI_PPT_TREASURY_V4a,
-    ODIN_PPT_TREASURY_V4a,
-    THOR_PPT_TREASURY_V5a,
-    LOKI_PPT_TREASURY_V5a,
-    ODIN_PPT_TREASURY_V5a,
-    THOR_MOE_TREASURY_V4a,
-    LOKI_MOE_TREASURY_V4a,
-    ODIN_MOE_TREASURY_V4a,
-    THOR_MOE_TREASURY_V5a,
-    LOKI_MOE_TREASURY_V5a,
-    ODIN_MOE_TREASURY_V5a,
+    THOR_PTY_V4a,
+    LOKI_PTY_V4a,
+    ODIN_PTY_V4a,
+    THOR_PTY_V5a,
+    LOKI_PTY_V5a,
+    ODIN_PTY_V5a,
+    THOR_MTY_V4a,
+    LOKI_MTY_V4a,
+    ODIN_MTY_V4a,
+    THOR_MTY_V5a,
+    LOKI_MTY_V5a,
+    ODIN_MTY_V5a,
     THOR_SOV_V5a,
     LOKI_SOV_V5a,
     ODIN_SOV_V5a,

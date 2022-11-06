@@ -13,8 +13,8 @@ export async function PptTreasuryFactory({
     token: Token, version?: Version
 }): Promise<Contract> {
     const contract = new PptTreasury(address({
-        infix: 'PPT_TREASURY', token: Tokenizer.xify(token), version
+        infix: 'PTY', token: Tokenizer.xify(token), version
     }));
-    return global.PPT_TREASURY = await contract.connect();
+    return global.PTY = await contract.connect();
 }
 export default PptTreasuryFactory;

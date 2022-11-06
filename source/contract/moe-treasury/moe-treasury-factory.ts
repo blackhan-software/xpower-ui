@@ -13,8 +13,8 @@ export async function MoeTreasuryFactory({
     token: Token, version?: Version
 }): Promise<Contract> {
     const contract = new MoeTreasury(address({
-        infix: 'MOE_TREASURY', token: Tokenizer.xify(token), version
+        infix: 'MTY', token: Tokenizer.xify(token), version
     }));
-    return global.MOE_TREASURY = await contract.connect();
+    return global.MTY = await contract.connect();
 }
 export default MoeTreasuryFactory;
