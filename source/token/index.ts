@@ -114,5 +114,19 @@ export class Tokenizer {
                 return Token.aHELA;
         }
     }
+    public static slug(token: Token) {
+        switch (token) {
+            case Token.THOR:
+            case Token.LOKI:
+            case Token.ODIN:
+            case Token.HELA:
+                return 'MOE';
+            case Token.aTHOR:
+            case Token.aLOKI:
+            case Token.aODIN:
+            case Token.aHELA:
+                return 'SOV';
+        }
+    }
 }
 export default Tokenizer;

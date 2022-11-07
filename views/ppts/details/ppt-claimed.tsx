@@ -1,5 +1,5 @@
 import { nice } from '../../../source/functions';
-import { Amount, NftIssue, Token } from '../../../source/redux/types';
+import { Amount, NftIssue, Token, TokenInfo } from '../../../source/redux/types';
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
@@ -12,6 +12,9 @@ type Props = {
 export function UiPptClaimed(
     { issue, token, value }: Props
 ) {
+    const { decimals } = TokenInfo(token);
+    const nice_value = typeof value === 'bigint'
+        ? nice(value, { base: 10 ** decimals }) : '';
     return <React.Fragment>
         <label className='form-label nft-claimed-label d-none d-sm-flex'>
             Claimed Amount
@@ -22,7 +25,7 @@ export function UiPptClaimed(
             <input type='text'
                 className='form-control'
                 placeholder='0' readOnly
-                value={typeof value === 'bigint' ? nice(value, { base: 1e18 }) : ''}
+                value={nice_value}
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'

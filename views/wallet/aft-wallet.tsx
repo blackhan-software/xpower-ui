@@ -2,7 +2,7 @@ import { Bus } from '../../source/bus';
 import { nice, nice_si, nomobi, x40 } from '../../source/functions';
 import { switchToken } from '../../source/redux/actions';
 import { AppDispatch } from '../../source/redux/store';
-import { Address, AftWallet, AftWalletBurner, Amount, Token } from '../../source/redux/types';
+import { Address, AftWallet, AftWalletBurner, Amount, Token, TokenInfo } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 
 import React from 'react';
@@ -107,9 +107,10 @@ function $sovBurner(
             return;
         }
         if (onBurn) {
+            const { decimals } = TokenInfo(token);
             const text = prompt(
                 `Really? Confirm the amount of ${token} tokens to burn:`,
-                nice(amount, { base: 1e18, precision: 18 })
+                nice(amount, { base: 10 ** decimals, precision: 18 })
             );
             if (typeof text !== 'string') {
                 return;
@@ -118,7 +119,7 @@ function $sovBurner(
             if (isNaN(input) || input === 0) {
                 return;
             }
-            const value = BigInt(1e18 * input);
+            const value = BigInt(input * 10 ** decimals);
             if (value < amount) {
                 onBurn(token, value);
             } else {
@@ -138,11 +139,12 @@ function $balance(
     { token, wallet }: Props
 ) {
     const amount = wallet.items[token]?.amount ?? 0n;
+    const { decimals } = TokenInfo(token);
     return <input type='text' readOnly
         className='form-control' id='aft-wallet-balance'
         data-bs-toggle='tooltip' data-bs-placement='top'
-        title={`${nice(amount, { base: 1e18 })} ${token}`}
-        value={nice_si(amount, { base: 1e18 })}
+        title={`${nice(amount, { base: 10 ** decimals })} ${token}`}
+        value={nice_si(amount, { base: 10 ** decimals })}
     />;
 }
 function $sovToggle(

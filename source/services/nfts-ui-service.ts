@@ -7,7 +7,7 @@ import { onAftWalletChanged, onTokenSwitch } from '../redux/observers';
 import { nftAmounts } from '../redux/reducers';
 import { aftWalletBy, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Address, Amount, MID_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftTokens, Token } from '../redux/types';
+import { Address, Amount, MID_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftTokens, Token, TokenInfo } from '../redux/types';
 import { MoeWallet, NftWallet, NftWalletMock } from '../wallet';
 import { Years } from '../years';
 
@@ -38,7 +38,8 @@ export const NftsUiService = (
     const nft_amounts = (
         token: Token, { amount }: { amount: Amount }
     ) => {
-        const balance = amount / BigInt(1e18);
+        const { decimals } = TokenInfo(token);
+        const balance = amount / BigInt(10 ** decimals);
         const nft_token = Nft.token(token);
         const entries = Array.from(NftLevels()).map((nft_level): [
             NftLevel, NftAmounts[NftLevel]
