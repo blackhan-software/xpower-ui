@@ -31,17 +31,20 @@ export function UiSelector(
     return <div
         className='btn-group selectors' role='group'
     >
-        {$anchor(Token.THOR, Tokenizer.xify(token), switching, dispatch)}
-        {$anchor(Token.LOKI, Tokenizer.xify(token), switching, dispatch)}
-        {$anchor(Token.ODIN, Tokenizer.xify(token), switching, dispatch)}
+        {$anchor(Token.THOR, token, switching, dispatch)}
+        {$anchor(Token.LOKI, token, switching, dispatch)}
+        {$anchor(Token.ODIN, token, switching, dispatch)}
     </div>;
 }
 function $anchor(
-    my_token: Token, token: Token,
+    xtoken_my: Token, token: Token,
     switching: boolean, dispatch: AppDispatch
 ) {
-    const selector = `selector-${Tokenizer.lower(my_token)}`;
-    const active = token === my_token ? 'active' : '';
+    const xtoken = Tokenizer.xify(token);
+    const atoken_my = Tokenizer.aify(xtoken_my);
+    const token_my = token.startsWith('a') ? atoken_my : xtoken_my;
+    const selector = `selector-${Tokenizer.lower(xtoken_my)}`;
+    const active = xtoken === xtoken_my ? 'active' : '';
     const disabled = switching ? 'pseudo-disabled' : '';
     const classes = [
         'btn btn-outline-warning', selector, active, disabled
@@ -51,12 +54,12 @@ function $anchor(
         data-bs-toggle='tooltip'
         data-bs-placement='top'
         data-bs-fixed='true'
-        href={`?token=${my_token}`}
-        onClick={(e) => switchTo(e, my_token, dispatch)}
+        href={`?token=${token_my}`}
+        onClick={(e) => switchTo(e, token_my, dispatch)}
     >
-        {$spinner(my_token, token, switching)}
-        {$image(my_token, token, switching)}
-        {$label(my_token)}
+        {$spinner(xtoken_my, xtoken, switching)}
+        {$image(xtoken_my, xtoken, switching)}
+        {$label(xtoken_my)}
     </a>;
 }
 function switchTo(
