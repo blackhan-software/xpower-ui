@@ -213,18 +213,18 @@ const ODIN_SOV_IMAGE_V5a = process.env.ODIN_SOV_IMAGE_V5a ?? "data:image/svg+xml
 assert(typeof ODIN_SOV_IMAGE_V5a === 'string', 'missing ODIN_SOV_IMAGE_V5a env variable');
 // NFT contract URIs
 const NFT_URI = JSON.parse(process.env.NFT_URI ?? `{
-    "thor":"/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts",
-    "loki":"/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts",
-    "odin":"/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts",
-    "hela":"/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts"
+    "thor":"/ipfs/QmYriQeaQmDNoYxioPcEpG3UJ3X1bFskRwzVx5DufrjpcZ/nfts",
+    "loki":"/ipfs/QmYriQeaQmDNoYxioPcEpG3UJ3X1bFskRwzVx5DufrjpcZ/nfts",
+    "odin":"/ipfs/QmYriQeaQmDNoYxioPcEpG3UJ3X1bFskRwzVx5DufrjpcZ/nfts",
+    "hela":"/ipfs/QmYriQeaQmDNoYxioPcEpG3UJ3X1bFskRwzVx5DufrjpcZ/nfts"
 }`);
 assert(NFT_URI, 'missing NFT_URI env variable');
 // PPT contract URIs
 const PPT_URI = JSON.parse(process.env.PPT_URI ?? `{
-    "thor":"/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/ppts",
-    "loki":"/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/ppts",
-    "odin":"/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/ppts",
-    "hela":"/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/ppts"
+    "thor":"/ipfs/QmYriQeaQmDNoYxioPcEpG3UJ3X1bFskRwzVx5DufrjpcZ/ppts",
+    "loki":"/ipfs/QmYriQeaQmDNoYxioPcEpG3UJ3X1bFskRwzVx5DufrjpcZ/ppts",
+    "odin":"/ipfs/QmYriQeaQmDNoYxioPcEpG3UJ3X1bFskRwzVx5DufrjpcZ/ppts",
+    "hela":"/ipfs/QmYriQeaQmDNoYxioPcEpG3UJ3X1bFskRwzVx5DufrjpcZ/ppts"
 }`);
 assert(PPT_URI, 'missing PPT_URI env variable');
 
