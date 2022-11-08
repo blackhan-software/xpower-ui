@@ -8,6 +8,7 @@ import { nftAmounts } from '../redux/reducers';
 import { aftWalletBy, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { Address, Amount, MID_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftTokens, Token, TokenInfo } from '../redux/types';
+import { Tokenizer } from '../token';
 import { MoeWallet, NftWallet, NftWalletMock } from '../wallet';
 import { Years } from '../years';
 
@@ -19,22 +20,24 @@ export const NftsUiService = (
     /**
      * nft-amounts:
      */
-    onAftWalletChanged(store, buffered(function syncAmounts(
-        token: Token, { amount }: { amount: Amount }
-    ) {
-        store.dispatch(setNftsUiAmounts({
-            ...nft_amounts(token, { amount })
-        }));
-    }));
-    onTokenSwitch(store, function syncAmounts(token) {
-        const { items } = aftWalletBy(store.getState(), token);
-        const item = items[token];
+    onAftWalletChanged(
+        store, buffered(sync_amounts)
+    );
+    onTokenSwitch(
+        store, sync_amounts
+    );
+    function sync_amounts(token: Token) {
+        const xtoken = Tokenizer.xify(token);
+        const { items } = aftWalletBy(
+            store.getState(), xtoken
+        );
+        const item = items[xtoken];
         if (item !== undefined) {
             store.dispatch(setNftsUiAmounts({
-                ...nft_amounts(token, item)
+                ...nft_amounts(xtoken, item)
             }));
         }
-    });
+    }
     const nft_amounts = (
         token: Token, { amount }: { amount: Amount }
     ) => {
