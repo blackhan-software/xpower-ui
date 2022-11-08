@@ -4,13 +4,14 @@ import { capitalize } from '../../routes/functions';
 import { Blockchain, ChainId } from '../../source/blockchain';
 import { ROParams } from '../../source/params';
 import { AppState, Store } from '../../source/redux/store';
-import { Token } from '../../source/redux/types';
+import { Token, TokenInfo } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { Version } from '../../source/types';
 
 import React, { createElement, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { connect, Provider } from 'react-redux';
+import { x40 } from '../../source/functions';
 
 type Props = {
     token: Token; version: Version;
@@ -198,11 +199,8 @@ function hostname() {
 function contractUrl(
     token: Token, version: Version
 ) {
-    const $address = document.getElementById(
-        `g-${token}_MOE_${version}`
-    );
-    const address = String($address?.dataset.value);
-    return `https://snowtrace.io/address/${address}`;
+    const { address } = TokenInfo(token, version);
+    return `https://snowtrace.io/address/${x40(address)}`;
 }
 async function addToken(
     token: Token, version: Version
