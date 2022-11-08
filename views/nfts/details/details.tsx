@@ -1,4 +1,5 @@
 import { Bus } from '../../../source/bus';
+import { nice } from '../../../source/functions';
 import { globalRef } from '../../../source/react';
 import { Amount, Nft, NftDetails, NftIssue, NftLevel, Nfts, Supply, Token } from '../../../source/redux/types';
 import { Years } from '../../../source/years';
@@ -152,7 +153,7 @@ function $balance(
         </label>
         <div className='input-group nft-balance'>
             <input className='form-control' readOnly
-                type='number' value={balance.toString()}
+                type='text' value={nice(balance)}
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
@@ -174,7 +175,7 @@ function $supply(
         </label>
         <div className='input-group nft-total-supply'>
             <input className='form-control' readOnly
-                type='number' value={supply.toString()}
+                type='text' value={nice(supply)}
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'

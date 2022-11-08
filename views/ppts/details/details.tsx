@@ -1,6 +1,6 @@
 import { Bus } from '../../../source/bus';
 import { MoeTreasuryFactory } from '../../../source/contract';
-import { x40 } from '../../../source/functions';
+import { nice, x40 } from '../../../source/functions';
 import { AddressContext, globalRef } from '../../../source/react';
 import { onPptChanged } from '../../../source/redux/observers';
 import { AppState } from '../../../source/redux/store';
@@ -292,7 +292,7 @@ function $balance(
         </label>
         <div className='input-group nft-balance'>
             <input className='form-control' readOnly
-                type='number' value={balance.toString()}
+                type='text' value={nice(balance)}
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
@@ -314,7 +314,7 @@ function $supply(
         </label>
         <div className='input-group nft-total-supply'>
             <input className='form-control' readOnly
-                type='number' value={supply.toString()}
+                type='text' value={nice(supply)}
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
