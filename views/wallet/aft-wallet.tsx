@@ -1,5 +1,5 @@
 import { Bus } from '../../source/bus';
-import { nice, nice_si, nomobi, x40 } from '../../source/functions';
+import { delayed, nice, nice_si, nomobi, x40 } from '../../source/functions';
 import { switchToken } from '../../source/redux/actions';
 import { AppDispatch } from '../../source/redux/store';
 import { Address, AftWallet, AftWalletBurner, Amount, Token, TokenInfo } from '../../source/redux/types';
@@ -115,7 +115,7 @@ function $sovBurner(
             if (typeof text !== 'string') {
                 return;
             }
-            const input = Number(text.replace(/['_]/, ''));
+            const input = Number(text.replace(/[']/g, ''));
             if (isNaN(input) || input === 0) {
                 return;
             }
@@ -138,6 +138,14 @@ function $sovBurner(
 function $balance(
     { token, wallet }: Props
 ) {
+    const on_click = delayed((e: React.TouchEvent) => {
+        const $burner = document.getElementById(
+            'aft-wallet-burner'
+        );
+        if ($burner) {
+            $burner.click();
+        }
+    }, 600);
     const amount = wallet.items[token]?.amount ?? 0n;
     const { decimals } = TokenInfo(token);
     return <input type='text' readOnly
@@ -145,6 +153,8 @@ function $balance(
         data-bs-toggle='tooltip' data-bs-placement='top'
         title={`${nice(amount, { base: 10 ** decimals })} ${token}`}
         value={nice_si(amount, { base: 10 ** decimals })}
+        onTouchEnd={() => on_click.cancel()}
+        onTouchStart={(e) => on_click(e)}
     />;
 }
 function $sovToggle(

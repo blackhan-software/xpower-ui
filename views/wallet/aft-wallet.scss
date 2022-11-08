@@ -51,6 +51,14 @@ div#aft-wallet {
       color: var(--xp-dimgray);
       width: 42px;
     }
+    @media (max-width: 575px) {
+      input#aft-wallet-address {
+        width: calc(100% - 192px);
+      }
+      button#aft-wallet-burner {
+        display: none;
+      }
+    }
     input#aft-wallet-balance {
       text-align: center;
       width: 105px;
