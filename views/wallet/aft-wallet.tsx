@@ -21,7 +21,7 @@ export function UiAftWallet(
     props: Props
 ) {
     const dispatch = useDispatch<AppDispatch>();
-    const aged = props.token.startsWith('a');
+    const aged = Tokenizer.aified(props.token);
     const set_aged = (aged: boolean) => {
         if (aged) {
             dispatch(switchToken(Tokenizer.aify(props.token)));
@@ -130,7 +130,7 @@ function $sovBurner(
     function title(token: Token) {
         const atoken = Tokenizer.aify(token);
         const xtoken = Tokenizer.xify(token);
-        return token.startsWith('a')
+        return Tokenizer.aified(token)
             ? `Burn your ${atoken} to *unwrap* ${xtoken} tokens`
             : `Burn your ${xtoken}`;
     }
@@ -138,7 +138,7 @@ function $sovBurner(
 function $balance(
     { token, wallet }: Props
 ) {
-    const on_click = delayed((e: React.TouchEvent) => {
+    const on_click = delayed(() => {
         const $burner = document.getElementById(
             'aft-wallet-burner'
         );
@@ -153,8 +153,8 @@ function $balance(
         data-bs-toggle='tooltip' data-bs-placement='top'
         title={`${nice(amount, { base: 10 ** decimals })} ${token}`}
         value={nice_si(amount, { base: 10 ** decimals })}
-        onTouchEnd={() => on_click.cancel()}
-        onTouchStart={(e) => on_click(e)}
+        onTouchEnd={on_click.cancel}
+        onTouchStart={on_click}
     />;
 }
 function $sovToggle(

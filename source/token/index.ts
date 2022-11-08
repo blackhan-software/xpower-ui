@@ -98,6 +98,16 @@ export class Tokenizer {
                 return Token.HELA;
         }
     }
+    public static xified(token: Token) {
+        switch (token) {
+            case Token.THOR:
+            case Token.LOKI:
+            case Token.ODIN:
+            case Token.HELA:
+                return true;
+        }
+        return false;
+    }
     public static aify(token: Token) {
         switch (token) {
             case Token.THOR:
@@ -113,6 +123,16 @@ export class Tokenizer {
             case Token.aHELA:
                 return Token.aHELA;
         }
+    }
+    public static aified(token: Token) {
+        switch (token) {
+            case Token.aTHOR:
+            case Token.aLOKI:
+            case Token.aODIN:
+            case Token.aHELA:
+                return true;
+        }
+        return false;
     }
     public static slug(token: Token) {
         switch (token) {

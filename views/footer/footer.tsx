@@ -205,7 +205,7 @@ function contractUrl(
 async function addToken(
     token: Token, version: Version
 ) {
-    if (!token.startsWith('a')) {
+    if (Tokenizer.xified(token)) {
         addMoeToken(token, version);
     } else {
         addSovToken(token, version);

@@ -394,7 +394,7 @@ export const pptsClaimRewards = AppThunk('ppts/claim-rewards', async (args: {
     function set_status(status: PptClaimerStatus) {
         if (status === PptClaimerStatus.claimed) {
             const state = api.getState();
-            if (!state.token.startsWith('a')) {
+            if (!Tokenizer.aified(state.token)) {
                 api.dispatch(switchToken(Tokenizer.aify(state.token)));
             }
         }
@@ -641,7 +641,7 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
  export const aftBurn = AppThunk('aft/burn', async (args: {
     address: Address | null, token: Token, amount: Amount
 }, api) => {
-    const action = args.token.startsWith('a')
+    const action = Tokenizer.aified(args.token)
         ? aftBurnAPower(args) : aftBurnXPower(args);
     api.dispatch(action as unknown as AnyAction);
 });
@@ -652,7 +652,7 @@ export const aftBurnAPower = AppThunk('aft/burn-apower', async (args: {
     if (!address) {
         throw new Error('missing selected-address');
     }
-    if (!token.startsWith('a')) {
+    if (!Tokenizer.aified(token)) {
         throw new Error('APower token required');
     }
     const sov_wallet = new SovWallet(address, token);
@@ -685,7 +685,7 @@ export const aftBurnXPower = AppThunk('aft/burn-xpower', async (args: {
     if (!address) {
         throw new Error('missing selected-address');
     }
-    if (token.startsWith('a')) {
+    if (!Tokenizer.xified(token)) {
         throw new Error('XPower token required');
     }
     const moe_wallet = new MoeWallet(address, token);

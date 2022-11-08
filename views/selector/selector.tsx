@@ -42,7 +42,7 @@ function $anchor(
 ) {
     const xtoken = Tokenizer.xify(token);
     const atoken_my = Tokenizer.aify(xtoken_my);
-    const token_my = token.startsWith('a') ? atoken_my : xtoken_my;
+    const token_my = Tokenizer.aified(token) ? atoken_my : xtoken_my;
     const selector = `selector-${Tokenizer.lower(xtoken_my)}`;
     const active = xtoken === xtoken_my ? 'active' : '';
     const disabled = switching ? 'pseudo-disabled' : '';
