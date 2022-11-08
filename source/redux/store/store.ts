@@ -2,11 +2,11 @@ import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
 
 import { ROParams } from '../../params';
+import withServices from '../../services';
 import { StateDb } from '../../state-db';
 import { middleware } from '../middleware';
 import * as reducers from '../reducers';
 import { refreshed } from '../selectors';
-import withServices from '../../services';
 
 const db = new StateDb(localStorage);
 if (ROParams.clear) {
@@ -36,9 +36,9 @@ const store = configureStore({
          */
         serializableCheck: false
     }),
-    enhancers: middleware({
-        logger: ROParams.logger
-    }),
+    enhancers: (e) => [
+        ...middleware({ logger: ROParams.logger }), ...e
+    ],
     preloadedState: db.load(ROParams.persist),
 });
 if (ROParams.persist > 0) {
