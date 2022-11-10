@@ -78,27 +78,23 @@ async function onChange(
         throw new Error('missing selected-address');
     }
     const $target = e.target as HTMLInputElement;
-    let value: Amount | null;
-    try {
-        if ($target.value.match(/^0x([0-9a-f]{40})/i) !== null) {
-            value = BigInt($target.value);
-        } else {
-            value = 0n;
-        }
-    } catch (ex) {
-        value = null;
+    if (!$target.value) {
+        props.onTargetChanged(null, null);
+        return;
     }
-    if (value === null || !$target.value) {
-        props.onTargetChanged(value, null);
-    } else if (
-        isAddress($target.value) &&
-        !isZeroAddress($target.value) &&
-        !isSameAddress($target.value, address)
+    if (!isAddress($target.value)) {
+        props.onTargetChanged(null, false);
+        return;
+    }
+    if (isZeroAddress($target.value) ||
+        isSameAddress($target.value, address)
     ) {
-        props.onTargetChanged(value, true);
-    } else {
+        const value = BigInt($target.value);
         props.onTargetChanged(value, false);
+        return;
     }
+    const value = BigInt($target.value);
+    props.onTargetChanged(value, true);
 }
 function isAddress(value: string) {
     return value.match(/^0x([0-9a-f]{40}$)/i);
