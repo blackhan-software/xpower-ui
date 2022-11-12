@@ -1,5 +1,6 @@
 import { nice } from '../../../source/functions';
 import { Amount, NftIssue, Token, TokenInfo } from '../../../source/redux/types';
+import { Tokenizer } from '../../../source/token';
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
@@ -12,6 +13,7 @@ type Props = {
 export function UiPptClaimed(
     { issue, token, value }: Props
 ) {
+    const atoken = Tokenizer.aify(token);
     const { decimals } = TokenInfo(token);
     const nice_value = typeof value === 'bigint'
         ? nice(value, { base: 10 ** decimals }) : '';
@@ -29,7 +31,7 @@ export function UiPptClaimed(
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Amount of claimed ${token} rewards so far (for ${issue})`}
+                title={`Amount of claimed ${atoken} rewards so far (for ${issue})`}
             >
                 <InfoCircle fill={true} />
             </span>

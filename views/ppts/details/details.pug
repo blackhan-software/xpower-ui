@@ -83,7 +83,7 @@ each year in Array.from(YEARS).reverse()
         )
         span.input-group-text.info(
           data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Amount of claimed {{TOKEN}} rewards so far (for ${year})`
+          title=`Amount of claimed {{aTOKEN}} rewards so far (for ${year})`
         )
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
@@ -97,7 +97,7 @@ each year in Array.from(YEARS).reverse()
         )
         span.input-group-text.info(
           data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Min. amount of claimable {{TOKEN}} rewards (for ${year})`
+          title=`Min. amount of claimable {{aTOKEN}} rewards (for ${year})`
         )
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
@@ -118,7 +118,7 @@ each year in Array.from(YEARS).reverse()
           span.text: | Claim Rewards
         button.btn.btn-outline-warning.info(
           type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Claim {{TOKEN}}s for staked ${levels[index]} NFTs at ${apr.toFixed(3)}% APR`
+          title=`Claim {{aTOKEN}}s for staked ${levels[index]} NFTs at ${apr.toFixed(3)}% APR`
         )
           include ../../../public/images/pug/info-circle-fill.svg.pug
   hr.year(style=`display:${

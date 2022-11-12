@@ -1,5 +1,6 @@
 import { globalRef } from '../../../source/react';
 import { Amount, Nft, NftIssue, NftLevel, PptClaimerStatus, Token } from '../../../source/redux/types';
+import { Tokenizer } from '../../../source/token';
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
@@ -81,10 +82,11 @@ function $info(
 ) {
     const apr = aprOf(props);
     const { level, token } = props;
+    const atoken = Tokenizer.aify(token);
     return <button type='button'
         className='btn btn-outline-warning info'
         data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`Claim ${token}s for staked ${Nft.nameOf(level)} NFTs at ${apr.toFixed(3)}% APR`}
+        title={`Claim ${atoken}s for staked ${Nft.nameOf(level)} NFTs at ${apr.toFixed(3)}% APR`}
     >
         <InfoCircle fill={true} />
     </button>;
