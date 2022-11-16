@@ -9,7 +9,10 @@ import { Nft, NftLevels, Token } from '../../source/redux/types';
 import { Years } from '../../source/years';
 
 Blockchain.onConnect(function enableAllowanceButton() {
-    const $approve_nft = $('.approve-allowance-nft:not([data-source=v4a])');
+    const $approve_nft = $('.approve-allowance-nft').filter((i, el) => {
+        const source = new RegExp($(el).data('source'));
+        return 'v2a|v3a|v3b'.match(source) !== null;
+    });
     $approve_nft.prop('disabled', false);
     const $unstake_ppt = $('.unstake-ppt');
     $unstake_ppt.prop('disabled', false);
@@ -19,28 +22,28 @@ $('button.unstake-ppt').on('click', async function unstakeTokens(e) {
     const $unstake_ppt = $unstake.parents('form.unstake-ppt');
     const $allowance_nft = $unstake_ppt.next('form.allowance-nft');
     if ($unstake.hasClass('thor')) {
-        await unstake(Token.THOR, {
+        await nftUnstake(Token.THOR, {
             $unstake, $approve: $allowance_nft.find(
                 '.approve-allowance-nft.thor'
             )
         });
     }
     if ($unstake.hasClass('loki')) {
-        await unstake(Token.LOKI, {
+        await nftUnstake(Token.LOKI, {
             $unstake, $approve: $allowance_nft.find(
                 '.approve-allowance-nft.loki'
             )
         });
     }
     if ($unstake.hasClass('odin')) {
-        await unstake(Token.ODIN, {
+        await nftUnstake(Token.ODIN, {
             $unstake, $approve: $allowance_nft.find(
                 '.approve-allowance-nft.odin'
             )
         });
     }
 });
-async function unstake(token: Token, { $unstake, $approve }: {
+async function nftUnstake(token: Token, { $unstake, $approve }: {
     $unstake: JQuery<HTMLElement>, $approve: JQuery<HTMLElement>
 }) {
     const address = await Blockchain.selectedAddress;
@@ -114,28 +117,28 @@ $('button.approve-allowance-nft').on('click', async function approveTokens(e) {
     const $allowance_nft = $approve.parents('form.allowance-nft');
     const $migration_nft = $allowance_nft.next('form.migration-nft');
     if ($approve.hasClass('thor')) {
-        await approve(Token.THOR, {
+        await nftApprove(Token.THOR, {
             $approve, $execute: $migration_nft.find(
                 '.execute-migration-nft.thor'
             )
         });
     }
     if ($approve.hasClass('loki')) {
-        await approve(Token.LOKI, {
+        await nftApprove(Token.LOKI, {
             $approve, $execute: $migration_nft.find(
                 '.execute-migration-nft.loki'
             )
         });
     }
     if ($approve.hasClass('odin')) {
-        await approve(Token.ODIN, {
+        await nftApprove(Token.ODIN, {
             $approve, $execute: $migration_nft.find(
                 '.execute-migration-nft.odin'
             )
         });
     }
 });
-async function approve(token: Token, { $approve, $execute }: {
+async function nftApprove(token: Token, { $approve, $execute }: {
     $approve: JQuery<HTMLElement>, $execute: JQuery<HTMLElement>
 }) {
     const address = await Blockchain.selectedAddress;
@@ -216,16 +219,16 @@ async function approve(token: Token, { $approve, $execute }: {
 $('button.execute-migration-nft').on('click', async function migrateTokens(e) {
     const $execute = $(e.target);
     if ($execute.hasClass('thor')) {
-        await migrate(Token.THOR, { $execute });
+        await nftMigrate(Token.THOR, { $execute });
     }
     if ($execute.hasClass('loki')) {
-        await migrate(Token.LOKI, { $execute });
+        await nftMigrate(Token.LOKI, { $execute });
     }
     if ($execute.hasClass('odin')) {
-        await migrate(Token.ODIN, { $execute });
+        await nftMigrate(Token.ODIN, { $execute });
     }
 });
-async function migrate(token: Token, { $execute }: {
+async function nftMigrate(token: Token, { $execute }: {
     $execute: JQuery<HTMLElement>
 }) {
     const address = await Blockchain.selectedAddress;

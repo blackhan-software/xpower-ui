@@ -15,25 +15,32 @@ block content
       include ../../public/images/pug/avalanche-24.svg.pug
     include ../connector/connector.pug
 
-    h2#claiming-of-tokens
-      | Claiming of Tokens <a class="header-anchor" href="#claiming-of-tokens">¶</a>
-    include ./moe-claim.pug
+    h2#claiming-of-all-rewards
+      | Claiming of all Rewards <a class="header-anchor" href="#claiming-of-all-rewards">¶</a>
+    include ./any-claim.pug
 
-    h2#migration-of-tokens
-      | Migration of Tokens <a class="header-anchor" href="#migration-of-tokens">¶</a>
+    h2#migration-of-moe-tokens
+      | Migration of MOE Tokens <a class="header-anchor" href="#migration-of-moe-tokens">¶</a>
     include ./moe-migrate.pug
 
-    h2#integration-of-tokens
-      | Integration of Tokens <a class="header-anchor" href="#integration-of-tokens">¶</a>
+    h2#migration-of-sov-tokens
+      | Migration of SOV Tokens <a class="header-anchor" href="#migration-of-sov-tokens">¶</a>
+    include ./sov-migrate.pug
+
+    h2#integration-of-moe-tokens
+      | Integration of MOE Tokens <a class="header-anchor" href="#integration-of-moe-tokens">¶</a>
     include ./moe-integrate.pug
+
+    h2#integration-of-sov-tokens
+      | Integration of SOV Tokens <a class="header-anchor" href="#integration-of-sov-tokens">¶</a>
     include ./sov-integrate.pug
 
     h2#migration-of-nfts
       | Migration of NFTs <a class="header-anchor" href="#migration-of-nfts">¶</a>
     include ./nft-migrate.pug
 
-    h2#burn-of-nfts
-      | Burning of NFTs [optional] <a class="header-anchor" href="#burn-of-nfts">¶</a>
+    h2#burning-of-nfts
+      | Burning of NFTs [optional] <a class="header-anchor" href="#burning-of-nfts">¶</a>
     include ./nft-burn.pug
 
 block footer

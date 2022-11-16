@@ -1,5 +1,5 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-import './moe-claim.scss';
+import './any-claim.scss';
 
 import { BigNumber } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
@@ -9,10 +9,10 @@ import { Nft, NftLevels, Token } from '../../source/redux/types';
 import { Years } from '../../source/years';
 
 Blockchain.onConnect(function enableAllowanceButton() {
-    const $claim_moe = $('.claim-moe');
-    $claim_moe.prop('disabled', false);
+    const $claim_any = $('.claim-any');
+    $claim_any.prop('disabled', false);
 });
-$('button.claim-moe').on('click', async function claimTokens(e) {
+$('button.claim-any').on('click', async function claimTokens(e) {
     const $claim = $(e.target);
     if ($claim.hasClass('thor')) {
         await claim(Token.THOR, { $claim });
@@ -35,17 +35,17 @@ async function claim(token: Token, { $claim }: {
     if (!src_version) {
         throw new Error('missing data-source');
     }
-    const moe_treasury = await MoeTreasuryFactory({
+    const any_treasury = await MoeTreasuryFactory({
         token, version: src_version
     });
     console.debug(
-        `[${src_version}:contract]`, moe_treasury.address
+        `[${src_version}:contract]`, any_treasury.address
     );
     const ids = Nft.coreIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels())
     });
-    const src_claimable: BigNumber[] = await moe_treasury.claimableForBatch(
+    const src_claimable: BigNumber[] = await any_treasury.claimableForBatch(
         x40(address), ids
     );
     console.debug(
@@ -62,7 +62,7 @@ async function claim(token: Token, { $claim }: {
     Alerts.hide();
     try {
         const nz = filter(ids, src_claimable, { zero: false });
-        await moe_treasury.claimForBatch(
+        await any_treasury.claimForBatch(
             x40(address), nz.ids
         );
         alert(

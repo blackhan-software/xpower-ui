@@ -1,0 +1,69 @@
+//-
+//- [v5a to v5b]
+//-
+form.sov-allowance
+  label.form-label
+    | Allowance Approval [v5a]
+  div.btn-group.approve-allowance.thor(role="group")
+    button.approve-allowance.thor.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
+    )
+      | Approve Allowance(s) for THOR &amp; aTHORs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Approve allowance(s) for the wrapped THOR & the old aTHOR tokens"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.approve-allowance.loki(role="group")
+    button.approve-allowance.loki.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
+    )
+      | Approve Allowance(s) for LOKI &amp; aLOKIs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Approve allowance(s) for the wrapped LOKI & the old aLOKI tokens"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.approve-allowance.odin(role="group")
+    button.approve-allowance.odin.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
+    )
+      | Approve Allowance(s) for ODIN &amp; aODINs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Approve allowance(s) for the wrapped ODIN & the old aODIN tokens"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+form.sov-migration
+  label.form-label
+    | Migration Execution [v5a to v5b]
+  div.btn-group.execute-migration.thor(role="group")
+    button.execute-migration.thor.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
+    )
+      | Execute Migration of aTHORs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Execute migration of the old THOR tokens"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.execute-migration.loki(role="group")
+    button.execute-migration.loki.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
+    )
+      | Execute Migration of aLOKIs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Execute migration of the old LOKI tokens"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.execute-migration.odin(role="group")
+    button.execute-migration.odin.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
+    )
+      | Execute Migration of aODINs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Execute migration of the old aODIN tokens"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug

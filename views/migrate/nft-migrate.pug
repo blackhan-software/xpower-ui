@@ -1,9 +1,9 @@
 //-
-//- [v2 to v3a]
+//- [v2a to v3a]
 //-
 form.allowance-nft
   label.form-label
-    | Allowance Approval for NFTs [v2]
+    | Allowance Approval for NFTs [v2a]
   div.btn-group.approve-allowance-nft.thor(role="group")
     button.approve-allowance-nft.thor.btn.btn-outline-warning(
       type="button" data-source="v2a" data-target="v3a" disabled
@@ -36,7 +36,7 @@ form.allowance-nft
       include ../../public/images/pug/info-circle-fill.svg.pug
 form.migration-nft
   label.form-label
-    | Migration Execution for NFTs [v2 to v3a]
+    | Migration Execution for NFTs [v2a to v3a]
   div.btn-group.execute-migration-nft.thor(role="group")
     button.execute-migration-nft.thor.btn.btn-outline-warning(
       type="button" data-source="v2a" data-target="v3a" disabled
@@ -174,7 +174,7 @@ form.allowance-nft
       include ../../public/images/pug/info-circle-fill.svg.pug
 form.migration-nft
   label.form-label
-    | Migration Execution for NFTs [v3b to v4]
+    | Migration Execution for NFTs [v3b to v4a]
   div.btn-group.execute-migration-nft.thor(role="group")
     button.execute-migration-nft.thor.btn.btn-outline-warning(
       type="button" data-source="v3b" data-target="v4a" disabled
@@ -210,7 +210,7 @@ form.migration-nft
 //-
 form.unstake-ppt
   label.form-label
-    | Unstaking of staked NFTs [v4]
+    | Unstaking of staked NFTs [v4a]
   div.btn-group.unstake-ppt.thor(role="group")
     button.unstake-ppt.thor.btn.btn-outline-warning(
       type="button" data-source="v4a" data-target="v5a" disabled
@@ -243,7 +243,7 @@ form.unstake-ppt
       include ../../public/images/pug/info-circle-fill.svg.pug
 form.allowance-nft
   label.form-label
-    | Allowance Approval for NFTs [v4]
+    | Allowance Approval for NFTs [v4a]
   div.btn-group.approve-allowance-nft.thor(role="group")
     button.approve-allowance-nft.thor.btn.btn-outline-warning(
       type="button" data-source="v4a" data-target="v5a" disabled
@@ -276,7 +276,7 @@ form.allowance-nft
       include ../../public/images/pug/info-circle-fill.svg.pug
 form.migration-nft
   label.form-label
-    | Migration Execution for NFTs [v4 to v5]
+    | Migration Execution for NFTs [v4a to v5a]
   div.btn-group.execute-migration-nft.thor(role="group")
     button.execute-migration-nft.thor.btn.btn-outline-warning(
       type="button" data-source="v4a" data-target="v5a" disabled
@@ -300,6 +300,108 @@ form.migration-nft
   div.btn-group.execute-migration-nft.odin(role="group")
     button.execute-migration-nft.odin.btn.btn-outline-warning(
       type="button" data-source="v4a" data-target="v5a" disabled
+    )
+      | Execute Migration of ODIN NFTs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Execute migration of the old ODIN NFTs"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+//-
+//- [v5a to v5b]
+//-
+form.unstake-ppt
+  label.form-label
+    | Unstaking of staked NFTs [v5a]
+  div.btn-group.unstake-ppt.thor(role="group")
+    button.unstake-ppt.thor.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
+    )
+      | Unstake THOR NFTs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Unstake the old staked THOR NFTs"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.unstake-ppt.loki(role="group")
+    button.unstake-ppt.loki.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
+    )
+      | Unstake LOKI NFTs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Unstake the old staked LOKI NFTs"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.unstake-ppt.odin(role="group")
+    button.unstake-ppt.odin.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
+    )
+      | Unstake ODIN NFTs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Unstak the old staked ODIN NFTs"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+form.allowance-nft
+  label.form-label
+    | Allowance Approval for NFTs [v5a]
+  div.btn-group.approve-allowance-nft.thor(role="group")
+    button.approve-allowance-nft.thor.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
+    )
+      | Approve Allowance for THOR NFTs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Approve allowance for the old THOR NFTs"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.approve-allowance-nft.loki(role="group")
+    button.approve-allowance-nft.loki.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
+    )
+      | Approve Allowance for LOKI NFTs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Approve allowance for the old LOKI NFTs"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.approve-allowance-nft.odin(role="group")
+    button.approve-allowance-nft.odin.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
+    )
+      | Approve Allowance for ODIN NFTs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Approve allowance for the old ODIN NFTs"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+form.migration-nft
+  label.form-label
+    | Migration Execution for NFTs [v5a to v5b]
+  div.btn-group.execute-migration-nft.thor(role="group")
+    button.execute-migration-nft.thor.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
+    )
+      | Execute Migration of THOR NFTs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Execute migration of the old THOR NFTs"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.execute-migration-nft.loki(role="group")
+    button.execute-migration-nft.loki.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
+    )
+      | Execute Migration of LOKI NFTs
+    button.btn.btn-outline-warning.info(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Execute migration of the old LOKI NFTs"
+    )
+      include ../../public/images/pug/info-circle-fill.svg.pug
+  div.btn-group.execute-migration-nft.odin(role="group")
+    button.execute-migration-nft.odin.btn.btn-outline-warning(
+      type="button" data-source="v5a" data-target="v5b" disabled
     )
       | Execute Migration of ODIN NFTs
     button.btn.btn-outline-warning.info(

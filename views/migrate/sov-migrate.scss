@@ -1,0 +1,28 @@
+form.sov-allowance {
+  div.approve-allowance {
+    button.approve-allowance {
+      width: calc(100% - 42px);
+      text-align: center;
+    }
+    .info > svg {
+      position: relative;
+      top: -1px;
+    }
+    margin-bottom: 0.5em;
+    width: 100%;
+  }
+}
+form.sov-migration {
+  div.execute-migration {
+    button.execute-migration {
+      text-align: center;
+      width: calc(100% - 42px);
+    }
+    .info > svg {
+      position: relative;
+      top: -1px;
+    }
+    margin-bottom: 0.5em;
+    width: 100%;
+  }
+}
