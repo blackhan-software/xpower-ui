@@ -71,9 +71,9 @@ export function version(params: URLSearchParams): Version {
             return 'v4a';
         case 'v5a':
             return 'v5a';
-        case 'v5b':
-            return 'v5b';
+        // case 'v5b':
+        //     return 'v5b';
         default:
-            return 'v5b';
+            return 'v5a';
     }
 }
