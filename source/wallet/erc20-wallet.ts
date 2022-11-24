@@ -46,14 +46,34 @@ export abstract class ERC20Wallet {
         ));
         return allowance.toBigInt();
     }
-    increaseAllowance(
+    approve(
         spender_address: Address | string, allowance: Allowance
     ): Promise<Transaction> {
         if (typeof spender_address === 'bigint') {
             spender_address = x40(spender_address);
         }
-        return this.contract.then((c) => c?.increaseAllowance(
+        return this.contract.then((c) => c?.approve(
             spender_address, allowance
+        ));
+    }
+    increaseAllowance(
+        spender_address: Address | string, delta_allowance: Allowance
+    ): Promise<Transaction> {
+        if (typeof spender_address === 'bigint') {
+            spender_address = x40(spender_address);
+        }
+        return this.contract.then((c) => c?.increaseAllowance(
+            spender_address, delta_allowance
+        ));
+    }
+    decreaseAllowance(
+        spender_address: Address | string, delta_allowance: Allowance
+    ): Promise<Transaction> {
+        if (typeof spender_address === 'bigint') {
+            spender_address = x40(spender_address);
+        }
+        return this.contract.then((c) => c?.decreaseAllowance(
+            spender_address, delta_allowance
         ));
     }
     onApproval(

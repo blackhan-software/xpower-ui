@@ -10,8 +10,9 @@ export function address({
     if (version === undefined) {
         version = ROParams.version;
     }
-    const id = `#g-${token}_${infix}_${version}`;
-    const address = $(id).data('value');
+    const id = `g-${token}_${infix}_${version}`;
+    const $element = document.getElementById(id);
+    const address = $element?.dataset.value;
     if (!address) {
         throw new Error(`missing ${id}`);
     }

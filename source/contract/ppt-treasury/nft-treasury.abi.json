@@ -3,12 +3,12 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "nft",
+                "name": "nftLink",
                 "type": "address"
             },
             {
                 "internalType": "address",
-                "name": "nftStaked",
+                "name": "pptLink",
                 "type": "address"
             }
         ],

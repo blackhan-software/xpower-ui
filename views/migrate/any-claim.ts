@@ -1,19 +1,23 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import './any-claim.scss';
 
-import { BigNumber } from 'ethers';
+import { BigNumber, Contract, Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { MoeTreasuryFactory } from '../../source/contract';
+import { MoeTreasuryFactory, OnClaimBatch } from '../../source/contract';
 import { Alert, alert, Alerts, x40 } from '../../source/functions';
 import { Nft, NftLevels, Token } from '../../source/redux/types';
+import { Version } from '../../source/types';
 import { Years } from '../../source/years';
 
 Blockchain.onConnect(function enableAllowanceButton() {
-    const $claim_any = $('.claim-any');
+    const $claim_any = $('.claim-any').filter((i, el) => {
+        const source = new RegExp($(el).data('source'));
+        return 'v2a|v3a|v3b'.match(source) === null;
+    });
     $claim_any.prop('disabled', false);
 });
 $('button.claim-any').on('click', async function claimTokens(e) {
-    const $claim = $(e.target);
+    const $claim = $(e.currentTarget);
     if ($claim.hasClass('thor')) {
         await claim(Token.THOR, { $claim });
     }
@@ -27,49 +31,82 @@ $('button.claim-any').on('click', async function claimTokens(e) {
 async function claim(token: Token, { $claim }: {
     $claim: JQuery<HTMLElement>
 }) {
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
-    }
-    const src_version = $claim.data('source');
-    if (!src_version) {
-        throw new Error('missing data-source');
-    }
-    const any_treasury = await MoeTreasuryFactory({
-        token, version: src_version
+    const { address, src_version } = await context({
+        $el: $claim
     });
-    console.debug(
-        `[${src_version}:contract]`, any_treasury.address
-    );
+    const { mty_treasury } = await contracts({
+        token, src_version
+    });
+    if (!mty_treasury) {
+        throw new Error('undefined mty_treasury');
+    }
+    //
+    // Check allowance:
+    //
     const ids = Nft.coreIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels())
     });
-    const src_claimable: BigNumber[] = await any_treasury.claimableForBatch(
+    const src_claimables: BigNumber[] = await mty_treasury.claimableForBatch(
         x40(address), ids
     );
     console.debug(
-        `[${src_version}:balances]`, src_claimable.map((b) => b.toString())
+        `[${src_version}:claimables]`, src_claimables.map((b) => b.toString())
     );
-    const src_zero = src_claimable.reduce((acc, b) => acc && b.isZero(), true);
-    if (src_zero) {
+    const src_claimable = src_claimables.reduce(
+        (acc, c) => acc.add(c), BigNumber.from(0)
+    );
+    if (src_claimable.isZero()) {
         alert(
-            `Rewards have already been claimed; you can continue now.`,
+            `No claimable rewards; you can continue now.`,
             Alert.info, { after: $claim.parent('div')[0] }
         );
         return;
     }
-    Alerts.hide();
-    try {
-        const nz = filter(ids, src_claimable, { zero: false });
-        await any_treasury.claimForBatch(
-            x40(address), nz.ids
-        );
+    const src_treasure: BigNumber = await mty_treasury.balance();
+    console.debug(
+        `[${src_version}:balance]`, src_treasure.toString()
+    );
+    if (src_treasure.isZero()) {
         alert(
-            `Rewards have successfully been claimed; you can continue now.`,
-            Alert.success, { after: $claim.parent('div')[0] }
+            `Empty treasury; you cannot claim any rewards.`,
+            Alert.warning, { after: $claim.parent('div')[0] }
         );
         return;
+    }
+    if (src_treasure.lt(src_claimable)) {
+        alert(
+            `Insufficient treasury; you cannot claim any rewards.`,
+            Alert.warning, { after: $claim.parent('div')[0] }
+        );
+        return;
+    }
+    //
+    // Claim tokens:
+    //
+    const reset = $claim.ing();
+    Alerts.hide();
+    try {
+        const nz = filter(ids, src_claimables, {
+            zero: false
+        });
+        mty_treasury.on(
+            'ClaimBatch', <OnClaimBatch>((
+                account, ids, amounts, ev
+            ) => {
+                if (ev.transactionHash !== tx?.hash) {
+                    return;
+                }
+                alert(
+                    `Rewards have been claimed; you can continue now.`,
+                    Alert.success, { after: $claim.parent('div')[0] }
+                );
+                reset();
+            })
+        );
+        const tx: Transaction = await mty_treasury.claimForBatch(
+            x40(address), nz.ids
+        );
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
@@ -80,6 +117,7 @@ async function claim(token: Token, { $claim }: {
             });
         }
         console.error(ex);
+        reset();
     }
 }
 function filter<I, B extends BigNumber>(
@@ -94,4 +132,41 @@ function filter<I, B extends BigNumber>(
         }
     }
     return { ids: ids_nz, balances: balances_nz };
+}
+async function context({ $el: $approve }: {
+    $el: JQuery<HTMLElement>
+}) {
+    const address = await Blockchain.selectedAddress;
+    if (!address) {
+        throw new Error('missing selected-address');
+    }
+    const src_version = $approve.data('source');
+    if (!src_version) {
+        throw new Error('missing data-source');
+    }
+    const tgt_version = $approve.data('target');
+    if (!tgt_version) {
+        throw new Error('missing data-target');
+    }
+    return { address, src_version, tgt_version };
+}
+async function contracts({
+    token, src_version
+}: {
+    token: Token, src_version: Version
+}) {
+    let mty_treasury: Contract | undefined;
+    try {
+        mty_treasury = await MoeTreasuryFactory({
+            token, version: src_version
+        });
+        console.debug(
+            `[${src_version}:mty_treasury]`, mty_treasury.address
+        );
+    } catch (ex) {
+        console.error(ex);
+    }
+    return {
+        mty_treasury,
+    };
 }

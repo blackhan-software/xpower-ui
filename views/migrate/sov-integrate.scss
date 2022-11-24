@@ -1,10 +1,11 @@
-form#sov-integration {
-  div.add-sov.thor,
-  div.add-sov.loki,
-  div.add-sov.odin {
-    button.add-sov.thor,
-    button.add-sov.loki,
-    button.add-sov.odin {
+form#sov-integrate {
+  div.add-sov {
+    button.add-sov {
+      img {
+        position: absolute;
+        right: 8px;
+        top: 6px;
+      }
       img {
         background-color: var(--xp-dimgray);
         border-radius: 10px;

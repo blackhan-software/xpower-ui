@@ -1,22 +1,12 @@
-form.sov-allowance {
-  div.approve-allowance {
-    button.approve-allowance {
-      width: calc(100% - 42px);
+form.sov-migrate {
+  div.sov-migrate {
+    button.approve-sov-allowance {
       text-align: center;
+      width: calc(50% - 21px);
     }
-    .info > svg {
-      position: relative;
-      top: -1px;
-    }
-    margin-bottom: 0.5em;
-    width: 100%;
-  }
-}
-form.sov-migration {
-  div.execute-migration {
-    button.execute-migration {
+    button.sov-migrate {
       text-align: center;
-      width: calc(100% - 42px);
+      width: calc(50% - 21px);
     }
     .info > svg {
       position: relative;

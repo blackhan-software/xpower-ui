@@ -34,6 +34,9 @@ export class ROParams {
     public static get version() {
         return parsers.version(this._search);
     }
+    public static get versionTarget() {
+        return parsers.versionTarget(this._search);
+    }
     /**
      * @info initial location.search (of first load):
      */

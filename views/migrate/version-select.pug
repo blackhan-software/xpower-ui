@@ -1,0 +1,26 @@
+label.mb-2(for="version-select")
+    | Version to migrate from
+div.btn-group#version-select-wrap(role="group")
+    select.form-select#version-select(disabled)
+        option(value="v2a")
+            | v2a: {{xTOKEN}}=0, {{aTOKEN}}=0 &amp; NFTs=0
+        option(value="v3a")
+            | v3a: {{xTOKEN}}=0, {{aTOKEN}}=0 &amp; NFTs=0
+        option(value="v3b")
+            | v3b: {{xTOKEN}}=0, {{aTOKEN}}=0 &amp; NFTs=0
+        option(value="v4a")
+            | v4a: {{xTOKEN}}=0, {{aTOKEN}}=0 &amp; NFTs=0
+        option(value="v5a")
+            | v5a: {{xTOKEN}}=0, {{aTOKEN}}=0 &amp; NFTs=0
+        option(value="v5b")
+            | v5b: {{xTOKEN}}=0, {{aTOKEN}}=0 &amp; NFTs=0
+        option(value="v00" selected)
+            | &middot;&middot;&middot;
+    button.btn.btn-outline-warning.info.loading(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      title="Select a version with non-zero {{xTOKEN}}, {{aTOKEN}} or NFT balances to migrate from"
+    )
+      span.spinner.spinner-border.spinner-border-sm(
+        role="status"
+      )
+      include ../../public/images/pug/info-circle-fill.svg.pug

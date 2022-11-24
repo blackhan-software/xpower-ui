@@ -1,92 +1,103 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import './moe-migrate.scss';
 
+import { Contract, Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { XPowerMoeFactory } from '../../source/contract';
+import { OnApproval, OnTransfer, XPowerMoeFactory } from '../../source/contract';
 import { Alert, alert, Alerts, x40 } from '../../source/functions';
-import { Token } from '../../source/redux/types';
+import { MAX_UINT256, Token } from '../../source/redux/types';
+import { Tokenizer } from '../../source/token';
+import { Version } from '../../source/types';
 
-Blockchain.onConnect(function enableAllowanceButton() {
-    const $approve = $('.approve-allowance');
+Blockchain.onConnect(function enableAllowance() {
+    const $approve = $('.approve-moe-allowance');
     $approve.prop('disabled', false);
 });
-$('form.moe-allowance').find('button.approve-allowance').on(
+$('button.approve-moe-allowance').on(
     'click', async function approveTokens(e) {
-        const $approve = $(e.target);
-        const $allowance = $approve.parents('form.moe-allowance');
-        const $migration = $allowance.next('form.moe-migration');
+        const $approve = $(e.currentTarget);
+        const $migrate = $approve.parents('form.moe-migrate');
         if ($approve.hasClass('thor')) {
-            await moeApprove(Token.THOR, {
-                $approve, $execute: $migration.find('.execute-migration.thor')
+            await moeApproveOld(Token.THOR, {
+                $approve, $migrate: $migrate.find(
+                    '.moe-migrate.thor'
+                )
             });
         }
         if ($approve.hasClass('loki')) {
-            await moeApprove(Token.LOKI, {
-                $approve, $execute: $migration.find('.execute-migration.loki')
+            await moeApproveOld(Token.LOKI, {
+                $approve, $migrate: $migrate.find(
+                    '.moe-migrate.loki'
+                )
             });
         }
         if ($approve.hasClass('odin')) {
-            await moeApprove(Token.ODIN, {
-                $approve, $execute: $migration.find('.execute-migration.odin')
+            await moeApproveOld(Token.ODIN, {
+                $approve, $migrate: $migrate.find(
+                    '.moe-migrate.odin'
+                )
             });
         }
     }
 );
-async function moeApprove(token: Token, { $approve, $execute }: {
-    $approve: JQuery<HTMLElement>, $execute: JQuery<HTMLElement>
+async function moeApproveOld(token: Token, { $approve, $migrate }: {
+    $approve: JQuery<HTMLElement>, $migrate: JQuery<HTMLElement>
 }) {
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
-    }
-    const src_version = $approve.data('source');
-    if (!src_version) {
-        throw new Error('missing data-source');
-    }
-    const src_xpower = await XPowerMoeFactory({
-        token, version: src_version
+    const { address, src_version, tgt_version } = await context({
+        $el: $approve
     });
-    console.debug(
-        `[${src_version}:contract]`, src_xpower.address
-    );
-    const tgt_version = $approve.data('target');
-    if (!tgt_version) {
-        throw new Error('missing data-target');
-    }
-    const tgt_xpower = await XPowerMoeFactory({
-        token, version: tgt_version
+    const { src_xpower, tgt_xpower } = await contracts({
+        token, src_version, tgt_version
     });
-    console.debug(
-        `[${tgt_version}:contract]`, tgt_xpower.address
-    );
-    const src_balance = await src_xpower.balanceOf(
-        x40(address)
-    );
+    if (!src_xpower) {
+        throw new Error('undefined src_xpower');
+    }
+    if (!tgt_xpower) {
+        throw new Error('undefined tgt_xpower');
+    }
+    //
+    // Check allowance:
+    //
     const src_allowance = await src_xpower.allowance(
         x40(address), tgt_xpower.address
     );
     console.debug(
         `[${src_version}:allowance]`, src_allowance.toString()
     );
-    if (src_allowance.gte(src_balance)) {
+    const src_balance = await src_xpower.balanceOf(
+        x40(address)
+    );
+    if (src_allowance.eq(MAX_UINT256) || src_balance.isZero()) {
         alert(
-            `Allowance has already been approved; you can migrate now.`,
+            `Allowance has already been approved for; you can migrate now.`,
             Alert.info, { after: $approve.parent('div')[0] }
         );
-        $execute.prop('disabled', false);
+        $migrate.prop('disabled', false);
         return;
     }
+    //
+    // Increase allowance:
+    //
+    let tx: Transaction | undefined;
+    const reset = $approve.ing();
     Alerts.hide();
     try {
-        await src_xpower.increaseAllowance(
-            tgt_xpower.address, src_balance.sub(src_allowance)
+        src_xpower.on('Approval', <OnApproval>((
+            owner, spender, value, ev
+        ) => {
+            if (ev.transactionHash !== tx?.hash) {
+                return;
+            }
+            alert(
+                `Allowance has been approved for; you can migrate now.`,
+                Alert.success, { after: $approve.parent('div')[0] }
+            );
+            $migrate.prop('disabled', false);
+            reset();
+        }));
+        tx = await src_xpower.approve(
+            tgt_xpower.address, MAX_UINT256
         );
-        alert(
-            `Allowance has successfully been approved; you can migrate now.`,
-            Alert.success, { after: $approve.parent('div')[0] }
-        );
-        $execute.prop('disabled', false);
-        return;
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
@@ -97,49 +108,41 @@ async function moeApprove(token: Token, { $approve, $execute }: {
             });
         }
         console.error(ex);
+        reset();
     }
 }
-$('form.moe-migration').find('button.execute-migration').on(
+$('button.moe-migrate').on(
     'click', async function migrateTokens(e) {
-        const $execute = $(e.target);
-        if ($execute.hasClass('thor')) {
-            await moeMigrate(Token.THOR, { $execute });
+        const $migrate = $(e.currentTarget);
+        if ($migrate.hasClass('thor')) {
+            await moeMigrateOld(Token.THOR, { $migrate });
         }
-        if ($execute.hasClass('loki')) {
-            await moeMigrate(Token.LOKI, { $execute });
+        if ($migrate.hasClass('loki')) {
+            await moeMigrateOld(Token.LOKI, { $migrate });
         }
-        if ($execute.hasClass('odin')) {
-            await moeMigrate(Token.ODIN, { $execute });
+        if ($migrate.hasClass('odin')) {
+            await moeMigrateOld(Token.ODIN, { $migrate });
         }
     }
 );
-async function moeMigrate(token: Token, { $execute }: {
-    $execute: JQuery<HTMLElement>
+async function moeMigrateOld(token: Token, { $migrate }: {
+    $migrate: JQuery<HTMLElement>
 }) {
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
-    }
-    const src_version = $execute.data('source');
-    if (!src_version) {
-        throw new Error('missing data-source');
-    }
-    const src_xpower = await XPowerMoeFactory({
-        token, version: src_version
+    const { address, src_version, tgt_version } = await context({
+        $el: $migrate
     });
-    console.debug(
-        `[${src_version}:contract]`, src_xpower.address
-    );
-    const tgt_version = $execute.data('target');
-    if (!tgt_version) {
-        throw new Error('missing data-target');
-    }
-    const tgt_xpower = await XPowerMoeFactory({
-        token, version: tgt_version
+    const { src_xpower, tgt_xpower } = await contracts({
+        token, src_version, tgt_version
     });
-    console.debug(
-        `[${tgt_version}:contract]`, tgt_xpower.address
-    );
+    if (!src_xpower) {
+        throw new Error('undefined src_xpower');
+    }
+    if (!tgt_xpower) {
+        throw new Error('undefined tgt_xpower');
+    }
+    //
+    // Check allowance:
+    //
     const src_balance = await src_xpower.balanceOf(
         x40(address)
     );
@@ -148,44 +151,104 @@ async function moeMigrate(token: Token, { $execute }: {
     );
     if (src_balance.isZero()) {
         alert(
-            `Your old balance is zero; nothing to migrate here.`,
-            Alert.warning, { after: $execute.parent('div')[0] }
+            `Old balance is zero; nothing to migrate here.`,
+            Alert.warning, { after: $migrate.parent('div')[0] }
         );
         return;
     }
-    const tgt_spender = tgt_xpower.address;
     const src_allowance = await src_xpower.allowance(
-        x40(address), tgt_spender
+        x40(address), tgt_xpower.address
     );
     console.debug(
         `[${src_version}:allowance]`, src_allowance.toString()
     );
     if (src_allowance.isZero()) {
         alert(
-            `Old allowance is zero; approve allowance! ` +
-            `Did your allowance transaction actually get confirmed? ` +
-            `Wait a little bit and then retry.`,
-            Alert.warning, { after: $execute.parent('div')[0] }
+            `No allowance; did your allowance transaction confirm?`,
+            Alert.warning, { after: $migrate.parent('div')[0] }
         );
         return;
     }
+    //
+    // Migrate tokens:
+    //
+    let tx: Transaction | undefined;
+    const reset = $migrate.ing();
     Alerts.hide();
     try {
-        await tgt_xpower.migrate(src_balance);
-        alert(
-            `Your old balance has successfully been migrated! ;)`,
-            Alert.success, { after: $execute.parent('div')[0], id: 'success' }
-        );
-        return;
+        src_xpower.on('Transfer', <OnTransfer>((
+            from, to, amount, ev
+        ) => {
+            if (ev.transactionHash !== tx?.hash) {
+                return;
+            }
+            alert(
+                `Old ${Tokenizer.xify(token)} balance has been migrated! ;)`,
+                Alert.success, { after: $migrate.parent('div')[0], id: 'success' }
+            );
+            reset();
+        }));
+        const index = await tgt_xpower.indexOf(src_xpower.address);
+        tx = await tgt_xpower.migrate(src_balance, [index]);
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
                 ex.message = `${ex.message} [${ex.data.message}]`;
             }
             alert(ex.message, Alert.warning, {
-                after: $execute.parent('div')[0]
+                after: $migrate.parent('div')[0]
             });
         }
         console.error(ex);
+        reset();
     }
+}
+async function context({ $el: $approve }: {
+    $el: JQuery<HTMLElement>
+}) {
+    const address = await Blockchain.selectedAddress;
+    if (!address) {
+        throw new Error('missing selected-address');
+    }
+    const src_version = $approve.data('source');
+    if (!src_version) {
+        throw new Error('missing data-source');
+    }
+    const tgt_version = $approve.data('target');
+    if (!tgt_version) {
+        throw new Error('missing data-target');
+    }
+    return { address, src_version, tgt_version };
+}
+async function contracts({
+    token, src_version, tgt_version
+}: {
+    token: Token, src_version: Version, tgt_version: Version
+}) {
+    let src_xpower: Contract | undefined;
+    try {
+        src_xpower = await XPowerMoeFactory({
+            token, version: src_version
+        });
+        console.debug(
+            `[${src_version}:src_xpower]`, src_xpower.address
+        );
+    } catch (ex) {
+        console.error(ex);
+    }
+    let tgt_xpower: Contract | undefined;
+    try {
+        tgt_xpower = await XPowerMoeFactory({
+            token, version: tgt_version
+        });
+        console.debug(
+            `[${tgt_version}:tgt_xpower]`, tgt_xpower.address
+        );
+    } catch (ex) {
+        console.error(ex);
+    }
+    return {
+        src_xpower,
+        tgt_xpower,
+    };
 }

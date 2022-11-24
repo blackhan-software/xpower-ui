@@ -1,15 +1,25 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import './nft-burn.scss';
 
-import { BigNumber } from 'ethers';
+import { BigNumber, Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { XPowerNftFactory } from '../../source/contract';
+import { OnTransferBatch, XPowerNftFactory } from '../../source/contract';
 import { Alert, alert, Alerts, x40 } from '../../source/functions';
 import { Nft, NftLevels, Token } from '../../source/redux/types';
+import { Version } from '../../source/types';
 import { Years } from '../../source/years';
 
+Blockchain.onConnect(function enableBurnButton() {
+    const $burn_nft = $('button.burn-empty-nft').filter((i, el) => {
+        const source = new RegExp($(el).data('source'));
+        return 'v3a'.match(source) !== null;
+    });
+    $burn_nft.prop('disabled', false);
+    $burn_nft.parents('form').show();
+    $burn_nft.parents('form').prev('h2').show();
+});
 $('button.burn-empty-nft').on('click', async function burnEmpty(e) {
-    const $burn = $(e.target);
+    const $burn = $(e.currentTarget);
     if ($burn.hasClass('thor')) {
         await burn(Token.THOR, { $burn });
     }
@@ -23,20 +33,15 @@ $('button.burn-empty-nft').on('click', async function burnEmpty(e) {
 async function burn(token: Token, { $burn }: {
     $burn: JQuery<HTMLElement>
 }) {
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
-    }
-    const src_version = $burn.data('source');
-    if (!src_version) {
-        throw new Error('missing data-source');
-    }
-    const src_xpower = await XPowerNftFactory({
-        token, version: src_version
+    const { address, src_version } = await context({
+        $el: $burn
     });
-    console.debug(
-        `[${src_version}:contract]`, src_xpower.address
-    );
+    const { nft_source } = await contracts({
+        token, src_version
+    });
+    //
+    // Check balances:
+    //
     const ids = Nft.coreIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels())
@@ -44,25 +49,37 @@ async function burn(token: Token, { $burn }: {
     const accounts = ids.map(() => {
         return x40(address);
     });
-    const v3a_balances: BigNumber[] = await src_xpower.balanceOfBatch(
+    const src_balances: BigNumber[] = await nft_source.balanceOfBatch(
         accounts, ids
     );
     console.debug(
-        `[${src_version}:balances]`, v3a_balances.map((b) => b.toString())
+        `[${src_version}:balances]`, src_balances.map((b) => b.toString())
     );
-    const zz = filter(ids, v3a_balances, {
+    const zz = filter(ids, src_balances, {
         zero: true
     });
+    //
+    // Burn tokens:
+    //
+    let tx: Transaction | undefined;
+    const reset = $burn.ing();
     Alerts.hide();
     try {
-        await src_xpower.burnBatch(
+        nft_source.on('TransferBatch', <OnTransferBatch>((
+            operator, from, to, ids, values, ev
+        ) => {
+            if (ev.transactionHash !== tx?.hash) {
+                return;
+            }
+            alert(
+                `Your old empty NFTs have been burned! ;)`,
+                Alert.success, { id: 'success', after: $burn.parent('div')[0] }
+            );
+            reset();
+        }));
+        tx = await nft_source.burnBatch(
             x40(address), zz.ids, zz.balances
         );
-        alert(
-            `Your old empty NFTs have successfully been burned! ;)`,
-            Alert.success, { id: 'success', after: $burn.parent('div')[0] }
-        );
-        return;
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
@@ -73,6 +90,7 @@ async function burn(token: Token, { $burn }: {
             });
         }
         console.error(ex);
+        reset();
     }
 }
 function filter<I, B extends BigNumber>(
@@ -87,4 +105,32 @@ function filter<I, B extends BigNumber>(
         }
     }
     return { ids: ids_nz, balances: balances_nz };
+}
+async function context({ $el: $approve }: {
+    $el: JQuery<HTMLElement>
+}) {
+    const address = await Blockchain.selectedAddress;
+    if (!address) {
+        throw new Error('missing selected-address');
+    }
+    const src_version = $approve.data('source');
+    if (!src_version) {
+        throw new Error('missing data-source');
+    }
+    return { address, src_version };
+}
+async function contracts({
+    token, src_version
+}: {
+    token: Token, src_version: Version
+}) {
+    const nft_source = await XPowerNftFactory({
+        token, version: src_version
+    });
+    console.debug(
+        `[${src_version}:contract]`, nft_source.address
+    );
+    return {
+        nft_source,
+    };
 }

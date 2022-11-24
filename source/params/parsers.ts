@@ -59,21 +59,34 @@ export function speed(params: URLSearchParams): number {
 export function token(params: URLSearchParams): Token {
     return Tokenizer.token(params.get('token'));
 }
-export function version(params: URLSearchParams): Version {
-    switch (params.get('version')) {
-        case 'v2a':
-            return 'v2a';
-        case 'v3a':
-            return 'v3a';
-        case 'v3b':
-            return 'v3b';
-        case 'v4a':
-            return 'v4a';
-        case 'v5a':
-            return 'v5a';
-        // case 'v5b':
-        //     return 'v5b';
-        default:
-            return 'v5a';
+export function version(
+    params: URLSearchParams, value?: string | null, fallback = Version.v5c
+): Version {
+    if (value === undefined) {
+        value = params.get('version');
     }
+    switch (value) {
+        case 'v2a':
+            return Version.v2a;
+        case 'v3a':
+            return Version.v3a;
+        case 'v3b':
+            return Version.v3b;
+        case 'v4a':
+            return Version.v4a;
+        case 'v5a':
+            return Version.v5a;
+        case 'v5b':
+            return Version.v5b;
+        case 'v5c':
+            return Version.v5c;
+        default:
+            return fallback;
+    }
+}
+export function versionSource(params: URLSearchParams): Version {
+    return version(params, params.get('version-source'), Version.v5a);
+}
+export function versionTarget(params: URLSearchParams): Version {
+    return version(params, params.get('version-target'));
 }

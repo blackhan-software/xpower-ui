@@ -1,0 +1,23 @@
+div#version-select-wrap {
+    select#version-select:hover:not([disabled]) {
+        cursor: pointer;
+    }
+    select#version-select {
+        border-radius: 4px 0 0 4px;
+        font-size: smaller;
+        height: 38px;
+        text-align: center;
+        width: calc(100% - 42px);
+    }
+    .info:not(.loading) {
+        .spinner {
+            display: none;
+        }
+    }
+    .info.loading {
+        .bi-info-circle-fill {
+            display: none;
+        }
+    }
+    width: 100%;
+}

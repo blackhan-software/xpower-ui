@@ -3,23 +3,36 @@
 @import "../connector/connector.scss";
 @import "../footer/footer.scss";
 
-content > h2 {
+content>h1 img {
+    border-radius: 12px;
+    border: 1px solid var(--xp-powered);
+}
+content>h2 {
     background-color: #24292d;
     border-radius: 4px;
     font-size: 20px;
     font-weight: bold;
     padding: 0.5em;
 }
-content > h2::before, h2::before {
+content>h2 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+content>h2::before, h2::before {
     content: '> '
 }
-content > .header-anchor, .header-anchor {
+content>.header-anchor, .header-anchor {
     color: var(--xp-powered, yellow);
     float: right;
     opacity: 5%;
     text-decoration: none;
+    text-shadow: -1px -1px 2px var(--xp-dimgray);
 }
-content > .header-anchor:hover, .header-anchor:hover {
+content>.header-anchor:hover, .header-anchor:hover {
     color: var(--xp-powered, yellow);
     opacity: 100%;
+}
+content+footer {
+    padding-top: 0.5em;
 }

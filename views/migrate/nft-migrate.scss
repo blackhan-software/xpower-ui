@@ -1,7 +1,25 @@
-form.unstake-ppt {
-  div.unstake-ppt {
-    button.unstake-ppt {
+form.unstake-old {
+  div.unstake-old {
+    button.unstake-old {
+      text-align: center;
       width: calc(100% - 42px);
+    }
+    .info > svg {
+      position: relative;
+      top: -1px;
+    }
+    margin-bottom: 0.5em;
+    width: 100%;
+  }
+}
+form.migrate-old {
+  div.migrate-old {
+    button.approve-old {
+      text-align: center;
+      width: calc(50% - 21px);
+    }
+    button.migrate-old {
+      width: calc(50% - 21px);
       text-align: center;
     }
     .info > svg {
@@ -12,10 +30,14 @@ form.unstake-ppt {
     width: 100%;
   }
 }
-form.allowance-nft {
-  div.approve-allowance-nft {
-    button.approve-allowance-nft {
-      width: calc(100% - 42px);
+form.restake-new {
+  div.restake-new {
+    button.approve-new {
+      text-align: center;
+      width: calc(50% - 21px);
+    }
+    button.restake-new {
+      width: calc(50% - 21px);
       text-align: center;
     }
     .info > svg {
@@ -26,17 +48,6 @@ form.allowance-nft {
     width: 100%;
   }
 }
-form.migration-nft {
-  div.execute-migration-nft {
-    button.execute-migration-nft {
-      text-align: center;
-      width: calc(100% - 42px);
-    }
-    .info > svg {
-      position: relative;
-      top: -1px;
-    }
-    margin-bottom: 0.5em;
-    width: 100%;
-  }
+form.restake-new {
+  display: none;
 }

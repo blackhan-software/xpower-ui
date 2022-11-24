@@ -1,6 +1,7 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import { Dispatch, MiddlewareAPI } from '@reduxjs/toolkit';
 import { HashManager, IntervalManager } from '.';
+import { address as addressOf } from '../contract/address';
 import { alert, Alert, Alerts } from '../functions';
 import { Miner } from '../miner';
 import { ROParams } from '../params';
@@ -25,9 +26,12 @@ export function MiningManager(
         const xtoken = Tokenizer.xify(token);
         let miner = MiningManager._miner[xtoken];
         if (miner === undefined) {
+            const contract = BigInt(addressOf({
+                infix: 'MOE', token: xtoken
+            }));
             const speed = miningSpeedBy(api.getState(), xtoken);
             miner = MiningManager._miner[xtoken] = new Miner(
-                xtoken, address, speed, ROParams.level.min
+                xtoken, contract, address, speed, ROParams.level.min
             );
         }
         return miner;

@@ -1,65 +1,73 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import './nft-migrate.scss';
 
-import { BigNumber } from 'ethers';
+import { BigNumber, Contract, Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { PptTreasuryFactory, XPowerNftFactory, XPowerPptFactory } from '../../source/contract';
+import { OnApprovalForAll, OnStakeBatch, OnTransferBatch, OnUnstakeBatch, PptTreasuryFactory, XPowerNftFactory, XPowerPptFactory } from '../../source/contract';
 import { Alert, alert, Alerts, x40 } from '../../source/functions';
 import { Nft, NftLevels, Token } from '../../source/redux/types';
+import { Tokenizer } from '../../source/token';
+import { Version } from '../../source/types';
 import { Years } from '../../source/years';
 
-Blockchain.onConnect(function enableAllowanceButton() {
-    const $approve_nft = $('.approve-allowance-nft').filter((i, el) => {
+Blockchain.onConnect(function enableUnstake() {
+    const $unstake_ppt = $('.unstake-old').filter((i, el) => {
+        const source = new RegExp($(el).data('source'));
+        return 'v2a|v3a|v3b'.match(source) === null;
+    });
+    $unstake_ppt.prop('disabled', false);
+});
+Blockchain.onConnect(function enableAllowance() {
+    const $approve_old = $('.approve-old').filter((i, el) => {
         const source = new RegExp($(el).data('source'));
         return 'v2a|v3a|v3b'.match(source) !== null;
     });
-    $approve_nft.prop('disabled', false);
-    const $unstake_ppt = $('.unstake-ppt');
-    $unstake_ppt.prop('disabled', false);
+    $approve_old.prop('disabled', false);
 });
-$('button.unstake-ppt').on('click', async function unstakeTokens(e) {
-    const $unstake = $(e.target);
-    const $unstake_ppt = $unstake.parents('form.unstake-ppt');
-    const $allowance_nft = $unstake_ppt.next('form.allowance-nft');
+$('button.unstake-old').on('click', async function unstakeOldNfts(e) {
+    const $unstake = $(e.currentTarget);
+    const $unstake_ppt = $unstake.parents('form.unstake-old');
+    const $migrate_nft = $unstake_ppt.next('form.migrate-old');
     if ($unstake.hasClass('thor')) {
-        await nftUnstake(Token.THOR, {
-            $unstake, $approve: $allowance_nft.find(
-                '.approve-allowance-nft.thor'
+        await nftUnstakeOld(Token.THOR, {
+            $unstake, $approve: $migrate_nft.find(
+                '.approve-old.thor'
             )
         });
     }
     if ($unstake.hasClass('loki')) {
-        await nftUnstake(Token.LOKI, {
-            $unstake, $approve: $allowance_nft.find(
-                '.approve-allowance-nft.loki'
+        await nftUnstakeOld(Token.LOKI, {
+            $unstake, $approve: $migrate_nft.find(
+                '.approve-old.loki'
             )
         });
     }
     if ($unstake.hasClass('odin')) {
-        await nftUnstake(Token.ODIN, {
-            $unstake, $approve: $allowance_nft.find(
-                '.approve-allowance-nft.odin'
+        await nftUnstakeOld(Token.ODIN, {
+            $unstake, $approve: $migrate_nft.find(
+                '.approve-old.odin'
             )
         });
     }
 });
-async function nftUnstake(token: Token, { $unstake, $approve }: {
+async function nftUnstakeOld(token: Token, { $unstake, $approve }: {
     $unstake: JQuery<HTMLElement>, $approve: JQuery<HTMLElement>
 }) {
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
-    }
-    const src_version = $unstake.data('source');
-    if (!src_version) {
-        throw new Error('missing data-source');
-    }
-    const src_xpower = await XPowerPptFactory({
-        token, version: src_version
+    const { address, src_version, tgt_version } = await context({
+        $el: $unstake
     });
-    console.debug(
-        `[${src_version}:contract]`, src_xpower.address
-    );
+    const { ppt_source, nty_source } = await contracts({
+        token, src_version, tgt_version
+    });
+    if (!ppt_source) {
+        throw new Error('undefined ppt_source');
+    }
+    if (!nty_source) {
+        throw new Error('undefined nty_source');
+    }
+    //
+    // Check balances:
+    //
     const ids = Nft.coreIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels())
@@ -67,7 +75,7 @@ async function nftUnstake(token: Token, { $unstake, $approve }: {
     const accounts = ids.map(() => {
         return x40(address);
     });
-    const src_balances: BigNumber[] = await src_xpower.balanceOfBatch(
+    const src_balances: BigNumber[] = await ppt_source.balanceOfBatch(
         accounts, ids
     );
     console.debug(
@@ -76,30 +84,38 @@ async function nftUnstake(token: Token, { $unstake, $approve }: {
     const src_zero = src_balances.reduce((acc, b) => acc && b.isZero(), true);
     if (src_zero) {
         alert(
-            `NFTs have already been unstaked; you can continue now.`,
+            `Old NFTs have already been unstaked; you can continue now.`,
             Alert.info, { after: $unstake.parent('div')[0] }
         );
         $approve.prop('disabled', false);
         return;
     }
-    const src_treasury = await PptTreasuryFactory({
-        token, version: src_version
-    });
-    console.debug(
-        `[${src_version}:contract]`, src_treasury.address
-    );
+    //
+    // Unstake tokens:
+    //
+    let tx: Transaction | undefined;
+    const reset = $unstake.ing();
     Alerts.hide();
     try {
-        const nz = filter(ids, src_balances, { zero: false });
-        await src_treasury.unstakeBatch(
+        nty_source.on('UnstakeBatch', <OnUnstakeBatch>((
+            from, nftIds, amounts, ev
+        ) => {
+            if (ev.transactionHash !== tx?.hash) {
+                return;
+            }
+            alert(
+                `Old NFTs have been unstaked; you can continue now.`,
+                Alert.success, { after: $unstake.parent('div')[0] }
+            );
+            $approve.prop('disabled', false);
+            reset();
+        }));
+        const nz = filter(ids, src_balances, {
+            zero: false
+        });
+        tx = await nty_source.unstakeBatch(
             x40(address), nz.ids, nz.balances
         );
-        alert(
-            `NFTs have successfully been unstaked; you can continue now.`,
-            Alert.success, { after: $unstake.parent('div')[0] }
-        );
-        $approve.prop('disabled', false);
-        return;
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
@@ -110,63 +126,54 @@ async function nftUnstake(token: Token, { $unstake, $approve }: {
             });
         }
         console.error(ex);
+        reset();
     }
 }
-$('button.approve-allowance-nft').on('click', async function approveTokens(e) {
-    const $approve = $(e.target);
-    const $allowance_nft = $approve.parents('form.allowance-nft');
-    const $migration_nft = $allowance_nft.next('form.migration-nft');
+$('button.approve-old').on('click', function approveOldNfts(e) {
+    const $approve = $(e.currentTarget);
+    const $migrate_nft = $approve.parents('form.migrate-old');
     if ($approve.hasClass('thor')) {
-        await nftApprove(Token.THOR, {
-            $approve, $execute: $migration_nft.find(
-                '.execute-migration-nft.thor'
+        nftApproveOld(Token.THOR, {
+            $approve, $migrate: $migrate_nft.find(
+                '.migrate-old.thor'
             )
         });
     }
     if ($approve.hasClass('loki')) {
-        await nftApprove(Token.LOKI, {
-            $approve, $execute: $migration_nft.find(
-                '.execute-migration-nft.loki'
+        nftApproveOld(Token.LOKI, {
+            $approve, $migrate: $migrate_nft.find(
+                '.migrate-old.loki'
             )
         });
     }
     if ($approve.hasClass('odin')) {
-        await nftApprove(Token.ODIN, {
-            $approve, $execute: $migration_nft.find(
-                '.execute-migration-nft.odin'
+        nftApproveOld(Token.ODIN, {
+            $approve, $migrate: $migrate_nft.find(
+                '.migrate-old.odin'
             )
         });
     }
 });
-async function nftApprove(token: Token, { $approve, $execute }: {
-    $approve: JQuery<HTMLElement>, $execute: JQuery<HTMLElement>
+async function nftApproveOld(token: Token, { $approve, $migrate }: {
+    $approve: JQuery<HTMLElement>, $migrate: JQuery<HTMLElement>
 }) {
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
-    }
-    const src_version = $approve.data('source');
-    if (!src_version) {
-        throw new Error('missing data-source');
-    }
-    const src_xpower = await XPowerNftFactory({
-        token, version: src_version
+    const { address, src_version, tgt_version } = await context({
+        $el: $approve
     });
-    console.debug(
-        `[${src_version}:contract]`, src_xpower.address
-    );
-    const tgt_version = $approve.data('target');
-    if (!tgt_version) {
-        throw new Error('missing data-target');
-    }
-    const tgt_xpower = await XPowerNftFactory({
-        token, version: tgt_version
+    const { nft_source, nft_target } = await contracts({
+        token, src_version, tgt_version
     });
-    console.debug(
-        `[${tgt_version}:contract]`, tgt_xpower.address
-    );
-    const src_approved = await src_xpower.isApprovedForAll(
-        x40(address), tgt_xpower.address
+    if (!nft_source) {
+        throw new Error('undefined nft_source');
+    }
+    if (!nft_target) {
+        throw new Error('undefined nft_target');
+    }
+    //
+    // Check approval:
+    //
+    const src_approved = await nft_source.isApprovedForAll(
+        x40(address), nft_target.address
     );
     console.debug(
         `[${src_version}:approved]`, src_approved
@@ -178,32 +185,46 @@ async function nftApprove(token: Token, { $approve, $execute }: {
     const accounts = ids.map(() => {
         return x40(address);
     });
-    const src_balances: BigNumber[] = await src_xpower.balanceOfBatch(
+    const src_balances: BigNumber[] = await nft_source.balanceOfBatch(
         accounts, ids
     );
     console.debug(
         `[${src_version}:balances]`, src_balances.map((b) => b.toString())
     );
-    const src_zero = src_balances.reduce((acc, b) => acc && b.isZero(), true);
+    const src_zero = src_balances.reduce(
+        (acc, b) => acc && b.isZero(), true
+    );
     if (src_approved || src_zero) {
         alert(
-            `NFTs have already been approved for; you can migrate now.`,
+            `Old NFTs have already been approved for; you can migrate now.`,
             Alert.info, { after: $approve.parent('div')[0] }
         );
-        $execute.prop('disabled', false);
+        $migrate.prop('disabled', false);
         return;
     }
+    //
+    // Approve tokens:
+    //
+    let tx: Transaction | undefined;
+    const reset = $approve.ing();
     Alerts.hide();
     try {
-        await src_xpower.setApprovalForAll(
-            tgt_xpower.address, true
+        nft_source.on('ApprovalForAll', <OnApprovalForAll>((
+            address, operator, approved, ev
+        ) => {
+            if (ev.transactionHash !== tx?.hash) {
+                return;
+            }
+            alert(
+                `Old NFTs have been approved for; you can migrate now.`,
+                Alert.success, { after: $approve.parent('div')[0] }
+            );
+            $migrate.prop('disabled', false);
+            reset();
+        }));
+        tx = await nft_source.setApprovalForAll(
+            nft_target.address, true
         );
-        alert(
-            `NFTs have successfully been approved for; you can migrate now.`,
-            Alert.success, { after: $approve.parent('div')[0] }
-        );
-        $execute.prop('disabled', false);
-        return;
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
@@ -214,46 +235,174 @@ async function nftApprove(token: Token, { $approve, $execute }: {
             });
         }
         console.error(ex);
+        reset();
     }
 }
-$('button.execute-migration-nft').on('click', async function migrateTokens(e) {
-    const $execute = $(e.target);
-    if ($execute.hasClass('thor')) {
-        await nftMigrate(Token.THOR, { $execute });
+$('button.migrate-old').on('click', async function migrateOldNfts(e) {
+    const $migrate = $(e.currentTarget);
+    const $migrate_nft = $migrate.parents('form.migrate-old');
+    const $restake_nft = $migrate_nft.next('form.restake-new');
+    if ($migrate.hasClass('thor')) {
+        await nftMigrateOld(Token.THOR, {
+            $migrate, $approve: $restake_nft.find(
+                '.approve-new.thor'
+            )
+        });
     }
-    if ($execute.hasClass('loki')) {
-        await nftMigrate(Token.LOKI, { $execute });
+    if ($migrate.hasClass('loki')) {
+        await nftMigrateOld(Token.LOKI, {
+            $migrate, $approve: $restake_nft.find(
+                '.approve-new.loki'
+            )
+        });
     }
-    if ($execute.hasClass('odin')) {
-        await nftMigrate(Token.ODIN, { $execute });
+    if ($migrate.hasClass('odin')) {
+        await nftMigrateOld(Token.ODIN, {
+            $migrate, $approve: $restake_nft.find(
+                '.approve-new.odin'
+            )
+        });
     }
 });
-async function nftMigrate(token: Token, { $execute }: {
-    $execute: JQuery<HTMLElement>
+async function nftMigrateOld(token: Token, { $migrate, $approve }: {
+    $migrate: JQuery<HTMLElement>, $approve: JQuery<HTMLElement>
 }) {
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
-    }
-    const src_version = $execute.data('source');
-    if (!src_version) {
-        throw new Error('missing data-source');
-    }
-    const src_xpower = await XPowerNftFactory({
-        token, version: src_version
+    const { address, src_version, tgt_version } = await context({
+        $el: $migrate
     });
-    console.debug(
-        `[${src_version}:contract]`, src_xpower.address
+    const { nft_source, nft_target } = await contracts({
+        token, src_version, tgt_version
+    });
+    if (!nft_source) {
+        throw new Error('undefined nft_source');
+    }
+    if (!nft_target) {
+        throw new Error('undefined nft_target');
+    }
+    //
+    // Check balances:
+    //
+    const ids = Nft.coreIds({
+        issues: Array.from(Years()),
+        levels: Array.from(NftLevels())
+    });
+    const accounts = ids.map(() => {
+        return x40(address);
+    });
+    const src_balances: BigNumber[] = await nft_source.balanceOfBatch(
+        accounts, ids
     );
-    const tgt_version = $execute.data('target');
-    if (!tgt_version) {
-        throw new Error('missing data-target');
-    }
-    const tgt_xpower = await XPowerNftFactory({
-        token, version: tgt_version
-    });
     console.debug(
-        `[${tgt_version}:contract]`, tgt_xpower.address
+        `[${src_version}:balances]`, src_balances.map((b) => b.toString())
+    );
+    const src_zero = src_balances.reduce(
+        (acc, b) => acc && b.isZero(), true
+    );
+    if (src_zero) {
+        alert(
+            `Old NFT balances are zero; nothing to migrate here.`,
+            Alert.warning, { after: $migrate.parent('div')[0] }
+        );
+        $approve.prop('disabled', false);
+        return;
+    }
+    //
+    // Check approval:
+    //
+    const src_approved = await nft_source.isApprovedForAll(
+        x40(address), nft_target.address
+    );
+    if (src_approved === false) {
+        alert(
+            `No approval; did your approval transaction confirm?`,
+            Alert.warning, { after: $migrate.parent('div')[0] }
+        );
+        return;
+    }
+    //
+    // Migrate tokens:
+    //
+    let tx: Transaction | undefined;
+    const reset = $migrate.ing();
+    Alerts.hide();
+    try {
+        nft_target.on('TransferBatch', <OnTransferBatch>((
+            operator, from, to, ids, values, ev
+        ) => {
+            if (ev.transactionHash !== tx?.hash) {
+                return;
+            }
+            alert(
+                `Old ${Tokenizer.xify(token)} NFTs have been migrated! ;)`,
+                Alert.success, { id: 'success', after: $migrate.parent('div')[0] }
+            );
+            $approve.prop('disabled', false);
+            reset();
+        }));
+        const nz = filter(ids, src_balances, { zero: false });
+        const index = await nft_target.indexOf(nft_source.address);
+        tx = await nft_target.migrateBatch(nz.ids, nz.balances, [index]);
+    } catch (ex: any) {
+        if (ex.message) {
+            if (ex.data && ex.data.message) {
+                ex.message = `${ex.message} [${ex.data.message}]`;
+            }
+            alert(ex.message, Alert.warning, {
+                after: $migrate.parent('div')[0]
+            });
+        }
+        console.error(ex);
+        reset();
+    }
+}
+$('button.approve-new').on('click', async function approveNewNfts(e) {
+    const $approve = $(e.currentTarget);
+    const $restake_nft = $approve.parents('form.restake-new');
+    if ($approve.hasClass('thor')) {
+        await nftApproveNew(Token.THOR, {
+            $approve, $restake: $restake_nft.find(
+                '.restake-new.thor'
+            )
+        });
+    }
+    if ($approve.hasClass('loki')) {
+        await nftApproveNew(Token.LOKI, {
+            $approve, $restake: $restake_nft.find(
+                '.restake-new.loki'
+            )
+        });
+    }
+    if ($approve.hasClass('odin')) {
+        await nftApproveNew(Token.ODIN, {
+            $approve, $restake: $restake_nft.find(
+                '.restake-new.odin'
+            )
+        });
+    }
+});
+async function nftApproveNew(token: Token, { $approve, $restake }: {
+    $approve: JQuery<HTMLElement>, $restake: JQuery<HTMLElement>
+}) {
+    const { address, src_version, tgt_version } = await context({
+        $el: $approve
+    });
+    const { nft_target, nty_target } = await contracts({
+        token, src_version, tgt_version
+    });
+    if (!nft_target) {
+        throw new Error('undefined nft_target');
+    }
+    if (!nty_target) {
+        throw new Error('undefined nty_target');
+    }
+    //
+    // Check approval:
+    //
+    const tgt_approved = await nft_target.isApprovedForAll(
+        x40(address), nty_target.address
+    );
+    console.debug(
+        `[${tgt_version}:approved]`, tgt_approved
     );
     const ids = Nft.coreIds({
         issues: Array.from(Years()),
@@ -262,51 +411,148 @@ async function nftMigrate(token: Token, { $execute }: {
     const accounts = ids.map(() => {
         return x40(address);
     });
-    const src_balances: BigNumber[] = await src_xpower.balanceOfBatch(
+    const tgt_balances: BigNumber[] = await nft_target.balanceOfBatch(
         accounts, ids
     );
     console.debug(
-        `[${src_version}:balances]`, src_balances.map((b) => b.toString())
+        `[${tgt_version}:balances]`, tgt_balances.map((b) => b.toString())
     );
-    const src_zero = src_balances.reduce((acc, b) => acc && b.isZero(), true);
-    if (src_zero) {
+    const tgt_zero = tgt_balances.reduce(
+        (acc, b) => acc && b.isZero(), true
+    );
+    if (tgt_approved || tgt_zero) {
         alert(
-            `Your old NFT balance is zero; nothing to migrate here.`,
-            Alert.warning, { after: $execute.parent('div')[0] }
+            `New NFTs have already been approved for; you can restake now.`,
+            Alert.info, { after: $approve.parent('div')[0] }
         );
+        $restake.prop('disabled', false);
         return;
     }
-    const src_approved = await src_xpower.isApprovedForAll(
-        x40(address), tgt_xpower.address
-    );
-    if (src_approved === false) {
-        alert(
-            `Old NFTs have not been approved for! ` +
-            `Did your approval transaction actually get confirmed? ` +
-            `Wait a little bit and then retry.`,
-            Alert.warning, { after: $execute.parent('div')[0] }
-        );
-        return;
-    }
-    const nz = filter(ids, src_balances, { zero: false });
+    //
+    // Approve tokens:
+    //
+    let tx: Transaction | undefined;
+    const reset = $approve.ing();
     Alerts.hide();
     try {
-        await tgt_xpower.migrateBatch(nz.ids, nz.balances);
-        alert(
-            `Your old NFTs have successfully been migrated! ;)`,
-            Alert.success, { id: 'success', after: $execute.parent('div')[0] }
+        nft_target.on('ApprovalForAll', <OnApprovalForAll>((
+            address, operator, approved, ev
+        ) => {
+            if (ev.transactionHash !== tx?.hash) {
+                return;
+            }
+            alert(
+                `New NFTs have been approved for; you can restake now.`,
+                Alert.success, { after: $approve.parent('div')[0] }
+            );
+            $restake.prop('disabled', false);
+            reset();
+        }));
+        tx = await nft_target.setApprovalForAll(
+            nty_target.address, true
         );
-        return;
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
                 ex.message = `${ex.message} [${ex.data.message}]`;
             }
             alert(ex.message, Alert.warning, {
-                after: $execute.parent('div')[0]
+                after: $approve.parent('div')[0]
             });
         }
         console.error(ex);
+        reset();
+    }
+}
+$('button.restake-new').on('click', async function restakeNewNfts(e) {
+    const $restake = $(e.currentTarget);
+    if ($restake.hasClass('thor')) {
+        await nftRestakeNew(Token.THOR, { $restake });
+    }
+    if ($restake.hasClass('loki')) {
+        await nftRestakeNew(Token.LOKI, { $restake });
+    }
+    if ($restake.hasClass('odin')) {
+        await nftRestakeNew(Token.ODIN, { $restake });
+    }
+});
+async function nftRestakeNew(token: Token, { $restake }: {
+    $restake: JQuery<HTMLElement>
+}) {
+    const { address, src_version, tgt_version } = await context({
+        $el: $restake
+    });
+    const { nft_target, nty_target } = await contracts({
+        token, src_version, tgt_version
+    });
+    if (!nft_target) {
+        throw new Error('undefined nft_target');
+    }
+    if (!nty_target) {
+        throw new Error('undefined nty_target');
+    }
+    //
+    // Check balances:
+    //
+    const ids = Nft.coreIds({
+        issues: Array.from(Years()),
+        levels: Array.from(NftLevels())
+    });
+    const accounts = ids.map(() => {
+        return x40(address);
+    });
+    const tgt_balances: BigNumber[] = await nft_target.balanceOfBatch(
+        accounts, ids
+    );
+    console.debug(
+        `[${tgt_version}:balances]`, tgt_balances.map((b) => b.toString())
+    );
+    const tgt_zero = tgt_balances.reduce(
+        (acc, b) => acc && b.isZero(), true
+    );
+    if (tgt_zero) {
+        alert(
+            `New NFT balances are zero; nothing to restake here.`,
+            Alert.warning, { after: $restake.parent('div')[0] }
+        );
+        return;
+    }
+    //
+    // Restake tokens:
+    //
+    let tx: Transaction | undefined;
+    const reset = $restake.ing();
+    Alerts.hide();
+    try {
+        nty_target.on('StakeBatch', <OnStakeBatch>((
+            from, nftIds, amounts, ev
+        ) => {
+            if (ev.transactionHash !== tx?.hash) {
+                return;
+            }
+            alert(
+                `New NFTs have been restaked; you are done now. ;)`,
+                Alert.success, { after: $restake.parent('div')[0] }
+            );
+            reset();
+        }));
+        const nz = filter(ids, tgt_balances, {
+            zero: false
+        });
+        tx = await nty_target.stakeBatch(
+            x40(address), nz.ids, nz.balances
+        );
+    } catch (ex: any) {
+        if (ex.message) {
+            if (ex.data && ex.data.message) {
+                ex.message = `${ex.message} [${ex.data.message}]`;
+            }
+            alert(ex.message, Alert.warning, {
+                after: $restake.parent('div')[0]
+            });
+        }
+        console.error(ex);
+        reset();
     }
 }
 function filter<I, B extends BigNumber>(
@@ -321,4 +567,97 @@ function filter<I, B extends BigNumber>(
         }
     }
     return { ids: ids_nz, balances: balances_nz };
+}
+async function context({ $el: $approve }: {
+    $el: JQuery<HTMLElement>
+}) {
+    const address = await Blockchain.selectedAddress;
+    if (!address) {
+        throw new Error('missing selected-address');
+    }
+    const src_version = $approve.data('source');
+    if (!src_version) {
+        throw new Error('missing data-source');
+    }
+    const tgt_version = $approve.data('target');
+    if (!tgt_version) {
+        throw new Error('missing data-target');
+    }
+    return { address, src_version, tgt_version };
+}
+async function contracts({
+    token, src_version, tgt_version
+}: {
+    token: Token, src_version: Version, tgt_version: Version
+}) {
+    let nft_source: Contract | undefined;
+    try {
+        nft_source = await XPowerNftFactory({
+            token, version: src_version
+        });
+        console.debug(
+            `[${src_version}:nft_source]`, nft_source.address
+        );
+    } catch (ex) {
+        console.error(ex);
+    }
+    let nft_target: Contract | undefined;
+    try {
+        nft_target = await XPowerNftFactory({
+            token, version: tgt_version
+        });
+        console.debug(
+            `[${tgt_version}:nft_target]`, nft_target.address
+        );
+    } catch (ex) {
+        console.error(ex);
+    }
+    let ppt_source: Contract | undefined;
+    try {
+        ppt_source = await XPowerPptFactory({
+            token, version: src_version
+        });
+        console.debug(
+            `[${src_version}:ppt_source]`, ppt_source.address
+        );
+    } catch (ex) {
+        console.error(ex);
+    }
+    let ppt_target: Contract | undefined;
+    try {
+        ppt_target = await XPowerPptFactory({
+            token, version: tgt_version
+        });
+        console.debug(
+            `[${tgt_version}:ppt_target]`, ppt_target.address
+        );
+    } catch (ex) {
+        console.error(ex);
+    }
+    let nty_source: Contract | undefined;
+    try {
+        nty_source = await PptTreasuryFactory({
+            token, version: src_version
+        });
+        console.debug(
+            `[${src_version}:nty_source]`, nty_source.address
+        );
+    } catch (ex) {
+        console.error(ex);
+    }
+    let nty_target: Contract | undefined;
+    try {
+        nty_target = await PptTreasuryFactory({
+            token, version: tgt_version
+        });
+        console.debug(
+            `[${tgt_version}:nty_target]`, nty_target.address
+        );
+    } catch (ex) {
+        console.error(ex);
+    }
+    return {
+        nft_source, ppt_source, nty_source,
+        nft_target, ppt_target, nty_target,
+    };
 }

@@ -4,14 +4,17 @@ import { ancestors, buffered } from '../functions';
 import { AppState } from '../redux/store';
 
 export const TooltipService = (
-    _: Store<AppState>
+    _?: Store<AppState>
 ) => {
     const { Tooltip } = global.bootstrap ?? {
         Tooltip: undefined
     };
-    Bus.on('refresh-tips', buffered((
+    Bus.on(
+        'refresh-tips', buffered(refresh)
+    );
+    function refresh(
         options: { force?: boolean } | undefined
-    ) => {
+    ) {
         const $tips = document.querySelectorAll<HTMLElement>(
             '[data-bs-toggle=tooltip]'
         );
@@ -38,7 +41,7 @@ export const TooltipService = (
                 });
             });
         }
-    }));
+    }
     function show(e: Event) {
         const $tip = $tooltip(e.target as HTMLElement | null);
         Tooltip.getInstance($tip)?.show();
@@ -54,5 +57,6 @@ export const TooltipService = (
         });
         return $tip ?? $target;
     }
+    return refresh;
 };
 export default TooltipService;

@@ -1,36 +1,11 @@
-//-
-//- [v5a]
-//-
-form#sov-integration
-  label.form-label
-    | APower Wallet Integration [v5a]
-  div.btn-group.add-sov.thor(role="group")
-    button.add-sov.thor.btn.btn-outline-warning(
-      type="button" data-target="v5a"
+form#sov-integrate
+  div.btn-group.add-sov(role="group" class="{{xtoken}}")
+    button.add-sov.btn.btn-outline-warning(
+      type="button" class="{{xtoken}}" data-target="{{VERSION_TGT}}"
     )
-      | Add aTHOR to Metamask <img class="float-end" height=20 width=20 src="{{THOR_SOV_IMAGE}}">
+      | <span>Add Token to Wallet</span><img height=20 width=20 src="{{{{xTOKEN}}_SOV_IMAGE_{{VERSION_TGT_CAPITALIZED}}}}">
     button.btn.btn-outline-warning.info(
       type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-      title="Add the new aTHOR token to Metamask"
-    )
-      include ../../public/images/pug/info-circle-fill.svg.pug
-  div.btn-group.add-sov.loki(role="group")
-    button.add-sov.loki.btn.btn-outline-warning(
-      type="button" data-target="v5a"
-    )
-      | Add aLOKI to Metamask <img class="float-end" height=20 width=20 src="{{LOKI_SOV_IMAGE}}">
-    button.btn.btn-outline-warning.info(
-      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-      title="Add the new aLOKI token to Metamask"
-    )
-      include ../../public/images/pug/info-circle-fill.svg.pug
-  div.btn-group.add-sov.odin(role="group")
-    button.add-sov.odin.btn.btn-outline-warning(
-      type="button" data-target="v5a"
-    )
-      | Add aODIN to Metamask <img class="float-end" height=20 width=20 src="{{ODIN_SOV_IMAGE}}">
-    button.btn.btn-outline-warning.info(
-      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-      title="Add the new aODIN token to Metamask"
+      title="Add the new {{aTOKEN}} token to your wallet"
     )
       include ../../public/images/pug/info-circle-fill.svg.pug

@@ -1,4 +1,5 @@
 import { Page, Pager, Token } from '../redux/types';
+import { Version } from '../types';
 import * as parsers from './parsers';
 
 export class RWParams {
@@ -37,6 +38,14 @@ export class RWParams {
     static set token(value: Token) {
         const search = this.search();
         search.set('token', value);
+        this.push({ search });
+    }
+    public static get versionSource() {
+        return parsers.versionSource(this.search());
+    }
+    public static set versionSource(value: Version) {
+        const search = this.search();
+        search.set('version-source', value);
         this.push({ search });
     }
     private static pathname(): string | null {

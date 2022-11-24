@@ -7,7 +7,7 @@ import { onAftWalletChanged, onTokenSwitch } from '../redux/observers';
 import { nftAmounts } from '../redux/reducers';
 import { aftWalletBy, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Address, Amount, MID_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftTokens, Token, TokenInfo } from '../redux/types';
+import { Address, Amount, MAX_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftTokens, Token, TokenInfo } from '../redux/types';
 import { Tokenizer } from '../token';
 import { MoeWallet, NftWallet, NftWalletMock } from '../wallet';
 import { Years } from '../years';
@@ -117,7 +117,7 @@ export const NftsUiService = (
         const allowance = await moe_wallet.allowance(
             address, nft_contract.address
         );
-        const approval = allowance > MID_UINT256
+        const approval = allowance === MAX_UINT256
             ? NftMinterApproval.approved
             : NftMinterApproval.unapproved;
         return {

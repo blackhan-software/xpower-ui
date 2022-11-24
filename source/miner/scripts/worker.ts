@@ -1,16 +1,12 @@
 /* eslint @typescript-eslint/no-var-requires: [off] */
 /* eslint @typescript-eslint/no-unused-vars: [off] */
 
-import { Interval, Level, Nonce, Token } from '../../redux/types';
-import { Address, Amount, BlockHash } from '../../redux/types';
 import { x40, x64, x64_plain } from '../../functions';
+import { Address, Amount, BlockHash, Interval, Level, Nonce, Token } from '../../redux/types';
 
-import { defaultAbiCoder as abi } from 'ethers/lib/utils';
-import { randomBytes } from 'ethers/lib/utils';
+import { defaultAbiCoder as abi, randomBytes } from 'ethers/lib/utils';
 import { Observable } from 'observable-fns';
-
-import { WorkerFunction } from 'threads/dist/types/worker';
-import { WorkerModule } from 'threads/dist/types/worker';
+import { WorkerFunction, WorkerModule } from 'threads/dist/types/worker';
 import { expose } from 'threads/worker';
 
 const keccak = require('js-keccak-tiny/dist/node-bundle');
@@ -24,9 +20,10 @@ export interface Miner extends Function {
 export type Context = {
     address: Address,
     block_hash: BlockHash,
-    callback?: (item: Item) => void,
+    contract: Address,
     interval: Interval,
-    token: Token,
+} & {
+    callback?: (item: Item) => void,
 };
 export type IWorker = WorkerModule<keyof {
     identifier: WorkerFunction;
@@ -45,9 +42,8 @@ expose({
         return worker_id;
     },
     async init(
-        token: Token, address: Address, level: Level, meta: {
-            id: number
-        }
+        token: Token, contract: Address, address: Address,
+        level: Level, meta: { id: number }
     ) {
         if (worker !== undefined) {
             throw new Error(`worker already initialized`);
@@ -55,7 +51,9 @@ expose({
             const { keccak256: hash } = await keccak();
             keccak256 = (a) => hash(a).toString('hex');
         }
-        worker = new Worker(token, address, level, meta);
+        worker = new Worker(
+            token, contract, address, level, meta
+        );
         worker_id = meta.id;
     },
     start(
@@ -97,13 +95,12 @@ expose({
 });
 class Worker {
     public constructor(
-        token: Token, address: Address, level: Level, meta: {
-            id: number
-        }
+        token: Token, contract: Address, address: Address,
+        level: Level, meta: { id: number }
     ) {
         this._amount = amount(token, level);
         this._context = {
-            address, block_hash: 0n, interval: interval(), token
+            address, block_hash: 0n, contract, interval: interval()
         };
         this._miner = miner(level);
         this._nonce = nonce(meta.id);
@@ -292,14 +289,14 @@ function abi_encoder(
 ) {
     const lazy_arrayify = arrayifier(level);
     return (
-        { token, address, block_hash, interval }: Context, nonce: Nonce
+        { contract, address, block_hash, interval }: Context, nonce: Nonce
     ) => {
         let value = abi_encoded[interval];
         if (value === undefined) {
             const template = abi.encode([
-                'string', 'address', 'uint256', 'bytes32', 'uint256'
+                'address', 'address', 'uint256', 'bytes32', 'uint256'
             ], [
-                token,
+                x40(contract),
                 x40(address),
                 interval,
                 x64(block_hash),

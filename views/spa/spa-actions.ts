@@ -259,10 +259,6 @@ export const nftsApprove = AppThunk('nfts/approve', async (args: {
     }
     const moe_wallet = new MoeWallet(address, token);
     const nft_wallet = new NftWallet(address, token);
-    const nft_contract = await nft_wallet.contract;
-    const old_allowance = await moe_wallet.allowance(
-        address, nft_contract.address
-    );
     const on_approval: OnApproval = (
         owner, spender, value, ev
     ) => {
@@ -277,8 +273,8 @@ export const nftsApprove = AppThunk('nfts/approve', async (args: {
         set_approval(NftMinterApproval.approving);
         moe_wallet.onApproval(on_approval);
         const nft_contract = await nft_wallet.contract;
-        tx = await moe_wallet.increaseAllowance(
-            nft_contract.address, MAX_UINT256 - old_allowance
+        tx = await moe_wallet.approve(
+            nft_contract.address, MAX_UINT256
         );
     } catch (ex) {
         set_approval(NftMinterApproval.error);

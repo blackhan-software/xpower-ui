@@ -1,7 +1,7 @@
-import { Address, Amount, BlockHash, Level, Nonce, Token } from '../redux/types';
-import { ModuleThread, spawn, Thread, Worker } from 'threads';
-import { IWorker, Item } from './scripts/worker';
 import { EventEmitter } from 'events';
+import { ModuleThread, spawn, Thread, Worker } from 'threads';
+import { Address, Amount, BlockHash, Level, Nonce, Token } from '../redux/types';
+import { Item, IWorker } from './scripts/worker';
 
 export type OnMined = ({ nonce, amount, worker }: {
     nonce: Nonce, amount: Amount, worker: number
@@ -13,6 +13,8 @@ export class Miner extends EventEmitter {
     public constructor(
         /** token to mine for */
         token: Token,
+        /** contract to mine on */
+        contract: Address,
         /** address to mine for */
         address: Address,
         /** speed to mine with */
@@ -21,10 +23,11 @@ export class Miner extends EventEmitter {
         level: Level = 1,
     ) {
         super();
-        this._token = token;
         this._address = address;
-        this._speed = speed;
+        this._contract = contract;
         this._level = level;
+        this._speed = speed;
+        this._token = token;
         this.setMaxListeners(20);
     }
     public get running(): boolean {
@@ -125,7 +128,9 @@ export class Miner extends EventEmitter {
             worker = new Worker('./scripts/worker.js');
         }
         const thread = await spawn<IWorker>(worker);
-        await thread.init(this.token, this.address, this.level, { id });
+        await thread.init(
+            this.token, this.contract, this.address, this.level, { id }
+        );
         return thread;
     }
     private async fire() {
@@ -134,6 +139,9 @@ export class Miner extends EventEmitter {
     }
     private get address() {
         return this._address;
+    }
+    private get contract() {
+        return this._contract;
     }
     private get level() {
         return this._level;
@@ -151,6 +159,7 @@ export class Miner extends EventEmitter {
         return this._workers;
     }
     private _address: Address;
+    private _contract: Address;
     private _level: Level;
     private _paused = false;
     private _speed: number;

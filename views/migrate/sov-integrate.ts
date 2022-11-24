@@ -17,7 +17,7 @@ $('button.add-sov.odin').on('click', (e) => addToken(e, {
 async function addToken(
     ev: JQuery.TriggeredEvent, { token }: { token: Token }
 ) {
-    const tgt_version = $(ev.target).data('target');
+    const tgt_version = $(ev.currentTarget).data('target');
     if (await Blockchain.isInstalled()) {
         if (await Blockchain.isAvalanche()) {
             const address: string = $(
@@ -35,8 +35,8 @@ async function addToken(
                     decimals: Number(decimals), image
                 });
                 alert(
-                    `The ${symbol} token has successfully been added to your wallet! ;)`,
-                    Alert.success, { id: 'success', after: $(ev.target).parent('div')[0] }
+                    `The ${symbol} token has been added to your wallet! ;)`,
+                    Alert.success, { id: 'success', after: $(ev.currentTarget).parent('div')[0] }
                 );
             } catch (ex: any) {
                 if (ex.message) {
@@ -44,7 +44,7 @@ async function addToken(
                         ex.message = `${ex.message} [${ex.data.message}]`;
                     }
                     alert(ex.message, Alert.warning, {
-                        after: $(ev.target).parent('div')[0]
+                        after: $(ev.currentTarget).parent('div')[0]
                     });
                 }
                 console.error(ex);

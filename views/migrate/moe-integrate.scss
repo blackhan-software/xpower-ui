@@ -1,10 +1,11 @@
-form#moe-integration {
-  div.add-moe.thor,
-  div.add-moe.loki,
-  div.add-moe.odin {
-    button.add-moe.thor,
-    button.add-moe.loki,
-    button.add-moe.odin {
+form#moe-integrate {
+  div.add-moe {
+    button.add-moe {
+      img {
+        position: absolute;
+        right: 8px;
+        top: 6px;
+      }
       img {
         background-color: var(--xp-dimgray);
         border-radius: 10px;
