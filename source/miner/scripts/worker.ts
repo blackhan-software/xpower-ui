@@ -318,8 +318,8 @@ function arrayifier(
     level: Level
 ) {
     const diff_max = 16n ** BigInt(level) - 1n;
-    const offset_2 = 64 - level * 2;
-    const offset_1 = 32 - level;
+    const offset_2 = 64 - Math.max(64, level * 2);
+    const offset_1 = 32 - Math.max(32, level);
     return (nonce: Nonce, x64_nonce: string) => {
         if (nonce - nonce_cache[level] > diff_max) {
             array_cache[level] = arrayify(x64_nonce);
