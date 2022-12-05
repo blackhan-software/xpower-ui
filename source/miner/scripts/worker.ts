@@ -3,6 +3,7 @@
 
 import { x40, x64, x64_plain } from '../../functions';
 import { Address, Amount, BlockHash, Interval, Level, Nonce, Token } from '../../redux/types';
+import { Version } from '../../types';
 
 import { defaultAbiCoder as abi, randomBytes } from 'ethers/lib/utils';
 import { Observable } from 'observable-fns';
@@ -15,9 +16,10 @@ let worker: Worker | undefined;
 let worker_id = 0;
 
 export interface Miner extends Function {
-    (context: Context, nonce: Nonce): string
+    (nonce: Nonce, context: Context): string
 }
 export type Context = {
+    token: Token,
     address: Address,
     block_hash: BlockHash,
     contract: Address,
@@ -35,25 +37,42 @@ export type IWorker = WorkerModule<keyof {
     reset: WorkerFunction;
 }>;
 export type Item = {
-    nonce: Nonce, amount: Amount
+    amount: Amount,
+    nonce: Nonce,
 };
 expose({
     identifier() {
         return worker_id;
     },
-    async init(
-        token: Token, contract: Address, address: Address,
-        level: Level, meta: { id: number }
-    ) {
+    async init({
+        address,
+        contract,
+        level,
+        meta,
+        token,
+        version,
+    }: {
+        address: Address,
+        contract: Address,
+        level: Level,
+        meta: { id: number },
+        token: Token,
+        version: Version,
+    }) {
         if (worker !== undefined) {
             throw new Error(`worker already initialized`);
         } else {
             const { keccak256: hash } = await keccak();
             keccak256 = (a) => hash(a).toString('hex');
         }
-        worker = new Worker(
-            token, contract, address, level, meta
-        );
+        worker = new Worker({
+            address,
+            contract,
+            level,
+            meta,
+            token,
+            version,
+        });
         worker_id = meta.id;
     },
     start(
@@ -94,15 +113,30 @@ expose({
     }
 });
 class Worker {
-    public constructor(
-        token: Token, contract: Address, address: Address,
-        level: Level, meta: { id: number }
-    ) {
+    public constructor({
+        address,
+        contract,
+        level,
+        meta,
+        token,
+        version,
+    }: {
+        address: Address,
+        contract: Address,
+        level: Level,
+        meta: { id: number },
+        token: Token,
+        version: Version,
+    }) {
         this._amount = amount(token, level);
         this._context = {
-            address, block_hash: 0n, contract, interval: interval()
+            address,
+            block_hash: 0n,
+            contract,
+            interval: interval(),
+            token,
         };
-        this._miner = miner(level);
+        this._miner = miner(level, version);
         this._nonce = nonce(meta.id);
     }
     public start(
@@ -168,9 +202,9 @@ class Worker {
     private work() {
         const nonce = this.next_nonce;
         const amount = this.amount(
-            this.miner(this.context, nonce)
+            this.miner(nonce, this.context)
         );
-        return { nonce, amount };
+        return { amount, nonce };
     }
     private get amount() {
         return this._amount;
@@ -225,11 +259,11 @@ function amount(
         n_level > n_difficulty + 1n
             ? n_level : n_difficulty + 1n;
     switch (token) {
-        case Token.ODIN:
+        case Token.THOR:
             return (hash: string) => {
                 const lhs_zeros = zeros(hash);
                 if (lhs_zeros >= n_threshold) {
-                    return 16n ** (lhs_zeros - n_difficulty) - 1n;
+                    return (lhs_zeros - n_difficulty);
                 }
                 return 0n;
             };
@@ -241,11 +275,11 @@ function amount(
                 }
                 return 0n;
             };
-        case Token.THOR:
+        case Token.ODIN:
             return (hash: string) => {
                 const lhs_zeros = zeros(hash);
                 if (lhs_zeros >= n_threshold) {
-                    return (lhs_zeros - n_difficulty);
+                    return 16n ** (lhs_zeros - n_difficulty) - 1n;
                 }
                 return 0n;
             };
@@ -277,20 +311,20 @@ function zeros(
     return 0n;
 }
 function miner(
-    level: Level
+    level: Level, version: Version
 ) {
-    const abi_encode = abi_encoder(level);
-    return (context: Context, nonce: Nonce) => keccak256(
-        abi_encode(context, nonce)
+    const abi_encode = abi_encoder(level, version);
+    return (nonce: Nonce, context: Context) => keccak256(
+        abi_encode(nonce, context)
     );
 }
 function abi_encoder(
-    level: Level
+    level: Level, version: Version
 ) {
     const lazy_arrayify = arrayifier(level);
-    return (
-        { contract, address, block_hash, interval }: Context, nonce: Nonce
-    ) => {
+    const encoder_new = (nonce: Nonce, {
+        address, block_hash, contract, interval
+    }: Context) => {
         let value = abi_encoded[interval];
         if (value === undefined) {
             const template = abi.encode([
@@ -310,6 +344,39 @@ function abi_encoder(
         value.set(array, 128);
         return value;
     };
+    const encoder_old = (nonce: Nonce, {
+        address, block_hash, interval, token
+    }: Context) => {
+        let value = abi_encoded[interval];
+        if (value === undefined) {
+            const template = abi.encode([
+                'string', 'address', 'uint256', 'bytes32', 'uint256'
+            ], [
+                token,
+                x40(address),
+                interval,
+                x64(block_hash),
+                0
+            ]);
+            abi_encoded[interval] = value = arrayify(template.slice(2));
+            array_cache[level] = arrayify(x64_plain(nonce));
+            nonce_cache[level] = nonce;
+        }
+        const array = lazy_arrayify(nonce, x64_plain(nonce));
+        value.set(array, 128);
+        return value;
+    };
+    switch (version) {
+        case Version.v2a:
+        case Version.v3a:
+        case Version.v3b:
+        case Version.v4a:
+        case Version.v5a:
+        case Version.v5b:
+            return encoder_old;
+        default:
+            return encoder_new;
+    }
 }
 function arrayifier(
     level: Level

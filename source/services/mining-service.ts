@@ -2,6 +2,7 @@ import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
 import { x64 } from '../functions';
 import { HashManager, IntervalManager, MiningManager as MM } from '../managers';
+import { ROParams } from '../params';
 import { setMiningSpeed, setMiningStatus } from '../redux/actions';
 import { onPageSwitch, onTokenSwitch } from '../redux/observers';
 import { xtokenOf } from '../redux/selectors';
@@ -93,7 +94,7 @@ export const MiningService = (
                 return;
             }
             HashManager.set(block_hash, timestamp, {
-                slot: Tokenizer.xify(token)
+                token: Tokenizer.xify(token), version: ROParams.version
             });
         };
         const moe_wallet = new MoeWallet(address, token);

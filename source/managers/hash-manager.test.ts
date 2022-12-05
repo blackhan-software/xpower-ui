@@ -3,9 +3,12 @@
  */
 import { HashManager, Slot } from './hash-manager';
 
+import { Token } from '../redux/types';
+import { Version } from '../types';
+
 describe('HashManager', () => {
-    const cpu_slot = { slot: 'thor' } as Slot;
-    const gpu_slot = { slot: 'loki' } as Slot;
+    const cpu_slot = { token: Token.THOR, version: Version.v5c } as Slot;
+    const gpu_slot = { token: Token.LOKI, version: Version.v5c } as Slot;
     const block_hash = BigInt('0xb10c');
     it('should set time for block-hash', () => {
         HashManager.set(block_hash, 1n, cpu_slot);

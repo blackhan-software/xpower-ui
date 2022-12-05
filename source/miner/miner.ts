@@ -1,6 +1,9 @@
 import { EventEmitter } from 'events';
 import { ModuleThread, spawn, Thread, Worker } from 'threads';
+import { ROParams } from '../params';
 import { Address, Amount, BlockHash, Level, Nonce, Token } from '../redux/types';
+import { Tokenizer } from '../token';
+import { Version } from '../types';
 import { Item, IWorker } from './scripts/worker';
 
 export type OnMined = ({ nonce, amount, worker }: {
@@ -21,13 +24,16 @@ export class Miner extends EventEmitter {
         speed = Miner.SPEED_DEFAULT,
         /** min. level to mine at */
         level: Level = 1,
+        /** version to mine for */
+        version = ROParams.version
     ) {
         super();
         this._address = address;
         this._contract = contract;
         this._level = level;
         this._speed = speed;
-        this._token = token;
+        this._token = Tokenizer.xify(token);
+        this._version = version;
         this.setMaxListeners(20);
     }
     public get running(): boolean {
@@ -128,9 +134,14 @@ export class Miner extends EventEmitter {
             worker = new Worker('./scripts/worker.js');
         }
         const thread = await spawn<IWorker>(worker);
-        await thread.init(
-            this.token, this.contract, this.address, this.level, { id }
-        );
+        await thread.init({
+            address: this.address,
+            contract: this.contract,
+            level: this.level,
+            meta: { id },
+            token: this.token,
+            version: this.version,
+        });
         return thread;
     }
     private async fire() {
@@ -155,6 +166,9 @@ export class Miner extends EventEmitter {
     public get token(): Token {
         return this._token;
     }
+    public get version(): Version {
+        return this._version;
+    }
     private get workers(): ModuleThread<IWorker>[] {
         return this._workers;
     }
@@ -164,6 +178,7 @@ export class Miner extends EventEmitter {
     private _paused = false;
     private _speed: number;
     private _token: Token;
+    private _version: Version;
     private _workers: ModuleThread<IWorker>[] = [];
 }
 function logical_cpus() {

@@ -27,11 +27,11 @@ export function MiningManager(
         let miner = MiningManager._miner[xtoken];
         if (miner === undefined) {
             const contract = BigInt(addressOf({
-                infix: 'MOE', token: xtoken
+                infix: 'MOE', token
             }));
-            const speed = miningSpeedBy(api.getState(), xtoken);
+            const speed = miningSpeedBy(api.getState(), token);
             miner = MiningManager._miner[xtoken] = new Miner(
-                xtoken, contract, address, speed, ROParams.level.min
+                token, contract, address, speed, ROParams.level.min
             );
         }
         return miner;
@@ -39,8 +39,7 @@ export function MiningManager(
     async function my_toggle({ address, token }: {
         address: Address, token: Token
     }): Promise<void> {
-        const xtoken = Tokenizer.xify(token);
-        const miner = my_miner({ address, token: xtoken });
+        const miner = my_miner({ address, token });
         Alerts.hide();
         if (miner.running) {
             return await miner.stop();
@@ -52,11 +51,11 @@ export function MiningManager(
         // if: recent(block-hash?) => mine
         //
         const block_hash = HashManager.latestHash({
-            slot: xtoken
+            token, version: ROParams.version
         });
         if (block_hash !== null) {
             const timestamp = HashManager.get(block_hash, {
-                slot: xtoken
+                token, version: ROParams.version
             });
             if (timestamp !== null) {
                 const interval = IntervalManager.intervalFrom(
@@ -77,7 +76,7 @@ export function MiningManager(
         }) => {
             mine(address, block_hash);
         });
-        const moe_wallet = new MoeWallet(address, xtoken);
+        const moe_wallet = new MoeWallet(address, token);
         try {
             const init = await moe_wallet.init();
             console.debug('[init]', init);
@@ -104,7 +103,7 @@ export function MiningManager(
             address: Address, block_hash: BlockHash
         ) {
             miner.emit('initialized', { block_hash });
-            const { min, max } = range(xtoken);
+            const { min, max } = range(token);
             if (miner.running) {
                 await miner.stop();
             }
@@ -116,7 +115,7 @@ export function MiningManager(
                         address,
                         amount,
                         block_hash,
-                        token: xtoken,
+                        token: Tokenizer.xify(token),
                         worker,
                     }));
                 }

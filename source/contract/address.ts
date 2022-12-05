@@ -1,6 +1,7 @@
 import { Version } from '../../source/types';
 import { ROParams } from '../params';
 import { Token } from '../redux/types';
+import { Tokenizer } from '../token';
 
 export function address({
     infix, token, version
@@ -9,6 +10,9 @@ export function address({
 }): string {
     if (version === undefined) {
         version = ROParams.version;
+    }
+    if (token.startsWith('a')) {
+        token = Tokenizer.xify(token);
     }
     const id = `g-${token}_${infix}_${version}`;
     const $element = document.getElementById(id);

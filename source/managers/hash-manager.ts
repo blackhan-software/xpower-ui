@@ -1,10 +1,13 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-import { Timestamp } from '../redux/types';
+import { Timestamp, Token } from '../redux/types';
+import { Tokenizer } from '../token';
+import { Version } from '../types';
+
 import { EventEmitter } from 'events';
 
 export type Hash = bigint;
 export type Slot = {
-    slot: string;
+    token: Token, version: Version
 }
 export class HashManager extends EventEmitter {
     public get(hash: Hash, slot: Slot): Timestamp | null {
@@ -30,7 +33,7 @@ export class HashManager extends EventEmitter {
             localStorage.setItem(`block-hash[${key(hash, slot)}]`, `${time}`);
             this.emit('block-hash', {
                 block_hash: BigInt(hash),
-                slot: slot.slot
+                slot
             });
         }
     }
@@ -59,7 +62,7 @@ export class HashManager extends EventEmitter {
     }
     private static _me: HashManager | undefined;
 }
-function key(hash: Hash | string, { slot }: Slot) {
-    return `${hash}:${slot}`;
+function key(hash: Hash | string, { token, version }: Slot) {
+    return `${hash}:${Tokenizer.xify(token)}:${version}`;
 }
 export default HashManager;

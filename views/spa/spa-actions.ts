@@ -8,6 +8,7 @@ import { Blockchain } from '../../source/blockchain';
 import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
 import { Alert, alert, Alerts, ancestor, x40 } from '../../source/functions';
 import { HashManager, MiningManager as MM } from '../../source/managers';
+import { ROParams } from '../../source/params';
 import { globalRef } from '../../source/react';
 import { Tokenizer } from '../../source/token';
 import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfManager, SovWallet } from '../../source/wallet';
@@ -55,7 +56,7 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
     }
     const amount = Tokenizer.amount(token, level);
     const block_hash = HashManager.latestHash({
-        slot: Tokenizer.xify(token)
+        token: Tokenizer.xify(token), version: ROParams.version
     });
     if (!block_hash) {
         throw new Error('missing block-hash');
