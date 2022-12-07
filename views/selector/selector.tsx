@@ -51,9 +51,6 @@ function $anchor(
     ];
     return <a type='button'
         className={classes.join(' ')}
-        data-bs-toggle='tooltip'
-        data-bs-placement='top'
-        data-bs-fixed='true'
         href={`?token=${token_my}`}
         onClick={(e) => switchTo(e, token_my, dispatch)}
     >
