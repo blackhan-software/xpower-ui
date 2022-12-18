@@ -25,12 +25,14 @@ type Props = {
 export function UiNftSender(
     props: Props
 ) {
-    const core_id = Nft.coreId({
-        issue: props.issue, level: props.level
+    const full_id = Nft.fullId({
+        issue: props.issue,
+        level: props.level,
+        token: Nft.token(props.token)
     });
     return <div
         className='btn-group nft-sender d-none d-sm-flex'
-        ref={globalRef(`.nft-sender[core-id="${core_id}"]`)}
+        ref={globalRef(`.nft-sender[full-id="${full_id}"]`)}
         role='group'
     >
         <UiNftToggle

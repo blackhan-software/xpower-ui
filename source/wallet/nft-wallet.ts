@@ -1,8 +1,10 @@
-import { XPowerNftFactory } from '../contract';
-import { XPowerNftMockFactory } from '../contract';
 import { BigNumber, Contract, Transaction } from 'ethers';
-import { Address, Amount, Token, Year } from '../redux/types';
-import { NftCoreId, NftLevel } from '../redux/types';
+import { XPowerNftFactory, XPowerNftMockFactory } from '../contract';
+import address from '../contract/address';
+import { ROParams } from '../params';
+import { Address, Amount, Nft, NftFullId, NftLevel, NftRealId, Token, Year } from '../redux/types';
+import Tokenizer from '../token';
+import { Version } from '../types';
 
 import { ERC1155Wallet } from './erc1155-wallet';
 import { OtfManager } from './otf-manager';
@@ -11,8 +13,7 @@ export class NftWallet extends ERC1155Wallet {
     constructor(
         address: Address | string, token: Token
     ) {
-        super(address);
-        this._token = token;
+        super(address, token);
     }
     async mint(
         level: NftLevel, amount: Amount
@@ -20,8 +21,18 @@ export class NftWallet extends ERC1155Wallet {
         const contract = await OtfManager.connect(
             await this.contract
         );
-        return contract.mint(
-            this._address, level, amount
+        if (ROParams.version < Version.v6a && !ROParams.versionFaked) {
+            return contract['mint(address,uint256,uint256)'](
+                this._address, level, amount
+            );
+        }
+        const moe_address = address({
+            token: Tokenizer.xify(this._token),
+            version: ROParams.version,
+            infix: 'MOE',
+        });
+        return contract['mint(address,uint256,uint256,uint256)'](
+            this._address, level, amount, contract.moeIndexOf(moe_address)
         );
     }
     async mintBatch(
@@ -30,17 +41,27 @@ export class NftWallet extends ERC1155Wallet {
         const contract = await OtfManager.connect(
             await this.contract
         );
-        return contract.mintBatch(
-            this._address, levels, amounts
+        if (ROParams.version < Version.v6a && !ROParams.versionFaked) {
+            return contract['mintBatch(address,uint256[],uint256[])'](
+                this._address, levels, amounts
+            );
+        }
+        const moe_address = address({
+            token: Tokenizer.xify(this._token),
+            version: ROParams.version,
+            infix: 'MOE',
+        });
+        return contract['mintBatch(address,uint256[],uint256[],uint256)'](
+            this._address, levels, amounts, contract.moeIndexOf(moe_address)
         );
     }
     async idBy(
         year: Year, level: NftLevel
-    ): Promise<NftCoreId> {
-        const id: BigNumber = await this.contract.then((c) => {
-            return c?.idBy(year, level);
+    ): Promise<NftFullId> {
+        return Nft.fullIdOf({
+            real_id: `${100 * year + level}` as NftRealId,
+            token: this._nftToken
         });
-        return id.toString() as NftCoreId;
     }
     async year(
         delta_years: number
@@ -60,7 +81,6 @@ export class NftWallet extends ERC1155Wallet {
         }
         return Promise.resolve(this._contract);
     }
-    protected readonly _token: Token;
 }
 export class NftWalletMock extends NftWallet {
     constructor(

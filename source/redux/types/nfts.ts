@@ -1,140 +1,150 @@
 import { ROParams } from '../../params';
+import { Version } from '../../types';
 import { Amount, Supply, Year } from './base';
+import { Token } from './token';
 
 export class Nft {
+    static oldIndexOf(token: NftToken) {
+        return token - 1;
+    }
     static nameOf(level: NftLevel) {
-        return NftLevel[level] as NftName | undefined;
+        return NftLevel[level] as NftName;
     }
     static rankOf(level: NftLevel) {
         return level / 3 + 1;
     }
-    static token(id: string): NftToken {
-        const [prefix] = id.split(':');
-        switch (prefix.toLowerCase()) {
-            case 'thor':
-            case 'athor':
-                return NftToken.THOR;
-            case 'loki':
-            case 'aloki':
-                return NftToken.LOKI;
-            case 'odin':
-            case 'aodin':
-                return NftToken.ODIN;
-            case 'hela':
-            case 'ahela':
-                return NftToken.HELA;
+    static token(id: NftFullId | Token): NftToken {
+        const memo = this._token[id];
+        if (memo) {
+            return memo;
+        }
+        switch (id.toUpperCase()) {
+            case Token.THOR:
+            case Token.aTHOR:
+                return this._token[id] = NftToken.THOR;
+            case Token.LOKI:
+            case Token.aLOKI:
+                return this._token[id] = NftToken.LOKI;
+            case Token.ODIN:
+            case Token.aODIN:
+                return this._token[id] = NftToken.ODIN;
+            case Token.HELA:
+            case Token.aHELA:
+                return this._token[id] = NftToken.HELA;
+        }
+        switch (parseInt(id[0])) {
+            case NftToken.THOR:
+                return this._token[id] = NftToken.THOR;
+            case NftToken.LOKI:
+                return this._token[id] = NftToken.LOKI;
+            case NftToken.ODIN:
+                return this._token[id] = NftToken.ODIN;
+            case NftToken.HELA:
+                return this._token[id] = NftToken.HELA;
         }
         throw new Error(`unknown token for "${id}"`);
     }
-    static issue(id: string): NftIssue {
-        const [prefix, suffix] = id.split(':');
-        const long_id = suffix ?? prefix;
-        const m = long_id.match(/^0+(?<id>[1-9a-f][0-9a-f]+)$/);
-        const core_id = m && m.groups ? m.groups.id : long_id;
-        const issue = Number(this.decimalized(core_id).slice(0, 4));
+    static issue(id: NftFullId): NftIssue {
+        const memo = this._issue[id];
+        if (memo) {
+            return memo;
+        }
+        const issue = Number(id.slice(-6, -2));
         if (isNaN(issue)) {
             throw new Error(`unknown issue for "${id}"`);
         }
-        return issue;
+        return this._issue[id] = issue;
     }
-    static level(id: string): NftLevel {
-        const [prefix, suffix] = id.split(':');
-        const long_id = suffix ?? prefix;
-        const m = long_id.match(/^0+(?<id>[1-9a-f][0-9a-f]+)$/);
-        const core_id = m && m.groups ? m.groups.id : long_id;
-        const level = Number(this.decimalized(core_id).slice(-2));
+    static level(id: NftFullId): NftLevel {
+        const memo = this._level[id];
+        if (memo) {
+            return memo;
+        }
+        const level = Number(id.slice(-2));
         switch (level) {
             case NftLevel.UNIT:
-                return NftLevel.UNIT;
+                return this._level[id] = NftLevel.UNIT;
             case NftLevel.KILO:
-                return NftLevel.KILO;
+                return this._level[id] = NftLevel.KILO;
             case NftLevel.MEGA:
-                return NftLevel.MEGA;
+                return this._level[id] = NftLevel.MEGA;
             case NftLevel.GIGA:
-                return NftLevel.GIGA;
+                return this._level[id] = NftLevel.GIGA;
             case NftLevel.TERA:
-                return NftLevel.TERA;
+                return this._level[id] = NftLevel.TERA;
             case NftLevel.PETA:
-                return NftLevel.PETA;
+                return this._level[id] = NftLevel.PETA;
             case NftLevel.EXA:
-                return NftLevel.EXA;
+                return this._level[id] = NftLevel.EXA;
             case NftLevel.ZETTA:
-                return NftLevel.ZETTA;
+                return this._level[id] = NftLevel.ZETTA;
             case NftLevel.YOTTA:
-                return NftLevel.YOTTA;
+                return this._level[id] = NftLevel.YOTTA;
         }
         throw new Error(`unknown level for "${id}"`);
-    }
-    static coreIds({ issues, levels }: {
-        issues: NftIssue[], levels: NftLevel[]
-    }): NftCoreId[] {
-        const list = [] as NftCoreId[];
-        for (const issue of issues) {
-            for (const level of levels) {
-                list.push(Nft.coreId({
-                    issue, level
-                }));
-            }
-        }
-        return list;
     }
     static fullIds({ issues, levels, token }: {
         issues: NftIssue[], levels: NftLevel[], token: NftToken
     }): NftFullId[] {
-        const list = [] as NftFullId[];
+        const full_ids = [] as NftFullId[];
         for (const issue of issues) {
             for (const level of levels) {
-                list.push(Nft.fullId({
+                full_ids.push(Nft.fullId({
                     issue, level, token
                 }));
             }
         }
-        return list;
-    }
-    static coreId({ issue, level }: {
-        issue: NftIssue, level: NftLevel
-    }) {
-        if (issue < 2021) {
-            throw new Error(`NFT issue=${issue} invalid`);
-        }
-        if (level < 10) {
-            return `${issue}0${level}` as NftCoreId;
-        }
-        return `${issue}${level}` as NftCoreId;
+        return full_ids;
     }
     static fullId({ issue, level, token }: {
-        issue: NftIssue, level: NftLevel, token?: NftToken
-    }) {
+        issue: NftIssue, level: NftLevel, token: NftToken
+    }): NftFullId {
         if (issue < 2021) {
             throw new Error(`NFT issue=${issue} invalid`);
         }
         if (level < 10) {
-            return `${token}:${issue}0${level}` as NftFullId;
+            return `${token}${issue}0${level}` as NftFullId;
         }
-        return `${token}:${issue}${level}` as NftFullId;
+        return `${token}${issue}${level}`;
     }
-    private static decimalized(core_id: string) {
-        const radix = this.hexadecimal(core_id) ? 16 : 10;
-        return parseInt(core_id, radix).toString(10);
+    static realIds(
+        ids: NftFullId[], { version } = { version: ROParams.version }
+    ): NftRealId[] {
+        return ids.map((id) => this.realId(id, { version }));
     }
-    private static hexadecimal(core_id: string, minimum = '202100') {
-        return parseInt(core_id, 16) < parseInt(minimum, 16);
+    static realId(
+        id: NftFullId, { version } = { version: ROParams.version }
+    ): NftRealId {
+        return version < Version.v6a && !ROParams.versionFaked
+            ? id.slice(-6) as NftCoreId : id;
     }
+    static fullIdOf({ real_id, token }: {
+        real_id: NftRealId, token: NftToken
+    }): NftFullId {
+        return real_id.length > 6
+            ? real_id as NftFullId
+            : token + real_id as NftFullId;
+    }
+    private static _token = {} as Record<NftFullId | Token, NftToken>;
+    private static _issue = {} as Record<NftFullId, NftIssue>;
+    private static _level = {} as Record<NftFullId, NftLevel>;
 }
-export type NftFullId = `${NftToken}:${NftCoreId}`;
+export type NftFullId = `${NftToken}${NftIssue}${NftLevel}`;
 export type NftCoreId = `${NftIssue}${NftLevel}`;
+export type NftRealId = NftFullId | NftCoreId;
 export type NftIssue = Year;
 export enum NftToken {
-    THOR = 'THOR',
-    LOKI = 'LOKI',
-    ODIN = 'ODIN',
-    HELA = 'HELA',
+    THOR = 1,
+    LOKI = 2,
+    ODIN = 3,
+    HELA = 4,
 }
 export type NftTokens = keyof typeof NftToken;
 export function* NftTokens() {
-    for (const t in NftToken) {
-        yield t as NftToken;
-    }
+    yield NftToken.THOR;
+    yield NftToken.LOKI;
+    yield NftToken.ODIN;
+    yield NftToken.HELA;
 }
 export enum NftLevel {
     UNIT = 0,

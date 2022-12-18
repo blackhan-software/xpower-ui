@@ -23,11 +23,13 @@ type Props = {
 export function UiPptClaimer(
     props: Props
 ) {
-    const core_id = Nft.coreId({
-        issue: props.issue, level: props.level
+    const full_id = Nft.fullId({
+        issue: props.issue,
+        level: props.level,
+        token: Nft.token(props.token)
     });
     return <div role='group'
-        ref={globalRef(`.ppt-claimer[core-id="${core_id}"]`)}
+        ref={globalRef(`.ppt-claimer[full-id="${full_id}"]`)}
         className='btn-group nft-claimer d-none d-sm-flex'
     >
         <UiPptToggle

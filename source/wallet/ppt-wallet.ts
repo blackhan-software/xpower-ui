@@ -1,6 +1,6 @@
-import { XPowerPptFactory, XPowerPptMockFactory } from '../contract';
 import { BigNumber, Contract } from 'ethers';
-import { Address, NftCoreId, NftLevel, Token, Year } from '../redux/types';
+import { XPowerPptFactory, XPowerPptMockFactory } from '../contract';
+import { Address, Nft, NftFullId, NftLevel, NftRealId, Token, Year } from '../redux/types';
 
 import { ERC1155Wallet } from './erc1155-wallet';
 
@@ -8,16 +8,15 @@ export class PptWallet extends ERC1155Wallet {
     constructor(
         address: Address | string, token: Token
     ) {
-        super(address);
-        this._token = token;
+        super(address, token);
     }
     async idBy(
         year: Year, level: NftLevel
-    ): Promise<NftCoreId> {
-        const id: BigNumber = await this.contract.then((c) => {
-            return c?.idBy(year, level);
+    ): Promise<NftFullId> {
+        return Nft.fullIdOf({
+            real_id: `${100 * year + level}` as NftRealId,
+            token: this._nftToken
         });
-        return id.toString() as NftCoreId;
     }
     async year(
         delta_years: number
@@ -37,7 +36,6 @@ export class PptWallet extends ERC1155Wallet {
         }
         return Promise.resolve(this._contract);
     }
-    protected readonly _token: Token;
 }
 export class PptWalletMock extends PptWallet {
     constructor(

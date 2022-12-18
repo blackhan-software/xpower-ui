@@ -61,10 +61,6 @@ function $row(
     const nft_token = Nft.token(
         props.token
     );
-    const core_id = Nft.coreId({
-        issue: nft_issue,
-        level: nft_level,
-    });
     const full_id = Nft.fullId({
         issue: nft_issue,
         level: nft_level,
@@ -73,9 +69,9 @@ function $row(
     const nft = props.nfts.items[full_id] ?? {
         amount: 0n, supply: 0n
     };
-    return <React.Fragment key={core_id}>
+    return <React.Fragment key={full_id}>
         <div className='row year'
-            ref={globalRef(`:nft.row[core-id="${core_id}"]`)}
+            ref={globalRef(`:nft.row[full-id="${full_id}"]`)}
             style={{ display: fixed || toggled ? 'flex' : 'none' }}
         >
             <div className='col-sm nft-details-lhs'>
@@ -189,7 +185,7 @@ function $supply(
 function $expander(
     props: Props, nft_issue: NftIssue
 ) {
-    const { details, level: nft_level } = props;
+    const { details, level: nft_level, token } = props;
     const by_level = details[nft_level];
     const by_issue = by_level[nft_issue];
     const { expanded, toggled } = by_issue;
@@ -208,6 +204,7 @@ function $expander(
         }}
         expanded={expanded}
         toggled={toggled}
+        token={token}
     />;
 }
 function $target(

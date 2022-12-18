@@ -68,10 +68,11 @@ async function nftUnstakeOld(token: Token, { $unstake, $approve }: {
     //
     // Check balances:
     //
-    const ids = Nft.coreIds({
+    const ids = Nft.realIds(Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels())
-    });
+        levels: Array.from(NftLevels()),
+        token: Nft.token(token)
+    }));
     const accounts = ids.map(() => {
         return x40(address);
     });
@@ -178,10 +179,11 @@ async function nftApproveOld(token: Token, { $approve, $migrate }: {
     console.debug(
         `[${src_version}:approved]`, src_approved
     );
-    const ids = Nft.coreIds({
+    const ids = Nft.realIds(Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels())
-    });
+        levels: Array.from(NftLevels()),
+        token: Nft.token(token)
+    }));
     const accounts = ids.map(() => {
         return x40(address);
     });
@@ -282,10 +284,11 @@ async function nftMigrateOld(token: Token, { $migrate, $approve }: {
     //
     // Check balances:
     //
-    const ids = Nft.coreIds({
+    const ids = Nft.realIds(Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels())
-    });
+        levels: Array.from(NftLevels()),
+        token: Nft.token(token)
+    }));
     const accounts = ids.map(() => {
         return x40(address);
     });
@@ -340,7 +343,7 @@ async function nftMigrateOld(token: Token, { $migrate, $approve }: {
             reset();
         }));
         const nz = filter(ids, src_balances, { zero: false });
-        const index = await nft_target.indexOf(nft_source.address);
+        const index = await nft_target.oldIndexOf(nft_source.address);
         tx = await nft_target.migrateBatch(nz.ids, nz.balances, [index]);
     } catch (ex: any) {
         if (ex.message) {
@@ -404,10 +407,11 @@ async function nftApproveNew(token: Token, { $approve, $restake }: {
     console.debug(
         `[${tgt_version}:approved]`, tgt_approved
     );
-    const ids = Nft.coreIds({
+    const ids = Nft.realIds(Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels())
-    });
+        levels: Array.from(NftLevels()),
+        token: Nft.token(token)
+    }));
     const accounts = ids.map(() => {
         return x40(address);
     });
@@ -494,10 +498,11 @@ async function nftRestakeNew(token: Token, { $restake }: {
     //
     // Check balances:
     //
-    const ids = Nft.coreIds({
+    const ids = Nft.realIds(Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels())
-    });
+        levels: Array.from(NftLevels()),
+        token: Nft.token(token)
+    }));
     const accounts = ids.map(() => {
         return x40(address);
     });

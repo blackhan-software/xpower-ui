@@ -15,14 +15,16 @@ export const NftsService = (
         address, token
     }) {
         let index = 0;
+        const nft_token = Nft.token(token);
         const levels = Array.from(NftLevels());
         const issues = Array.from(Years({ reverse: true }));
         const wallet = new NftWallet(address, token);
-        const balances = await wallet.balances({ issues, levels });
-        const supplies = wallet.totalSupplies({ issues, levels });
-        const nft_token = Nft.token(
-            token
-        );
+        const balances = await wallet.balances({
+            issues, levels, token: nft_token
+        });
+        const supplies = wallet.totalSupplies({
+            issues, levels, token: nft_token
+        });
         for (const issue of issues) {
             for (const level of levels) {
                 const amount = balances[index];
@@ -61,13 +63,10 @@ export const NftsService = (
                 x40(op), x40(from), x40(to),
                 id, value, ev
             );
-            const nft_token = Nft.token(
-                token
-            );
             const nft_id = Nft.fullId({
                 issue: Nft.issue(id),
                 level: Nft.level(id),
-                token: nft_token
+                token: Nft.token(id)
             });
             if (address === from) {
                 store.dispatch(removeNft(nft_id, {
@@ -99,14 +98,11 @@ export const NftsService = (
                 x40(op), x40(from), x40(to),
                 ids, values, ev
             );
-            const nft_token = Nft.token(
-                token
-            );
             for (let i = 0; i < ids.length; i++) {
                 const nft_id = Nft.fullId({
                     issue: Nft.issue(ids[i]),
                     level: Nft.level(ids[i]),
-                    token: nft_token
+                    token: Nft.token(ids[i])
                 });
                 if (address === from) {
                     store.dispatch(removeNft(nft_id, {

@@ -99,11 +99,11 @@ export function UiPptDetails(
         Array.from(Years()).forEach(async (
             ppt_issue: NftIssue
         ) => {
-            const core_id = Nft.coreId({
-                level: ppt_level, issue: ppt_issue
+            const full_id = Nft.fullId({
+                level: ppt_level, issue: ppt_issue, token: ppt_token
             });
             const ref = globalRef<HTMLElement>(
-                `:ppt.row[core-id="${core_id}"]`
+                `:ppt.row[full-id="${full_id}"]`
             );
             if (ref.current) {
                 on_refresh(ref.current, async () => {
@@ -165,16 +165,16 @@ function claims(
         ppt_level: NftLevel,
         ppt_issue: NftIssue
     ) => {
-        const core_id = Nft.coreId({
-            level: ppt_level, issue: ppt_issue
+        const full_id = Nft.fullId({
+            level: ppt_level, issue: ppt_issue, token: ppt_token
         });
         const moe_treasury = MoeTreasuryFactory({ token });
         const [claimed, claimable] = await Promise.all([
             await moe_treasury.then(
-                (c) => c.claimedFor(x40(address), core_id)
+                (c) => c.claimedFor(x40(address), Nft.realId(full_id))
             ),
             await moe_treasury.then(
-                (c) => c.claimableFor(x40(address), core_id)
+                (c) => c.claimableFor(x40(address), Nft.realId(full_id))
             )
         ]);
         return {
@@ -200,10 +200,6 @@ function $row(
     const by_issue = by_level[ppt_issue];
     const { fixed, toggled } = by_issue;
     const ppt_token = Nft.token(token);
-    const core_id = Nft.coreId({
-        issue: ppt_issue,
-        level: ppt_level
-    });
     const full_id = Nft.fullId({
         issue: ppt_issue,
         level: ppt_level,
@@ -212,9 +208,9 @@ function $row(
     const ppt = ppts.items[full_id] ?? {
         amount: 0n, supply: 0n
     };
-    return <React.Fragment key={core_id}>
+    return <React.Fragment key={full_id}>
         <div className='row year'
-            ref={globalRef(`:ppt.row[core-id="${core_id}"]`)}
+            ref={globalRef(`:ppt.row[full-id="${full_id}"]`)}
             style={{ display: fixed || toggled ? 'flex' : 'none' }}
         >
             <div className='col-sm nft-details-lhs'>
@@ -328,7 +324,7 @@ function $supply(
 function $expander(
     props: Props, ppt_issue: NftIssue
 ) {
-    const { details, level: ppt_level } = props;
+    const { details, level: ppt_level, token } = props;
     const by_level = details[ppt_level];
     const by_issue = by_level[ppt_issue];
     const { expanded, toggled } = by_issue;
@@ -347,6 +343,7 @@ function $expander(
         }}
         expanded={expanded}
         toggled={toggled}
+        token={token}
     />;
 }
 function $claimed(

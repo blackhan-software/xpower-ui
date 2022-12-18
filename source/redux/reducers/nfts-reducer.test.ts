@@ -7,7 +7,7 @@ import { removeNft } from '../actions';
 import { Nfts, Empty } from '../types';
 
 describe('Store w/nfts-reducer (set)', () => {
-    const id = 'THOR:202103';
+    const id = '1202103';
     it('should set 1 nft', () => {
         const state_0 = Empty<Nfts>();
         const state_1 = nftsReducer(state_0, setNft(id, {
@@ -32,7 +32,7 @@ describe('Store w/nfts-reducer (set)', () => {
     });
 });
 describe('Store w/nfts-reducer (add)', () => {
-    const id = 'LOKI:202103';
+    const id = '2202103';
     it('should add 1 nft (w/rel. supply)', () => {
         const state_0 = Empty<Nfts>();
         const state_1 = nftsReducer(state_0, addNft(id, {
@@ -145,7 +145,7 @@ describe('Store w/nfts-reducer (add)', () => {
     });
 });
 describe('Store w/nfts-reducer (remove)', () => {
-    const id = 'ODIN:202109';
+    const id = '3202109';
     it('should remove 1 nft (w/rel. supply)', () => {
         const state_0 = Empty<Nfts>();
         const state_1 = nftsReducer(state_0, addNft(id, {

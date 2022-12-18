@@ -43,10 +43,11 @@ async function claim(token: Token, { $claim }: {
     //
     // Check allowance:
     //
-    const ids = Nft.coreIds({
+    const ids = Nft.realIds(Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels())
-    });
+        levels: Array.from(NftLevels()),
+        token: Nft.token(token)
+    }));
     const src_claimables: BigNumber[] = await mty_treasury.claimableForBatch(
         x40(address), ids
     );

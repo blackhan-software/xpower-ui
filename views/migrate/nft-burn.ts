@@ -42,10 +42,11 @@ async function burn(token: Token, { $burn }: {
     //
     // Check balances:
     //
-    const ids = Nft.coreIds({
+    const ids = Nft.realIds(Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels())
-    });
+        levels: Array.from(NftLevels()),
+        token: Nft.token(token)
+    }));
     const accounts = ids.map(() => {
         return x40(address);
     });

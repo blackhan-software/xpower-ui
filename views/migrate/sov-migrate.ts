@@ -346,8 +346,8 @@ async function sovMigrateOld(token: Token, { $migrate }: {
             );
             reset();
         }));
-        const sov_index = await tgt_apower.indexOf(src_apower.address);
-        const moe_index = await tgt_xpower.indexOf(src_xpower.address);
+        const sov_index = await tgt_apower.oldIndexOf(src_apower.address);
+        const moe_index = await tgt_xpower.oldIndexOf(src_xpower.address);
         tx = await tgt_apower.migrate(src_balance, [sov_index, moe_index]);
     } catch (ex: any) {
         if (ex.message) {

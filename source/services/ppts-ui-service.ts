@@ -161,12 +161,14 @@ export const PptsUiService = (
         const ppt_wallet = address && avalanche
             ? new PptWallet(address, token)
             : new PptWalletMock(0n, token);
-        const ppt_id = Nft.coreId({ level, issue });
+        const ppt_id = Nft.fullId({
+            level, issue, token: Nft.token(token)
+        });
         const supply = await ppt_wallet.totalSupply(ppt_id);
         if (supply > 0) {
             const ppt_contract = await ppt_wallet.contract;
             const market = 'https://opensea.io/assets/avalanche';
-            return new URL(`${market}/${ppt_contract.address}/${ppt_id}`);
+            return new URL(`${market}/${ppt_contract.address}/${Nft.realId(ppt_id)}`);
         }
         return null;
     }

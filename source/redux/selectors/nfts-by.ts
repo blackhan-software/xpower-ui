@@ -17,13 +17,13 @@ export function nftsBy(
     return {
         items: Object.fromEntries(
             Object.entries(nfts.items).filter(([id]) => {
-                if (issue !== undefined && issue !== Nft.issue(id)) {
+                if (issue !== undefined && issue !== Nft.issue(id as NftFullId)) {
                     return false;
                 }
-                if (level !== undefined && level !== Nft.level(id)) {
+                if (level !== undefined && level !== Nft.level(id as NftFullId)) {
                     return false;
                 }
-                if (token !== undefined && token !== Nft.token(id)) {
+                if (token !== undefined && token !== Nft.token(id as NftFullId)) {
                     return false;
                 }
                 return true;

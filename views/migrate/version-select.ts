@@ -20,10 +20,11 @@ Blockchain.onConnect(async function setBalances() {
     const versions = Array.from(Versions())
         .filter((v) => v !== ROParams.versionTarget)
         .reverse();
-    const ids = Nft.coreIds({
+    const ids = Nft.realIds(Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels())
-    });
+        levels: Array.from(NftLevels()),
+        token: Nft.token(token)
+    }));
     const accounts = ids.map(() => {
         return x40(address);
     });

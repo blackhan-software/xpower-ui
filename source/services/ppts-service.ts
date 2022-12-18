@@ -17,14 +17,16 @@ export const PptsService = (
         address, token
     }) {
         let index = 0;
+        const ppt_token = Nft.token(token);
         const levels = Array.from(NftLevels());
         const issues = Array.from(Years({ reverse: true }));
         const wallet = new PptWallet(address, token);
-        const balances = await wallet.balances({ issues, levels });
-        const supplies = wallet.totalSupplies({ issues, levels });
-        const ppt_token = Nft.token(
-            token
-        );
+        const balances = await wallet.balances({
+            issues, levels, token: ppt_token
+        });
+        const supplies = wallet.totalSupplies({
+            issues, levels, token: ppt_token
+        });
         for (const issue of issues) {
             for (const level of levels) {
                 const amount = balances[index];
@@ -63,13 +65,10 @@ export const PptsService = (
                 x40(op), x40(from), x40(to),
                 id, value, ev
             );
-            const nft_token = Nft.token(
-                token
-            );
             const nft_id = Nft.fullId({
                 issue: Nft.issue(id),
                 level: Nft.level(id),
-                token: nft_token
+                token: Nft.token(id)
             });
             if (address === from) {
                 store.dispatch(removePpt(nft_id, {
@@ -101,14 +100,11 @@ export const PptsService = (
                 x40(op), x40(from), x40(to),
                 ids, values, ev
             );
-            const nft_token = Nft.token(
-                token
-            );
             for (let i = 0; i < ids.length; i++) {
                 const ppt_id = Nft.fullId({
                     issue: Nft.issue(ids[i]),
                     level: Nft.level(ids[i]),
-                    token: nft_token
+                    token: Nft.token(ids[i])
                 });
                 if (address === from) {
                     store.dispatch(removePpt(ppt_id, {
@@ -143,12 +139,13 @@ export const PptsService = (
                     nft_issue, { fixed, toggled }
                 ]) => {
                     if (fixed || toggled) {
-                        const core_id = Nft.coreId({
+                        const full_id = Nft.fullId({
                             level: Number(nft_level),
-                            issue: Number(nft_issue)
+                            issue: Number(nft_issue),
+                            token: nft_token
                         });
                         const $ref = globalRef<HTMLElement>(
-                            `:ppt.row[core-id="${core_id}"]`
+                            `:ppt.row[full-id="${full_id}"]`
                         );
                         $ref.current?.dispatchEvent(
                             new Event('refresh-claims')

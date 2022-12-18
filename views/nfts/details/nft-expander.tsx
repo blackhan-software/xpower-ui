@@ -1,10 +1,11 @@
 import { globalRef } from '../../../source/react';
-import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
+import { Nft, NftIssue, NftLevel, Token } from '../../../source/redux/types';
 
 import React, { useEffect } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 
 type Props = {
+    token: Token;
     issue: NftIssue;
     level: NftLevel;
     expanded: boolean | null;
@@ -17,12 +18,13 @@ export function UiNftExpander(
 ) {
     useEffect(() => {
         if (props.expanded) {
-            const core_id = Nft.coreId({
+            const full_id = Nft.fullId({
                 issue: props.issue,
-                level: props.level
+                level: props.level,
+                token: Nft.token(props.token)
             });
             const $row = globalRef<HTMLElement>(
-                `:nft.row[core-id="${core_id}"]`
+                `:nft.row[full-id="${full_id}"]`
             );
             if ($row.current) {
                 showTarget($row.current);

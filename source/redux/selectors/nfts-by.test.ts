@@ -14,7 +14,7 @@ describe('nfts-by', () => {
         const state = {
             nfts: {
                 items: {
-                    'ODIN:202100': {
+                    '3202100': {
                         amount: 1n, supply: 2n
                     }
                 }
@@ -29,10 +29,10 @@ describe('nfts-by', () => {
         const state = {
             nfts: {
                 items: {
-                    'ODIN:202100': {
+                    '3202100': {
                         amount: 1n, supply: 2n
                     },
-                    'ODIN:202103': {
+                    '3202103': {
                         amount: 2n, supply: 4n
                     }
                 }

@@ -41,10 +41,10 @@ export class NftImageMeta {
             ? await get_meta(new NftWallet(address, nft.token))
             : await get_meta(new NftWalletMock(0n, nft.token)));
         async function get_meta(wallet: NftWallet) {
-            const core_id = await wallet.idBy(
+            const full_id = await wallet.idBy(
                 nft.issue, nft.level
             );
-            return wallet.meta(core_id);
+            return wallet.meta(full_id);
         }
     }
 }

@@ -7,7 +7,7 @@ import { addNft, removeNft } from '../actions';
 import { AppState } from '../store';
 
 describe('onNftAdded', () => {
-    const id = 'THOR:202103';
+    const id = '1202103';
     it('should invoke handler (for addNft)', () => {
         const reducer = combineReducers({
             nfts: nftsReducer
@@ -20,7 +20,7 @@ describe('onNftAdded', () => {
         onNftAdded(store as Store<AppState, AnyAction>, (id, i, {
             amount: t_amount, supply: t_supply
         }) => {
-            expect(id).toEqual('THOR:202103');
+            expect(id).toEqual('1202103');
             expect(i.amount).toEqual(1n);
             expect(i.supply).toEqual(2n);
             expect(t_amount).toEqual(1n);
@@ -32,7 +32,7 @@ describe('onNftAdded', () => {
     });
 });
 describe('onNftRemoved', () => {
-    const id = 'LOKI:202206';
+    const id = '2202206';
     it('should invoke handler (for removeNft)', () => {
         const reducer = combineReducers({
             nfts: nftsReducer
@@ -45,7 +45,7 @@ describe('onNftRemoved', () => {
         onNftRemoved(store as Store<AppState, AnyAction>, (id, i, {
             amount: t_amount, supply: t_supply
         }) => {
-            expect(id).toEqual('LOKI:202206');
+            expect(id).toEqual('2202206');
             expect(i.amount).toEqual(1n);
             expect(i.supply).toEqual(3n);
             expect(t_amount).toEqual(1n);

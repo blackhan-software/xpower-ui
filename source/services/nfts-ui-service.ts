@@ -167,12 +167,14 @@ export const NftsUiService = (
         const nft_wallet = address && avalanche
             ? new NftWallet(address, token)
             : new NftWalletMock(0n, token);
-        const nft_id = Nft.coreId({ level, issue });
+        const nft_id = Nft.fullId({
+            level, issue, token: Nft.token(token)
+        });
         const supply = await nft_wallet.totalSupply(nft_id);
         if (supply > 0) {
             const nft_contract = await nft_wallet.contract;
             const market = 'https://opensea.io/assets/avalanche';
-            return new URL(`${market}/${nft_contract.address}/${nft_id}`);
+            return new URL(`${market}/${nft_contract.address}/${Nft.realId(nft_id)}`);
         }
         return null;
     }

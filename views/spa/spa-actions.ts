@@ -2,7 +2,7 @@
 import { removeNonce, removeNonceByAmount, setAftWalletBurner, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter, switchToken } from '../../source/redux/actions';
 import { mintingRowBy, nftTotalBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
 import { AppThunk } from '../../source/redux/store';
-import { Address, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftCoreId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, NftSenderStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../source/redux/types';
+import { Address, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, NftSenderStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../source/redux/types';
 
 import { Blockchain } from '../../source/blockchain';
 import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
@@ -174,8 +174,8 @@ export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
     const nft_token = Nft.token(
         token
     );
-    const core_id = Nft.coreId({
-        issue, level
+    const full_id = Nft.fullId({
+        issue, level, token: nft_token
     });
     const { nfts_ui: { details } } = api.getState();
     const by_token = details[nft_token];
@@ -213,7 +213,7 @@ export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
         set_status(NftSenderStatus.sending);
         nft_wallet.onTransferSingle(on_single_tx);
         tx = await nft_wallet.safeTransfer(
-            target, core_id, amount
+            target, full_id, amount
         );
     } catch (ex: any) {
         /* eslint no-ex-assign: [off] */
@@ -225,7 +225,7 @@ export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
                 ex.message = `${ex.message} [${ex.data.message}]`;
             }
             const $ref = globalRef<HTMLElement>(
-                `.nft-sender[core-id="${core_id}"]`
+                `.nft-sender[full-id="${full_id}"]`
             );
             const $sender_row = ancestor(
                 $ref.current, (e) => e.classList.contains('row')
@@ -348,8 +348,8 @@ export const pptsClaimRewards = AppThunk('ppts/claim-rewards', async (args: {
     if (!address) {
         throw new Error('missing selected-address');
     }
-    const core_id = Nft.coreId({
-        issue, level
+    const full_id = Nft.fullId({
+        issue, level, token: Nft.token(token)
     });
     const moe_treasury = MoeTreasuryFactory({
         token
@@ -373,12 +373,12 @@ export const pptsClaimRewards = AppThunk('ppts/claim-rewards', async (args: {
             await moe_treasury
         );
         tx = await contract.claimFor(
-            x40(address), core_id
+            x40(address), Nft.realId(full_id)
         );
     } catch (ex: any) {
         set_status(PptClaimerStatus.error);
         const $ref = globalRef<HTMLElement>(
-            `.ppt-claimer[core-id="${core_id}"]`
+            `.ppt-claimer[full-id="${full_id}"]`
         );
         const $claimer_row = ancestor(
             $ref.current, (e) => e.classList.contains('row')
@@ -473,7 +473,7 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
         token
     );
     const ppt_mints = [] as Array<{
-        ppt_id: NftCoreId; amount: Amount;
+        ppt_id: NftFullId; amount: Amount;
     }>;
     for (const level of NftLevels()) {
         const { amount } = list[level];
@@ -488,8 +488,8 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
                 if (nft_total.amount === 0n) {
                     continue;
                 }
-                const ppt_id = Nft.coreId({
-                    level, issue
+                const ppt_id = Nft.fullId({
+                    level, issue, token: ppt_token
                 });
                 if (mint_amount >= nft_total.amount) {
                     ppt_mints.push({
@@ -532,7 +532,7 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
             await ppt_treasury
         );
         tx = await contract.stakeBatch(
-            x40(address), ppt_ids, amounts
+            x40(address), Nft.realIds(ppt_ids), amounts
         );
     } catch (ex: any) {
         set_status(PptMinterStatus.error);
@@ -558,7 +558,7 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
         token
     );
     const ppt_burns = [] as Array<{
-        ppt_id: NftCoreId; amount: Amount;
+        ppt_id: NftFullId; amount: Amount;
     }>;
     for (const level of NftLevels()) {
         const { amount } = list[level];
@@ -573,8 +573,8 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
                 if (ppt_total.amount === 0n) {
                     continue;
                 }
-                const ppt_id = Nft.coreId({
-                    level, issue
+                const ppt_id = Nft.fullId({
+                    level, issue, token: ppt_token
                 });
                 if (burn_amount >= ppt_total.amount) {
                     ppt_burns.push({
@@ -617,7 +617,7 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
             await ppt_treasury
         );
         tx = await contract.unstakeBatch(
-            x40(address), ppt_ids, amounts
+            x40(address), Nft.realIds(ppt_ids), amounts
         );
     } catch (ex: any) {
         set_status(PptBurnerStatus.error);
