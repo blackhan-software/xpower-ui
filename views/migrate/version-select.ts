@@ -20,11 +20,11 @@ Blockchain.onConnect(async function setBalances() {
     const versions = Array.from(Versions())
         .filter((v) => v < ROParams.versionTarget)
         .reverse();
-    const ids = Nft.realIds(Nft.fullIds({
+    const ids = Nft.fullIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels()),
         token: Nft.token(token)
-    }));
+    });
     const accounts = ids.map(() => {
         return x40(address);
     });
@@ -57,7 +57,7 @@ Blockchain.onConnect(async function setBalances() {
                 token, version
             });
             const nfts: BigNumber[] = await nft_contract.balanceOfBatch(
-                accounts, ids
+                accounts, Nft.realIds(ids, { version })
             );
             nft = nfts.reduce((a, n) => a.add(n), BigNumber.from(0));
         } catch (ex) {
@@ -71,7 +71,7 @@ Blockchain.onConnect(async function setBalances() {
                 token, version
             });
             const ppts: BigNumber[] = await ppt_contract.balanceOfBatch(
-                accounts, ids
+                accounts, Nft.realIds(ids, { version })
             );
             ppt = ppts.reduce((a, p) => a.add(p), BigNumber.from(0));
         } catch (ex) {

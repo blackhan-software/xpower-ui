@@ -42,16 +42,16 @@ async function burn(token: Token, { $burn }: {
     //
     // Check balances:
     //
-    const ids = Nft.realIds(Nft.fullIds({
+    const ids = Nft.fullIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels()),
         token: Nft.token(token)
-    }));
+    });
     const accounts = ids.map(() => {
         return x40(address);
     });
     const src_balances: BigNumber[] = await nft_source.balanceOfBatch(
-        accounts, ids
+        accounts, Nft.realIds(ids, { version: src_version })
     );
     console.debug(
         `[${src_version}:balances]`, src_balances.map((b) => b.toString())
@@ -79,7 +79,7 @@ async function burn(token: Token, { $burn }: {
             reset();
         }));
         tx = await nft_source.burnBatch(
-            x40(address), zz.ids, zz.balances
+            x40(address), Nft.realIds(zz.ids, { version: src_version }), zz.balances
         );
     } catch (ex: any) {
         if (ex.message) {

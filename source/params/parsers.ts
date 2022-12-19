@@ -60,7 +60,7 @@ export function token(params: URLSearchParams): Token {
     return Tokenizer.token(params.get('token'));
 }
 export function version(
-    params: URLSearchParams, value?: string | null, fallback = Version.v5c
+    params: URLSearchParams, value?: string | null, fallback = Version.v6a
 ): Version {
     if (value === undefined) {
         value = params.get('version');
@@ -86,10 +86,10 @@ export function version(
     return fallback;
 }
 export function versionSource(params: URLSearchParams): Version {
-    return version(params, params.get('version-source'), Version.v5a);
+    return version(params, params.get('version-source'), Version.v5c);
 }
 export function versionTarget(params: URLSearchParams): Version {
-    return version(params, params.get('version-target'), Version.v5c);
+    return version(params, params.get('version-target'));
 }
 export function versionFaked(params: URLSearchParams): boolean {
     return Boolean(params.get('version')?.match(/^v[0-9]+[a-z]+-(dev|faked?)$/));

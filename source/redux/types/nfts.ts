@@ -20,16 +20,16 @@ export class Nft {
         }
         switch (id.toUpperCase()) {
             case Token.THOR:
-            case Token.aTHOR:
+            case Token.aTHOR.toUpperCase():
                 return this._token[id] = NftToken.THOR;
             case Token.LOKI:
-            case Token.aLOKI:
+            case Token.aLOKI.toUpperCase():
                 return this._token[id] = NftToken.LOKI;
             case Token.ODIN:
-            case Token.aODIN:
+            case Token.aODIN.toUpperCase():
                 return this._token[id] = NftToken.ODIN;
             case Token.HELA:
-            case Token.aHELA:
+            case Token.aHELA.toUpperCase():
                 return this._token[id] = NftToken.HELA;
         }
         switch (parseInt(id[0])) {

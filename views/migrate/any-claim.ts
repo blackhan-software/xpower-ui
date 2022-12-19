@@ -34,22 +34,22 @@ async function claim(token: Token, { $claim }: {
     const { address, src_version } = await context({
         $el: $claim
     });
-    const { mty_treasury } = await contracts({
+    const { mty_source } = await contracts({
         token, src_version
     });
-    if (!mty_treasury) {
+    if (!mty_source) {
         throw new Error('undefined mty_treasury');
     }
     //
     // Check allowance:
     //
-    const ids = Nft.realIds(Nft.fullIds({
+    const ids = Nft.fullIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels()),
         token: Nft.token(token)
-    }));
-    const src_claimables: BigNumber[] = await mty_treasury.claimableForBatch(
-        x40(address), ids
+    });
+    const src_claimables: BigNumber[] = await mty_source.claimableForBatch(
+        x40(address), Nft.realIds(ids, { version: src_version })
     );
     console.debug(
         `[${src_version}:claimables]`, src_claimables.map((b) => b.toString())
@@ -64,7 +64,7 @@ async function claim(token: Token, { $claim }: {
         );
         return;
     }
-    const src_treasure: BigNumber = await mty_treasury.balance();
+    const src_treasure: BigNumber = await mty_source.balance();
     console.debug(
         `[${src_version}:balance]`, src_treasure.toString()
     );
@@ -91,7 +91,7 @@ async function claim(token: Token, { $claim }: {
         const nz = filter(ids, src_claimables, {
             zero: false
         });
-        mty_treasury.on(
+        mty_source.on(
             'ClaimBatch', <OnClaimBatch>((
                 account, ids, amounts, ev
             ) => {
@@ -105,8 +105,8 @@ async function claim(token: Token, { $claim }: {
                 reset();
             })
         );
-        const tx: Transaction = await mty_treasury.claimForBatch(
-            x40(address), nz.ids
+        const tx: Transaction = await mty_source.claimForBatch(
+            x40(address), Nft.realIds(nz.ids, { version: src_version })
         );
     } catch (ex: any) {
         if (ex.message) {
@@ -156,18 +156,18 @@ async function contracts({
 }: {
     token: Token, src_version: Version
 }) {
-    let mty_treasury: Contract | undefined;
+    let mty_source: Contract | undefined;
     try {
-        mty_treasury = await MoeTreasuryFactory({
+        mty_source = await MoeTreasuryFactory({
             token, version: src_version
         });
         console.debug(
-            `[${src_version}:mty_treasury]`, mty_treasury.address
+            `[${src_version}:mty_source]`, mty_source.address
         );
     } catch (ex) {
         console.error(ex);
     }
     return {
-        mty_treasury,
+        mty_source,
     };
 }

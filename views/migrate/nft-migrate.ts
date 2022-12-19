@@ -68,16 +68,16 @@ async function nftUnstakeOld(token: Token, { $unstake, $approve }: {
     //
     // Check balances:
     //
-    const ids = Nft.realIds(Nft.fullIds({
+    const ids = Nft.fullIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels()),
         token: Nft.token(token)
-    }));
+    });
     const accounts = ids.map(() => {
         return x40(address);
     });
     const src_balances: BigNumber[] = await ppt_source.balanceOfBatch(
-        accounts, ids
+        accounts, Nft.realIds(ids, { version: src_version })
     );
     console.debug(
         `[${src_version}:balances]`, src_balances.map((b) => b.toString())
@@ -115,7 +115,7 @@ async function nftUnstakeOld(token: Token, { $unstake, $approve }: {
             zero: false
         });
         tx = await nty_source.unstakeBatch(
-            x40(address), nz.ids, nz.balances
+            x40(address), Nft.realIds(nz.ids, { version: src_version }), nz.balances
         );
     } catch (ex: any) {
         if (ex.message) {
@@ -179,16 +179,16 @@ async function nftApproveOld(token: Token, { $approve, $migrate }: {
     console.debug(
         `[${src_version}:approved]`, src_approved
     );
-    const ids = Nft.realIds(Nft.fullIds({
+    const ids = Nft.fullIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels()),
         token: Nft.token(token)
-    }));
+    });
     const accounts = ids.map(() => {
         return x40(address);
     });
     const src_balances: BigNumber[] = await nft_source.balanceOfBatch(
-        accounts, ids
+        accounts, Nft.realIds(ids, { version: src_version })
     );
     console.debug(
         `[${src_version}:balances]`, src_balances.map((b) => b.toString())
@@ -284,16 +284,16 @@ async function nftMigrateOld(token: Token, { $migrate, $approve }: {
     //
     // Check balances:
     //
-    const ids = Nft.realIds(Nft.fullIds({
+    const ids = Nft.fullIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels()),
         token: Nft.token(token)
-    }));
+    });
     const accounts = ids.map(() => {
         return x40(address);
     });
     const src_balances: BigNumber[] = await nft_source.balanceOfBatch(
-        accounts, ids
+        accounts, Nft.realIds(ids, { version: src_version })
     );
     console.debug(
         `[${src_version}:balances]`, src_balances.map((b) => b.toString())
@@ -330,7 +330,7 @@ async function nftMigrateOld(token: Token, { $migrate, $approve }: {
     Alerts.hide();
     try {
         nft_target.on('TransferBatch', <OnTransferBatch>((
-            operator, from, to, ids, values, ev
+            op, from, to, ids, values, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
                 return;
@@ -344,7 +344,9 @@ async function nftMigrateOld(token: Token, { $migrate, $approve }: {
         }));
         const nz = filter(ids, src_balances, { zero: false });
         const index = await nft_target.oldIndexOf(nft_source.address);
-        tx = await nft_target.migrateBatch(nz.ids, nz.balances, [index]);
+        tx = await nft_target.migrateBatch(
+            Nft.realIds(nz.ids, { version: tgt_version }), nz.balances, [index]
+        );
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
@@ -407,16 +409,16 @@ async function nftApproveNew(token: Token, { $approve, $restake }: {
     console.debug(
         `[${tgt_version}:approved]`, tgt_approved
     );
-    const ids = Nft.realIds(Nft.fullIds({
+    const ids = Nft.fullIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels()),
         token: Nft.token(token)
-    }));
+    });
     const accounts = ids.map(() => {
         return x40(address);
     });
     const tgt_balances: BigNumber[] = await nft_target.balanceOfBatch(
-        accounts, ids
+        accounts, Nft.realIds(ids, { version: tgt_version })
     );
     console.debug(
         `[${tgt_version}:balances]`, tgt_balances.map((b) => b.toString())
@@ -498,16 +500,16 @@ async function nftRestakeNew(token: Token, { $restake }: {
     //
     // Check balances:
     //
-    const ids = Nft.realIds(Nft.fullIds({
+    const ids = Nft.fullIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels()),
         token: Nft.token(token)
-    }));
+    });
     const accounts = ids.map(() => {
         return x40(address);
     });
     const tgt_balances: BigNumber[] = await nft_target.balanceOfBatch(
-        accounts, ids
+        accounts, Nft.realIds(ids, { version: tgt_version })
     );
     console.debug(
         `[${tgt_version}:balances]`, tgt_balances.map((b) => b.toString())
@@ -545,7 +547,7 @@ async function nftRestakeNew(token: Token, { $restake }: {
             zero: false
         });
         tx = await nty_target.stakeBatch(
-            x40(address), nz.ids, nz.balances
+            x40(address), Nft.realIds(nz.ids, { version: tgt_version }), nz.balances
         );
     } catch (ex: any) {
         if (ex.message) {
