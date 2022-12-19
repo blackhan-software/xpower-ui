@@ -18,7 +18,7 @@ $(window).on('load', function setVersion() {
 Blockchain.onConnect(async function setBalances() {
     const { address, token } = await context();
     const versions = Array.from(Versions())
-        .filter((v) => v !== ROParams.versionTarget)
+        .filter((v) => v < ROParams.versionTarget)
         .reverse();
     const ids = Nft.realIds(Nft.fullIds({
         issues: Array.from(Years()),

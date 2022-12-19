@@ -80,6 +80,8 @@ export function version(
             return Version.v5b;
         case 'v5c':
             return Version.v5c;
+        case 'v6a':
+            return Version.v6a;
         default:
             return fallback;
     }
@@ -88,5 +90,5 @@ export function versionSource(params: URLSearchParams): Version {
     return version(params, params.get('version-source'), Version.v5a);
 }
 export function versionTarget(params: URLSearchParams): Version {
-    return version(params, params.get('version-target'));
+    return version(params, params.get('version-target'), Version.v5c);
 }
