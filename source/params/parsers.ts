@@ -65,30 +65,32 @@ export function version(
     if (value === undefined) {
         value = params.get('version');
     }
-    switch (value) {
-        case 'v2a':
-            return Version.v2a;
-        case 'v3a':
-            return Version.v3a;
-        case 'v3b':
-            return Version.v3b;
-        case 'v4a':
-            return Version.v4a;
-        case 'v5a':
-            return Version.v5a;
-        case 'v5b':
-            return Version.v5b;
-        case 'v5c':
-            return Version.v5c;
+    switch (value?.slice(0, 3)) {
         case 'v6a':
             return Version.v6a;
-        default:
-            return fallback;
+        case 'v5c':
+            return Version.v5c;
+        case 'v5b':
+            return Version.v5b;
+        case 'v5a':
+            return Version.v5a;
+        case 'v4a':
+            return Version.v4a;
+        case 'v3b':
+            return Version.v3b;
+        case 'v3a':
+            return Version.v3a;
+        case 'v2a':
+            return Version.v2a;
     }
+    return fallback;
 }
 export function versionSource(params: URLSearchParams): Version {
     return version(params, params.get('version-source'), Version.v5a);
 }
 export function versionTarget(params: URLSearchParams): Version {
     return version(params, params.get('version-target'), Version.v5c);
+}
+export function versionFaked(params: URLSearchParams): boolean {
+    return Boolean(params.get('version')?.match(/^v[0-9]+[a-z]+-(dev|faked?)$/));
 }
