@@ -50,6 +50,12 @@ const LOKI_MOE_V5c = process.env.LOKI_MOE_V5c ?? '0x0f310C35C006a86BD0Df6595B185
 assert(LOKI_MOE_V5c, 'missing LOKI_MOE_V5c env variable');
 const ODIN_MOE_V5c = process.env.ODIN_MOE_V5c ?? '0x7577131aCA38c2B2CE2a3F7c447CCC2D6decc977';
 assert(ODIN_MOE_V5c, 'missing ODIN_MOE_V5c env variable');
+const THOR_MOE_V6a = process.env.THOR_MOE_V6a ?? '0x0000000000000000000000000000000000000000';
+assert(THOR_MOE_V6a, 'missing THOR_MOE_V6a env variable');
+const LOKI_MOE_V6a = process.env.LOKI_MOE_V6a ?? '0x0000000000000000000000000000000000000000';
+assert(LOKI_MOE_V6a, 'missing LOKI_MOE_V6a env variable');
+const ODIN_MOE_V6a = process.env.ODIN_MOE_V6a ?? '0x0000000000000000000000000000000000000000';
+assert(ODIN_MOE_V6a, 'missing ODIN_MOE_V6a env variable');
 // MOE contract symbols
 const THOR_MOE_SYMBOL_V2a = process.env.THOR_MOE_SYMBOL_V2a ?? 'THOR';
 assert(THOR_MOE_SYMBOL_V2a, 'missing THOR_MOE_SYMBOL_V2a env variable');
@@ -87,6 +93,12 @@ const LOKI_MOE_SYMBOL_V5c = process.env.LOKI_MOE_SYMBOL_V5c ?? 'LOKI';
 assert(LOKI_MOE_SYMBOL_V5c, 'missing LOKI_MOE_SYMBOL_V5c env variable');
 const ODIN_MOE_SYMBOL_V5c = process.env.ODIN_MOE_SYMBOL_V5c ?? 'ODIN';
 assert(ODIN_MOE_SYMBOL_V5c, 'missing ODIN_MOE_SYMBOL_V5c env variable');
+const THOR_MOE_SYMBOL_V6a = process.env.THOR_MOE_SYMBOL_V6a ?? 'THOR';
+assert(THOR_MOE_SYMBOL_V6a, 'missing THOR_MOE_SYMBOL_V6a env variable');
+const LOKI_MOE_SYMBOL_V6a = process.env.LOKI_MOE_SYMBOL_V6a ?? 'LOKI';
+assert(LOKI_MOE_SYMBOL_V6a, 'missing LOKI_MOE_SYMBOL_V6a env variable');
+const ODIN_MOE_SYMBOL_V6a = process.env.ODIN_MOE_SYMBOL_V6a ?? 'ODIN';
+assert(ODIN_MOE_SYMBOL_V6a, 'missing ODIN_MOE_SYMBOL_V6a env variable');
 // MOE contract decimals
 const THOR_MOE_DECIMALS_V2a = process.env.THOR_MOE_DECIMALS_V2a ?? '0';
 assert(THOR_MOE_DECIMALS_V2a, 'missing THOR_MOE_DECIMALS_V2a env variable');
@@ -124,6 +136,12 @@ const LOKI_MOE_DECIMALS_V5c = process.env.LOKI_MOE_DECIMALS_V5c ?? '18';
 assert(LOKI_MOE_DECIMALS_V5c, 'missing LOKI_MOE_DECIMALS_V5c env variable');
 const ODIN_MOE_DECIMALS_V5c = process.env.ODIN_MOE_DECIMALS_V5c ?? '18';
 assert(ODIN_MOE_DECIMALS_V5c, 'missing ODIN_MOE_DECIMALS_V5c env variable');
+const THOR_MOE_DECIMALS_V6a = process.env.THOR_MOE_DECIMALS_V6a ?? '18';
+assert(THOR_MOE_DECIMALS_V6a, 'missing THOR_MOE_DECIMALS_V6a env variable');
+const LOKI_MOE_DECIMALS_V6a = process.env.LOKI_MOE_DECIMALS_V6a ?? '18';
+assert(LOKI_MOE_DECIMALS_V6a, 'missing LOKI_MOE_DECIMALS_V6a env variable');
+const ODIN_MOE_DECIMALS_V6a = process.env.ODIN_MOE_DECIMALS_V6a ?? '18';
+assert(ODIN_MOE_DECIMALS_V6a, 'missing ODIN_MOE_DECIMALS_V6a env variable');
 // MOE contract images
 const THOR_MOE_IMAGE_V2a = process.env.THOR_MOE_IMAGE_V2a ?? "data:image/svg+xml,%3Csvg viewBox='0 0 640 640' width='640' height='640' fill='%2322262a' id='svg55' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cdefs id='defs53'%3E%3ClinearGradient id='paint0_linear_152_206' x1='233.535' y1='156.147' x2='432.978' y2='252.918' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23E4E416' id='stop18' /%3E%3Cstop offset='1' stop-color='%23FFFF01' id='stop20' /%3E%3C/linearGradient%3E%3ClinearGradient id='paint1_linear_152_206' x1='389.944' y1='49.795502' x2='379.23599' y2='177.05499' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23FFFF01' id='stop23' /%3E%3Cstop offset='1' stop-color='%23E2E20A' id='stop25' /%3E%3C/linearGradient%3E%3ClinearGradient id='paint2_linear_152_206' x1='249.062' y1='-19.343399' x2='262.11301' y2='112.227' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23FFFF01' id='stop28' /%3E%3Cstop offset='1' stop-color='%23E8E80E' id='stop30' /%3E%3C/linearGradient%3E%3ClinearGradient id='paint3_linear_152_206' x1='145.575' y1='44.921101' x2='216.41' y2='135.909' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23FFFF01' id='stop33' /%3E%3Cstop offset='1' stop-color='%23EFEF0B' id='stop35' /%3E%3C/linearGradient%3E%3ClinearGradient id='paint4_linear_152_206' x1='243.09801' y1='283.21899' x2='193.239' y2='175.668' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23FFFF00' id='stop38' /%3E%3Cstop offset='1' stop-color='%23FAFA26' id='stop40' /%3E%3C/linearGradient%3E%3ClinearGradient id='paint5_linear_152_206' x1='120.495' y1='329.76401' x2='-60.060101' y2='429.384' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23E6E61C' id='stop43' /%3E%3Cstop offset='1' stop-color='%23FAFA00' id='stop45' /%3E%3C/linearGradient%3E%3ClinearGradient id='paint6_linear_152_206' x1='181.588' y1='316.45499' x2='137.58099' y2='542.84302' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23EFEF12' id='stop48' /%3E%3Cstop offset='1' stop-color='%23FFFF00' id='stop50' /%3E%3C/linearGradient%3E%3ClinearGradient id='paint0_linear_152_206-3' x1='233.535' y1='156.147' x2='432.978' y2='252.918' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23E4E416' id='stop18-6' /%3E%3Cstop offset='1' stop-color='%23FFFF01' id='stop20-7' /%3E%3C/linearGradient%3E%3ClinearGradient id='paint1_linear_152_206-5' x1='389.944' y1='49.795502' x2='379.23599' y2='177.05499' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23FFFF01' id='stop23-3' /%3E%3Cstop offset='1' stop-color='%23E2E20A' id='stop25-5' /%3E%3C/linearGradient%3E%3ClinearGradient id='paint2_linear_152_206-6' x1='249.062' y1='-19.343399' x2='262.11301' y2='112.227' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23FFFF01' id='stop28-2' /%3E%3Cstop offset='1' stop-color='%23E8E80E' id='stop30-9' /%3E%3C/linearGradient%3E%3ClinearGradient id='paint3_linear_152_206-1' x1='145.575' y1='44.921101' x2='216.41' y2='135.909' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23FFFF01' id='stop33-2' /%3E%3Cstop offset='1' stop-color='%23EFEF0B' id='stop35-7' /%3E%3C/linearGradient%3E%3ClinearGradient id='paint4_linear_152_206-0' x1='243.09801' y1='283.21899' x2='193.239' y2='175.668' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23FFFF00' id='stop38-9' /%3E%3Cstop offset='1' stop-color='%23FAFA26' id='stop40-3' /%3E%3C/linearGradient%3E%3ClinearGradient id='paint5_linear_152_206-6' x1='120.495' y1='329.76401' x2='-60.060101' y2='429.384' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23E6E61C' id='stop43-0' /%3E%3Cstop offset='1' stop-color='%23FAFA00' id='stop45-6' /%3E%3C/linearGradient%3E%3ClinearGradient id='paint6_linear_152_206-2' x1='181.588' y1='316.45499' x2='137.58099' y2='542.84302' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23EFEF12' id='stop48-6' /%3E%3Cstop offset='1' stop-color='%23FFFF00' id='stop50-1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect style='fill:%2322262a;fill-opacity:1;stroke:%23000000;stroke-width:2' id='rect1391' width='640' height='640' x='0' y='0' /%3E%3Cg id='g1072' transform='translate(80.626,51.52)'%3E%3Cpath d='m 459.707,159.289 c -1.263,16.16 -6.504,31.954 -14.79,31.399 -9.939,-13.929 -22.228,-19.784 -36.393,-19.146 -9.33,0.474 -18.305,3.73 -25.768,9.349 -45.364,33.795 -103.877,16.195 -83.102,-45.564 -36.593,15.239 -48.633,30.561 -48.633,82.723 0,35.236 61.854,79.679 68.358,130.437 -1.039,-3.683 -27.881,-64.026 -104.467,-122.54 -15.062,-8.912 -24.541,-42.495 -13.055,-71.273 5.902,-14.803 17.423,-28.33 36.663,-36.688 14.968,-6.48 34.61,-9.809 59.954,-8.121 0,-0.059 34.279,48.326 161.233,49.424 z' fill='url(%23paint0_linear_152_206)' id='path2' style='fill:url(%23paint0_linear_152_206-3)' /%3E%3Cpath d='M 459.707,159.29 C 332.753,158.192 298.478,109.859 298.478,109.859 l 6.44,-34.3791 2.798,-14.9324 7.212,-38.4108 c 16.432,74.0359 87.127,138.7703 136.315,103.6413 7.154,1.711 9.68,17.788 8.464,33.512 z' fill='url(%23paint1_linear_152_206)' id='path4' style='fill:url(%23paint1_linear_152_206-5)' /%3E%3Cpath d='m 314.929,22.1249 -7.213,38.3636 -2.797,14.9323 -6.445,34.4472 c -25.344,-1.688 -44.936,1.621 -59.903,8.101 L 194.302,0.287109 C 232.524,65.34 277.663,65.5407 314.929,22.1249 Z' fill='url(%23paint2_linear_152_206)' id='path6' style='fill:url(%23paint2_linear_152_206-6)' /%3E%3Cpath d='m 238.57,117.962 c -19.24,8.334 -30.776,21.849 -36.69,36.652 L 167.329,135.727 153.873,128.385 93.3525,95.3331 c 42.4955,7.0829 69.8695,2.5851 88.1185,-15.676 16.408,-16.396 20.964,-50.156 12.855,-79.442256 z' fill='url(%23paint3_linear_152_206)' id='path8' style='fill:url(%23paint3_linear_152_206-1)' /%3E%3Cpath d='M 319.374,348.48 C 269.584,281.279 219.657,276.821 177.929,247.205 137.795,214.838 149.505,199.244 141.053,157.162 134.254,131.193 114.635,112.885 93.3286,95.3438 l 60.5204,33.0522 13.457,7.342 34.58,18.872 c -11.486,28.732 -2.036,62.376 13.026,71.288 76.585,58.502 103.424,118.899 104.462,122.582 z' fill='url(%23paint4_linear_152_206)' id='path10' style='fill:url(%23paint4_linear_152_206-0)' /%3E%3Cpath d='M 314.941,391.383 C 221.404,314.49 152.506,296.91 107.886,337.942 c 8.959,-13.917 14.375,-26.356 16.913,-37.463 v -0.142 c 1.786,-7.359 2.147,-14.992 1.062,-22.487 -5.56,-35.011 -47.0751,-50.628 -89.3341,-50.841 74.7091,-49.802 107.9731,19.725 170.0871,54.052 54.665,30.171 116.365,42.153 108.327,110.322 z' fill='%23ffff00' id='path12' /%3E%3Cpath d='m 124.834,300.338 v 0.142 c -2.538,11.107 -7.993,23.578 -16.952,37.472 -3.403,3.146 -6.56,6.552 -9.501,10.134 -3.5677,4.957 -6.4965,8.965 -9.7857,13.717 -11.1353,17.934 -20.0632,41.149 -26.7838,69.644 -1.8571,7.87 -3.5452,16.133 -5.064,24.789 -4.2522,25.003 -7.0936,50.225 -8.5108,75.547 C -36.4348,429.889 2.79056,369.995 70.6647,315.011 78.1855,309.044 84.1544,301.35 88.0641,292.583 101.615,261.16 75.469,243.147 36.5506,226.928 c 42.259,0.212 83.8094,15.829 89.3344,50.84 1.099,7.521 0.742,15.184 -1.051,22.57 z' fill='url(%23paint5_linear_152_206)' id='path14' style='fill:url(%23paint5_linear_152_206-6)' /%3E%3Cpath d='M 314.941,391.383 C 229.502,351.426 78.0518,410.261 48.2344,531.785 c 1.4172,-25.322 4.1906,-50.535 8.4428,-75.537 1.5109,-8.657 3.1989,-16.92 5.064,-24.789 6.7284,-28.519 15.6563,-51.734 26.7837,-69.645 3.2816,-4.604 6.575,-9.184 9.7857,-13.716 2.9404,-3.582 6.1234,-6.958 9.5264,-10.105 44.655,-41.055 113.568,-23.502 207.104,53.39 z' fill='url(%23paint6_linear_152_206)' id='path16' style='fill:url(%23paint6_linear_152_206-2)' /%3E%3C/g%3E%3C/svg%3E";
 assert(typeof THOR_MOE_IMAGE_V2a === 'string', 'missing THOR_MOE_IMAGE_V2a env variable');
@@ -161,6 +179,12 @@ const LOKI_MOE_IMAGE_V5c = process.env.LOKI_MOE_IMAGE_V5c ?? LOKI_MOE_IMAGE_V5b;
 assert(typeof LOKI_MOE_IMAGE_V5c === 'string', 'missing LOKI_MOE_IMAGE_V5c env variable');
 const ODIN_MOE_IMAGE_V5c = process.env.ODIN_MOE_IMAGE_V5c ?? ODIN_MOE_IMAGE_V5b;
 assert(typeof ODIN_MOE_IMAGE_V5c === 'string', 'missing ODIN_MOE_IMAGE_V5c env variable');
+const THOR_MOE_IMAGE_V6a = process.env.THOR_MOE_IMAGE_V6a ?? THOR_MOE_IMAGE_V5c;
+assert(typeof THOR_MOE_IMAGE_V6a === 'string', 'missing THOR_MOE_IMAGE_V6a env variable');
+const LOKI_MOE_IMAGE_V6a = process.env.LOKI_MOE_IMAGE_V6a ?? LOKI_MOE_IMAGE_V5c;
+assert(typeof LOKI_MOE_IMAGE_V6a === 'string', 'missing LOKI_MOE_IMAGE_V6a env variable');
+const ODIN_MOE_IMAGE_V6a = process.env.ODIN_MOE_IMAGE_V6a ?? ODIN_MOE_IMAGE_V5c;
+assert(typeof ODIN_MOE_IMAGE_V6a === 'string', 'missing ODIN_MOE_IMAGE_V6a env variable');
 // NFT contract addresses
 const THOR_NFT_V2a = process.env.THOR_NFT_V2a ?? '0x367905eE54817631DbF1d7a1aA15228426CB10Ba';
 assert(THOR_NFT_V2a, 'missing THOR_NFT_V2a env variable');
@@ -204,6 +228,8 @@ const LOKI_NFT_V5c = process.env.LOKI_NFT_V5c ?? '0x67F6a112300455f00d174C0EF310
 assert(LOKI_NFT_V5c, 'missing LOKI_NFT_V5c env variable');
 const ODIN_NFT_V5c = process.env.ODIN_NFT_V5c ?? '0xCdE807b08fBa39f8CDBA59c00259181221eaC427';
 assert(ODIN_NFT_V5c, 'missing ODIN_NFT_V5c env variable');
+const XPOW_NFT_V6a = process.env.XPOW_NFT_V6a ?? '0x0000000000000000000000000000000000000000';
+assert(XPOW_NFT_V6a, 'missing XPOW_NFT_V6a env variable');
 // PPT contract addresses
 const THOR_PPT_V4a = process.env.THOR_PPT_V4a ?? '0x881a061a35e8a0031171bF1b41f9DC76A614c34C';
 assert(THOR_PPT_V4a, 'missing THOR_PPT_V4a env variable');
@@ -229,6 +255,8 @@ const LOKI_PPT_V5c = process.env.LOKI_PPT_V5c ?? '0x098E7BEc9Aea1938Ee769b111Ab8
 assert(LOKI_PPT_V5c, 'missing LOKI_PPT_V5c env variable');
 const ODIN_PPT_V5c = process.env.ODIN_PPT_V5c ?? '0x47F24e97A38a75e9593033f8B39A0B154Dc48be8';
 assert(ODIN_PPT_V5c, 'missing ODIN_PPT_V5c env variable');
+const XPOW_PPT_V6a = process.env.XPOW_PPT_V6a ?? '0x0000000000000000000000000000000000000000';
+assert(XPOW_PPT_V6a, 'missing XPOW_PPT_V6a env variable');
 // PPT treasury contract addresses
 const THOR_PTY_V4a = process.env.THOR_PTY_V4a ?? '0xD7B2568cE0f91fcB0A8AeFC60DaE64E3350656c3';
 assert(THOR_PTY_V4a, 'missing THOR_PTY_V4a env variable');
@@ -254,6 +282,8 @@ const LOKI_PTY_V5c = process.env.LOKI_PTY_V5c ?? '0x7A3bA387933A3D21382403905f89
 assert(LOKI_PTY_V5c, 'missing LOKI_PTY_V5c env variable');
 const ODIN_PTY_V5c = process.env.ODIN_PTY_V5c ?? '0x89f78236CD41d045ad9A7210DF50aF201748532d';
 assert(ODIN_PTY_V5c, 'missing ODIN_PTY_V5c env variable');
+const XPOW_PTY_V6a = process.env.XPOW_PTY_V6a ?? '0x0000000000000000000000000000000000000000';
+assert(XPOW_PTY_V6a, 'missing XPOW_PTY_V6a env variable');
 // MOE treasury contract addresses
 const THOR_MTY_V4a = process.env.THOR_MTY_V4a ?? '0xA2433ff916457694af1Edfe499Bd61d67312Ac8a';
 assert(THOR_MTY_V4a, 'missing THOR_MTY_V4a env variable');
@@ -279,6 +309,12 @@ const LOKI_MTY_V5c = process.env.LOKI_MTY_V5c ?? '0x10a9AC9Ab982F79572Cd186eBeE6
 assert(LOKI_MTY_V5c, 'missing LOKI_MTY_V5c env variable');
 const ODIN_MTY_V5c = process.env.ODIN_MTY_V5c ?? '0xb2BA3c84Aca679A1c14ccD15902EC80D711BAcd4';
 assert(ODIN_MTY_V5c, 'missing ODIN_MTY_V5c env variable');
+const THOR_MTY_V6a = process.env.THOR_MTY_V6a ?? '0x0000000000000000000000000000000000000000';
+assert(THOR_MTY_V6a, 'missing THOR_MTY_V6a env variable');
+const LOKI_MTY_V6a = process.env.LOKI_MTY_V6a ?? '0x0000000000000000000000000000000000000000';
+assert(LOKI_MTY_V6a, 'missing LOKI_MTY_V6a env variable');
+const ODIN_MTY_V6a = process.env.ODIN_MTY_V6a ?? '0x0000000000000000000000000000000000000000';
+assert(ODIN_MTY_V6a, 'missing ODIN_MTY_V6a env variable');
 // SOV contract addresses
 const THOR_SOV_V5a = process.env.THOR_SOV_V5a ?? '0x114D214f7e814b87BCbB1a109Ef1706e061a8CA8';
 assert(THOR_SOV_V5a, 'missing THOR_SOV_V5a env variable');
@@ -298,6 +334,12 @@ const LOKI_SOV_V5c = process.env.LOKI_SOV_V5c ?? '0x42Fa90Abba2Acd3b064Dd3F29F99
 assert(LOKI_SOV_V5c, 'missing LOKI_SOV_V5c env variable');
 const ODIN_SOV_V5c = process.env.ODIN_SOV_V5c ?? '0x1A4488Df88f87F773a32265769568056A7E85C01';
 assert(ODIN_SOV_V5c, 'missing ODIN_SOV_V5c env variable');
+const THOR_SOV_V6a = process.env.THOR_SOV_V6a ?? '0x0000000000000000000000000000000000000000';
+assert(THOR_SOV_V6a, 'missing THOR_SOV_V6a env variable');
+const LOKI_SOV_V6a = process.env.LOKI_SOV_V6a ?? '0x0000000000000000000000000000000000000000';
+assert(LOKI_SOV_V6a, 'missing LOKI_SOV_V6a env variable');
+const ODIN_SOV_V6a = process.env.ODIN_SOV_V6a ?? '0x0000000000000000000000000000000000000000';
+assert(ODIN_SOV_V6a, 'missing ODIN_SOV_V6a env variable');
 // SOV contract symbols
 const THOR_SOV_SYMBOL_V5a = process.env.THOR_SOV_SYMBOL_V5a ?? 'aTHOR';
 assert(THOR_SOV_SYMBOL_V5a, 'missing THOR_SOV_SYMBOL_V5a env variable');
@@ -317,6 +359,12 @@ const LOKI_SOV_SYMBOL_V5c = process.env.LOKI_SOV_SYMBOL_V5c ?? 'aLOKI';
 assert(LOKI_SOV_SYMBOL_V5c, 'missing LOKI_SOV_SYMBOL_V5c env variable');
 const ODIN_SOV_SYMBOL_V5c = process.env.ODIN_SOV_SYMBOL_V5c ?? 'aODIN';
 assert(ODIN_SOV_SYMBOL_V5c, 'missing ODIN_SOV_SYMBOL_V5c env variable');
+const THOR_SOV_SYMBOL_V6a = process.env.THOR_SOV_SYMBOL_V6a ?? 'aTHOR';
+assert(THOR_SOV_SYMBOL_V6a, 'missing THOR_SOV_SYMBOL_V6a env variable');
+const LOKI_SOV_SYMBOL_V6a = process.env.LOKI_SOV_SYMBOL_V6a ?? 'aLOKI';
+assert(LOKI_SOV_SYMBOL_V6a, 'missing LOKI_SOV_SYMBOL_V6a env variable');
+const ODIN_SOV_SYMBOL_V6a = process.env.ODIN_SOV_SYMBOL_V6a ?? 'aODIN';
+assert(ODIN_SOV_SYMBOL_V6a, 'missing ODIN_SOV_SYMBOL_V6a env variable');
 // SOV contract decimals
 const THOR_SOV_DECIMALS_V5a = process.env.THOR_SOV_DECIMALS_V5a ?? '18';
 assert(THOR_SOV_DECIMALS_V5a, 'missing THOR_SOV_DECIMALS_V5a env variable');
@@ -336,6 +384,12 @@ const LOKI_SOV_DECIMALS_V5c = process.env.LOKI_SOV_DECIMALS_V5c ?? '18';
 assert(LOKI_SOV_DECIMALS_V5c, 'missing LOKI_SOV_DECIMALS_V5c env variable');
 const ODIN_SOV_DECIMALS_V5c = process.env.ODIN_SOV_DECIMALS_V5c ?? '18';
 assert(ODIN_SOV_DECIMALS_V5c, 'missing ODIN_SOV_DECIMALS_V5c env variable');
+const THOR_SOV_DECIMALS_V6a = process.env.THOR_SOV_DECIMALS_V6a ?? '18';
+assert(THOR_SOV_DECIMALS_V6a, 'missing THOR_SOV_DECIMALS_V6a env variable');
+const LOKI_SOV_DECIMALS_V6a = process.env.LOKI_SOV_DECIMALS_V6a ?? '18';
+assert(LOKI_SOV_DECIMALS_V6a, 'missing LOKI_SOV_DECIMALS_V6a env variable');
+const ODIN_SOV_DECIMALS_V6a = process.env.ODIN_SOV_DECIMALS_V6a ?? '18';
+assert(ODIN_SOV_DECIMALS_V6a, 'missing ODIN_SOV_DECIMALS_V6a env variable');
 // SOV contract images
 const THOR_SOV_IMAGE_V5a = process.env.THOR_SOV_IMAGE_V5a ?? "data:image/svg+xml,%3Csvg style='filter:invert(1)' viewBox='0 0 480 480' id='svg72' width='480' height='480' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cdefs id='defs30'%3E%3Cstyle id='style2'%3E.cls-1%7Bfill:%2322262a;%7D.cls-10,.cls-11,.cls-12,.cls-13,.cls-14,.cls-15,.cls-16,.cls-17,.cls-18,.cls-19,.cls-2,.cls-3,.cls-4,.cls-5,.cls-6,.cls-7,.cls-8,.cls-9%7Bstroke:%2322262a;stroke-miterlimit:10;fill-rule:evenodd;%7D.cls-2%7Bfill:url(%23linear-gradient);%7D.cls-3%7Bfill:url(%23linear-gradient-2);%7D.cls-4%7Bfill:url(%23linear-gradient-3);%7D.cls-5%7Bfill:url(%23linear-gradient-4);%7D.cls-6%7Bfill:url(%23linear-gradient-5);%7D.cls-7%7Bfill:url(%23linear-gradient-6);%7D.cls-8%7Bfill:url(%23linear-gradient-7);%7D.cls-9%7Bfill:url(%23linear-gradient-8);%7D.cls-10%7Bfill:url(%23linear-gradient-9);%7D.cls-11%7Bfill:url(%23linear-gradient-10);%7D.cls-12%7Bfill:url(%23linear-gradient-11);%7D.cls-13%7Bfill:url(%23linear-gradient-12);%7D.cls-14%7Bfill:url(%23linear-gradient-13);%7D.cls-15%7Bfill:url(%23linear-gradient-14);%7D.cls-16%7Bfill:url(%23linear-gradient-15);%7D.cls-17%7Bfill:url(%23linear-gradient-16);%7D.cls-18%7Bfill:url(%23linear-gradient-17);%7D.cls-19%7Bfill:url(%23linear-gradient-18);%7D%3C/style%3E%3ClinearGradient id='linear-gradient' x1='166.59' y1='418.81' x2='197.08' y2='471.63' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23ff0' id='stop4' /%3E%3Cstop offset='0.27' stop-color='%23fbf801' id='stop6' /%3E%3Cstop offset='0.65' stop-color='%23f1e603' id='stop8' /%3E%3Cstop offset='1' stop-color='%23e4cf06' id='stop10' /%3E%3C/linearGradient%3E%3ClinearGradient id='linear-gradient-2' x1='189.23' y1='401.69' x2='207.67' y2='433.62' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-3' x1='193.89999' y1='387.98999' x2='214.62' y2='423.88' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-4' x1='204.77' y1='372.70999' x2='225.58' y2='408.75' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-5' x1='216.63' y1='356.17001' x2='237.41' y2='392.16' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-6' x1='228.75999' y1='339.26999' x2='249.67' y2='375.5' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-7' x1='240.58' y1='320.60999' x2='262' y2='357.70999' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-8' x1='253.82001' y1='302.42001' x2='274.87' y2='338.88' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-9' x1='266.20001' y1='283.38' x2='287.94' y2='321.03' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-10' x1='279.76999' y1='264.32999' x2='301.84' y2='302.56' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-11' x1='293.59' y1='242.92999' x2='316.72' y2='282.98999' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-12' x1='283.85999' y1='215.28' x2='339.14001' y2='311.01999' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-13' x1='274.45999' y1='197.24001' x2='283.20999' y2='212.39999' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-14' x1='300.64999' y1='167.35001' x2='307.06' y2='178.46001' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-15' x1='366.01999' y1='135.64999' x2='380.34' y2='160.45' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-16' x1='338.54999' y1='163.94' x2='351.23999' y2='185.92999' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-17' x1='349.64999' y1='176.52' x2='405.04999' y2='272.45999' xlink:href='%23linear-gradient' /%3E%3ClinearGradient id='linear-gradient-18' x1='381.73001' y1='146.48' x2='438.29999' y2='244.46001' xlink:href='%23linear-gradient' /%3E%3ClinearGradient xlink:href='%23linear-gradient' id='linearGradient893' gradientUnits='userSpaceOnUse' x1='166.59' y1='418.81' x2='197.08' y2='471.63' /%3E%3C/defs%3E%3Crect class='cls-1' width='480' height='480' id='rect32' x='0' y='0' style='stroke-width:0.8' /%3E%3Cg id='g952' transform='translate(-59.156252,-59.91375)'%3E%3Cpath class='cls-2' d='m 198.3,432.52 c -5.58,0.56 -7.53,0.14 -9.92,-2.19 -1.76,-1.71 -2.53,-3.17 -3.49,-6.65 -0.89,-3.19 -1.44,-4.22 -3.42,-6.34 -1.98,-2.12 -3.83,-3 -6,-3 -1.56,0 -2,0.25 -12.32,8 -5.9,4.44 -10.8,8.19 -10.91,8.36 -0.11,0.17 0,3.08 0.82,10.43 0.58,5.47 1.42,13.72 1.72,17.1 a 19.35,19.35 0 0 0 0.46,3.26 c 0.17,0.16 20.64,8.23 25.53,10.06 l 1.92,0.72 8.94,-2.55 c 4.92,-1.41 10.9,-3.07 13.29,-3.72 a 23,23 0 0 0 4.57,-1.51 11.55,11.55 0 0 0 0.31,-2.75 c 0,-1.31 0.31,-5.69 0.58,-9.74 0.27,-4.05 0.68,-9.71 0.89,-12.58 0.25,-3.63 0.25,-5.35 0,-5.66 -1.09,-1.26 -7.12,-1.84 -12.97,-1.24 z' id='path34' style='fill:url(%23linearGradient893)' /%3E%3Cpath class='cls-3' d='m 213.34,412 c -1.48,-3.45 -5.2,-5.64 -10.45,-6.15 a 101.14,101.14 0 0 0 -15,0 c -6.37,0.52 -10.42,1.86 -11.43,3.74 -0.64,1.21 -0.17,1.76 2,2.4 3,0.86 4.44,1.71 5.9,3.4 a 18.67,18.67 0 0 1 3.7,7.26 c 1.1,3.61 2.85,5.45 6.1,6.39 0.7,0.2 2.84,0.12 6.11,-0.26 5.52,-0.62 7.7,-0.43 11,1 l 1.69,0.72 2.23,-2.23 v -4.64 c 0,-4.79 -0.64,-8.79 -1.85,-11.63 z' id='path36' style='fill:url(%23linear-gradient-2)' /%3E%3Cpath class='cls-4' d='m 223.41,398 c -1.51,-2.82 -4.42,-5.93 -6.11,-6.52 -1.69,-0.59 -19,-0.81 -23.61,-0.34 -1.63,0.18 -3.83,0.43 -4.87,0.58 l -1.9,0.27 -4,5.44 c -2.19,3 -4,5.57 -4,5.73 0,0.16 0.35,0.21 0.78,0.07 4.75,-1.41 7.57,-1.72 15.69,-1.73 14.24,0 17.91,1.27 20.73,7.31 a 23.2,23.2 0 0 1 2.18,9.7 c 0,1.72 0.09,3.1 0.13,3.1 0.04,0 2,-2.61 4.33,-5.82 l 4.27,-5.82 -0.23,-1.72 A 41.57,41.57 0 0 0 223.41,398 Z' id='path38' style='fill:url(%23linear-gradient-3)' /%3E%3Cpath class='cls-5' d='m 228.6,375.37 c -1.66,-0.8 -2.1,-0.84 -9.47,-0.91 -4.25,0 -8.51,0 -9.47,0.08 A 82.71,82.71 0 0 0 199,376.07 c -0.59,0.32 -4.33,5.14 -8.16,10.56 l -1.71,2.37 3.6,-0.22 c 2,-0.12 7.93,-0.21 13.24,-0.21 12,0 12.75,0.18 16,3.46 2.49,2.54 4.92,7.09 6.24,11.71 a 9.66,9.66 0 0 0 1.09,2.91 c 0.23,0 2.25,-2.73 8.67,-11.7 a 10.39,10.39 0 0 0 1.69,-3 c 0,-1.09 -2.65,-7 -4.3,-9.63 -2.12,-3.32 -4.59,-5.9 -6.76,-6.95 z' id='path40' style='fill:url(%23linear-gradient-4)' /%3E%3Cpath class='cls-6' d='m 242.38,360.43 a 6.23,6.23 0 0 0 -4.17,-2.2 97.38,97.38 0 0 0 -17,-0.38 c -5.43,0.45 -10.06,1.3 -11,2 -1.11,0.86 -9.26,12.85 -8.84,13 a 17.7,17.7 0 0 0 3.24,-0.26 c 7.45,-1 22,-0.81 25.05,0.35 a 22,22 0 0 1 3.73,3.22 32.51,32.51 0 0 1 7,10.92 l 1.15,2.64 4.8,-6.65 c 2.64,-3.65 4.88,-6.85 5,-7.12 a 8.3,8.3 0 0 0 -0.73,-2.9 33.54,33.54 0 0 0 -8.23,-12.62 z' id='path42' style='fill:url(%23linear-gradient-5)' /%3E%3Cpath class='cls-7' d='m 251.9,342.26 -2.28,-1.08 -7.54,-0.05 c -4.14,0 -8.16,0 -8.94,0.1 -2.37,0.23 -8.68,1.21 -10.21,1.58 -1.37,0.35 -1.66,0.68 -5.91,6.83 a 75,75 0 0 0 -4.31,6.64 23.39,23.39 0 0 0 3.8,-0.34 c 7.78,-1.05 19.11,-1 23.51,0.13 3.82,1 10.3,8.93 12.95,15.9 l 0.51,1.33 5.69,-8 5.69,-7.95 -1.57,-3 c -3.11,-5.97 -6.8,-9.9 -11.39,-12.09 z' id='path44' style='fill:url(%23linear-gradient-6)' /%3E%3Cpath class='cls-8' d='m 269.53,325.24 a 15,15 0 0 0 -7.61,-3.83 70.88,70.88 0 0 0 -12,-0.15 108,108 0 0 0 -12.1,1.91 l -3,0.73 -5.5,7.91 c -3,4.31 -5.38,7.88 -5.38,8 a 25.21,25.21 0 0 0 3.58,-0.43 c 1.91,-0.31 6.71,-0.64 10.66,-0.75 12.61,-0.38 15.36,0.43 21.32,6.29 a 31.39,31.39 0 0 1 5.88,8.08 l 1.1,2.06 3.83,-5.33 5.69,-7.73 1.79,-2.52 -0.44,-1.67 a 28.29,28.29 0 0 0 -7.82,-12.57 z' id='path46' style='fill:url(%23linear-gradient-7)' /%3E%3Cpath class='cls-9' d='m 283.68,309.58 c -5.23,-5.61 -7.29,-6.5 -15.47,-6.63 -3.09,-0.06 -6.17,0 -6.84,0.06 a 76,76 0 0 0 -9.94,1.78 c -3.64,0.88 -3.86,1 -4.87,2.35 -2,2.76 -9.25,13.22 -9.25,13.42 0,0 1.72,-0.21 3.74,-0.58 8.67,-1.55 18.59,-1.78 23.27,-0.54 5.24,1.38 11.09,7.22 14,14 a 9.25,9.25 0 0 0 1.43,2.59 72.41,72.41 0 0 0 5.83,-7.55 l 5.48,-7.65 -0.51,-1.23 a 43.11,43.11 0 0 0 -6.87,-10.02 z' id='path48' style='fill:url(%23linear-gradient-8)' /%3E%3Cpath class='cls-10' d='m 300.93,296.58 a 40.9,40.9 0 0 0 -8.65,-9.28 c -3.17,-2.54 -4.2,-3.09 -6.89,-3.68 -2.69,-0.59 -12,-0.55 -15.87,0.06 -4.77,0.75 -7.65,1.76 -8.67,3.07 -1.6,2 -10.86,15.35 -10.86,15.62 a 23.32,23.32 0 0 0 3.37,-0.59 c 6.49,-1.39 15.3,-1.87 20.28,-1.09 a 19.38,19.38 0 0 1 10.08,5.41 46.89,46.89 0 0 1 8,10.45 4.9,4.9 0 0 0 1.1,1.65 c 0.29,0 10.23,-14 10.74,-15.08 0.51,-1.08 -0.47,-3.22 -2.63,-6.54 z' id='path50' style='fill:url(%23linear-gradient-9)' /%3E%3Cpath class='cls-11' d='m 264.31,282 a 15.47,15.47 0 0 0 3.07,-0.44 c 3.76,-0.75 14.14,-1.08 17.18,-0.55 3.94,0.7 4.83,1.09 8.32,3.72 A 40.08,40.08 0 0 1 304.6,298 l 1.15,2.29 5.42,-7.61 c 3.44,-4.86 5.4,-7.92 5.36,-8.42 -0.06,-1.22 -2.74,-5.66 -5.43,-9 -2.89,-3.6 -7.74,-7.93 -10.22,-9.12 -3,-1.46 -8.46,-1.88 -15.39,-1.22 -3.91,0.38 -9.66,1.58 -10.63,2.22 -0.81,0.56 -10.81,14.6 -10.55,14.86 z' id='path52' style='fill:url(%23linear-gradient-10)' /%3E%3Cpath class='cls-12' d='m 277.52,263.75 c 5,-1.39 17.47,-1.86 21.67,-0.83 3.61,0.88 8.4,4.51 12.85,9.7 2.57,3 6.13,8.27 6.13,9.06 0,0.79 0.69,0.16 3.83,-4.26 7,-9.87 7.44,-10.8 7.49,-16.19 0,-5.65 -1.78,-9.93 -6.06,-14.2 a 23.57,23.57 0 0 0 -9.81,-6 c -1.8,-0.61 -3.29,-0.81 -7,-0.9 a 42.07,42.07 0 0 0 -6.13,0.18 31.54,31.54 0 0 0 -7.88,3.17 c -2.91,1.86 -4,3.29 -13.52,17 -2.09,3.04 -2.31,3.52 -1.57,3.27 z' id='path54' style='fill:url(%23linear-gradient-11)' /%3E%3Cpath class='cls-13' d='m 379.77,252.16 c -7.13,-9 -9.8,-12.41 -25.31,-32 l -20.12,-25.38 c -2.37,-3 -4.59,-5.5 -4.9,-5.53 a 81.64,81.64 0 0 0 -8.81,4.76 c -4.53,2.66 -18.74,10.9 -31.55,18.33 -22.8,13.22 -33,19.14 -54,31.34 -6.51,3.79 -10.3,6.19 -10.3,6.53 0,0.57 1.53,2.76 17.19,25.41 5.79,8.37 10.67,15.18 10.86,15.18 0.19,0 2.32,-2.8 22.33,-30.8 6.55,-9.15 12.32,-17.1 12.82,-17.65 1.13,-1.23 7.12,-4.18 10.2,-5 1.71,-0.47 3.61,-0.63 7.55,-0.64 4.56,0 5.61,0.11 7.89,0.82 7.83,2.45 13.65,7 17,13.34 2.3,4.41 2.9,9.44 1.8,15.18 -0.47,2.49 -0.75,3 -3.79,7.36 -3.78,5.4 -11.39,16.32 -21.81,31.32 -4,5.79 -8.08,11.6 -9,12.92 a 13.54,13.54 0 0 0 -1.6,2.51 24.25,24.25 0 0 0 3.62,-1.4 c 1.93,-0.83 10.12,-4.31 18.23,-7.72 l 22.44,-9.47 17,-7.18 c 40.2,-17 40.51,-17.1 41,-17.7 0.3,-0.36 -1.37,-2.68 -7.38,-10.24 -4.31,-5.38 -9.39,-11.81 -11.36,-14.29 z' id='path56' style='fill:url(%23linear-gradient-12)' /%3E%3Cpath class='cls-14' d='m 227.24,244.71 c 1.51,-0.9 17.27,-10.15 35,-20.57 l 44,-25.85 c 6.46,-3.81 13,-7.65 14.55,-8.54 l 2.81,-1.63 5.7,-11.12 c 3.13,-6.12 5.7,-11.32 5.7,-11.57 0,-0.51 -0.76,-0.58 -1.24,-0.1 -0.48,0.48 -3.76,2.24 -24.53,13.67 -6.56,3.62 -26.13,14.46 -43.48,24.09 -17.35,9.63 -32.93,18.26 -34.63,19.18 a 14.71,14.71 0 0 0 -3.38,2.25 49.68,49.68 0 0 0 -1.24,5.5 c -0.5,2.7 -1.07,5.62 -1.24,6.48 -0.3,1.53 -1.26,6.85 -1.58,8.85 -0.22,1.37 0.32,1.26 3.56,-0.64 z' id='path58' style='fill:url(%23linear-gradient-13)' /%3E%3Cpath class='cls-15' d='m 234.36,216.53 c 0.21,0 6.27,-3.18 13.44,-7.05 l 19.71,-10.67 24.37,-13.15 c 9.74,-5.25 20.23,-10.91 23.31,-12.59 l 12.39,-6.7 6.77,-3.67 15.34,-13.15 19.4,-16.65 c 3.8,-3.26 4.78,-4.42 3.7,-4.36 -0.24,0 -7.15,3.69 -15.34,8.16 -8.19,4.47 -23,12.56 -32.79,17.92 -9.79,5.36 -21.66,11.87 -26.36,14.45 -4.7,2.58 -8.86,4.83 -9.31,5 -0.45,0.17 -3.16,2.15 -6.06,4.38 -2.9,2.23 -7.62,5.88 -10.52,8.09 -31.52,24.17 -38.23,29.36 -38.33,29.64 -0.1,0.28 0.06,0.35 0.28,0.35 z' id='path60' style='fill:url(%23linear-gradient-14)' /%3E%3Cpath class='cls-16' d='m 342.73,160.58 c 0,0.21 3.19,1.7 7.09,3.33 7.56,3.15 8.71,3.63 12,5.09 l 2.1,0.93 3.34,-3.44 c 22,-22.69 33.48,-34.79 33.6,-35.48 0.09,-0.54 -0.23,-0.67 -2.11,-0.86 -1.21,-0.13 -3.39,-0.39 -4.84,-0.6 -1.45,-0.21 -4.45,-0.59 -6.66,-0.86 l -5.79,-0.72 -1.75,-0.22 -16.14,14.15 c -21.57,18.86 -20.86,18.24 -20.84,18.68 z' id='path62' style='fill:url(%23linear-gradient-15)' /%3E%3Cpath class='cls-17' d='m 343,164.15 -2.7,-1.23 -4.92,9 c -2.71,4.95 -4.93,9.21 -4.93,9.49 0,0.28 0.64,0.47 3.77,0.3 14.39,-0.81 18,-1 22.16,-1.21 l 4.72,-0.24 0.25,-1.23 a 31,31 0 0 0 0.34,-3.82 l 0.08,-2.59 -6.11,-2.78 c -3.36,-1.52 -7,-3.14 -8,-3.6 -1,-0.46 -3.18,-1.41 -4.66,-2.09 z' id='path64' style='fill:url(%23linear-gradient-16)' /%3E%3Cpath class='cls-18' d='m 363.58,184.8 -4.2,-0.05 c -2.32,0 -8.95,0.1 -14.72,0.28 a 96.54,96.54 0 0 0 -10.83,0.63 c -0.21,0.21 -0.08,0.7 0.31,1.31 0.39,0.61 8.47,11 18,23.24 9.53,12.24 21.36,27.32 26.17,33.49 19.54,25 23.73,30.34 24,30.34 0.27,0 15.54,-16 15.7,-16.45 0,-0.16 -12.2,-16.57 -27.18,-36.5 z' id='path66' style='fill:url(%23linear-gradient-17)' /%3E%3Cpath class='cls-19' d='m 447.28,194.67 c -0.38,-0.42 -5,-6.91 -10.26,-14.43 -5.26,-7.52 -11.75,-16.76 -14.4,-20.52 -2.65,-3.76 -6.93,-9.81 -9.49,-13.45 -6.85,-9.73 -8.82,-12.31 -9.4,-12.39 -0.29,0 -1.13,0.59 -1.88,1.4 -0.75,0.81 -9.22,9.37 -18.84,19 l -17.52,17.54 -0.52,4.9 c -0.28,2.7 -0.51,5.06 -0.51,5.24 0,0.35 2.07,3.18 7,9.65 1.27,1.64 3.93,5.11 5.93,7.72 2,2.61 9.4,12.23 16.43,21.38 l 19.47,25.34 c 3.67,4.77 6.84,8.67 7,8.67 0.44,0 0.59,-0.26 5.89,-10.16 4.59,-8.61 4.57,-8.58 14.11,-26.65 3.62,-6.85 6.7,-12.61 6.84,-12.8 a 31,31 0 0 0 0.51,-5 c 0.36,-4.36 0.29,-4.74 -0.36,-5.44 z' id='path68' style='fill:url(%23linear-gradient-18)' /%3E%3C/g%3E%3C/svg%3E";
 assert(typeof THOR_SOV_IMAGE_V5a === 'string', 'missing THOR_SOV_IMAGE_V5a env variable');
@@ -355,22 +409,12 @@ const LOKI_SOV_IMAGE_V5c = process.env.LOKI_SOV_IMAGE_V5c ?? LOKI_SOV_IMAGE_V5b;
 assert(typeof LOKI_SOV_IMAGE_V5c === 'string', 'missing LOKI_SOV_IMAGE_V5c env variable');
 const ODIN_SOV_IMAGE_V5c = process.env.ODIN_SOV_IMAGE_V5c ?? ODIN_SOV_IMAGE_V5b;
 assert(typeof ODIN_SOV_IMAGE_V5c === 'string', 'missing ODIN_SOV_IMAGE_V5c env variable');
-// NFT contract URIs
-const NFT_URI = JSON.parse(process.env.NFT_URI ?? `{
-    "thor":"/ipfs/QmRXTuqBgXd1uCfPkgANA9h8dQQHQxs4msAj53mmyVqFQq/nfts",
-    "loki":"/ipfs/QmRXTuqBgXd1uCfPkgANA9h8dQQHQxs4msAj53mmyVqFQq/nfts",
-    "odin":"/ipfs/QmRXTuqBgXd1uCfPkgANA9h8dQQHQxs4msAj53mmyVqFQq/nfts",
-    "hela":"/ipfs/QmRXTuqBgXd1uCfPkgANA9h8dQQHQxs4msAj53mmyVqFQq/nfts"
-}`);
-assert(NFT_URI, 'missing NFT_URI env variable');
-// PPT contract URIs
-const PPT_URI = JSON.parse(process.env.PPT_URI ?? `{
-    "thor":"/ipfs/QmRXTuqBgXd1uCfPkgANA9h8dQQHQxs4msAj53mmyVqFQq/ppts",
-    "loki":"/ipfs/QmRXTuqBgXd1uCfPkgANA9h8dQQHQxs4msAj53mmyVqFQq/ppts",
-    "odin":"/ipfs/QmRXTuqBgXd1uCfPkgANA9h8dQQHQxs4msAj53mmyVqFQq/ppts",
-    "hela":"/ipfs/QmRXTuqBgXd1uCfPkgANA9h8dQQHQxs4msAj53mmyVqFQq/ppts"
-}`);
-assert(PPT_URI, 'missing PPT_URI env variable');
+const THOR_SOV_IMAGE_V6a = process.env.THOR_SOV_IMAGE_V6a ?? THOR_SOV_IMAGE_V5c;
+assert(typeof THOR_SOV_IMAGE_V6a === 'string', 'missing THOR_SOV_IMAGE_V6a env variable');
+const LOKI_SOV_IMAGE_V6a = process.env.LOKI_SOV_IMAGE_V6a ?? LOKI_SOV_IMAGE_V5c;
+assert(typeof LOKI_SOV_IMAGE_V6a === 'string', 'missing LOKI_SOV_IMAGE_V6a env variable');
+const ODIN_SOV_IMAGE_V6a = process.env.ODIN_SOV_IMAGE_V6a ?? ODIN_SOV_IMAGE_V5c;
+assert(typeof ODIN_SOV_IMAGE_V6a === 'string', 'missing ODIN_SOV_IMAGE_V6a env variable');
 
 export default {
     IPFS_GATEWAY,
@@ -399,6 +443,9 @@ export default {
     THOR_MOE_V5c,
     LOKI_MOE_V5c,
     ODIN_MOE_V5c,
+    THOR_MOE_V6a,
+    LOKI_MOE_V6a,
+    ODIN_MOE_V6a,
     THOR_MOE_SYMBOL_V2a,
     LOKI_MOE_SYMBOL_V2a,
     ODIN_MOE_SYMBOL_V2a,
@@ -417,6 +464,9 @@ export default {
     THOR_MOE_SYMBOL_V5c,
     LOKI_MOE_SYMBOL_V5c,
     ODIN_MOE_SYMBOL_V5c,
+    THOR_MOE_SYMBOL_V6a,
+    LOKI_MOE_SYMBOL_V6a,
+    ODIN_MOE_SYMBOL_V6a,
     THOR_MOE_DECIMALS_V2a,
     LOKI_MOE_DECIMALS_V2a,
     ODIN_MOE_DECIMALS_V2a,
@@ -435,6 +485,9 @@ export default {
     THOR_MOE_DECIMALS_V5c,
     LOKI_MOE_DECIMALS_V5c,
     ODIN_MOE_DECIMALS_V5c,
+    THOR_MOE_DECIMALS_V6a,
+    LOKI_MOE_DECIMALS_V6a,
+    ODIN_MOE_DECIMALS_V6a,
     THOR_MOE_IMAGE_V2a,
     LOKI_MOE_IMAGE_V2a,
     ODIN_MOE_IMAGE_V2a,
@@ -453,6 +506,9 @@ export default {
     THOR_MOE_IMAGE_V5c,
     LOKI_MOE_IMAGE_V5c,
     ODIN_MOE_IMAGE_V5c,
+    THOR_MOE_IMAGE_V6a,
+    LOKI_MOE_IMAGE_V6a,
+    ODIN_MOE_IMAGE_V6a,
     THOR_NFT_V2a,
     LOKI_NFT_V2a,
     ODIN_NFT_V2a,
@@ -474,6 +530,7 @@ export default {
     THOR_NFT_V5c,
     LOKI_NFT_V5c,
     ODIN_NFT_V5c,
+    XPOW_NFT_V6a,
     THOR_PPT_V4a,
     LOKI_PPT_V4a,
     ODIN_PPT_V4a,
@@ -486,6 +543,7 @@ export default {
     THOR_PPT_V5c,
     LOKI_PPT_V5c,
     ODIN_PPT_V5c,
+    XPOW_PPT_V6a,
     THOR_PTY_V4a,
     LOKI_PTY_V4a,
     ODIN_PTY_V4a,
@@ -498,6 +556,7 @@ export default {
     THOR_PTY_V5c,
     LOKI_PTY_V5c,
     ODIN_PTY_V5c,
+    XPOW_PTY_V6a,
     THOR_MTY_V4a,
     LOKI_MTY_V4a,
     ODIN_MTY_V4a,
@@ -510,6 +569,9 @@ export default {
     THOR_MTY_V5c,
     LOKI_MTY_V5c,
     ODIN_MTY_V5c,
+    THOR_MTY_V6a,
+    LOKI_MTY_V6a,
+    ODIN_MTY_V6a,
     THOR_SOV_V5a,
     LOKI_SOV_V5a,
     ODIN_SOV_V5a,
@@ -519,6 +581,9 @@ export default {
     THOR_SOV_V5c,
     LOKI_SOV_V5c,
     ODIN_SOV_V5c,
+    THOR_SOV_V6a,
+    LOKI_SOV_V6a,
+    ODIN_SOV_V6a,
     THOR_SOV_SYMBOL_V5a,
     LOKI_SOV_SYMBOL_V5a,
     ODIN_SOV_SYMBOL_V5a,
@@ -528,6 +593,9 @@ export default {
     THOR_SOV_SYMBOL_V5c,
     LOKI_SOV_SYMBOL_V5c,
     ODIN_SOV_SYMBOL_V5c,
+    THOR_SOV_SYMBOL_V6a,
+    LOKI_SOV_SYMBOL_V6a,
+    ODIN_SOV_SYMBOL_V6a,
     THOR_SOV_DECIMALS_V5a,
     LOKI_SOV_DECIMALS_V5a,
     ODIN_SOV_DECIMALS_V5a,
@@ -537,6 +605,9 @@ export default {
     THOR_SOV_DECIMALS_V5c,
     LOKI_SOV_DECIMALS_V5c,
     ODIN_SOV_DECIMALS_V5c,
+    THOR_SOV_DECIMALS_V6a,
+    LOKI_SOV_DECIMALS_V6a,
+    ODIN_SOV_DECIMALS_V6a,
     THOR_SOV_IMAGE_V5a,
     LOKI_SOV_IMAGE_V5a,
     ODIN_SOV_IMAGE_V5a,
@@ -546,6 +617,7 @@ export default {
     THOR_SOV_IMAGE_V5c,
     LOKI_SOV_IMAGE_V5c,
     ODIN_SOV_IMAGE_V5c,
-    NFT_URI,
-    PPT_URI,
+    THOR_SOV_IMAGE_V6a,
+    LOKI_SOV_IMAGE_V6a,
+    ODIN_SOV_IMAGE_V6a,
 };

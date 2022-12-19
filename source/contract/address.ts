@@ -6,12 +6,12 @@ import { Tokenizer } from '../token';
 export function address({
     infix, token, version
 }: {
-    infix: string, token: Token, version?: Version
+    infix: string, token: Token | 'XPOW', version?: Version
 }): string {
     if (version === undefined) {
         version = ROParams.version;
     }
-    if (token.startsWith('a')) {
+    if (token.startsWith('a') && token !== 'XPOW') {
         token = Tokenizer.xify(token);
     }
     const id = `g-${token}_${infix}_${version}`;

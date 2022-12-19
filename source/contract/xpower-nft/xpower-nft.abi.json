@@ -3,23 +3,13 @@
         "inputs": [
             {
                 "internalType": "string",
-                "name": "nftName",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "nftSymbol",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
                 "name": "nftUri",
                 "type": "string"
             },
             {
-                "internalType": "address",
+                "internalType": "address[]",
                 "name": "moeLink",
-                "type": "address"
+                "type": "address[]"
             },
             {
                 "internalType": "address[]",
@@ -524,6 +514,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "contractURI",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "uint256",
@@ -676,6 +679,11 @@
                 "internalType": "uint256",
                 "name": "level",
                 "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "prefix",
+                "type": "uint256"
             }
         ],
         "name": "idBy",
@@ -700,6 +708,11 @@
                 "internalType": "uint256[]",
                 "name": "levels",
                 "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256",
+                "name": "prefix",
+                "type": "uint256"
             }
         ],
         "name": "idsBy",
@@ -711,25 +724,6 @@
             }
         ],
         "stateMutability": "pure",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "base",
-                "type": "address"
-            }
-        ],
-        "name": "indexOf",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -908,6 +902,62 @@
                 "type": "address"
             },
             {
+                "internalType": "uint256",
+                "name": "level",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "index",
+                "type": "uint256"
+            }
+        ],
+        "name": "mint",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "levels",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "amounts",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256",
+                "name": "index",
+                "type": "uint256"
+            }
+        ],
+        "name": "mintBatch",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
                 "internalType": "uint256[]",
                 "name": "levels",
                 "type": "uint256[]"
@@ -924,6 +974,25 @@
         "type": "function"
     },
     {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "moe",
+                "type": "address"
+            }
+        ],
+        "name": "moeIndexOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [],
         "name": "name",
         "outputs": [
@@ -931,6 +1000,25 @@
                 "internalType": "string",
                 "name": "",
                 "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            }
+        ],
+        "name": "oldIndexOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -1106,7 +1194,20 @@
         "inputs": [
             {
                 "internalType": "string",
-                "name": "newuri",
+                "name": "uri",
+                "type": "string"
+            }
+        ],
+        "name": "setContractURI",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "uri",
                 "type": "string"
             }
         ],

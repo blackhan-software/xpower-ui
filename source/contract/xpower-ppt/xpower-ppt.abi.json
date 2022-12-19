@@ -1,5 +1,26 @@
 [
     {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "pptUri",
+                "type": "string"
+            },
+            {
+                "internalType": "address[]",
+                "name": "pptBase",
+                "type": "address[]"
+            },
+            {
+                "internalType": "uint256",
+                "name": "deadlineIn",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
         "anonymous": false,
         "inputs": [
             {
@@ -512,6 +533,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "contractURI",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "uint256",
@@ -664,6 +698,11 @@
                 "internalType": "uint256",
                 "name": "level",
                 "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "prefix",
+                "type": "uint256"
             }
         ],
         "name": "idBy",
@@ -688,6 +727,11 @@
                 "internalType": "uint256[]",
                 "name": "levels",
                 "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256",
+                "name": "prefix",
+                "type": "uint256"
             }
         ],
         "name": "idsBy",
@@ -699,25 +743,6 @@
             }
         ],
         "stateMutability": "pure",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "base",
-                "type": "address"
-            }
-        ],
-        "name": "indexOf",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -925,6 +950,25 @@
         "type": "function"
     },
     {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            }
+        ],
+        "name": "oldIndexOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [],
         "name": "owner",
         "outputs": [
@@ -1094,7 +1138,20 @@
         "inputs": [
             {
                 "internalType": "string",
-                "name": "newuri",
+                "name": "uri",
+                "type": "string"
+            }
+        ],
+        "name": "setContractURI",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "uri",
                 "type": "string"
             }
         ],

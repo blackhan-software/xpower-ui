@@ -1,4 +1,4 @@
-import ABI from './xpower-nft-staked.abi.json';
+import ABI from './xpower-ppt.abi.json';
 import { Base } from '../base';
 
 export class XPowerPpt extends Base {

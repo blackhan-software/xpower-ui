@@ -1,7 +1,7 @@
 import { BigNumber, ContractInterface, Event } from 'ethers';
 import { Base } from '../base';
 
-import ABI from './nft-treasury.abi.json';
+import ABI from './ppt-treasury.abi.json';
 
 export type OnStake = (
     from: string,
