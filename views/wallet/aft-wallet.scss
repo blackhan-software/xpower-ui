@@ -15,7 +15,7 @@ div#aft-wallet {
       border-bottom: 1px solid var(--xp-powered);
       border-left: 1px solid var(--xp-powered);
       border-top: 1px solid var(--xp-powered);
-      background-color: var(--xp-dimgray);
+      background-color: var(--xp-gray-dark);
       color: var(--xp-powered);
     }
     input#aft-wallet-address {
@@ -26,7 +26,7 @@ div#aft-wallet {
     button#aft-wallet-burner:hover:not(.disabled):not(.burning) {
       border-bottom: 1px solid var(--xp-powered);
       border-top: 1px solid var(--xp-powered);
-      background-color: var(--xp-dimgray);
+      background-color: var(--xp-gray-dark);
       color: var(--xp-powered);
     }
     button#aft-wallet-burner.burning {
@@ -48,7 +48,7 @@ div#aft-wallet {
       .spinner {
         display: none;
       }
-      color: var(--xp-dimgray);
+      color: var(--xp-gray-dark);
       width: 42px;
     }
     @media (max-width: 575px) {
@@ -75,7 +75,7 @@ div#aft-wallet {
       border-bottom: 1px solid var(--xp-powered);
       border-right: 1px solid var(--xp-powered);
       border-top: 1px solid var(--xp-powered);
-      background-color: var(--xp-dimgray);
+      background-color: var(--xp-gray-dark);
       color: var(--xp-powered);
     }
   }

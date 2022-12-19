@@ -36,6 +36,8 @@ describe('env_of_home', () => {
             }, ...{
                 XP_POWERED: "--xp-yellow",
                 XP_POWERED_DARK: "--xp-yellow-dark",
+                XP_POWEREDi: "--xp-yellow-i",
+                XP_POWERED_DARKi: "--xp-yellow-dark-i",
             }, ...{
                 AMOUNT_1: "1",
                 AMOUNT_2: "2",

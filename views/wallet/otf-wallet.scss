@@ -5,8 +5,8 @@ div#otf-wallet {
   div.otf-wallet-address {
     button#otf-wallet-transfer:hover:not(.processing) {
       border: 1px solid var(--xp-powered);
-      border-right: 1px solid var(--xp-dimgray);
-      background-color: var(--xp-dimgray);
+      border-right: 1px solid var(--xp-gray-dark);
+      background-color: var(--xp-gray-dark);
       color: var(--xp-powered);
     }
     button#otf-wallet-transfer.processing {

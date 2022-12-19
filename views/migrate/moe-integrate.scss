@@ -7,10 +7,10 @@ form#moe-integrate {
         top: 6px;
       }
       img {
-        background-color: var(--xp-dimgray);
+        border: 2px solid var(--xp-gray-dark);
+        background-color: var(--xp-gray-dark);
         border-radius: 10px;
         margin-top: 2px;
-        padding: 2px;
       }
       text-align: center;
       width: calc(100% - 42px);

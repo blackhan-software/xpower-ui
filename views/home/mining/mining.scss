@@ -37,9 +37,9 @@ div#mining {
           background-color: var(--xp-powered);
         }
         div.progress-bar.with-indicator {
-          border-right: 1px dotted var(--xp-dimgray);
+          border-right: 1px dotted var(--xp-gray-dark);
         }
-        border: 3px double var(--xp-dimgray);
+        border: 3px double var(--xp-gray-dark);
         margin: calc(1em - 2px) 1em;
         width: 100%;
       }

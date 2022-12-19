@@ -36,6 +36,8 @@ describe('env_of', () => {
             }, ...{
                 XP_POWERED: '--xp-yellow',
                 XP_POWERED_DARK: '--xp-yellow-dark',
+                XP_POWEREDi: '--xp-yellow-i',
+                XP_POWERED_DARKi: '--xp-yellow-dark-i',
             }
         });
     });
