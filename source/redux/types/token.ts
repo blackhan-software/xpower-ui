@@ -17,34 +17,34 @@ export enum Token {
 }
 export function XTokens(): Set<Token> {
     const ref = Token as typeof Token & {
-        _set?: Set<Token>
+        _xxx?: Set<Token>
     };
-    if (ref._set === undefined) {
-        ref._set = new Set(Object.values(Token).filter((t) => {
+    if (ref._xxx === undefined) {
+        ref._xxx = new Set(Object.values(Token).filter((t) => {
             return !t.startsWith('a');
         }));
     }
-    return ref._set;
+    return ref._xxx;
 }
 export function ATokens(): Set<Token> {
     const ref = Token as typeof Token & {
-        _set?: Set<Token>
+        _aaa?: Set<Token>
     };
-    if (ref._set === undefined) {
-        ref._set = new Set(Object.values(Token).filter((t) => {
+    if (ref._aaa === undefined) {
+        ref._aaa = new Set(Object.values(Token).filter((t) => {
             return t.startsWith('a');
         }));
     }
-    return ref._set;
+    return ref._aaa;
 }
 export function Tokens(): Set<Token> {
     const ref = Token as typeof Token & {
-        _set?: Set<Token>
+        _all?: Set<Token>
     };
-    if (ref._set === undefined) {
-        ref._set = new Set(Object.values(Token));
+    if (ref._all === undefined) {
+        ref._all = new Set(Object.values(Token));
     }
-    return ref._set;
+    return ref._all;
 }
 export type TokenInfo = {
     /** address of token */
