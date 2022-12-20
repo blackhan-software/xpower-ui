@@ -32,7 +32,9 @@ export class MoeWallet extends ERC20Wallet {
             await this.contract
         );
         return contract.mint(
-            this._address, x64(block_hash), x64(nonce)
+            this._address, x64(block_hash), x64(nonce), {
+                gasLimit: 500_000
+            }
         );
     }
     async onInit(
