@@ -62,7 +62,7 @@ interface JQuery {
                 : head + ing!;
             const tail = rest.pop();
             if (tail) {
-                rest.push(tail + '…');
+                rest.push(tail + (!tail.endsWith('…') ? '…' : ''));
             } else {
                 head_new += '…';
             }
