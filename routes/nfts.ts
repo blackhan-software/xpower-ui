@@ -1,8 +1,7 @@
-import { Nft, NftLevel, NftToken } from '../source/redux/types';
-import { capitalize, host } from './functions';
 import { join } from 'path';
+import { Nft, NftFullId, NftLevel, NftToken } from '../source/redux/types';
+import { capitalize, host } from './functions';
 
-import env from '../env';
 import express from 'express';
 const router = express.Router();
 
@@ -11,32 +10,22 @@ router.get('/:token/:id.json', (req, res) => {
   const { token, id } = req.params;
   const { resolution } = req.query;
   const nft = {
-    issue: Nft.issue(id),
-    level: Nft.level(id),
-    token: Nft.token(token)
+    issue: Nft.issue(id as NftFullId),
+    level: Nft.level(id as NftFullId),
+    token: Nft.token(token as NftFullId)
   };
-  const key = `${token}/${Nft.coreId(nft)}.json`;
-  const location = env.NFT_URI[key];
-  if (typeof location === 'string') {
-    return res.redirect(location);
-  }
   const LEVEL = NftLevel[nft.level].toUpperCase();
   const order = 1 + nft.level / 3; // 1, 2, 3, ...
   const TOKEN = NftToken[nft.token].toUpperCase();
   const Token = capitalize(TOKEN.toLowerCase());
   res.send({
     name: `${LEVEL} ${TOKEN}`,
-    describe: `${LEVEL} ${TOKEN} NFT`,
+    description: `Stakeable ${LEVEL} ${TOKEN} NFT`,
     image: host(req) + join(
-      env.NFT_URI[token], resolution as string ?? '320x427',
-      `${nft.issue}`, Token, `${order}-${Token}_${LEVEL}.png`
+      '/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts',
+      resolution as string ?? '320x427', `${nft.issue}`, Token,
+      `${order}-${Token}_${LEVEL}.png`
     ),
-    properties: {
-      issue: `${nft.issue}`,
-      label: LEVEL,
-      level: `${nft.level}`,
-      token: `${TOKEN}`
-    }
   });
 });
 export default router;
