@@ -32,9 +32,14 @@ const configuration = ({
             './views/migrate/index.ts',
             './views/footer/footer.tsx',
         ],
-        worker: [
-            './source/miner/scripts/worker.ts',
-        ],
+        worker_dev: {
+            import: './source/miner/scripts/worker.ts',
+            filename: 'worker.js',
+        },
+        worker_pro: {
+            import: './source/miner/scripts/worker.ts',
+            filename: 'worker.[contenthash:8].js',
+        },
     },
     module: {
         rules: [{

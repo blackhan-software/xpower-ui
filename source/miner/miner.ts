@@ -6,6 +6,9 @@ import { Tokenizer } from '../token';
 import { Version } from '../types';
 import { Item, IWorker } from './scripts/worker';
 
+import { Global } from '../types';
+declare const global: Global;
+
 export type OnMined = ({ nonce, amount, worker }: {
     nonce: Nonce, amount: Amount, worker: number
 }) => void;
@@ -127,13 +130,22 @@ export class Miner extends EventEmitter {
         return new_value;
     }
     private async hire(id: number) {
-        let worker: Worker;
+        let thread: ModuleThread<IWorker>;
+        const path_dev = './scripts/worker.js';
         try {
-            worker = new Worker($('#g-worker-path').data('value'));
+            const path_pro = $('#g-worker-path').data('value');
+            const head_pro = await fetch(path_pro, { method: 'HEAD' });
+            if (head_pro.ok) {
+                const worker = new Worker(path_pro);
+                thread = await spawn<IWorker>(worker);
+            } else {
+                const worker = new Worker(path_dev);
+                thread = await spawn<IWorker>(worker);
+            }
         } catch (ex) {
-            worker = new Worker('./scripts/worker.js');
+            const worker = new Worker(path_dev);
+            thread = await spawn<IWorker>(worker);
         }
-        const thread = await spawn<IWorker>(worker);
         await thread.init({
             address: this.address,
             contract: this.contract,
