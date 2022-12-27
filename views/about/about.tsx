@@ -131,10 +131,20 @@ async function renderMarkdown(
     }
     function add_token(content: string) {
         const token_lc = Tokenizer.lower(token);
+        const atoken = Tokenizer.aify(token);
+        const atoken_lc = Tokenizer.lower(atoken);
+        const xtoken = Tokenizer.xify(token);
+        const xtoken_lc = Tokenizer.lower(xtoken);
         return content
             .replace(/{{TOKEN}}/g, token)
+            .replace(/{{aTOKEN}}/g, atoken)
+            .replace(/{{xTOKEN}}/g, xtoken)
             .replace(/{{token}}/g, token_lc)
-            .replace(/{{Token}}/g, capitalize(token_lc));
+            .replace(/{{atoken}}/g, atoken_lc)
+            .replace(/{{xtoken}}/g, xtoken_lc)
+            .replace(/{{Token}}/g, capitalize(token_lc))
+            .replace(/{{aToken}}/g, 'a' + capitalize(token_lc))
+            .replace(/{{xToken}}/g, capitalize(xtoken_lc));
     }
     return html;
 }
