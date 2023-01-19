@@ -1,7 +1,7 @@
 import { Parser } from '../parser';
 import { Level, NftLevel, Token } from '../redux/types';
 import { Tokenizer } from '../token';
-import { Version } from '../types';
+import { Version, Versions } from '../types';
 
 export function autoMint(params: URLSearchParams): number {
     return Parser.number(params.get('auto-mint'), 3000);
@@ -60,33 +60,19 @@ export function token(params: URLSearchParams): Token {
     return Tokenizer.token(params.get('token'));
 }
 export function version(
-    params: URLSearchParams, value?: string | null, fallback = Version.v6a
+    params: URLSearchParams, value?: string | null, fallback = Version.v6b
 ): Version {
     if (value === undefined) {
         value = params.get('version');
     }
-    switch (value?.slice(0, 3)) {
-        case 'v6a':
-            return Version.v6a;
-        case 'v5c':
-            return Version.v5c;
-        case 'v5b':
-            return Version.v5b;
-        case 'v5a':
-            return Version.v5a;
-        case 'v4a':
-            return Version.v4a;
-        case 'v3b':
-            return Version.v3b;
-        case 'v3a':
-            return Version.v3a;
-        case 'v2a':
-            return Version.v2a;
+    if (value) {
+        const version = value.slice(0, 3) as Version;
+        if (Versions().has(version)) return version;
     }
     return fallback;
 }
 export function versionSource(params: URLSearchParams): Version {
-    return version(params, params.get('version-source'), Version.v5c);
+    return version(params, params.get('version-source'), Version.v6a);
 }
 export function versionTarget(params: URLSearchParams): Version {
     return version(params, params.get('version-target'));

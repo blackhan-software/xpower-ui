@@ -3,7 +3,7 @@ import './any-claim.scss';
 
 import { BigNumber, Contract, Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { MoeTreasuryFactory, OnClaimBatch } from '../../source/contract';
+import { MoeTreasuryFactory, OnClaimBatch, XPowerMoeFactory } from '../../source/contract';
 import { Alert, alert, Alerts, x40 } from '../../source/functions';
 import { Nft, NftLevels, Token } from '../../source/redux/types';
 import { Version } from '../../source/types';
@@ -12,7 +12,7 @@ import { Years } from '../../source/years';
 Blockchain.onConnect(function enableAllowanceButton() {
     const $claim_any = $('.claim-any').filter((i, el) => {
         const source = new RegExp($(el).data('source'));
-        return 'v2a|v3a|v3b'.match(source) === null;
+        return 'v2a|v2b|v2c|v3a|v3b'.match(source) === null;
     });
     $claim_any.prop('disabled', false);
 });
@@ -34,9 +34,12 @@ async function claim(token: Token, { $claim }: {
     const { address, src_version } = await context({
         $el: $claim
     });
-    const { mty_source } = await contracts({
+    const { src_xpower, mty_source } = await contracts({
         token, src_version
     });
+    if (!src_xpower) {
+        throw new Error('undefined src_xpower');
+    }
     if (!mty_source) {
         throw new Error('undefined mty_treasury');
     }
@@ -64,7 +67,9 @@ async function claim(token: Token, { $claim }: {
         );
         return;
     }
-    const src_treasure: BigNumber = await mty_source.balance();
+    const src_treasure: BigNumber = await mtyBalanceOf(token, {
+        $claim
+    });
     console.debug(
         `[${src_version}:balance]`, src_treasure.toString()
     );
@@ -121,6 +126,42 @@ async function claim(token: Token, { $claim }: {
         reset();
     }
 }
+async function mtyBalanceOf(token: Token, { $claim }: {
+    $claim: JQuery<HTMLElement>
+}) {
+    const { src_version } = await context({
+        $el: $claim
+    });
+    const { src_xpower, mty_source } = await contracts({
+        token, src_version
+    });
+    if (!src_xpower) {
+        throw new Error('undefined src_xpower');
+    }
+    if (!mty_source) {
+        throw new Error('undefined mty_treasury');
+    }
+    //
+    // v6a (or earlier):
+    //
+    try {
+        return await mty_source.balance();
+    } catch (ex) {
+        console.error(ex);
+    }
+    //
+    // v6b (or later):
+    //
+    try {
+        const moe_index = await mty_source.moeIndexOf(
+            src_xpower.address
+        );
+        return await mty_source.moeBalanceOf(moe_index);
+    } catch (ex) {
+        console.error(ex);
+    }
+    return BigNumber.from(0);
+}
 function filter<I, B extends BigNumber>(
     ids: Array<I>, balances: Array<B>, { zero }: { zero: boolean }
 ) {
@@ -156,6 +197,17 @@ async function contracts({
 }: {
     token: Token, src_version: Version
 }) {
+    let src_xpower: Contract | undefined;
+    try {
+        src_xpower = await XPowerMoeFactory({
+            token, version: src_version
+        });
+        console.debug(
+            `[${src_version}:src_xpower]`, src_xpower.address
+        );
+    } catch (ex) {
+        console.error(ex);
+    }
     let mty_source: Contract | undefined;
     try {
         mty_source = await MoeTreasuryFactory({
@@ -168,6 +220,7 @@ async function contracts({
         console.error(ex);
     }
     return {
+        src_xpower,
         mty_source,
     };
 }

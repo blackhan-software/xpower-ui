@@ -643,6 +643,19 @@
     },
     {
         "inputs": [],
+        "name": "prefix",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "renounceOwnership",
         "outputs": [],
         "stateMutability": "nonpayable",
@@ -699,7 +712,14 @@
     },
     {
         "inputs": [],
-        "name": "sealedAll",
+        "name": "sealAll",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "seals",
         "outputs": [
             {
                 "internalType": "bool[]",

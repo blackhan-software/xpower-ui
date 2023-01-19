@@ -874,6 +874,24 @@
     {
         "inputs": [
             {
+                "internalType": "uint256",
+                "name": "level",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "mint",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "address",
                 "name": "to",
                 "type": "address"
@@ -924,11 +942,6 @@
     },
     {
         "inputs": [
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
             {
                 "internalType": "uint256[]",
                 "name": "levels",
@@ -938,11 +951,6 @@
                 "internalType": "uint256[]",
                 "name": "amounts",
                 "type": "uint256[]"
-            },
-            {
-                "internalType": "uint256",
-                "name": "index",
-                "type": "uint256"
             }
         ],
         "name": "mintBatch",
@@ -966,6 +974,34 @@
                 "internalType": "uint256[]",
                 "name": "amounts",
                 "type": "uint256[]"
+            }
+        ],
+        "name": "mintBatch",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "levels",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "amounts",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256",
+                "name": "index",
+                "type": "uint256"
             }
         ],
         "name": "mintBatch",
@@ -1035,6 +1071,25 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            }
+        ],
+        "name": "prefixOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "pure",
         "type": "function"
     },
     {
@@ -1161,7 +1216,14 @@
     },
     {
         "inputs": [],
-        "name": "sealedAll",
+        "name": "sealAll",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "seals",
         "outputs": [
             {
                 "internalType": "bool[]",

@@ -13,14 +13,14 @@ import { Years } from '../../source/years';
 Blockchain.onConnect(function enableUnstake() {
     const $unstake_ppt = $('.unstake-old').filter((i, el) => {
         const source = new RegExp($(el).data('source'));
-        return 'v2a|v3a|v3b'.match(source) === null;
+        return 'v2a|v2b|v2c|v3a|v3b'.match(source) === null;
     });
     $unstake_ppt.prop('disabled', false);
 });
 Blockchain.onConnect(function enableAllowance() {
     const $approve_old = $('.approve-old').filter((i, el) => {
         const source = new RegExp($(el).data('source'));
-        return 'v2a|v3a|v3b'.match(source) !== null;
+        return 'v2a|v2b|v2c|v3a|v3b'.match(source) !== null;
     });
     $approve_old.prop('disabled', false);
 });

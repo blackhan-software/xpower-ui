@@ -62,24 +62,33 @@ export function TokenInfo(
     if (version === undefined) {
         version = ROParams.version;
     }
-    const slug = Tokenizer.slug(token);
-    const xtoken = Tokenizer.xify(token);
-    const $moe = document.getElementById(
-        `g-${xtoken}_${slug}_${version}`
-    );
-    const $symbol = document.getElementById(
-        `g-${xtoken}_${slug}_SYMBOL_${version}`
-    );
-    const $decimals = document.getElementById(
-        `g-${xtoken}_${slug}_DECIMALS_${version}`
-    );
-    const $image = document.getElementById(
-        `g-${xtoken}_${slug}_IMAGE_${version}`
-    );
-    return {
-        address: BigInt($moe?.dataset.value as string),
-        symbol: String($symbol?.dataset.value),
-        decimals: Number($decimals?.dataset.value),
-        image: String($image?.dataset.value)
-    };
+    if (Tokenizer.slug(token) === 'MOE') {
+        const xtoken = Tokenizer.xify(token);
+        const $moe = document.getElementById(
+            `g-${xtoken}_MOE_${version}`
+        );
+        const $image = document.getElementById(
+            `g-${xtoken}_MOE_IMAGE`
+        );
+        return {
+            address: BigInt($moe?.dataset.value as string),
+            decimals: version < Version.v5a ? 0 : 18,
+            image: String($image?.dataset.value),
+            symbol: Tokenizer.xify(token),
+        };
+    } else {
+        const xtoken = Tokenizer.xify(token);
+        const $sov = document.getElementById(
+            `g-${xtoken}_SOV_${version}`
+        );
+        const $image = document.getElementById(
+            `g-${xtoken}_SOV_IMAGE`
+        );
+        return {
+            address: BigInt($sov?.dataset.value as string),
+            decimals: 18,
+            image: String($image?.dataset.value),
+            symbol: Tokenizer.aify(token),
+        };
+    }
 }

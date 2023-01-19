@@ -220,19 +220,13 @@ async function addMoeToken(
             const $moe = document.getElementById(
                 `g-${xtoken}_MOE_${version}`
             );
-            const $symbol = document.getElementById(
-                `g-${xtoken}_MOE_SYMBOL_${version}`
-            );
-            const $decimals = document.getElementById(
-                `g-${xtoken}_MOE_DECIMALS_${version}`
-            );
             const $image = document.getElementById(
-                `g-${xtoken}_MOE_IMAGE_${version}`
+                `g-${xtoken}_MOE_IMAGE`
             );
             Blockchain.addToken({
                 address: BigInt($moe?.dataset.value as string),
-                symbol: String($symbol?.dataset.value),
-                decimals: Number($decimals?.dataset.value),
+                symbol: xtoken,
+                decimals: version < Version.v5a ? 0 : 18,
                 image: String($image?.dataset.value)
             });
         } else {
@@ -245,25 +239,20 @@ async function addMoeToken(
 async function addSovToken(
     token: Token, version: Version
 ) {
+    const atoken = Tokenizer.aify(token);
     const xtoken = Tokenizer.xify(token);
     if (await Blockchain.isInstalled()) {
         if (await Blockchain.isAvalanche()) {
             const $sov = document.getElementById(
                 `g-${xtoken}_SOV_${version}`
             );
-            const $symbol = document.getElementById(
-                `g-${xtoken}_SOV_SYMBOL_${version}`
-            );
-            const $decimals = document.getElementById(
-                `g-${xtoken}_SOV_DECIMALS_${version}`
-            );
             const $image = document.getElementById(
-                `g-${xtoken}_SOV_IMAGE_${version}`
+                `g-${xtoken}_SOV_IMAGE`
             );
             Blockchain.addToken({
                 address: BigInt($sov?.dataset.value as string),
-                symbol: String($symbol?.dataset.value),
-                decimals: Number($decimals?.dataset.value),
+                symbol: atoken,
+                decimals: 18,
                 image: String($image?.dataset.value)
             });
         } else {

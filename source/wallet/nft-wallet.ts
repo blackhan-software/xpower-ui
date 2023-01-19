@@ -21,6 +21,11 @@ export class NftWallet extends ERC1155Wallet {
         const contract = await OtfManager.connect(
             await this.contract
         );
+        if (ROParams.version < Version.v2b && !ROParams.versionFaked) {
+            return contract['mint(uint256,uint256)'](
+                level, amount
+            );
+        }
         if (ROParams.version < Version.v6a && !ROParams.versionFaked) {
             return contract['mint(address,uint256,uint256)'](
                 this._address, level, amount
@@ -41,6 +46,11 @@ export class NftWallet extends ERC1155Wallet {
         const contract = await OtfManager.connect(
             await this.contract
         );
+        if (ROParams.version < Version.v2b && !ROParams.versionFaked) {
+            return contract['mintBatch(uint256[],uint256[])'](
+                levels, amounts
+            );
+        }
         if (ROParams.version < Version.v6a && !ROParams.versionFaked) {
             return contract['mintBatch(address,uint256[],uint256[])'](
                 this._address, levels, amounts

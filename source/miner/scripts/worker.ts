@@ -309,6 +309,50 @@ function abi_encoder(
     level: Level, version: Version, versionFaked: boolean
 ) {
     const lazy_arrayify = arrayifier(level);
+    const encoder_v2c = (nonce: Nonce, {
+        address, block_hash, interval, token
+    }: Context) => {
+        let value = abi_encoded[interval];
+        if (value === undefined) {
+            const template = abi.encode([
+                'string', 'uint256', 'address', 'uint256', 'bytes32'
+            ], [
+                symbol_v2c(token),
+                0,
+                x40(address),
+                interval,
+                x64(block_hash)
+            ]);
+            abi_encoded[interval] = value = arrayify(template.slice(2));
+            array_cache[level] = arrayify(x64_plain(nonce));
+            nonce_cache[level] = nonce;
+        }
+        const array = lazy_arrayify(nonce, x64_plain(nonce));
+        value.set(array, 32);
+        return value;
+    };
+    const encoder_v3b = (nonce: Nonce, {
+        address, block_hash, interval, token
+    }: Context) => {
+        let value = abi_encoded[interval];
+        if (value === undefined) {
+            const template = abi.encode([
+                'string', 'address', 'uint256', 'bytes32', 'uint256'
+            ], [
+                symbol_v3b(token),
+                x40(address),
+                interval,
+                x64(block_hash),
+                0
+            ]);
+            abi_encoded[interval] = value = arrayify(template.slice(2));
+            array_cache[level] = arrayify(x64_plain(nonce));
+            nonce_cache[level] = nonce;
+        }
+        const array = lazy_arrayify(nonce, x64_plain(nonce));
+        value.set(array, 128);
+        return value;
+    };
     const encoder_v5b = (nonce: Nonce, {
         address, block_hash, interval, token
     }: Context) => {
@@ -353,7 +397,7 @@ function abi_encoder(
         value.set(array, 128);
         return value;
     };
-    const encoder_new = (nonce: Nonce, {
+    const encoder_v6b = (nonce: Nonce, {
         address, block_hash, contract, interval
     }: Context) => {
         let value = abi_encoded[interval];
@@ -375,12 +419,16 @@ function abi_encoder(
         return value;
     };
     if (versionFaked) {
-        return encoder_new;
+        return encoder_v6b;
     }
     switch (version) {
         case Version.v2a:
+        case Version.v2b:
+        case Version.v2c:
+            return encoder_v2c;
         case Version.v3a:
         case Version.v3b:
+            return encoder_v3b;
         case Version.v4a:
         case Version.v5a:
         case Version.v5b:
@@ -388,8 +436,21 @@ function abi_encoder(
         case Version.v5c:
         case Version.v6a:
             return encoder_v6a;
+        case Version.v6b:
         default:
-            return encoder_new;
+            return encoder_v6b;
+    }
+    function symbol_v2c(token: Token) {
+        if (token === Token.THOR) return 'XPOW.CPU';
+        if (token === Token.LOKI) return 'XPOW.GPU';
+        if (token === Token.ODIN) return 'XPOW.ASIC';
+        return 'XPOW';
+    }
+    function symbol_v3b(token: Token) {
+        if (token === Token.THOR) return 'PARA';
+        if (token === Token.LOKI) return 'AQCH';
+        if (token === Token.ODIN) return 'QRSH';
+        return 'XPOW';
     }
 }
 function arrayifier(

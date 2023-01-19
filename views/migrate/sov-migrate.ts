@@ -12,7 +12,7 @@ import { Version } from '../../source/types';
 Blockchain.onConnect(function enableAllowance() {
     const $approve = $('.approve-sov-allowance').filter((i, el) => {
         const source = new RegExp($(el).data('source'));
-        return 'v2a|v3a|v3b|v4a'.match(source) === null;
+        return 'v2a|v2b|v2c|v3a|v3b|v4a'.match(source) === null;
     });
     $approve.prop('disabled', false);
 });

@@ -2,8 +2,10 @@ import { Contract, Transaction, Event } from 'ethers';
 import { OnInit as on_init } from '../contract';
 import { XPowerMoeFactory } from '../contract';
 import { x64 } from '../functions';
+import { ROParams } from '../params';
 import { Address, BlockHash, Nonce } from '../redux/types';
 import { Timestamp, Token } from '../redux/types';
+import { Version } from '../types';
 
 import { ERC20Wallet } from './erc20-wallet';
 import { OtfManager } from './otf-manager';
@@ -31,9 +33,14 @@ export class MoeWallet extends ERC20Wallet {
         const contract = await OtfManager.connect(
             await this.contract
         );
-        return contract.mint(
+        if (ROParams.version < Version.v3a && !ROParams.versionFaked) {
+            return contract['mint(uint256,bytes32)'](
+                x64(nonce), x64(block_hash)
+            );
+        }
+        return contract['mint(address,bytes32,uint256)'](
             this._address, x64(block_hash), x64(nonce), {
-                gasLimit: 500_000
+                gasLimit: 250_000
             }
         );
     }
