@@ -51,6 +51,7 @@ expose({
         meta,
         token,
         version,
+        versionFaked,
     }: {
         address: Address,
         contract: Address,
@@ -58,6 +59,7 @@ expose({
         meta: { id: number },
         token: Token,
         version: Version,
+        versionFaked: boolean,
     }) {
         if (worker !== undefined) {
             throw new Error(`worker already initialized`);
@@ -72,6 +74,7 @@ expose({
             meta,
             token,
             version,
+            versionFaked
         });
         worker_id = meta.id;
     },
@@ -120,6 +123,7 @@ class Worker {
         meta,
         token,
         version,
+        versionFaked,
     }: {
         address: Address,
         contract: Address,
@@ -127,6 +131,7 @@ class Worker {
         meta: { id: number },
         token: Token,
         version: Version,
+        versionFaked: boolean,
     }) {
         this._amount = amount(token, level);
         this._context = {
@@ -136,8 +141,9 @@ class Worker {
             interval: interval(),
             token,
         };
-        this._miner = miner(level, version);
+        this._miner = miner(level, version, versionFaked);
         this._nonce = nonce(meta.id);
+        this._versionFaked = versionFaked;
     }
     public start(
         block_hash: BlockHash,
@@ -236,6 +242,7 @@ class Worker {
     private _miner: Miner;
     private _nonce: Nonce;
     private _running = false;
+    private _versionFaked: boolean;
 }
 function interval() {
     const time = new Date().getTime();
@@ -251,55 +258,35 @@ function nonce(
 function amount(
     token: Token, level: Level
 ) {
-    const n_difficulty = difficulty({
-        timestamp: Date.parse('2022-02-22T22:22:22.000Z')
-    });
     const n_level = BigInt(level);
-    const n_threshold =
-        n_level > n_difficulty + 1n
-            ? n_level : n_difficulty + 1n;
     switch (token) {
         case Token.THOR:
             return (hash: string) => {
                 const lhs_zeros = zeros(hash);
-                if (lhs_zeros >= n_threshold) {
-                    return (lhs_zeros - n_difficulty);
+                if (lhs_zeros >= n_level) {
+                    return (lhs_zeros);
                 }
                 return 0n;
             };
         case Token.LOKI:
             return (hash: string) => {
                 const lhs_zeros = zeros(hash);
-                if (lhs_zeros >= n_threshold) {
-                    return 2n ** (lhs_zeros - n_difficulty) - 1n;
+                if (lhs_zeros >= n_level) {
+                    return 2n ** (lhs_zeros) - 1n;
                 }
                 return 0n;
             };
         case Token.ODIN:
             return (hash: string) => {
                 const lhs_zeros = zeros(hash);
-                if (lhs_zeros >= n_threshold) {
-                    return 16n ** (lhs_zeros - n_difficulty) - 1n;
+                if (lhs_zeros >= n_level) {
+                    return 16n ** (lhs_zeros) - 1n;
                 }
                 return 0n;
             };
         default:
             return (hash: string) => 0n;
     }
-}
-function difficulty({
-    timestamp, days = 86_400_000n
-}: {
-    timestamp: bigint | number, days?: bigint
-}) {
-    if (typeof timestamp === 'number') {
-        timestamp = BigInt(timestamp);
-    }
-    const now = BigInt(new Date().getTime());
-    if (now - timestamp > 0n) {
-        return 100n * (now - timestamp) / (4n * 365_25n * days);
-    }
-    return 0n;
 }
 function zeros(
     hash: string
@@ -311,40 +298,18 @@ function zeros(
     return 0n;
 }
 function miner(
-    level: Level, version: Version
+    level: Level, version: Version, versionFaked: boolean
 ) {
-    const abi_encode = abi_encoder(level, version);
+    const abi_encode = abi_encoder(level, version, versionFaked);
     return (nonce: Nonce, context: Context) => keccak256(
         abi_encode(nonce, context)
     );
 }
 function abi_encoder(
-    level: Level, version: Version
+    level: Level, version: Version, versionFaked: boolean
 ) {
     const lazy_arrayify = arrayifier(level);
-    const encoder_new = (nonce: Nonce, {
-        address, block_hash, contract, interval
-    }: Context) => {
-        let value = abi_encoded[interval];
-        if (value === undefined) {
-            const template = abi.encode([
-                'address', 'address', 'uint256', 'bytes32', 'uint256'
-            ], [
-                x40(contract),
-                x40(address),
-                interval,
-                x64(block_hash),
-                0
-            ]);
-            abi_encoded[interval] = value = arrayify(template.slice(2));
-            array_cache[level] = arrayify(x64_plain(nonce));
-            nonce_cache[level] = nonce;
-        }
-        const array = lazy_arrayify(nonce, x64_plain(nonce));
-        value.set(array, 128);
-        return value;
-    };
-    const encoder_old = (nonce: Nonce, {
+    const encoder_v5b = (nonce: Nonce, {
         address, block_hash, interval, token
     }: Context) => {
         let value = abi_encoded[interval];
@@ -366,6 +331,52 @@ function abi_encoder(
         value.set(array, 128);
         return value;
     };
+    const encoder_v6a = (nonce: Nonce, {
+        address, block_hash, contract, interval
+    }: Context) => {
+        let value = abi_encoded[interval];
+        if (value === undefined) {
+            const template = abi.encode([
+                'address', 'address', 'uint256', 'bytes32', 'uint256'
+            ], [
+                x40(contract),
+                x40(address),
+                interval,
+                x64(block_hash),
+                0
+            ]);
+            abi_encoded[interval] = value = arrayify(template.slice(2));
+            array_cache[level] = arrayify(x64_plain(nonce));
+            nonce_cache[level] = nonce;
+        }
+        const array = lazy_arrayify(nonce, x64_plain(nonce));
+        value.set(array, 128);
+        return value;
+    };
+    const encoder_new = (nonce: Nonce, {
+        address, block_hash, contract, interval
+    }: Context) => {
+        let value = abi_encoded[interval];
+        if (value === undefined) {
+            const template = abi.encode([
+                'address', 'address', 'bytes32', 'uint256'
+            ], [
+                x40(contract),
+                x40(address),
+                x64(block_hash),
+                0
+            ]);
+            abi_encoded[interval] = value = arrayify(template.slice(2));
+            array_cache[level] = arrayify(x64_plain(nonce));
+            nonce_cache[level] = nonce;
+        }
+        const array = lazy_arrayify(nonce, x64_plain(nonce));
+        value.set(array, 96);
+        return value;
+    };
+    if (versionFaked) {
+        return encoder_new;
+    }
     switch (version) {
         case Version.v2a:
         case Version.v3a:
@@ -373,7 +384,10 @@ function abi_encoder(
         case Version.v4a:
         case Version.v5a:
         case Version.v5b:
-            return encoder_old;
+            return encoder_v5b;
+        case Version.v5c:
+        case Version.v6a:
+            return encoder_v6a;
         default:
             return encoder_new;
     }

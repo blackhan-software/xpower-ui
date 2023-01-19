@@ -28,7 +28,9 @@ export class Miner extends EventEmitter {
         /** min. level to mine at */
         level: Level = 1,
         /** version to mine for */
-        version = ROParams.version
+        version = ROParams.version,
+        /** version to fake instead  */
+        versionFaked = ROParams.versionFaked
     ) {
         super();
         this._address = address;
@@ -37,6 +39,7 @@ export class Miner extends EventEmitter {
         this._speed = speed;
         this._token = Tokenizer.xify(token);
         this._version = version;
+        this._versionFaked = versionFaked;
         this.setMaxListeners(20);
     }
     public get running(): boolean {
@@ -153,6 +156,7 @@ export class Miner extends EventEmitter {
             meta: { id },
             token: this.token,
             version: this.version,
+            versionFaked: this.versionFaked
         });
         return thread;
     }
@@ -181,6 +185,9 @@ export class Miner extends EventEmitter {
     public get version(): Version {
         return this._version;
     }
+    private get versionFaked(): boolean {
+        return this._versionFaked;
+    }
     private get workers(): ModuleThread<IWorker>[] {
         return this._workers;
     }
@@ -191,6 +198,7 @@ export class Miner extends EventEmitter {
     private _speed: number;
     private _token: Token;
     private _version: Version;
+    private _versionFaked: boolean;
     private _workers: ModuleThread<IWorker>[] = [];
 }
 function logical_cpus() {
