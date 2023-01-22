@@ -1,4 +1,9 @@
 {
+    "files.associations": {
+        ".env-avalanche-test": "ini",
+        ".env-avalanche-main": "ini",
+        ".env-hardhat": "ini"
+    },
     "files.exclude": {
         "**/*.css.map": {
             "when": "$(basename).map"
