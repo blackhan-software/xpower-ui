@@ -563,8 +563,8 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
     for (const level of NftLevels()) {
         const { amount } = list[level];
         if (amount < 0n) {
-            // unstake from oldest to youngest:
-            const issues = Array.from(Years());
+            // unstake from youngest to oldest (backwards):
+            const issues = Array.from(Years()).reverse();
             let burn_amount = -amount;
             for (const issue of issues) {
                 const ppt_total = pptTotalBy(api.getState(), {
