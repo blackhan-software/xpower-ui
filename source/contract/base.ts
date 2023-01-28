@@ -23,8 +23,11 @@ export class Base {
             pos = global.WEB3_PROVIDER = new Web3Provider(
                 await Blockchain.provider
             );
+            //
+            // @info: disabled due to potential rate-limiting!
+            //
             if (await Blockchain.isAvalanche()) {
-                pos._pollingInterval = 600; // ms
+                pos._pollingInterval = 900; // ms
             }
             return this.contract.connect(pos.getSigner());
         }

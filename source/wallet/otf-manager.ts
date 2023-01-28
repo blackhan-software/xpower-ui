@@ -44,8 +44,11 @@ export class OtfManager {
         const provider = global.WEB3_PROVIDER_OTF = new Web3Provider(
             await Blockchain.provider
         );
+        //
+        // @info: disabled due to potential rate-limiting!
+        //
         if (await Blockchain.isAvalanche()) {
-            provider._pollingInterval = 600; // ms
+            provider._pollingInterval = 900; // ms
         }
         const wallet = new Wallet(JSON.parse(atob(value)), provider);
         return this._wallet = global.OTF_WALLET = new NonceManager(wallet);
