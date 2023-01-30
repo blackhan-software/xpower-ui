@@ -1,5 +1,6 @@
 export * from './aft-wallet';
 export * from './base';
+export * from './history';
 export * from './mining';
 export * from './minting';
 export * from './nfts';

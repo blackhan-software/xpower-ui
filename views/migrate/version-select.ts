@@ -1,6 +1,6 @@
 import './version-select.scss';
 
-import { BigNumber } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
 import { XPowerMoeFactory, XPowerNftFactory, XPowerPptFactory, XPowerSovFactory } from '../../source/contract';
 import { x40 } from '../../source/functions';
@@ -16,10 +16,25 @@ $(window).on('load', function setVersion() {
     $select.find('option[value=v00]').remove()
 });
 Blockchain.onConnect(async function setBalances() {
-    const { address, token } = await context();
     const versions = Array.from(Versions())
-        .filter((v) => v < ROParams.versionTarget)
-        .reverse();
+        .filter((v) => v < ROParams.versionTarget).reverse();
+    const balances = versions.map((version) => ({
+        version, balance: get_balances(RWParams.token, version)
+    }));
+    for (const { version, balance } of balances) {
+        set_balances(RWParams.token, version, await balance);
+    }
+    const $select = $('#version-select');
+    $select.next('.info').removeClass('loading');
+    $select.prop('disabled', false);
+});
+async function get_balances(
+    token: Token, version: Version
+) {
+    const address = await Blockchain.selectedAddress;
+    if (!address) {
+        throw new Error('missing selected-address');
+    }
     const ids = Nft.fullIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels()),
@@ -28,88 +43,59 @@ Blockchain.onConnect(async function setBalances() {
     const accounts = ids.map(() => {
         return x40(address);
     });
-    for (const version of versions) {
-        let moe = BigNumber.from(0);
-        try {
-            const moe_contract = await XPowerMoeFactory({
-                token, version
-            });
-            moe = await moe_contract.balanceOf(x40(address));
-        } catch (ex) {
-            if (`${ex}`.match(/missing\sg/) === null) {
-                console.error(ex);
-            }
-        }
-        let sov = BigNumber.from(0);
-        try {
-            const sov_contract = await XPowerSovFactory({
-                token, version
-            });
-            sov = await sov_contract.balanceOf(x40(address));
-        } catch (ex) {
-            if (`${ex}`.match(/missing\sg/) === null) {
-                console.error(ex);
-            }
-        }
-        let nft = BigNumber.from(0);
-        try {
-            const nft_contract = await XPowerNftFactory({
-                token, version
-            });
-            const nfts: BigNumber[] = await nft_contract.balanceOfBatch(
-                accounts, Nft.realIds(ids, { version })
-            );
-            nft = nfts.reduce((a, n) => a.add(n), BigNumber.from(0));
-        } catch (ex) {
-            if (`${ex}`.match(/missing\sg/) === null) {
-                console.error(ex);
-            }
-        }
-        let ppt = BigNumber.from(0);
-        try {
-            const ppt_contract = await XPowerPptFactory({
-                token, version
-            });
-            const ppts: BigNumber[] = await ppt_contract.balanceOfBatch(
-                accounts, Nft.realIds(ids, { version })
-            );
-            ppt = ppts.reduce((a, p) => a.add(p), BigNumber.from(0));
-        } catch (ex) {
-            if (`${ex}`.match(/missing\sg/) === null) {
-                console.error(ex);
-            }
-        }
-        set_balances(token, version, {
-            moe, sov, nft: nft.add(ppt)
-        });
-        const $select = $('#version-select');
-        $select.next('.info').removeClass('loading');
-        $select.prop('disabled', false);
+    const {
+        moe_contract, sov_contract,
+        nft_contract, ppt_contract,
+    } = await contracts({
+        token, version
+    });
+    let moe = BigNumber.from(0);
+    if (moe_contract) {
+        moe = await moe_contract.balanceOf(x40(address));
     }
-    function set_balances(
-        token: Token, version: Version, value: {
-            moe: BigNumber, sov: BigNumber, nft: BigNumber
-        }
-    ) {
-        const $option = $(
-            `#version-select>option[value=${version}]`
+    let sov = BigNumber.from(0);
+    if (sov_contract) {
+        sov = await sov_contract.balanceOf(x40(address));
+    }
+    let nft = BigNumber.from(0);
+    if (nft_contract) {
+        const nfts: BigNumber[] = await nft_contract.balanceOfBatch(
+            accounts, Nft.realIds(ids, { version })
         );
-        const xtoken = Tokenizer.xify(token);
-        const moe_text
-            = `${xtoken}${value.moe.isZero() ? '=' : '>'}0`;
-        const atoken = Tokenizer.aify(token);
-        const sov_text
-            = `${atoken}${value.sov.isZero() ? '=' : '>'}0`;
-        const ntoken = 'NFTs';
-        const nft_text
-            = `${ntoken}${value.nft.isZero() ? '=' : '>'}0`;
-        const opt_text = $option.text()
-            .replace(new RegExp(xtoken + '=0'), moe_text)
-            .replace(new RegExp(atoken + '=0'), sov_text)
-            .replace(new RegExp('NFTs' + '=0'), nft_text);
-        $option.html(opt_text);
+        nft = nfts.reduce((a, n) => a.add(n), BigNumber.from(0));
     }
-});
+    let ppt = BigNumber.from(0);
+    if (ppt_contract) {
+        const ppts: BigNumber[] = await ppt_contract.balanceOfBatch(
+            accounts, Nft.realIds(ids, { version })
+        );
+        ppt = ppts.reduce((a, p) => a.add(p), BigNumber.from(0));
+    }
+    return { moe, sov, nft: nft.add(ppt) };
+}
+function set_balances(
+    token: Token, version: Version, balance: {
+        moe: BigNumber, sov: BigNumber, nft: BigNumber
+    }
+) {
+    const $option = $(
+        `#version-select>option[value=${version}]`
+    );
+    const xtoken = Tokenizer.xify(token);
+    const moe_text
+        = `${xtoken}${balance.moe.isZero() ? '=' : '>'}0`;
+    const atoken = Tokenizer.aify(token);
+    const sov_text
+        = `${atoken}${balance.sov.isZero() ? '=' : '>'}0`;
+    const ntoken = 'NFTs';
+    const nft_text
+        = `${ntoken}${balance.nft.isZero() ? '=' : '>'}0`;
+    const opt_text = $option.text()
+        .replace(new RegExp(xtoken + '=0'), moe_text)
+        .replace(new RegExp(atoken + '=0'), sov_text)
+        .replace(new RegExp('NFTs' + '=0'), nft_text);
+    $option.html(opt_text);
+}
 $('#version-select').on('change tap', function selectVersion(e) {
     const version = $(e.currentTarget).val() as Version;
     if (RWParams.versionSource !== version) {
@@ -135,10 +121,55 @@ $('.selectors>a').on('click', function selectToken(e) {
     e.preventDefault();
     location.reload();
 });
-async function context() {
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
+async function contracts({
+    token, version
+}: {
+    token: Token, version: Version
+}) {
+    let moe_contract: Contract | undefined;
+    try {
+        moe_contract = await XPowerMoeFactory({
+            token, version
+        });
+    } catch (ex) {
+        if (`${ex}`.match(/missing\sg/) === null) {
+            console.error(ex);
+        }
     }
-    return { address, token: RWParams.token };
+    let sov_contract: Contract | undefined;
+    try {
+        sov_contract = await XPowerSovFactory({
+            token, version
+        });
+    } catch (ex) {
+        if (`${ex}`.match(/missing\sg/) === null) {
+            console.error(ex);
+        }
+    }
+    let nft_contract: Contract | undefined;
+    try {
+        nft_contract = await XPowerNftFactory({
+            token, version
+        });
+    } catch (ex) {
+        if (`${ex}`.match(/missing\sg/) === null) {
+            console.error(ex);
+        }
+    }
+    let ppt_contract: Contract | undefined;
+    try {
+        ppt_contract = await XPowerPptFactory({
+            token, version
+        });
+    } catch (ex) {
+        if (`${ex}`.match(/missing\sg/) === null) {
+            console.error(ex);
+        }
+    }
+    return {
+        moe_contract,
+        sov_contract,
+        nft_contract,
+        ppt_contract
+    };
 }

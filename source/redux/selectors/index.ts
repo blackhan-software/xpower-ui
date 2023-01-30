@@ -14,3 +14,4 @@ export * from './ppts-by';
 export * from './refreshed';
 export * from './token-of';
 export * from './total-by';
+export * from './version-by';

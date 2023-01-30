@@ -3,6 +3,7 @@ import { ROParams } from '../params';
 import { AppState } from '../redux/store';
 
 import { LocationService } from './location-service';
+import { HistoryService } from './history-service';
 import { MiningService } from './mining-service';
 import { MintingService } from './minting-service';
 import { NftsService } from './nfts-service';
@@ -22,6 +23,9 @@ export default <
 ) => {
     if (ROParams.service('location')) {
         LocationService(store);
+    }
+    if (ROParams.service('history')) {
+        HistoryService(store);
     }
     if (ROParams.service('mining')) {
         MiningService(store);

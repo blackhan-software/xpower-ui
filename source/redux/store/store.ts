@@ -17,6 +17,7 @@ if (ROParams.clearAll) {
 }
 export const reducer = combineReducers({
     aft_wallet: reducers.aftWalletReducer,
+    history: reducers.historyReducer,
     mining: reducers.miningReducer,
     minting: reducers.mintingReducer,
     nfts: reducers.nftsReducer,

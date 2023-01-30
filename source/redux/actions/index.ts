@@ -1,4 +1,5 @@
 export * from './aft-wallet-actions';
+export * from './history-actions';
 export * from './mining-actions';
 export * from './minting-actions';
 export * from './nfts-actions';

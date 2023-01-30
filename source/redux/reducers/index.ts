@@ -1,4 +1,5 @@
 export * from './aft-wallet-reducer';
+export * from './history-reducer';
 export * from './mining-reducer';
 export * from './minting-reducer';
 export * from './nfts-reducer';

@@ -2,15 +2,16 @@
 /* eslint no-async-promise-executor: [off] */
 
 import { x40 } from '../functions';
+import { ROParams, RWParams } from '../params';
 import { Address, Token, TokenInfo, XTokens } from '../redux/types';
-import { RWParams } from '../params';
+import { Version } from '../types';
 import { Chain, ChainId } from './chain';
 
 import detectProvider from '@metamask/detect-provider';
 import { EventEmitter } from 'events';
 
 export type Connect = {
-    address: Address, chainId: ChainId, token: Token
+    address: Address, chainId: ChainId, token: Token, version: Version
 };
 export class Blockchain extends EventEmitter {
     private static get me(): Blockchain {
@@ -62,8 +63,10 @@ export class Blockchain extends EventEmitter {
             throw new Error('missing selected-address');
         }
         setTimeout(async () => this.emit('connect', {
-            address, chainId: await this.chainId,
-            token: RWParams.token
+            address,
+            chainId: await this.chainId,
+            token: RWParams.token,
+            version: ROParams.version
         }));
         return address;
     }
