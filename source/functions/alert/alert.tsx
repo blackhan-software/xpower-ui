@@ -14,9 +14,9 @@ export enum Alert {
 }
 export class Alerts {
     static show(
-        message: string, type = Alert.primary, options?: {
-            id?: string, icon?: string, style?: Record<string, string>
-        }
+        message: JSX.Element[] | string, type = Alert.primary, options?: Partial<{
+            html: boolean, icon: string, id: string, style: Record<string, string>,
+        }>
     ) {
         if (options === undefined) {
             options = { id: '', icon: '' };
@@ -80,8 +80,10 @@ export class Alerts {
             data-id={`'${options.id}'`} role='alert' style={options.style}
         >
             <i className={`bi bi-${options.icon} flex-shrink-0 me-3`} />
-            <div className='text-truncate' title={capitalize(message)}>
-                {capitalize(message)}
+            <div className='text-truncate' title={
+                !options?.html ? capitalize(message.toString()) : undefined
+            }>
+                {options?.html ? message : capitalize(message.toString())}
             </div>
             <button className='btn-sm btn-close' data-bs-dismiss='alert'
                 type='button'

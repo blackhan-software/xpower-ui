@@ -6,7 +6,7 @@ import { AddressContext, AddressProvider, DebugContext, DebugProvider } from '..
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiToggled, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
 import { AppDispatch, AppState, Store } from '../../source/redux/store';
-import { AftWallet, Mining, Minting, Nft, NftLevels, Nfts, NftsUi, NftTokens, OtfWallet, Page, PptsUi, Token } from '../../source/redux/types';
+import { AftWallet, History, Mining, Minting, Nft, NftLevels, Nfts, NftsUi, NftTokens, OtfWallet, Page, PptsUi, Token } from '../../source/redux/types';
 
 import React, { createElement, useContext, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -21,12 +21,14 @@ import { UiPpts } from '../ppts/ppts';
 import { UiSelector } from '../selector/selector';
 import { UiWallet } from '../wallet/wallet';
 
-import * as actions from './spa-actions';
 import Tokenizer from '../../source/token';
+import * as actions from './spa-actions';
+import { $notify } from './spa-notify';
 
 type Props = {
     page: Page;
     token: Token;
+    history: History;
     mining: Mining;
     minting: Minting;
     nfts: Nfts;
@@ -51,7 +53,9 @@ export function SPA(
     const { nfts, nfts_ui } = props;
     const { ppts, ppts_ui } = props;
     const { page, token } = props;
+    const { history } = props;
     return <React.StrictMode>
+        {$notify(history, token)}
         {$h1(page)}
         {$connector(page)}
         {$wallet(page, token, aft_wallet, otf_wallet)}
