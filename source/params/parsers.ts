@@ -1,7 +1,8 @@
 import { Parser } from '../parser';
-import { Level, NftLevel, Token } from '../redux/types';
+import { Level, NftLevel, Page, Token } from '../redux/types';
 import { Tokenizer } from '../token';
 import { Version, Versions } from '../types';
+import { RWParams } from './rw-params';
 
 export function autoMint(params: URLSearchParams): number {
     return Parser.number(params.get('auto-mint'), 3000);
@@ -48,7 +49,7 @@ export function reloadMs(params: URLSearchParams): number | null {
     return Parser.number(params.get('reload-ms'), null);
 }
 export function service(params: URLSearchParams, name: string): boolean {
-    return Parser.boolean(params.get(`${name}-service`), true);
+    return Parser.boolean(params.get(`${name}-service`), RWParams.page !== Page.None);
 }
 export function speed(params: URLSearchParams): number {
     const element = global.document?.getElementById('g-mining-speed');
