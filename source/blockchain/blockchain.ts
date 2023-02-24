@@ -28,9 +28,7 @@ export class Blockchain extends EventEmitter {
     }
     public get provider(): Promise<any> {
         if (!this._provider) {
-            return detectProvider({
-                timeout: 600
-            }).then((p) => {
+            return detectProvider().then((p) => {
                 return this._provider = p;
             });
         }
