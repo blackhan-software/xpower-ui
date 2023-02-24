@@ -2,11 +2,16 @@ footer.mt-auto.pb-3
     nav.navbar.px-2.py-0
         ul.navbar-nav
             li.nav-item
-                span: | &copy;
-                span
-                    = ' ' + new Date().getFullYear()
-                span.d-none.d-sm-inline
-                    = ' ' + UI_COPYRIGHT
+                a.nav-link.link-light.lower.linkedin(
+                    data-bs-toggle="tooltip" data-bs-placement="top"
+                    href="https://www.linkedin.com/company/blackhan"
+                    title="LinkedIn" target="_blank"
+                )
+                    span: | &copy;
+                    span
+                        = ' ' + new Date().getFullYear()
+                    span.d-none.d-sm-inline
+                        = ' ' + 'Blackhan Software Ltd'
 
         ul.navbar-nav.d-flex.flex-row.ml-auto
             li.nav-item.pb-1.pt-1.pe-1

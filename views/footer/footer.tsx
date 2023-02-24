@@ -1,6 +1,5 @@
 import './footer.scss';
 
-import { capitalize } from '../../routes/functions';
 import { Blockchain, ChainId } from '../../source/blockchain';
 import { ROParams } from '../../source/params';
 import { AppState, Store } from '../../source/redux/store';
@@ -40,13 +39,11 @@ function $underlay(
     const classes = [
         'navbar', 'px-2 py-0'
     ];
-    const host = hostname();
-    const year = new Date().getFullYear();
     return <nav className={
         [...classes, !props.ok ? 'underlay' : ''].join(' ')
     }>
         <ul className='navbar-nav'>
-            {$copyright(year, host)}
+            {$linkedin()}
         </ul>
         <ul className='navbar-nav d-flex flex-row ml-auto'>
             {$migrate(props)}
@@ -61,11 +58,21 @@ function $underlay(
         </ul>
     </nav>;
 }
-function $copyright(year: number, host: string) {
+function $linkedin() {
     return <li className='nav-item'>
-        <span>&copy;</span>
-        <span>{' ' + year}</span>
-        <span className='d-none d-sm-inline'>{' ' + host}</span>
+        <a className='nav-link link-light lower linkedin'
+            data-bs-toggle='tooltip' data-bs-placement='top'
+            href='https://www.linkedin.com/company/blackhan'
+            title='LinkedIn' target='_blank'
+        >
+            <span>&copy;</span>
+            <span>{
+                ' ' + new Date().getFullYear()
+            }</span>
+            <span className='d-none d-sm-inline'>{
+                ' ' + 'Blackhan Software Ltd'
+            }</span>
+        </a>
     </li>;
 }
 function $migrate({ token }: Props) {
@@ -185,16 +192,6 @@ function $avalanche() {
                 alt='Avalanche Logo' height='32' width='93' />
         </a>
     </li>;
-}
-function hostname() {
-    const host = location.host;
-    if (host.match(/localhost/i)) {
-        return capitalize(host, 1);
-    } else {
-        return capitalize(
-            host.replace(/www\./i, ''), 2
-        );
-    }
 }
 function contractUrl(
     token: Token, version: Version
