@@ -6,6 +6,7 @@ export type Allowance = bigint;
 export type Decimals = number;
 export type Amount = bigint;
 export type Balance = bigint;
+export type Rate = bigint;
 export type Supply = bigint;
 export type Timestamp = bigint;
 export type Year = number;

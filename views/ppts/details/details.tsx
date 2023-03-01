@@ -52,10 +52,13 @@ type Props = {
     ) => void;
 }
 type State = Record<NftLevel, Record<NftIssue, {
+    apr: Record<NftToken, Amount>;
+    aprBonus: Record<NftToken, Amount>;
     claimable: Record<NftToken, Amount>;
     claimed: Record<NftToken, Amount>;
 }>>
 function initialState(
+    apr = 0n, aprBonus = 0n,
     claimable = 0n, claimed = 0n
 ) {
     const ppt_tokens = Array.from(NftTokens());
@@ -64,6 +67,12 @@ function initialState(
     const state = Object.fromEntries(
         ppt_levels.map((level) => [level, Object.fromEntries(
             ppt_issues.map((issue) => [issue, {
+                apr: Object.assign({}, ...ppt_tokens.map((t) => ({
+                    [t]: apr
+                }))),
+                aprBonus: Object.assign({}, ...ppt_tokens.map((t) => ({
+                    [t]: aprBonus
+                }))),
                 claimable: Object.assign({}, ...ppt_tokens.map((t) => ({
                     [t]: claimable
                 }))),
@@ -90,6 +99,7 @@ export function UiPptDetails(
                 ppt_token, ppt_level, ppt_issue
             );
             set_state((s) => $.extend(true, {}, s, patch));
+            Bus.emit('refresh-tips');
         });
     }, [
         address, token, ppt_level
@@ -111,6 +121,7 @@ export function UiPptDetails(
                         ppt_token, ppt_level, ppt_issue
                     );
                     set_state((s) => $.extend(true, {}, s, patch));
+                    Bus.emit('refresh-tips');
                 });
             }
         });
@@ -145,6 +156,7 @@ export function UiPptDetails(
                 ppt_token, ppt_level, Nft.issue(full_id)
             );
             set_state((s) => $.extend(true, {}, s, patch));
+            Bus.emit('refresh-tips');
         });
     }, [
         address, token, ppt_level, store
@@ -169,7 +181,13 @@ function claims(
             level: ppt_level, issue: ppt_issue, token: ppt_token
         });
         const moe_treasury = MoeTreasuryFactory({ token });
-        const [claimed, claimable] = await Promise.all([
+        const [apr, aprBonus, claimed, claimable] = await Promise.all([
+            await moe_treasury.then(
+                (c) => c.aprOf(Nft.realId(full_id))
+            ),
+            await moe_treasury.then(
+                (c) => c.aprBonusOf(Nft.realId(full_id))
+            ),
             await moe_treasury.then(
                 (c) => c.claimedFor(x40(address), Nft.realId(full_id))
             ),
@@ -180,6 +198,12 @@ function claims(
         return {
             [ppt_level]: {
                 [ppt_issue]: {
+                    apr: {
+                        [ppt_token]: apr.toBigInt()
+                    },
+                    aprBonus: {
+                        [ppt_token]: aprBonus.toBigInt()
+                    },
                     claimable: {
                         [ppt_token]: claimable.toBigInt()
                     },
@@ -379,11 +403,14 @@ function $claimer(
     { state }: { state: State }
 ) {
     const { details, level: ppt_level, token } = props;
+    const { apr, aprBonus } = state[ppt_level][ppt_issue];
     const { claimer, toggled } = details[ppt_level][ppt_issue];
     const { claimable, claimed } = state[ppt_level][ppt_issue];
     return <UiPptClaimer
         issue={ppt_issue}
         level={ppt_level}
+        apr={apr[Nft.token(token)]}
+        aprBonus={aprBonus[Nft.token(token)]}
         claimable={claimable[Nft.token(token)]}
         claimed={claimed[Nft.token(token)]}
         onClaim={props.onPptClaim}

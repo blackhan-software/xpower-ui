@@ -1,5 +1,5 @@
 import { globalRef } from '../../../source/react';
-import { Amount, Nft, NftIssue, NftLevel, PptClaimerStatus, Token } from '../../../source/redux/types';
+import { Amount, Nft, NftIssue, NftLevel, PptClaimerStatus, Rate, Token } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
 
 import React from 'react';
@@ -10,13 +10,19 @@ type Props = {
     token: Token;
     issue: NftIssue;
     level: NftLevel;
+} & {
+    apr: Rate;
+    aprBonus: Rate;
     claimed: Amount;
     claimable: Amount;
-    status: PptClaimerStatus | null;
+} & {
     onClaim?: (
         issue: NftIssue,
         level: NftLevel
     ) => void;
+} & {
+    status: PptClaimerStatus | null;
+} & {
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
 }
@@ -82,22 +88,21 @@ function disabled(
 function $info(
     props: Props
 ) {
-    const apr = aprOf(props);
+    const rate = rateOf(props);
     const { level, token } = props;
     const atoken = Tokenizer.aify(token);
     return <button type='button'
         className='btn btn-outline-warning info'
         data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`Claim ${atoken}s for staked ${Nft.nameOf(level)} NFTs at ${apr.toFixed(3)}% APR`}
+        title={`Claim ${atoken}s for staked ${Nft.nameOf(level)} NFTs at ${rate.toFixed(3)}%`}
     >
         <InfoCircle fill={true} />
     </button>;
 }
-function aprOf(
-    { issue, level }: Props
+function rateOf(
+    { apr, aprBonus }: Props
 ) {
-    const now_year = new Date().getFullYear();
-    return level / 3 + (now_year - issue) ** 2 / 1000;
+    return Number(apr + aprBonus) / 1_000;
 }
 function Spinner(
     { show, grow }: { show: boolean, grow?: boolean }
