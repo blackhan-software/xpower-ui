@@ -13,8 +13,9 @@ export function clear(params: URLSearchParams): boolean {
 export function clearAll(params: URLSearchParams): boolean {
     return Parser.boolean(params.get('clear-all'), false);
 }
-export function debug(params: URLSearchParams): boolean {
-    return Parser.boolean(params.get('debug'), false);
+export function debug(params: URLSearchParams): number {
+    const flag = Parser.boolean(params.get('debug'), false);
+    return Parser.number(params.get('debug'), flag ? 1 : 0);
 }
 export function level(params: URLSearchParams): {
     min: Level, max: Level

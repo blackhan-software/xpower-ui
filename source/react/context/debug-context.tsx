@@ -2,14 +2,14 @@ import React, { Dispatch, SetStateAction, useState } from 'react';
 import { ROParams } from '../../params';
 
 export const DebugContext = React.createContext<[
-    boolean, Dispatch<SetStateAction<boolean>>
+    number, Dispatch<SetStateAction<number>>
 ]>([
-    false, (d) => d
+    0, (d) => d
 ]);
 export const DebugProvider = (
     props: { children: JSX.Element | JSX.Element[] }
 ) => {
-    const [debug, set_debug] = useState<boolean>(ROParams.debug);
+    const [debug, set_debug] = useState<number>(ROParams.debug);
     return <DebugContext.Provider value={[debug, set_debug]}>
         {props.children}
     </DebugContext.Provider>;
