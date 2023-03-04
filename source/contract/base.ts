@@ -26,9 +26,9 @@ export class Base {
             //
             // @info: disabled due to potential rate-limiting!
             //
-            if (await Blockchain.isAvalanche()) {
-                pos._pollingInterval = 900; // ms
-            }
+            // if (await Blockchain.isAvalanche()) {
+            //     pos._pollingInterval = 900; // ms
+            // }
             return this.contract.connect(pos.getSigner());
         }
         return this.contract.connect(pos);

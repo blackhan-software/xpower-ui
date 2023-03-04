@@ -47,9 +47,9 @@ export class OtfManager {
         //
         // @info: disabled due to potential rate-limiting!
         //
-        if (await Blockchain.isAvalanche()) {
-            provider._pollingInterval = 900; // ms
-        }
+        // if (await Blockchain.isAvalanche()) {
+        //     provider._pollingInterval = 900; // ms
+        // }
         const wallet = new Wallet(JSON.parse(atob(value)), provider);
         return this._wallet = global.OTF_WALLET = new NonceManager(wallet);
     }
