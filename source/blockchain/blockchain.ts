@@ -10,6 +10,10 @@ import { Chain, ChainId } from './chain';
 import detectProvider from '@metamask/detect-provider';
 import { EventEmitter } from 'events';
 
+export type Provider = Awaited<ReturnType<typeof detectProvider>> & {
+    request: (...args: any[]) => any;
+    isConnected: () => boolean;
+} & EventEmitter;
 export type Connect = {
     address: Address, chainId: ChainId, token: Token, version: Version
 };
@@ -23,70 +27,82 @@ export class Blockchain extends EventEmitter {
     private constructor() {
         super(); this.setMaxListeners(200);
     }
-    public static get provider(): Promise<any> {
-        return this.me.provider;
+    public static get provider(): Promise<Provider> {
+        return this.me.provider();
     }
-    public get provider(): Promise<any> {
-        if (!this._provider) {
-            return detectProvider().then((p) => {
-                return this._provider = p;
-            });
+    private async provider(): Promise<Provider> {
+        if (this._provider === undefined || this._provider === null) {
+            const provider = await detectProvider();
+            this._provider = provider as any;
         }
-        return Promise.resolve(this._provider);
+        return this._provider as Provider;
     }
     public static isInstalled(): Promise<boolean> {
         return this.me.isInstalled();
     }
-    public isInstalled(): Promise<boolean> {
-        return this.provider.then((p) => Boolean(p));
+    private async isInstalled(): Promise<boolean> {
+        if (this._isInstalled === undefined) {
+            this._isInstalled = await this.provider().then(
+                (p) => Boolean(p)
+            );
+        }
+        return Boolean(this._isInstalled);
     }
     public static isConnected(): Promise<boolean> {
         return this.me.isConnected();
     }
-    public isConnected(): Promise<boolean> {
-        return this.provider.then((p) => Boolean(p?.isConnected()));
+    private async isConnected(): Promise<boolean> {
+        if (this._isConnected === undefined) {
+            this._isConnected = await this.provider().then(
+                (p) => Boolean(p?.isConnected())
+            );
+        }
+        return Boolean(this._isConnected);
     }
     public static async connect(): Promise<Address> {
         return this.me.connect();
     }
-    public async connect(): Promise<Address> {
-        const accounts = await this.provider.then((p) => p?.request({
+    private async connect(): Promise<Address> {
+        const accounts = await this.provider().then((p) => p?.request({
             method: 'eth_requestAccounts'
         }));
         if (!accounts?.length) {
             throw new Error('missing accounts');
         }
-        const address = await this.selectedAddress;
+        const address = await this.selectedAddress();
         if (!address) {
             throw new Error('missing selected-address');
         }
-        setTimeout(async () => this.emit('connect', {
-            address,
-            chainId: await this.chainId,
-            token: RWParams.token,
-            version: ROParams.version
-        }));
+        setTimeout(async () => {
+            const info = {
+                address,
+                chainId: await this.chainId(),
+                token: RWParams.token,
+                version: ROParams.version
+            };
+            this.emit('connect', info);
+        });
         return address;
     }
     public static get selectedAddress(): Promise<Address | null> {
-        return this.me.selectedAddress;
+        return this.me.selectedAddress();
     }
-    public get selectedAddress(): Promise<Address | null> {
-        if (this.provider) {
-            const req = this.provider.then((p) => p?.request({
+    private async selectedAddress(): Promise<Address | null> {
+        if (this._selectedAddress === null && this._provider) {
+            const req = this.provider().then((p) => p?.request({
                 method: 'eth_accounts'
             }));
-            return req.then((a: string[]) =>
+            this._selectedAddress = await req.then((a: string[]) =>
                 a?.length > 0 ? BigInt(a[0]) : null
             );
         }
-        return Promise.resolve(null);
+        return this._selectedAddress;
     }
     public static async isAvalanche(): Promise<boolean> {
         return this.me.isAvalanche();
     }
-    public async isAvalanche(): Promise<boolean> {
-        const id = await this.chainId;
+    private async isAvalanche(): Promise<boolean> {
+        const id = await this.chainId();
         if (id === ChainId.AVALANCHE_MAINNET) {
             return true;
         }
@@ -104,9 +120,9 @@ export class Blockchain extends EventEmitter {
     public static async switchTo(id: ChainId) {
         await this.me.switchTo(id);
     }
-    public async switchTo(id: ChainId) {
+    private async switchTo(id: ChainId) {
         const chain = new Chain(id);
-        await this.provider.then((p) => p?.request({
+        await this.provider().then((p) => p?.request({
             method: 'wallet_addEthereumChain',
             params: [{
                 chainId: chain.id,
@@ -120,8 +136,8 @@ export class Blockchain extends EventEmitter {
     public static async addToken(info: TokenInfo) {
         return this.me.addToken(info);
     }
-    public async addToken(info: TokenInfo) {
-        return await this.provider.then((p) => p?.request({
+    private async addToken(info: TokenInfo) {
+        return await this.provider().then((p) => p?.request({
             method: 'wallet_watchAsset', params: {
                 type: 'ERC20', options: {
                     ...info, address: x40(info.address)
@@ -134,7 +150,7 @@ export class Blockchain extends EventEmitter {
     ) {
         return this.me.onConnect(listener);
     }
-    public onConnect(
+    private onConnect(
         listener: (options: Connect) => void
     ) {
         this.on('connect', listener);
@@ -149,7 +165,7 @@ export class Blockchain extends EventEmitter {
     ) {
         return this.me.onceConnect(listener, context);
     }
-    public onceConnect(
+    private onceConnect(
         listener: (options: Connect) => void, context?: {
             per: () => Token, tokens?: Set<Token>
         }
@@ -178,25 +194,79 @@ export class Blockchain extends EventEmitter {
             });
         };
     }
-    private get chainId() {
-        return new Promise<string | undefined>(async (resolve) => {
-            if (this.provider) try {
-                const chain_id = await this.provider.then((p) => p?.request({
-                    method: 'eth_chainId'
-                }));
-                if (chain_id && chain_id.length) {
-                    resolve(`0x${Number(chain_id).toString(16)}`);
-                } else {
-                    resolve(undefined);
-                }
-            } catch (ex) {
-                resolve(undefined);
-            } else {
-                resolve(undefined);
+    private async chainId(): Promise<ChainId | undefined> {
+        if (this._chainId === undefined && this._provider) try {
+            const chain_id = await this.provider().then(
+                (p) => p?.request({ method: 'eth_chainId' })
+            );
+            if (chain_id && chain_id.length) {
+                this._chainId = `0x${Number(chain_id).toString(16)}` as ChainId;
             }
-        });
+        } catch (ex: any) {
+            console.error(ex);
+        }
+        return this._chainId;
     }
-    private _provider: any | null;
+    private get _provider(): Provider | undefined {
+        return this.__provider;
+    }
+    private set _provider(provider: Provider | undefined) {
+        if (ROParams.debug > 1) {
+            console.debug('[Blockchain.provider]', provider);
+        }
+        if (ROParams.debug > 2 && provider) {
+            const request = provider.request;
+            const reques_dbg = (...args: any[]) => {
+                console.debug('[Blockchain.provider.request]', ...args);
+                return request.call(provider, ...args);
+            };
+            Object.defineProperty(provider, 'request', {
+                value: reques_dbg
+            });
+        }
+        this.__provider = provider;
+    }
+    private get _selectedAddress(): Address | null {
+        return this.__selectedAddress;
+    }
+    private set _selectedAddress(value: Address | null) {
+        if (ROParams.debug > 1) {
+            console.debug('[Blockchain.selected-address]', value);
+        }
+        this.__selectedAddress = value;
+    }
+    private get _isInstalled(): boolean | undefined {
+        return this.__isInstalled;
+    }
+    private set _isInstalled(value: boolean | undefined) {
+        if (ROParams.debug > 1) {
+            console.debug('[Blockchain.is-installed]', value);
+        }
+        this.__isInstalled = value;
+    }
+    private get _isConnected(): boolean | undefined {
+        return this.__isConnected;
+    }
+    private set _isConnected(value: boolean | undefined) {
+        if (ROParams.debug > 1) {
+            console.debug('[Blockchain.is-connected]', value);
+        }
+        this.__isConnected = value;
+    }
+    private get _chainId(): ChainId | undefined {
+        return this.__chainId;
+    }
+    private set _chainId(value: ChainId | undefined) {
+        if (ROParams.debug > 1) {
+            console.debug('[Blockchain.chain-id]', value);
+        }
+        this.__chainId = value;
+    }
+    private __selectedAddress: Address | null = null;
+    private __isInstalled: boolean | undefined;
+    private __isConnected: boolean | undefined;
+    private __provider: Provider | undefined;
+    private __chainId: ChainId | undefined;
     private static _me: any;
 }
 export default Blockchain;
