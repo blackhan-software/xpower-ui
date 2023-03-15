@@ -114,7 +114,7 @@ function $github() {
     return <li className='nav-item pb-1 pt-1 pe-1'>
         <a className='nav-link link-light lower github'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            title='GitHub' href='https://github.com/xpowermine'
+            title='GitHub' href='https://github.com/blackhan-software'
             target='_blank'
         >
             <i className='bi bi-github'></i>
