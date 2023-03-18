@@ -33,11 +33,19 @@ div#otf-wallet {
     input#otf-wallet-address {
       cursor: text;
       text-align: center;
-      width: calc(100% - 192px);
+      width: calc(100% - 234px);
     }
     input#otf-wallet-balance {
       text-align: center;
-      width: 105px;
+      width: 147px;
+    }
+    @media (max-width: 575px) {
+      input#otf-wallet-address {
+        width: calc(100% - 192px);
+      }
+      input#otf-wallet-balance {
+        width: 105px;
+      }
     }
     input {
       font-size: smaller;
