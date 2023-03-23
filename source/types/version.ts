@@ -11,6 +11,7 @@ export enum Version {
     'v6a' = 'v6a',
     'v6b' = 'v6b',
     'v6c' = 'v6c',
+    'v7a' = 'v7a',
 }
 export function Versions(): Set<Version> {
     const ref = Version as typeof Version & {
