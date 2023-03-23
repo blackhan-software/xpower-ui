@@ -1,6 +1,6 @@
 import './footer.scss';
 
-import { Blockchain, ChainId } from '../../source/blockchain';
+import { Blockchain, Chain, ChainId } from '../../source/blockchain';
 import { ROParams } from '../../source/params';
 import { AppState, Store } from '../../source/redux/store';
 import { Token, TokenInfo } from '../../source/redux/types';
@@ -21,12 +21,18 @@ export function UiFooter(
     const [ok, set_ok] = useState(
         Boolean(localStorage.getItem('ui-footer:ok'))
     );
-    useEffect(
-        () => { ok && localStorage.setItem('ui-footer:ok', '1'); }, [ok]
+    useEffect(() => {
+        if (ok) localStorage.setItem('ui-footer:ok', '1');
+    }, [ok]);
+    const [id, set_id] = useState<ChainId>(
+        ChainId.AVALANCHE_MAINNET
     );
+    useEffect(() => {
+        Blockchain.chainId().then((id) => id && set_id(id));
+    }, [id]);
     return <React.StrictMode>
         {$underlay({
-            ...props, ok
+            ...props, ok, chainId: id
         })}
         {$overlay({
             ...props, ok, set_ok
@@ -34,7 +40,7 @@ export function UiFooter(
     </React.StrictMode>;
 }
 function $underlay(
-    props: Props & { ok: boolean }
+    props: Props & { ok: boolean, chainId: ChainId }
 ) {
     const classes = [
         'navbar', 'px-2 py-0'
@@ -86,12 +92,12 @@ function $migrate({ token }: Props) {
         </a>
     </li>;
 }
-function $contract({ token, version }: Props) {
+function $contract({ chainId, token, version }: Props & { chainId: ChainId }) {
     return <li className='nav-item pb-1 pt-1 pe-1'>
         <a className='nav-link link-light lower smart-contract'
             data-bs-toggle='tooltip' data-bs-placement='top'
             title={`Smart contract of the ${token} token`}
-            target='_blank' href={contractUrl(token, version)}
+            target='_blank' href={contractUrl(chainId, token, version)}
         >
             <i className='bi bi-cpu-fill'></i>
             <i className='bi bi-cpu'></i>
@@ -142,11 +148,11 @@ function $youtube() {
             target='_blank' rel='noreferrer'
         >
             <svg xmlns='http://www.w3.org/2000/svg' className='fff bi bi-youtube' width='16' height='16' fill='currentColor' viewBox='0 0 16 16'>
-                <path d='M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.007 2.007 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.007 2.007 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31.4 31.4 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.007 2.007 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A99.788 99.788 0 0 1 7.858 2h.193zM6.4 5.209v4.818l4.157-2.408L6.4 5.209z'/>
+                <path d='M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.007 2.007 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.007 2.007 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31.4 31.4 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.007 2.007 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A99.788 99.788 0 0 1 7.858 2h.193zM6.4 5.209v4.818l4.157-2.408L6.4 5.209z' />
             </svg>
             <svg xmlns="http://www.w3.org/2000/svg" className="red bi bi-youtube" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M 8.051,1.999 H 8.14 c 0.822,0.003 4.987,0.033 6.11,0.335 a 2.01,2.01 0 0 1 1.415,1.42 c 0.101,0.38 0.172,0.883 0.22,1.402 l 0.01,0.104 0.022,0.26 0.008,0.104 c 0.065,0.914 0.073,1.77 0.074,1.957 v 0.075 c -0.001,0.194 -0.01,1.108 -0.082,2.06 L 15.909,9.821 15.9,9.925 c -0.05,0.572 -0.124,1.14 -0.235,1.558 a 2.007,2.007 0 0 1 -1.415,1.42 c -1.16,0.312 -5.569,0.334 -6.18,0.335 H 7.928 c -0.309,0 -1.587,-0.006 -2.927,-0.052 L 4.831,13.18 4.744,13.176 4.573,13.169 4.402,13.162 C 3.292,13.113 2.235,13.034 1.748,12.902 A 2.007,2.007 0 0 1 0.333,11.483 C 0.222,11.066 0.148,10.497 0.098,9.925 L 0.09,9.82 0.082,9.716 A 31.4,31.4 0 0 1 0,7.68 V 7.557 C 0.002,7.342 0.01,6.599 0.064,5.779 L 0.071,5.676 0.074,5.624 0.082,5.52 0.104,5.26 0.114,5.156 C 0.162,4.637 0.233,4.133 0.334,3.754 A 2.007,2.007 0 0 1 1.749,2.334 C 2.236,2.204 3.293,2.124 4.403,2.074 L 4.573,2.067 4.745,2.061 4.831,2.058 5.002,2.051 A 99.788,99.788 0 0 1 7.858,2 h 0.193 z" style={{fill:'#ff0000'}} />
-                <path d="m 6.4,5.209 v 4.818 l 4.157,-2.408 z" style={{fill:'#ffffff'}} />
+                <path d="M 8.051,1.999 H 8.14 c 0.822,0.003 4.987,0.033 6.11,0.335 a 2.01,2.01 0 0 1 1.415,1.42 c 0.101,0.38 0.172,0.883 0.22,1.402 l 0.01,0.104 0.022,0.26 0.008,0.104 c 0.065,0.914 0.073,1.77 0.074,1.957 v 0.075 c -0.001,0.194 -0.01,1.108 -0.082,2.06 L 15.909,9.821 15.9,9.925 c -0.05,0.572 -0.124,1.14 -0.235,1.558 a 2.007,2.007 0 0 1 -1.415,1.42 c -1.16,0.312 -5.569,0.334 -6.18,0.335 H 7.928 c -0.309,0 -1.587,-0.006 -2.927,-0.052 L 4.831,13.18 4.744,13.176 4.573,13.169 4.402,13.162 C 3.292,13.113 2.235,13.034 1.748,12.902 A 2.007,2.007 0 0 1 0.333,11.483 C 0.222,11.066 0.148,10.497 0.098,9.925 L 0.09,9.82 0.082,9.716 A 31.4,31.4 0 0 1 0,7.68 V 7.557 C 0.002,7.342 0.01,6.599 0.064,5.779 L 0.071,5.676 0.074,5.624 0.082,5.52 0.104,5.26 0.114,5.156 C 0.162,4.637 0.233,4.133 0.334,3.754 A 2.007,2.007 0 0 1 1.749,2.334 C 2.236,2.204 3.293,2.124 4.403,2.074 L 4.573,2.067 4.745,2.061 4.831,2.058 5.002,2.051 A 99.788,99.788 0 0 1 7.858,2 h 0.193 z" style={{ fill: '#ff0000' }} />
+                <path d="m 6.4,5.209 v 4.818 l 4.157,-2.408 z" style={{ fill: '#ffffff' }} />
             </svg>
         </a>
     </li>;
@@ -194,10 +200,12 @@ function $avalanche() {
     </li>;
 }
 function contractUrl(
-    token: Token, version: Version
+    chainId: ChainId, token: Token, version: Version
 ) {
+    const urls = new Chain(chainId).explorerUrls;
+    const explorer = urls.length ? urls[0] : '';
     const { address } = TokenInfo(token, version);
-    return `https://snowtrace.io/address/${x40(address)}`;
+    return `${explorer}/address/${x40(address)}`;
 }
 async function addToken(
     token: Token, version: Version

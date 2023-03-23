@@ -194,6 +194,9 @@ export class Blockchain extends EventEmitter {
             });
         };
     }
+    public static chainId(): Promise<ChainId | undefined> {
+        return this.me.chainId();
+    }
     private async chainId(): Promise<ChainId | undefined> {
         if (this._chainId === undefined && this._provider) try {
             const chain_id = await this.provider().then(
