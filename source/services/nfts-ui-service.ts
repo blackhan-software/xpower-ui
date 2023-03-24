@@ -3,11 +3,11 @@ import { Blockchain } from '../blockchain';
 import { Bus } from '../bus';
 import { buffered } from '../functions';
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiMinter } from '../redux/actions';
-import { onAftWalletChanged, onTokenSwitch } from '../redux/observers';
+import { onAftWalletChanged, onNftChanged, onTokenSwitch } from '../redux/observers';
 import { nftAmounts } from '../redux/reducers';
-import { aftWalletBy, xtokenOf } from '../redux/selectors';
+import { aftWalletBy, nftsBy, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Address, Amount, MAX_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftTokens, Token, TokenInfo } from '../redux/types';
+import { Address, Amount, MAX_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMintApproval, NftTokens, Token, TokenInfo } from '../redux/types';
 import { Tokenizer } from '../token';
 import { MoeWallet, NftWallet, NftWalletMock } from '../wallet';
 import { Years } from '../years';
@@ -22,6 +22,12 @@ export const NftsUiService = (
      */
     onAftWalletChanged(
         store, buffered(sync_amounts)
+    );
+    onNftChanged(
+        store, buffered(() => {
+            const { token } = store.getState();
+            sync_amounts(token);
+        })
     );
     onTokenSwitch(
         store, sync_amounts
@@ -41,23 +47,49 @@ export const NftsUiService = (
     const nft_amounts = (
         token: Token, { amount }: { amount: Amount }
     ) => {
-        const { decimals } = TokenInfo(token);
-        const balance = amount / BigInt(10 ** decimals);
         const nft_token = Nft.token(token);
+        const { decimals } = TokenInfo(token);
         const entries = Array.from(NftLevels()).map((nft_level): [
             NftLevel, NftAmounts[NftLevel]
         ] => {
-            const remainder = balance % 10n ** (BigInt(nft_level) + 3n);
-            const nft_amount = remainder / 10n ** BigInt(nft_level);
-            return [nft_level, {
-                amount: nft_amount, max: nft_amount, min: 0n
-            }];
+            const amount1 = by_moe(nft_level);
+            const amount2 = by_nft(nft_level);
+            const range1 = { amount1, max1: amount1, min1: 0n };
+            const range2 = { amount2, max2: amount2, min2: 0n };
+            return [nft_level, { ...range1, ...range2 }];
         });
         return {
             amounts: Object.assign(nftAmounts(), {
                 [nft_token]: Object.fromEntries(entries)
             })
         };
+        /**
+         * @return number of NFTs by MOE amount (for minting)
+         */
+        function by_moe(nft_level: NftLevel) {
+            const balance = amount / BigInt(10 ** decimals);
+            const remainder = balance % 10n ** (BigInt(nft_level) + 3n);
+            return remainder / 10n ** BigInt(nft_level);
+        }
+        /**
+         * @return number of NFTs by NFT amount (for upgradeing)
+         */
+        function by_nft(nft_level: NftLevel, nft_total = 0n) {
+            if (nft_level < 3) {
+                return nft_total;
+            }
+            for (const nft_issue of Years()) {
+                const nfts = nftsBy(store.getState(), {
+                    level: nft_level - 3,
+                    issue: nft_issue,
+                    token: nft_token
+                });
+                for (const item of Object.values(nfts.items)) {
+                    nft_total += item.amount / 1000n;
+                }
+            }
+            return nft_total;
+        }
     };
     /**
      * ui-details:
@@ -118,8 +150,8 @@ export const NftsUiService = (
             address, nft_contract.address
         );
         const approval = allowance === MAX_UINT256
-            ? NftMinterApproval.approved
-            : NftMinterApproval.unapproved;
+            ? NftMintApproval.approved
+            : NftMintApproval.unapproved;
         return {
             minter: { [Nft.token(token)]: { approval } }
         };

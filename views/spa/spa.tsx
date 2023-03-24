@@ -262,6 +262,9 @@ function $nfts(
             onNftMinterBatchMint={(token, list) =>
                 dispatch(actions.nftsBatchMint({ address, token, list }))
             }
+            onNftMinterBatchUpgrade={(token, list) =>
+                dispatch(actions.nftsBatchUpgrade({ address, token, list }))
+            }
             onNftMinterToggled={(toggled) => {
                 const flags = Object.fromEntries(
                     Array.from(NftLevels()).map(

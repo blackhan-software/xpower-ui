@@ -1,5 +1,5 @@
 import { globalRef } from '../../../source/react';
-import { Address, Amount, Nft, NftIssue, NftLevel, NftSenderStatus, Token } from '../../../source/redux/types';
+import { Address, Amount, Nft, NftIssue, NftLevel, NftSendStatus, Token } from '../../../source/redux/types';
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
@@ -17,7 +17,7 @@ type Props = {
         value: Address | null;
         valid: boolean | null;
     };
-    status: NftSenderStatus | null;
+    status: NftSendStatus | null;
     onTransfer?: (nft_issue: NftIssue, nft_level: NftLevel) => void;
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
@@ -54,7 +54,7 @@ function $button(
         )}
     >
         {Spinner({
-            show: props.status === NftSenderStatus.sending, grow: true
+            show: props.status === NftSendStatus.sending, grow: true
         })}
         <span className='text'>{text(props)}</span>
     </button>;
@@ -62,14 +62,14 @@ function $button(
 function text(
     { level, status }: Props
 ) {
-    return status === NftSenderStatus.sending
+    return status === NftSendStatus.sending
         ? `Sending ${Nft.nameOf(level)} NFTs…`
         : `Send ${Nft.nameOf(level)} NFTs`;
 }
 function disabled(
     { amount, status, target }: Props
 ) {
-    if (status === NftSenderStatus.sending) {
+    if (status === NftSendStatus.sending) {
         return true;
     }
     if (target.valid !== true) {

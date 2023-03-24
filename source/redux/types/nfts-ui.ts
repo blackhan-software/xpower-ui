@@ -22,38 +22,46 @@ export type NftDetails = Record<NftLevel, Record<NftIssue, {
         value: Amount | null;
     };
     sender: {
-        status: NftSenderStatus | null;
+        status: NftSendStatus | null;
     };
     fixed: boolean;
     toggled: boolean;
     expanded: boolean | null;
 }>>
 export type NftMinterList = Record<NftLevel, {
-    amount: Amount; max: Amount; min: Amount;
+    amount1: Amount; max1: Amount; min1: Amount;
+    amount2: Amount; max2: Amount; min2: Amount;
     display: boolean; toggled: boolean;
 }>
 export type NftAmounts = Record<NftLevel, {
-    amount: Amount; max: Amount; min: Amount;
+    amount1: Amount; max1: Amount; min1: Amount;
+    amount2: Amount; max2: Amount; min2: Amount;
 }>
 export type NftFlags = Record<NftLevel, {
     display: boolean; toggled: boolean;
 }>
 export type NftMinter = {
-    approval: NftMinterApproval | null;
-    status: NftMinterStatus | null;
+    approval: NftMintApproval | null;
+    mintStatus: NftMintStatus | null;
+    upgradeStatus: NftUpgradeStatus | null;
 }
-export enum NftMinterApproval {
+export enum NftMintApproval {
     unapproved = 'unapproved',
     approving = 'approving',
     approved = 'approved',
     error = 'error'
 }
-export enum NftMinterStatus {
+export enum NftMintStatus {
     minting = 'minting',
     minted = 'minted',
     error = 'error'
 }
-export enum NftSenderStatus {
+export enum NftUpgradeStatus {
+    upgrading = 'upgrading',
+    upgraded = 'upgraded',
+    error = 'error'
+}
+export enum NftSendStatus {
     sending = 'sending',
     sent = 'sent',
     error = 'error'

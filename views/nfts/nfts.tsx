@@ -54,6 +54,9 @@ type Props = {
     onNftMinterBatchMint?: (
         token: Token, list: NftMinterList
     ) => void;
+    onNftMinterBatchUpgrade?: (
+        token: Token, list: NftMinterList
+    ) => void;
     onNftMinterToggled?: (
         toggled: boolean
     ) => void;
@@ -78,8 +81,12 @@ function split(
         const nft_level = key as unknown as NftLevel;
         const { display, toggled } = value;
         lhs[nft_level] = { display, toggled };
-        const { amount, max, min } = value;
-        rhs[nft_level] = { amount, max, min };
+        const { amount1, max1, min1 } = value;
+        const { amount2, max2, min2 } = value;
+        rhs[nft_level] = {
+            amount1, max1, min1,
+            amount2, max2, min2,
+        };
     }
     return { lhs, rhs };
 }
@@ -137,11 +144,17 @@ export function UiNfts(
                 onApproval={
                     props.onNftMinterApproval
                 }
-                status={
-                    minter[nft_token].status
+                mintStatus={
+                    minter[nft_token].mintStatus
                 }
                 onBatchMint={
                     props.onNftMinterBatchMint
+                }
+                upgradeStatus={
+                    minter[nft_token].upgradeStatus
+                }
+                onBatchUpgrade={
+                    props.onNftMinterBatchUpgrade
                 }
                 onToggled={
                     props.onNftMinterToggled

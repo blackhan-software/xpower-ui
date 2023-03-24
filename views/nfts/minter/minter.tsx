@@ -1,14 +1,16 @@
-import { NftMinterApproval, NftMinterList, NftMinterStatus, Token } from '../../../source/redux/types';
+import { NftMintApproval, NftMinterList, NftMintStatus as NftMintStatus, NftUpgradeStatus, Token } from '../../../source/redux/types';
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 
 type Props = {
     list: NftMinterList;
-    approval: NftMinterApproval | null;
+    approval: NftMintApproval | null;
     onApproval?: (token: Token) => void;
-    status: NftMinterStatus | null;
+    mintStatus: NftMintStatus | null;
     onBatchMint?: (token: Token, list: NftMinterList) => void;
+    upgradeStatus: NftUpgradeStatus | null;
+    onBatchUpgrade?: (token: Token, list: NftMinterList) => void;
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
     token: Token;
@@ -22,6 +24,7 @@ export function UiNftMinter(
         {$toggleAll(props)}
         {$burnApproval(props)}
         {$batchMinter(props)}
+        {$batchUpgrader(props)}
         {$info(props)}
     </div>;
 }
@@ -68,23 +71,45 @@ function $burnApproval(
     </button>;
 }
 function $batchMinter(
-    { approval, list, status, token, onBatchMint }: Props
+    { approval, list, mintStatus: status, token, onBatchMint }: Props
 ) {
     const classes = [
         'btn btn-outline-warning',
         approved(approval) ? 'show' : ''
     ];
     const text = minting(status)
-        ? 'Minting NFTs…'
-        : 'Mint NFTs';
+        ? <>Minting<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
+        : <>Mint<span className="d-none d-sm-inline">&nbsp;NFTs</span></>
     return <button
         type='button' id='nft-batch-minter'
         className={classes.join(' ')}
-        disabled={disabled({ list, status })}
+        disabled={disabled1({ list, status })}
         onClick={onBatchMint?.bind(null, token, list)}
     >
         {Spinner({
             show: Boolean(minting(status)), grow: true
+        })}
+        <span className='text'>{text}</span>
+    </button>;
+}
+function $batchUpgrader(
+    { approval, list, upgradeStatus: status, token, onBatchUpgrade }: Props
+) {
+    const classes = [
+        'btn btn-outline-warning',
+        approved(approval) ? 'show' : ''
+    ];
+    const text = upgrading(status)
+        ? <>Upgrading<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
+        : <>Upgrade<span className="d-none d-sm-inline">&nbsp;NFTs</span></>
+    return <button
+        type='button' id='nft-batch-upgrader'
+        className={classes.join(' ')}
+        disabled={disabled2({ list, status })}
+        onClick={onBatchUpgrade?.bind(null, token, list)}
+    >
+        {Spinner({
+            show: Boolean(upgrading(status)), grow: true
         })}
         <span className='text'>{text}</span>
     </button>;
@@ -95,7 +120,7 @@ function $info(
     return <button type='button'
         className='btn btn-outline-warning info'
         data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`(Batch) mint stakeable ${token} NFTs`}
+        title={`(Batch) mint or upgrade stakeable ${token} NFTs`}
     >
         <InfoCircle fill={true} />
     </button>;
@@ -113,42 +138,69 @@ function Spinner(
     />;
 }
 function approved(
-    approval: NftMinterApproval | null
+    approval: NftMintApproval | null
 ): boolean | null {
     if (approval === null) {
         return null;
     }
-    return approval === NftMinterApproval.approved;
+    return approval === NftMintApproval.approved;
 }
 function approving(
-    approval: NftMinterApproval | null
+    approval: NftMintApproval | null
 ): boolean | null {
     if (approval === null) {
         return null;
     }
-    return approval === NftMinterApproval.approving;
+    return approval === NftMintApproval.approving;
 }
-function disabled(
-    { list, status }: Pick<Props, 'list' | 'status'>
-) {
+function disabled1({ list, status }: {
+    list: NftMinterList, status: NftMintStatus | null
+}) {
     if (minting(status)) {
         return true;
     }
-    if (!positives(list)) {
+    if (!positives1(list)) {
         return true;
     }
     return false;
 }
 function minting(
-    status: NftMinterStatus | null
+    status: NftMintStatus | null
 ): boolean | null {
-    return status === NftMinterStatus.minting;
+    return status === NftMintStatus.minting;
 }
-function positives(
+function positives1(
     list: NftMinterList
 ) {
     const amounts = Object.values(list).map(
-        ({ amount }) => amount
+        ({ amount1 }) => amount1
+    );
+    const positives = amounts.filter(
+        (amount) => amount > 0n
+    );
+    return positives.length > 0;
+}
+function disabled2({ list, status }: {
+    list: NftMinterList, status: NftUpgradeStatus | null
+}) {
+    if (upgrading(status)) {
+        return true;
+    }
+    if (!positives2(list)) {
+        return true;
+    }
+    return false;
+}
+function upgrading(
+    status: NftUpgradeStatus | null
+): boolean | null {
+    return status === NftUpgradeStatus.upgrading;
+}
+function positives2(
+    list: NftMinterList
+) {
+    const amounts = Object.values(list).map(
+        ({ amount2 }) => amount2
     );
     const positives = amounts.filter(
         (amount) => amount > 0n

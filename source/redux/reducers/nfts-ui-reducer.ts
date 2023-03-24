@@ -64,12 +64,12 @@ export function nftWrap<WR extends Record<string, unknown>>(
     return entries as Record<NftToken, WR>;
 }
 export function nftAmounts(
-    amount = 0n, max = 0n, min = 0n
+    amount1 = 0n, max1 = 0n, min1 = 0n
 ) {
     const amounts = Object.fromEntries(
         Array.from(NftLevels()).map(
             (nft_level) => [nft_level, {
-                amount, max, min
+                amount1, max1, min1
             }]
         )
     );
@@ -108,7 +108,7 @@ export function nftDetails(
 }
 export function nftMinter() {
     const minter = {
-        approval: null, status: null
+        approval: null, mintStatus: null, upgradeStatus: null
     };
     return nftWrap(minter as NftMinter);
 }

@@ -6,8 +6,8 @@ import React, { KeyboardEvent, MouseEvent, TouchEvent, useEffect, useRef } from 
 import { DashCircle, PlusCircle } from '../../../public/images/tsx';
 
 type Props = {
-    amount: Amount, level: NftLevel,
-    max: Amount, min: Amount
+    level: NftLevel,
+    amount1: Amount, max1: Amount, min1: Amount
     onUpdate?: OnUpdate
 };
 type OnUpdate = (args: Omit<Props, 'onUpdate'> & {
@@ -43,8 +43,8 @@ function $decrease(
     const stop = () => {
         set_delta(0n);
     };
-    const { amount, min } = props;
-    const decreasable = amount > min;
+    const { amount1, min1 } = props;
+    const decreasable = amount1 > min1;
     return <div
         className='btn-group' role='group'
     >
@@ -103,16 +103,16 @@ function $amount(
         data-bs-toggle='tooltip' data-bs-placement='top'
         onClick={() => extremify(props)}
         title={`${Nft.nameOf(props.level)} NFTs to mint`}
-    >{props.amount.toString()}</button>;
+    >{props.amount1.toString()}</button>;
 }
 function extremify(
-    { amount, level, max, min, onUpdate }: Props
+    { amount1, max1, min1, level, onUpdate }: Props
 ) {
-    if (onUpdate && (amount === max)) {
-        onUpdate({ amount: min, max, min, level });
+    if (onUpdate && (amount1 === max1)) {
+        onUpdate({ amount1: min1, max1, min1, level });
     }
-    if (onUpdate && (amount === min || amount < max)) {
-        onUpdate({ amount: max, max, min, level });
+    if (onUpdate && (amount1 === min1 || amount1 < max1)) {
+        onUpdate({ amount1: max1, max1, min1, level });
     }
 }
 function $increase(
@@ -124,8 +124,8 @@ function $increase(
     const stop = () => {
         set_delta(0n);
     };
-    const { amount, max } = props;
-    const increasable = amount < max;
+    const { amount1, max1 } = props;
+    const increasable = amount1 < max1;
     return <div
         className='btn-group' role='group'
     >
@@ -163,12 +163,12 @@ function increaseByWheel(
 function changeBy(
     props: Props, delta: Amount
 ) {
-    const { amount, min, max, onUpdate } = props;
-    if (delta < 0n && amount + delta >= min ||
-        delta > 0n && amount + delta <= max
+    const { amount1, min1, max1, onUpdate } = props;
+    if (delta < 0n && amount1 + delta >= min1 ||
+        delta > 0n && amount1 + delta <= max1
     ) {
         if (onUpdate) {
-            onUpdate({ ...props, amount: amount + delta });
+            onUpdate({ ...props, amount1: amount1 + delta });
         }
         return true;
     }

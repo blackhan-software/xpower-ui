@@ -65,6 +65,36 @@ export class NftWallet extends ERC1155Wallet {
             this._address, levels, amounts, contract.moeIndexOf(moe_address)
         );
     }
+    async upgrade(
+        issue: NftLevel, level: NftLevel, amount: Amount
+    ): Promise<Transaction> {
+        const contract = await OtfManager.connect(
+            await this.contract
+        );
+        const moe_address = address({
+            token: Tokenizer.xify(this._token),
+            version: ROParams.version,
+            infix: 'MOE',
+        });
+        return contract['upgrade(address,uint256,uint256,uint256,uint256)'](
+            this._address, issue, level, amount, contract.moeIndexOf(moe_address)
+        );
+    }
+    async upgradeBatch(
+        issues: NftLevel[], levels: NftLevel[][], amounts: Amount[][]
+    ): Promise<Transaction> {
+        const contract = await OtfManager.connect(
+            await this.contract
+        );
+        const moe_address = address({
+            token: Tokenizer.xify(this._token),
+            version: ROParams.version,
+            infix: 'MOE',
+        });
+        return contract['upgradeBatch(address,uint256[],uint256[][],uint256[][],uint256)'](
+            this._address, issues, levels, amounts, contract.moeIndexOf(moe_address)
+        );
+    }
     async idBy(
         year: Year, level: NftLevel
     ): Promise<NftFullId> {

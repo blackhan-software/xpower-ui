@@ -1,8 +1,8 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import { removeNonce, removeNonceByAmount, setAftWalletBurner, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter, switchToken } from '../../source/redux/actions';
-import { mintingRowBy, nftTotalBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
+import { mintingRowBy, nftsBy, nftTotalBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
 import { AppThunk } from '../../source/redux/store';
-import { Address, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, NftSenderStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../source/redux/types';
+import { Address, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftMintApproval, NftMinterList, NftMintStatus, NftSendStatus, NftUpgradeStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../source/redux/types';
 
 import { Blockchain } from '../../source/blockchain';
 import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
@@ -205,12 +205,12 @@ export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
                 }
             }
         }));
-        set_status(NftSenderStatus.sent);
+        set_status(NftSendStatus.sent);
     };
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        set_status(NftSenderStatus.sending);
+        set_status(NftSendStatus.sending);
         nft_wallet.onTransferSingle(on_single_tx);
         tx = await nft_wallet.safeTransfer(
             target, full_id, amount
@@ -235,10 +235,10 @@ export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
                 after: $sender_row
             });
         }
-        set_status(NftSenderStatus.error);
+        set_status(NftSendStatus.error);
         console.error(ex);
     }
-    function set_status(status: NftSenderStatus) {
+    function set_status(status: NftSendStatus) {
         api.dispatch(setNftsUiDetails({
             details: {
                 [nft_token]: {
@@ -266,25 +266,25 @@ export const nftsApprove = AppThunk('nfts/approve', async (args: {
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        set_approval(NftMinterApproval.approved);
+        set_approval(NftMintApproval.approved);
     };
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        set_approval(NftMinterApproval.approving);
+        set_approval(NftMintApproval.approving);
         moe_wallet.onApproval(on_approval);
         const nft_contract = await nft_wallet.contract;
         tx = await moe_wallet.approve(
             nft_contract.address, MAX_UINT256
         );
     } catch (ex) {
-        set_approval(NftMinterApproval.error);
+        set_approval(NftMintApproval.error);
         const $button = document.querySelector<HTMLElement>(
             '#nft-batch-minting'
         );
         error(ex, { after: $button });
     }
-    function set_approval(approval: NftMinterApproval) {
+    function set_approval(approval: NftMintApproval) {
         api.dispatch(setNftsUiMinter({
             minter: { [Nft.token(token)]: { approval } }
         }));
@@ -304,9 +304,10 @@ export const nftsBatchMint = AppThunk('nfts/batch-mint', async (args: {
         level: NftLevel; amount: Amount;
     }>;
     for (const level of NftLevels()) {
-        const { amount } = list[level];
-        if (amount)
-            nfts.push({ level, amount });
+        const { amount1 } = list[level];
+        if (amount1) {
+            nfts.push({ level, amount: amount1 });
+        }
     }
     const levels = nfts.map((nft) => nft.level);
     const amounts = nfts.map((nft) => nft.amount);
@@ -316,25 +317,97 @@ export const nftsBatchMint = AppThunk('nfts/batch-mint', async (args: {
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        set_status(NftMinterStatus.minted);
+        set_status(NftMintStatus.minted);
     };
     const nft_wallet = new NftWallet(address, token);
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
-        set_status(NftMinterStatus.minting);
+        set_status(NftMintStatus.minting);
         nft_wallet.onTransferBatch(on_batch_tx);
         tx = await nft_wallet.mintBatch(levels, amounts);
     } catch (ex) {
-        set_status(NftMinterStatus.error);
+        set_status(NftMintStatus.error);
         const $button = document.querySelector<HTMLElement>(
             '#nft-batch-minting'
         );
         error(ex, { after: $button });
     }
-    function set_status(status: NftMinterStatus) {
+    function set_status(mintStatus: NftMintStatus) {
         api.dispatch(setNftsUiMinter({
-            minter: { [nft_token]: { status } }
+            minter: { [nft_token]: { mintStatus } }
+        }));
+    }
+});
+export const nftsBatchUpgrade = AppThunk('nfts/batch-upgrade', async (args: {
+    address: Address | null, token: Token, list: NftMinterList
+}, api) => {
+    const { address, token, list } = args;
+    if (!address) {
+        throw new Error('missing selected-address');
+    }
+    const nft_token = Nft.token(
+        token
+    );
+    const nfts = [] as Array<{
+        issue: NftIssue, level: NftLevel; amount: Amount;
+    }>;
+    for (const nft_level of NftLevels()) {
+        const { amount2 } = list[nft_level];
+        if (amount2 && nft_level >= 3) {
+            for (const nft_issue of Years()) {
+                const { items } = nftsBy(api.getState(), {
+                    level: nft_level - 3,
+                    issue: nft_issue,
+                    token: nft_token
+                });
+                const sub_total = Object.values(items).reduce(
+                    (acc, { amount }) => acc + amount / 1000n, 0n
+                );
+                if (sub_total > 0) nfts.push({
+                    issue: nft_issue,
+                    level: nft_level,
+                    amount: sub_total
+                });
+            }
+        }
+    }
+    const issues = Array.from(new Set(nfts.map(({ issue }) => issue)));
+    const levels = [] as Array<NftLevel[]>;
+    const amounts = [] as Array<Amount[]>;
+    for (const issue of issues) {
+        levels.push(nfts
+            .filter((nft) => nft.issue === issue)
+            .map((nft) => nft.level));
+        amounts.push(nfts
+            .filter((nft) => nft.issue === issue)
+            .map((nft) => nft.amount));
+    }
+    const on_batch_tx: OnTransferBatch = async (
+        op, from, to, ids, values, ev
+    ) => {
+        if (ev.transactionHash !== tx?.hash) {
+            return;
+        }
+        set_status(NftUpgradeStatus.upgraded);
+    };
+    const nft_wallet = new NftWallet(address, token);
+    let tx: Transaction | undefined;
+    Alerts.hide();
+    try {
+        set_status(NftUpgradeStatus.upgrading);
+        nft_wallet.onTransferBatch(on_batch_tx);
+        tx = await nft_wallet.upgradeBatch(issues, levels, amounts);
+    } catch (ex) {
+        set_status(NftUpgradeStatus.error);
+        const $button = document.querySelector<HTMLElement>(
+            '#nft-batch-minting'
+        );
+        error(ex, { after: $button });
+    }
+    function set_status(upgradeStatus: NftUpgradeStatus) {
+        api.dispatch(setNftsUiMinter({
+            minter: { [nft_token]: { upgradeStatus } }
         }));
     }
 });
@@ -635,7 +708,7 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
 /**
  * aft-wallet:
  */
- export const aftBurn = AppThunk('aft/burn', async (args: {
+export const aftBurn = AppThunk('aft/burn', async (args: {
     address: Address | null, token: Token, amount: Amount
 }, api) => {
     const action = Tokenizer.aified(args.token)

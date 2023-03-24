@@ -44,7 +44,8 @@ type Props = {
     token: Token;
 }
 export type NftList = Record<NftLevel, {
-    amount: Amount; max: Amount; min: Amount;
+    amount1: Amount; max1: Amount; min1: Amount;
+    amount2: Amount; max2: Amount; min2: Amount;
     display: boolean; toggled: boolean;
 }>;
 export function UiNftList(
@@ -67,7 +68,7 @@ export function UiNftList(
 }
 function $nftMinter(
     props: Props, nft_level: NftLevel,
-    { display, toggled, amount, max, min }: NftList[NftLevel]
+    { display, toggled, amount1, max1, min1 }: NftList[NftLevel]
 ) {
     const { nfts, token } = props;
     const total_by = useMemo(() => nftTotalBy({ nfts }, {
@@ -90,13 +91,13 @@ function $nftMinter(
             {$minter(nft_level, props.token)}
             {$balance(nft_level, total_by)}
             <UiNftAmount
-                amount={amount}
+                amount1={amount1}
                 level={nft_level}
-                max={max} min={min}
-                onUpdate={({ amount }) => {
+                max1={max1} min1={min1}
+                onUpdate={({ amount1: amount }) => {
                     if (props.onNftList) {
                         props.onNftList({
-                            [nft_level]: { amount }
+                            [nft_level]: { amount1: amount }
                         });
                     }
                 }} />
