@@ -18,6 +18,8 @@ export class Chain {
                 return 'Avalanche Localhost';
             case ChainId.HARDHAT:
                 return 'Hardhat Localhost';
+            default:
+                return 'Unsupported Network';
         }
     }
     public get id(): ChainId {
@@ -30,15 +32,16 @@ export class Chain {
             case ChainId.AVALANCHE_MAINNET:
             case ChainId.AVALANCHE_FUJI:
             case ChainId.AVALANCHE_LOCAL:
+            case ChainId.HARDHAT:
                 return {
                     name: 'AVAX',
                     symbol: 'AVAX',
                     decimals: 18
                 };
-            case ChainId.HARDHAT:
+            default:
                 return {
-                    name: 'ETH',
-                    symbol: 'ETH',
+                    name: 'N/A',
+                    symbol: 'N/A',
                     decimals: 18
                 };
         }
@@ -53,6 +56,8 @@ export class Chain {
                 return ['http://localhost:9650/ext/bc/C/rpc'];
             case ChainId.HARDHAT:
                 return ['http://localhost:8545'];
+            default:
+                return [];
         }
     }
     public get explorerUrls(): string[] {
@@ -62,8 +67,8 @@ export class Chain {
             case ChainId.AVALANCHE_FUJI:
                 return ['https://testnet.snowtrace.io'];
             case ChainId.AVALANCHE_LOCAL:
-                return [];
             case ChainId.HARDHAT:
+            default:
                 return [];
         }
     }
