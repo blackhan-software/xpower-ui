@@ -113,7 +113,7 @@ function Spinner(
     ];
     return <span
         className={classes.join(' ')} role='status'
-        style={{ visibility: show ? 'visible' : 'hidden' }}
+        style={{ display: show ? 'inline-block' : 'none' }}
     />;
 }
 export default UiPptClaimer;
