@@ -42,6 +42,7 @@ export type PptMinter = {
     approval: PptMinterApproval | null;
     minter_status: PptMinterStatus | null;
     burner_status: PptBurnerStatus | null;
+    claimer_status: PptClaimerStatus | null;
 }
 export enum PptMinterApproval {
     unapproved = 'unapproved',

@@ -22,15 +22,15 @@ div#ppt-batch-minting
         role="status" style="display: none"
       )
       span.text: | Stake<span class="d-none d-sm-inline"> NFTs</span>
-    button.btn.btn-outline-warning#ppt-batch-burner(
-      type="button" disabled
+    button.btn.btn-outline-warning#ppt-batch-claimer(
+      type="button" data-bs-toggle="tooltip" data-bs-placement="top" disabled
     )
       span.spinner.spinner-border.spinner-border-sm.float-start(
         role="status" style="display: none"
       )
-      span.text: | Unstake<span class="d-none d-sm-inline"> NFTs</span>
+      span.text: | Claim<span class="d-none d-sm-inline"> Rewards</span>
     button.btn.btn-outline-warning.info(
       type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-      title="(Batch) stake or unstake {{TOKEN}} NFTs"
+      title="Batch (un)stake {{TOKEN}} NFTs or claim {{aTOKEN}} rewards"
     )
       include ../../../public/images/pug/info-circle-fill.svg.pug

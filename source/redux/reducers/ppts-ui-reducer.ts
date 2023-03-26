@@ -108,7 +108,10 @@ export function pptDetails(
 }
 export function pptMinter() {
     const minter = {
-        approval: null, minter_status: null, burner_status: null
+        approval: null,
+        minter_status: null,
+        burner_status: null,
+        claimer_status: null,
     };
     return pptWrap(minter as PptMinter);
 }

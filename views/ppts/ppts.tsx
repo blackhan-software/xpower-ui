@@ -9,10 +9,10 @@ import { UiPptList } from './list/list';
 import { UiPptMinter } from './minter';
 
 type Props = {
-    token: Token; ppts: Nfts; flags: PptFlags;
-    amounts: Record<NftToken, PptAmounts>;
+    ppts: Nfts; token: Token; flags: PptFlags;
     details: Record<NftToken, PptDetails>;
     minter: Record<NftToken, PptMinter>;
+    amounts: Record<NftToken, PptAmounts>;
     onPptList?: (
         flags: PptFlags,
         amounts: PptAmounts
@@ -60,6 +60,9 @@ type Props = {
     ) => void;
     onPptMinterBatchBurn?: (
         token: Token, list: PptMinterList
+    ) => void;
+    onPptMinterBatchClaim?: (
+        token: Token
     ) => void;
     onPptMinterToggled?: (
         toggled: boolean
@@ -138,20 +141,14 @@ export function UiPpts(
         </div>
         <div id='ppt-batch-minting'>
             <UiPptMinter
-                list={
-                    join(flags, amounts[ppt_token])
-                }
                 approval={
                     minter[ppt_token].approval
                 }
                 onApproval={
                     props.onPptMinterApproval
                 }
-                burner_status={
-                    minter[ppt_token].burner_status
-                }
-                onBatchBurn={
-                    props.onPptMinterBatchBurn
+                minter_list={
+                    join(flags, amounts[ppt_token])
                 }
                 minter_status={
                     minter[ppt_token].minter_status
@@ -159,11 +156,24 @@ export function UiPpts(
                 onBatchMint={
                     props.onPptMinterBatchMint
                 }
+                burner_status={
+                    minter[ppt_token].burner_status
+                }
+                onBatchBurn={
+                    props.onPptMinterBatchBurn
+                }
+                claimer_status={
+                    minter[ppt_token].claimer_status
+                }
+                onBatchClaim={
+                    props.onPptMinterBatchClaim
+                }
                 onToggled={
                     props.onPptMinterToggled
                 }
                 toggled={toggled}
                 token={token}
+                ppts={ppts}
             />
         </div>
     </React.Fragment>;

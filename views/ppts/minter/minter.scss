@@ -20,6 +20,7 @@ div#ppt-batch-minting {
       border-right: none;
       width: calc(100% - 84px);
     }
+
     #ppt-batch-minter {
       span.spinner {
         margin-top: 0.25em;
@@ -30,13 +31,35 @@ div#ppt-batch-minting {
       }
       border-left: none;
       border-right: none;
-      display: none;
       width: calc(50% - 41px);
+    }
+    #ppt-batch-minter {
+      display: none;
     }
     #ppt-batch-minter.show {
       display: inline-block
     }
+
     #ppt-batch-burner {
+      span.spinner {
+        margin-top: 0.25em;
+      }
+      span.spinner {
+        height: 1em;
+        width: 1em;
+      }
+      border-left: none;
+      border-right: none;
+      width: calc(50% - 41px);
+    }
+    #ppt-batch-burner {
+      display: none;
+    }
+    #ppt-batch-burner.show {
+      display: inline-block
+    }
+
+    #ppt-batch-claimer {
       span.spinner {
         margin-top: 0.25em;
       }
@@ -47,12 +70,13 @@ div#ppt-batch-minting {
       border-right: none;
       width: calc(50% - 41px);
     }
-    #ppt-batch-burner {
+    #ppt-batch-claimer {
       display: none;
     }
-    #ppt-batch-burner.show {
+    #ppt-batch-claimer.show {
       display: inline-block
     }
+
     margin-bottom: 1em;
     width: 100%;
   }

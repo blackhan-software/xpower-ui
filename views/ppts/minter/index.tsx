@@ -1,20 +1,23 @@
-import { PptBurnerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../../source/redux/types';
+import { Nfts, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../../source/redux/types';
 
 import React from 'react';
-import { UiPptBatchBurner } from './ppt-batch-burner';
-export { UiPptBatchMinter };
-import { UiPptBatchMinter } from './ppt-batch-minter';
-export { UiPptBatchBurner };
 import { InfoCircle } from '../../../public/images/tsx';
+import { Tokenizer } from '../../../source/token';
+import { UiPptBatchBurner } from './ppt-batch-burner';
+import { UiPptBatchClaimer } from './ppt-batch-claimer';
+import { UiPptBatchMinter } from './ppt-batch-minter';
 
 type Props = {
-    list: PptMinterList;
+    ppts: Nfts;
+    minter_list: PptMinterList;
     approval: PptMinterApproval | null;
     onApproval?: (token: Token) => void;
-    burner_status: PptBurnerStatus | null;
-    onBatchBurn?: (token: Token, list: PptMinterList) => void;
     minter_status: PptMinterStatus | null;
     onBatchMint?: (token: Token, list: PptMinterList) => void;
+    burner_status: PptBurnerStatus | null;
+    onBatchBurn?: (token: Token, list: PptMinterList) => void;
+    claimer_status: PptClaimerStatus | null;
+    onBatchClaim?: (token: Token) => void;
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
     token: Token;
@@ -27,8 +30,8 @@ export function UiPptMinter(
     >
         {$toggleAll(props)}
         {$burnApproval(props)}
-        {$pptBatchMinter(props)}
-        {$pptBatchBurner(props)}
+        {$pptBatchReminter(props)}
+        {$pptBatchClaimer(props)}
         {$info(props)}
     </div>;
 }
@@ -73,26 +76,48 @@ function $burnApproval(
         <span className='text'>{text}</span>
     </button>;
 }
+function $pptBatchReminter(
+    props: Props
+) {
+    const negatives = Object.values(props.minter_list)
+        .map(({ amount }) => amount).filter((a) => a < 0n);
+    if (negatives.length) {
+        return $pptBatchBurner(props)
+    } else {
+        return $pptBatchMinter(props)
+    }
+}
 function $pptBatchMinter(
-    { approval, list, minter_status, token, onBatchMint }: Props
+    { approval, minter_list, minter_status, token, onBatchMint }: Props
 ) {
     return <UiPptBatchMinter
         approved={approved(approval)}
-        list={list}
+        list={minter_list}
         status={minter_status}
         token={token}
         onBatchMint={onBatchMint}
     />;
 }
 function $pptBatchBurner(
-    { approval, list, burner_status, token, onBatchBurn }: Props
+    { approval, minter_list, burner_status, token, onBatchBurn }: Props
 ) {
     return <UiPptBatchBurner
         approved={approved(approval)}
-        list={list}
+        list={minter_list}
         status={burner_status}
         token={token}
         onBatchBurn={onBatchBurn}
+    />;
+}
+function $pptBatchClaimer(
+    { approval, claimer_status, ppts, token, onBatchClaim }: Props
+) {
+    return <UiPptBatchClaimer
+        approved={approved(approval)}
+        ppts={ppts}
+        status={claimer_status}
+        token={token}
+        onBatchClaim={onBatchClaim}
     />;
 }
 function $info(
@@ -101,7 +126,7 @@ function $info(
     return <button type='button'
         className='btn btn-outline-warning info'
         data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`(Batch) stake or unstake ${token} NFTs`}
+        title={`Batch (un)stake NFTs or claim ${Tokenizer.aify(token)} rewards`}
     >
         <InfoCircle fill={true} />
     </button>;

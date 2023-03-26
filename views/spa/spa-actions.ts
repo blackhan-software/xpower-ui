@@ -2,11 +2,11 @@
 import { removeNonce, removeNonceByAmount, setAftWalletBurner, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter, switchToken } from '../../source/redux/actions';
 import { mintingRowBy, nftsBy, nftTotalBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
 import { AppThunk } from '../../source/redux/store';
-import { Address, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftMintApproval, NftMinterList, NftMintStatus, NftSendStatus, NftUpgradeStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../source/redux/types';
+import { Address, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftMintApproval, NftMinterList, NftMintStatus, NftSendStatus, NftUpgradeStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token, TokenInfo } from '../../source/redux/types';
 
 import { Blockchain } from '../../source/blockchain';
-import { MoeTreasuryFactory, OnClaim, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
-import { Alert, alert, Alerts, ancestor, x40 } from '../../source/functions';
+import { MoeTreasuryFactory, OnClaim, OnClaimBatch, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
+import { Alert, alert, Alerts, ancestor, nice_si, x40 } from '../../source/functions';
 import { HashManager, MiningManager as MM } from '../../source/managers';
 import { ROParams } from '../../source/params';
 import { globalRef } from '../../source/react';
@@ -17,7 +17,7 @@ import { Years } from '../../source/years';
 import { Web3Provider } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import { AnyAction } from '@reduxjs/toolkit';
-import { Transaction } from 'ethers';
+import { BigNumber, Transaction } from 'ethers';
 /**
  * mining:
  */
@@ -435,6 +435,9 @@ export const pptsClaimRewards = AppThunk('ppts/claim-rewards', async (args: {
         }
         set_status(PptClaimerStatus.claimed);
     };
+    if (!Tokenizer.aified(token)) {
+        api.dispatch(switchToken(Tokenizer.aify(token)));
+    }
     let tx: Transaction | undefined;
     Alerts.hide();
     try {
@@ -462,12 +465,6 @@ export const pptsClaimRewards = AppThunk('ppts/claim-rewards', async (args: {
         });
     }
     function set_status(status: PptClaimerStatus) {
-        if (status === PptClaimerStatus.claimed) {
-            const state = api.getState();
-            if (!Tokenizer.aified(state.token)) {
-                api.dispatch(switchToken(Tokenizer.aify(state.token)));
-            }
-        }
         api.dispatch(setPptsUiDetails({
             details: {
                 [Nft.token(token)]: {
@@ -705,6 +702,93 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
         }));
     }
 });
+export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
+    address: Address | null, token: Token
+}, api) => {
+    const { address, token } = args;
+    if (!address) {
+        throw new Error('missing selected-address');
+    }
+    const ppt_token = Nft.token(
+        token
+    );
+    const ppt_ids = Nft.fullIds({
+        issues: Array.from(Years()),
+        levels: Array.from(NftLevels()),
+        token: ppt_token
+    });
+    const moe_info = TokenInfo(token);
+    const moe_treasury = await MoeTreasuryFactory({ token });
+    const claimables: BigNumber[] = await moe_treasury.claimableForBatch(
+        x40(address), Nft.realIds(ppt_ids)
+    );
+    const claimable = claimables.reduce(
+        (acc, c) => acc.add(c), BigNumber.from(0)
+    );
+    if (claimable.isZero()) {
+        warn(`No claimable ${Tokenizer.aify(token)} rewards yet; you need to wait.`, {
+            after: $button()
+        });
+        return;
+    }
+    const treasure: BigNumber = await moe_treasury.moeBalanceOf(
+        moe_treasury.moeIndexOf(x40(moe_info.address))
+    );
+    if (treasure.isZero()) {
+        set_status(PptClaimerStatus.error);
+        warn(`Empty treasury; you cannot claim any ${Tokenizer.aify(token)} rewards.`, {
+            after: $button()
+        });
+        return;
+    }
+    if (treasure.lt(claimable)) {
+        set_status(PptClaimerStatus.error);
+        warn(`Insufficient treasury; you cannot claim all ${Tokenizer.aify(token)} rewards.`, {
+            after: $button()
+        });
+        return;
+    }
+    const on_claim_batch: OnClaimBatch = async (
+        account, ids, amounts, ev
+    ) => {
+        if (ev.transactionHash !== tx?.hash) {
+            return;
+        }
+        const amount = nice_si(amounts.reduce(
+            (acc, a) => acc + a.toBigInt(), 0n
+        ), {
+            base: 10 ** moe_info.decimals
+        });
+        success(`Claimed ${amount} of ${Tokenizer.aify(token)}. If you wait longer, you can claim more!`, {
+            after: $button()
+        });
+        set_status(PptClaimerStatus.claimed);
+    };
+    if (!Tokenizer.aified(token)) {
+        api.dispatch(switchToken(Tokenizer.aify(token)));
+    }
+    let tx: Transaction | undefined;
+    Alerts.hide();
+    try {
+        set_status(PptClaimerStatus.claiming);
+        moe_treasury.on('ClaimBatch', on_claim_batch);
+        const contract = await OtfManager.connect(moe_treasury);
+        tx = await contract.claimForBatch(x40(address), Nft.realIds(
+            ppt_ids.filter((_, i) => !claimables[i].isZero())
+        ));
+    } catch (ex: any) {
+        set_status(PptClaimerStatus.error);
+        error(ex, { after: $button() });
+    }
+    function set_status(claimer_status: PptClaimerStatus) {
+        api.dispatch(setPptsUiMinter({
+            minter: { [ppt_token]: { claimer_status } }
+        }));
+    }
+    function $button() {
+        return document.querySelector<HTMLElement>('#ppt-batch-minting');
+    }
+});
 /**
  * aft-wallet:
  */
@@ -893,6 +977,32 @@ export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
         console.error(ex);
     }
 });
+/**
+ * success-alert:
+ */
+function success(message: string, options?: {
+    style?: Record<string, string>;
+    icon?: string; id?: string;
+    after?: HTMLElement | null;
+}) {
+    alert(message, Alert.success, {
+        style: { margin: '-0.5em 0 0.5em 0' },
+        ...options
+    });
+}
+/**
+ * warn-alert:
+ */
+function warn(message: string, options?: {
+    style?: Record<string, string>;
+    icon?: string; id?: string;
+    after?: HTMLElement | null;
+}) {
+    alert(message, Alert.warning, {
+        style: { margin: '-0.5em 0 0.5em 0' },
+        ...options
+    });
+}
 /**
  * error-alert:
  */

@@ -27,7 +27,7 @@ export function UiPptBatchBurner(
         onClick={onBatchBurn?.bind(null, token, list)}
     >
         {Spinner({
-            show: !!burning(status), grow: true
+            show: burning(status), grow: true
         })}
         <span className='text'>{text}</span>
     </button>;

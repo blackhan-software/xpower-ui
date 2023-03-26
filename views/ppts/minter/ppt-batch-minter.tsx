@@ -27,7 +27,7 @@ export function UiPptBatchMinter(
         onClick={onBatchMint?.bind(null, token, list)}
     >
         {Spinner({
-            show: !!minting(status), grow: true
+            show: minting(status), grow: true
         })}
         <span className='text'>{text}</span>
     </button>;

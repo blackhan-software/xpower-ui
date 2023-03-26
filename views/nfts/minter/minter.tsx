@@ -120,7 +120,7 @@ function $info(
     return <button type='button'
         className='btn btn-outline-warning info'
         data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`(Batch) mint or upgrade stakeable ${token} NFTs`}
+        title={`Batch mint or upgrade stakeable ${token} NFTs`}
     >
         <InfoCircle fill={true} />
     </button>;

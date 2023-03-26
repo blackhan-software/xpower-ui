@@ -383,6 +383,9 @@ function $ppts(
             onPptMinterBatchBurn={(token, list) =>
                 dispatch(actions.pptsBatchBurn({ address, token, list }))
             }
+            onPptMinterBatchClaim={(token) => {
+                dispatch(actions.pptsBatchClaim({ address, token }));
+            }}
             onPptMinterToggled={(toggled) => {
                 const flags = Object.fromEntries(
                     Array.from(NftLevels()).map(
