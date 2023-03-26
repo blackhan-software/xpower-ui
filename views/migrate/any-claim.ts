@@ -82,7 +82,7 @@ async function claim(token: Token, { $claim }: {
     }
     if (src_treasure.lt(src_claimable)) {
         alert(
-            `Insufficient treasury; you cannot claim any rewards.`,
+            `Insufficient treasury; you cannot claim all rewards.`,
             Alert.warning, { after: $claim.parent('div')[0] }
         );
         return;
