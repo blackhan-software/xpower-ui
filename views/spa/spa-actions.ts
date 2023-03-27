@@ -553,7 +553,7 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
             let mint_amount = amount;
             for (const issue of issues) {
                 const nft_total = nftTotalBy(api.getState(), {
-                    level, issue
+                    level, issue, token: ppt_token
                 });
                 if (nft_total.amount === 0n) {
                     continue;
@@ -638,7 +638,7 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
             let burn_amount = -amount;
             for (const issue of issues) {
                 const ppt_total = pptTotalBy(api.getState(), {
-                    level, issue
+                    level, issue, token: ppt_token
                 });
                 if (ppt_total.amount === 0n) {
                     continue;
