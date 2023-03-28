@@ -2,7 +2,7 @@ import * as actions from '../actions';
 import { AppMiddleware } from '../store';
 const tracker: { now: number, nonce: number }[] = [];
 
-export const Logger: AppMiddleware = (_) => (next) => (action) => {
+export const Logger: AppMiddleware = ({ dispatch, getState }) => (next) => (action) => {
     if (actions.addNonce.match(action)) {
         const { nonce, item: { amount, worker: index } } = action.payload;
         const xnonce = nonce.toString(16);
@@ -15,8 +15,11 @@ export const Logger: AppMiddleware = (_) => (next) => (action) => {
         }
         const t = tracker[index || 0];
         const hms = tms - t.now > 0 ? (nonce - t.nonce) / (tms - t.now) : 0
-        console.log(`[${action.type}#${index}]`,
-            `0x${px}...${sx}`, '=>', amount, '[', hms.toFixed(3), 'H/ms', ']');
+        console.log(
+            `[${action.type}#${index}]`,
+            `0x${px}...${sx}`, '=>', amount,
+            '[', hms.toFixed(3), 'H/ms', ']'
+        );
         return next(action);
     }
     if (actions.removeNonce.match(action)) {
@@ -31,7 +34,13 @@ export const Logger: AppMiddleware = (_) => (next) => (action) => {
         console.log(`[${action.type}]`, amount);
         return next(action);
     }
-    console.log(`[${action.type}]`, action.payload);
+    if (typeof action !== 'function') {
+        console.log(`[${action.type}]`, Object.fromEntries(
+            Object.entries(action).filter(([k]) => k !== 'type'))
+        );
+    } else {
+        return action(dispatch, getState);
+    }
     return next(action);
 };
 export default Logger;
