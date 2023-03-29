@@ -12,7 +12,7 @@ export function $notify(
     if (versions.length) {
         const $alert = Alerts.show(
             $message(versions[0], token), Alert.primary, {
-                html: true, id: versions[0]
+                html: true, id: String.random(8)
             }
         );
         return <NotificationBoundary>{$alert}</NotificationBoundary>;

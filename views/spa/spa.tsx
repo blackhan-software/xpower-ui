@@ -370,7 +370,7 @@ function $ppts(
                 dispatch(setPptsUiDetails({ details }));
             }}
             onPptClaim={(issue, level) =>
-                dispatch(actions.pptsClaimRewards({
+                dispatch(actions.pptsClaim({
                     address, token: xtoken, issue, level
                 }))
             }

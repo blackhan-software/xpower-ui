@@ -6,10 +6,9 @@ import { Address, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft
 
 import { Blockchain } from '../../source/blockchain';
 import { MoeTreasuryFactory, OnClaim, OnClaimBatch, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
-import { Alert, alert, Alerts, ancestor, nice_si, x40 } from '../../source/functions';
+import { error, x40 } from '../../source/functions';
 import { HashManager, MiningManager as MM } from '../../source/managers';
 import { ROParams } from '../../source/params';
-import { globalRef } from '../../source/react';
 import { Tokenizer } from '../../source/token';
 import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfManager, SovWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
@@ -69,7 +68,6 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
     }
     const moe_wallet = new MoeWallet(address, token);
     let tx: Transaction | undefined;
-    Alerts.hide();
     try {
         const on_transfer: OnTransfer = async (
             from, to, amount, ev
@@ -133,12 +131,7 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
                 }));
             }
         }
-        const $mint = globalRef<HTMLElement>(
-            `.mint[level="${level}"]`
-        );
-        error(ex, {
-            after: $mint.current, id: `${nonce}`
-        });
+        throw error(ex);
     }
     function set_status(status: MinterStatus) {
         api.dispatch(setMintingRow({ level, row: { status } }));
@@ -208,7 +201,6 @@ export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
         set_status(NftSendStatus.sent);
     };
     let tx: Transaction | undefined;
-    Alerts.hide();
     try {
         set_status(NftSendStatus.sending);
         nft_wallet.onTransferSingle(on_single_tx);
@@ -216,27 +208,8 @@ export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
             target, full_id, amount
         );
     } catch (ex: any) {
-        /* eslint no-ex-assign: [off] */
-        if (ex.error) {
-            ex = ex.error;
-        }
-        if (ex.message) {
-            if (ex.data && ex.data.message) {
-                ex.message = `${ex.message} [${ex.data.message}]`;
-            }
-            const $ref = globalRef<HTMLElement>(
-                `.nft-sender[full-id="${full_id}"]`
-            );
-            const $sender_row = ancestor(
-                $ref.current, (e) => e.classList.contains('row')
-            );
-            alert(ex.message, Alert.warning, {
-                style: { margin: '0.5em 0 -0.5em 0' },
-                after: $sender_row
-            });
-        }
         set_status(NftSendStatus.error);
-        console.error(ex);
+        throw error(ex);
     }
     function set_status(status: NftSendStatus) {
         api.dispatch(setNftsUiDetails({
@@ -269,7 +242,6 @@ export const nftsApprove = AppThunk('nfts/approve', async (args: {
         set_approval(NftMintApproval.approved);
     };
     let tx: Transaction | undefined;
-    Alerts.hide();
     try {
         set_approval(NftMintApproval.approving);
         moe_wallet.onApproval(on_approval);
@@ -279,10 +251,7 @@ export const nftsApprove = AppThunk('nfts/approve', async (args: {
         );
     } catch (ex) {
         set_approval(NftMintApproval.error);
-        const $button = document.querySelector<HTMLElement>(
-            '#nft-batch-minting'
-        );
-        error(ex, { after: $button });
+        throw error(ex);
     }
     function set_approval(approval: NftMintApproval) {
         api.dispatch(setNftsUiMinter({
@@ -321,17 +290,13 @@ export const nftsBatchMint = AppThunk('nfts/batch-mint', async (args: {
     };
     const nft_wallet = new NftWallet(address, token);
     let tx: Transaction | undefined;
-    Alerts.hide();
     try {
         set_status(NftMintStatus.minting);
         nft_wallet.onTransferBatch(on_batch_tx);
         tx = await nft_wallet.mintBatch(levels, amounts);
     } catch (ex) {
         set_status(NftMintStatus.error);
-        const $button = document.querySelector<HTMLElement>(
-            '#nft-batch-minting'
-        );
-        error(ex, { after: $button });
+        throw error(ex);
     }
     function set_status(mintStatus: NftMintStatus) {
         api.dispatch(setNftsUiMinter({
@@ -393,84 +358,17 @@ export const nftsBatchUpgrade = AppThunk('nfts/batch-upgrade', async (args: {
     };
     const nft_wallet = new NftWallet(address, token);
     let tx: Transaction | undefined;
-    Alerts.hide();
     try {
         set_status(NftUpgradeStatus.upgrading);
         nft_wallet.onTransferBatch(on_batch_tx);
         tx = await nft_wallet.upgradeBatch(issues, levels, amounts);
     } catch (ex) {
         set_status(NftUpgradeStatus.error);
-        const $button = document.querySelector<HTMLElement>(
-            '#nft-batch-minting'
-        );
-        error(ex, { after: $button });
+        throw error(ex);
     }
     function set_status(upgradeStatus: NftUpgradeStatus) {
         api.dispatch(setNftsUiMinter({
             minter: { [nft_token]: { upgradeStatus } }
-        }));
-    }
-});
-/**
- * ppt-claimer:
- */
-export const pptsClaimRewards = AppThunk('ppts/claim-rewards', async (args: {
-    address: Address | null, token: Token, issue: NftIssue, level: NftLevel
-}, api) => {
-    const { address, token, issue, level } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
-    }
-    const full_id = Nft.fullId({
-        issue, level, token: Nft.token(token)
-    });
-    const moe_treasury = MoeTreasuryFactory({
-        token
-    });
-    const on_claim_tx: OnClaim = async (
-        acc, id, amount, ev
-    ) => {
-        if (ev.transactionHash !== tx?.hash) {
-            return;
-        }
-        set_status(PptClaimerStatus.claimed);
-    };
-    if (!Tokenizer.aified(token)) {
-        api.dispatch(switchToken(Tokenizer.aify(token)));
-    }
-    let tx: Transaction | undefined;
-    Alerts.hide();
-    try {
-        set_status(PptClaimerStatus.claiming);
-        moe_treasury.then(
-            (c) => c.on('Claim', on_claim_tx)
-        );
-        const contract = await OtfManager.connect(
-            await moe_treasury
-        );
-        tx = await contract.claimFor(
-            x40(address), Nft.realId(full_id)
-        );
-    } catch (ex: any) {
-        set_status(PptClaimerStatus.error);
-        const $ref = globalRef<HTMLElement>(
-            `.ppt-claimer[full-id="${full_id}"]`
-        );
-        const $claimer_row = ancestor(
-            $ref.current, (e) => e.classList.contains('row')
-        );
-        error(ex, {
-            after: $claimer_row,
-            style: { margin: '0.5em 0 -0.5em 0' }
-        });
-    }
-    function set_status(status: PptClaimerStatus) {
-        api.dispatch(setPptsUiDetails({
-            details: {
-                [Nft.token(token)]: {
-                    [level]: { [issue]: { claimer: { status } } }
-                }
-            }
         }));
     }
 });
@@ -511,7 +409,6 @@ export const pptsApprove = AppThunk('ppts/approve', async (args: {
             set_approval(PptMinterApproval.approved);
         };
         let tx: Transaction | undefined;
-        Alerts.hide();
         try {
             set_approval(PptMinterApproval.approving);
             nft_wallet.onApprovalForAll(on_approval);
@@ -520,10 +417,7 @@ export const pptsApprove = AppThunk('ppts/approve', async (args: {
             );
         } catch (ex) {
             set_approval(PptMinterApproval.error);
-            const $button = document.querySelector<HTMLElement>(
-                '#ppt-batch-minting'
-            );
-            error(ex, { after: $button });
+            throw error(ex);
         }
     }
     function set_approval(approval: PptMinterApproval) {
@@ -592,7 +486,6 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
         token
     });
     let tx: Transaction | undefined;
-    Alerts.hide();
     try {
         set_status(PptMinterStatus.minting);
         ppt_treasury.then(
@@ -606,10 +499,7 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
         );
     } catch (ex: any) {
         set_status(PptMinterStatus.error);
-        const $button = document.querySelector<HTMLElement>(
-            '#ppt-batch-minting'
-        );
-        error(ex, { after: $button });
+        throw error(ex);
     }
     function set_status(minter_status: PptMinterStatus) {
         api.dispatch(setPptsUiMinter({
@@ -677,7 +567,6 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
         token
     });
     let tx: Transaction | undefined;
-    Alerts.hide();
     try {
         set_status(PptBurnerStatus.burning);
         ppt_treasury.then(
@@ -691,14 +580,64 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
         );
     } catch (ex: any) {
         set_status(PptBurnerStatus.error);
-        const $button = document.querySelector<HTMLElement>(
-            '#ppt-batch-minting'
-        );
-        error(ex, { after: $button });
+        throw error(ex);
     }
     function set_status(burner_status: PptBurnerStatus) {
         api.dispatch(setPptsUiMinter({
             minter: { [ppt_token]: { burner_status } }
+        }));
+    }
+});
+/**
+ * ppt-claimer:
+ */
+export const pptsClaim = AppThunk('ppts/claim', async (args: {
+    address: Address | null, token: Token, issue: NftIssue, level: NftLevel
+}, api) => {
+    const { address, token, issue, level } = args;
+    if (!address) {
+        throw new Error('missing selected-address');
+    }
+    const full_id = Nft.fullId({
+        issue, level, token: Nft.token(token)
+    });
+    const moe_treasury = MoeTreasuryFactory({
+        token
+    });
+    const on_claim_tx: OnClaim = async (
+        acc, id, amount, ev
+    ) => {
+        if (ev.transactionHash !== tx?.hash) {
+            return;
+        }
+        set_status(PptClaimerStatus.claimed);
+    };
+    if (!Tokenizer.aified(token)) {
+        api.dispatch(switchToken(Tokenizer.aify(token)));
+    }
+    let tx: Transaction | undefined;
+    try {
+        set_status(PptClaimerStatus.claiming);
+        moe_treasury.then(
+            (c) => c.on('Claim', on_claim_tx)
+        );
+        const contract = await OtfManager.connect(
+            await moe_treasury
+        );
+        tx = await contract.claimFor(
+            x40(address), Nft.realId(full_id)
+        );
+    } catch (ex: any) {
+        set_status(PptClaimerStatus.error);
+        throw error(ex);
+    }
+    function set_status(status: PptClaimerStatus) {
+        api.dispatch(setPptsUiDetails({
+            details: {
+                [Nft.token(token)]: {
+                    [level]: { [issue]: { claimer: { status } } }
+                }
+            }
         }));
     }
 });
@@ -709,9 +648,8 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
     if (!address) {
         throw new Error('missing selected-address');
     }
-    const ppt_token = Nft.token(
-        token
-    );
+    const ppt_token = Nft.token(token);
+    set_status(PptClaimerStatus.claiming);
     const ppt_ids = Nft.fullIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels()),
@@ -726,27 +664,19 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
         (acc, c) => acc.add(c), BigNumber.from(0)
     );
     if (claimable.isZero()) {
-        warn(`No claimable ${Tokenizer.aify(token)} rewards yet; you need to wait.`, {
-            after: $button()
-        });
-        return;
+        set_status(PptClaimerStatus.error);
+        throw error(`No claimable rewards yet; need to wait.`);
     }
     const treasure: BigNumber = await moe_treasury.moeBalanceOf(
         moe_treasury.moeIndexOf(x40(moe_info.address))
     );
     if (treasure.isZero()) {
         set_status(PptClaimerStatus.error);
-        warn(`Empty treasury; you cannot claim any ${Tokenizer.aify(token)} rewards.`, {
-            after: $button()
-        });
-        return;
+        throw error(`Empty treasury; cannot claim any rewards.`);
     }
     if (treasure.lt(claimable)) {
         set_status(PptClaimerStatus.error);
-        warn(`Insufficient treasury; you cannot claim all ${Tokenizer.aify(token)} rewards.`, {
-            after: $button()
-        });
-        return;
+        throw error(`Insufficient treasury; cannot claim all rewards.`);
     }
     const on_claim_batch: OnClaimBatch = async (
         account, ids, amounts, ev
@@ -754,39 +684,32 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
         if (ev.transactionHash !== tx?.hash) {
             return;
         }
-        const amount = nice_si(amounts.reduce(
-            (acc, a) => acc + a.toBigInt(), 0n
-        ), {
-            base: 10 ** moe_info.decimals
-        });
-        success(`Claimed ${amount} of ${Tokenizer.aify(token)}. If you wait longer, you can claim more!`, {
-            after: $button()
-        });
         set_status(PptClaimerStatus.claimed);
     };
     if (!Tokenizer.aified(token)) {
         api.dispatch(switchToken(Tokenizer.aify(token)));
     }
     let tx: Transaction | undefined;
-    Alerts.hide();
     try {
-        set_status(PptClaimerStatus.claiming);
         moe_treasury.on('ClaimBatch', on_claim_batch);
         const contract = await OtfManager.connect(moe_treasury);
         tx = await contract.claimForBatch(x40(address), Nft.realIds(
             ppt_ids.filter((_, i) => !claimables[i].isZero())
         ));
+        set_claimable(claimable.toBigInt());
     } catch (ex: any) {
         set_status(PptClaimerStatus.error);
-        error(ex, { after: $button() });
+        throw error(ex);
+    }
+    function set_claimable(claimable_amount: Amount) {
+        api.dispatch(setPptsUiMinter({
+            minter: { [ppt_token]: { claimable_amount } }
+        }));
     }
     function set_status(claimer_status: PptClaimerStatus) {
         api.dispatch(setPptsUiMinter({
             minter: { [ppt_token]: { claimer_status } }
         }));
-    }
-    function $button() {
-        return document.querySelector<HTMLElement>('#ppt-batch-minting');
     }
 });
 /**
@@ -819,14 +742,13 @@ export const aftBurnAPower = AppThunk('aft/burn-apower', async (args: {
         set_status(AftWalletBurner.burned);
     };
     let tx: Transaction | undefined;
-    Alerts.hide();
     try {
         set_status(AftWalletBurner.burning);
         sov_wallet.onTransfer(on_transfer_tx);
         tx = await sov_wallet.burn(amount);
     } catch (ex: any) {
         set_status(AftWalletBurner.error);
-        console.error(ex);
+        throw error(ex);
     }
     function set_status(burner_status: AftWalletBurner) {
         api.dispatch(setAftWalletBurner({ burner: burner_status }));
@@ -852,14 +774,13 @@ export const aftBurnXPower = AppThunk('aft/burn-xpower', async (args: {
         set_status(AftWalletBurner.burned);
     };
     let tx: Transaction | undefined;
-    Alerts.hide();
     try {
         set_status(AftWalletBurner.burning);
         moe_wallet.onTransfer(on_transfer_tx);
         tx = await moe_wallet.burn(amount);
     } catch (ex: any) {
         set_status(AftWalletBurner.error);
-        console.error(ex);
+        throw error(ex);
     }
     function set_status(burner_status: AftWalletBurner) {
         api.dispatch(setAftWalletBurner({ burner: burner_status }));
@@ -891,7 +812,6 @@ export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
     const mmw_signer = provider.getSigner(x40(address));
     const mmw_balance = await mmw_signer.getBalance();
     let gas_limit = parseUnits('0');
-    Alerts.hide();
     try {
         gas_limit = await mmw_signer.estimateGas({
             value: mmw_balance.lt(unit) ? mmw_balance : unit,
@@ -901,8 +821,7 @@ export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
         api.dispatch(setOtfWalletProcessing({
             processing: false
         }));
-        console.error(ex);
-        return;
+        throw error(ex);
     }
     const gas_price_base = await mmw_signer.getGasPrice();
     const gas_price = gas_price_base.add(parseUnits('1.5', 'gwei'));
@@ -925,7 +844,7 @@ export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
         api.dispatch(setOtfWalletProcessing({
             processing: false
         }));
-        console.error(ex);
+        throw error(ex);
     }
 });
 export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
@@ -944,7 +863,6 @@ export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
     const otf_signer = await OtfManager.init();
     const otf_balance = await otf_signer.getBalance();
     let gas_limit = parseUnits('0');
-    Alerts.hide();
     try {
         gas_limit = await otf_signer.estimateGas({
             to: x40(address), value: otf_balance
@@ -953,8 +871,7 @@ export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
         api.dispatch(setOtfWalletProcessing({
             processing: false
         }));
-        console.error(ex);
-        return;
+        throw error(ex);
     }
     const gas_price_base = await otf_signer.getGasPrice();
     const gas_price = gas_price_base.mul(1125).div(1000);
@@ -974,55 +891,6 @@ export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
         api.dispatch(setOtfWalletProcessing({
             processing: false
         }));
-        console.error(ex);
+        throw error(ex);
     }
 });
-/**
- * success-alert:
- */
-function success(message: string, options?: {
-    style?: Record<string, string>;
-    icon?: string; id?: string;
-    after?: HTMLElement | null;
-}) {
-    alert(message, Alert.success, {
-        style: { margin: '-0.5em 0 0.5em 0' },
-        ...options
-    });
-}
-/**
- * warn-alert:
- */
-function warn(message: string, options?: {
-    style?: Record<string, string>;
-    icon?: string; id?: string;
-    after?: HTMLElement | null;
-}) {
-    alert(message, Alert.warning, {
-        style: { margin: '-0.5em 0 0.5em 0' },
-        ...options
-    });
-}
-/**
- * error-alert:
- */
-function error(ex: any, options?: {
-    style?: Record<string, string>;
-    icon?: string; id?: string;
-    after?: HTMLElement | null;
-}) {
-    /* eslint no-ex-assign: [off] */
-    if (ex.error) {
-        ex = ex.error;
-    }
-    if (ex.message) {
-        if (ex.data && ex.data.message) {
-            ex.message = `${ex.message} [${ex.data.message}]`;
-        }
-        alert(ex.message, Alert.warning, {
-            style: { margin: '-0.5em 0 0.5em 0' },
-            ...options
-        });
-    }
-    console.error(ex);
-}
