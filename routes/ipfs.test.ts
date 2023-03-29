@@ -13,7 +13,7 @@ describe('GET /ipfs', () => {
     it('should redirect to IPFS gateway', async () => {
         await get.expect((res) => {
             expect(res.header.location).toMatch(
-                /^https:\/\/dweb.link/
+                /^https:\/\/ipfs.xpowermine\.com/
             );
         });
     });

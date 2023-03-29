@@ -1,9 +1,11 @@
-import XPowerNft from './xpower-nft';
+import { address } from '../../../test/env-address';
+import { XPowerNft } from './xpower-nft';
 
 describe('XPowerNft', () => {
     it('should be constructible', () => {
-        const address = '0xd17C755b49A831CDF32Fb5C797cFdf3aD5Bbae24';
-        const xpower_nft = new XPowerNft(address);
+        const xpower_nft = new XPowerNft(address({
+            infix: 'NFT', token: 'XPOW'
+        }));
         expect(xpower_nft).toBeDefined();
-    })
+    });
 });
