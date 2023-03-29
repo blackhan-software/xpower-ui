@@ -32,7 +32,7 @@ export class Alerts {
         }
         if (options.id) {
             const $alerts = document.querySelectorAll(
-                `.alert[data-id='${options.id || ''}']`
+                `.alert[data-id="${options.id}"]`
             );
             for (const $alert of $alerts) {
                 $alert.remove();
@@ -77,7 +77,7 @@ export class Alerts {
         }
         return <div
             className={`alert alert-${type} alert-dismissible align-items-center d-flex`}
-            data-id={`'${options.id}'`} role='alert' style={options.style}
+            data-id={options.id} role='alert' style={options.style}
         >
             <i className={`bi bi-${options.icon} flex-shrink-0 me-3`} />
             <div className='text-truncate' title={
@@ -101,7 +101,7 @@ export class Alerts {
         }
         if (options.id) {
             const $alerts = document.querySelectorAll(
-                `.alert[data-id='${options.id}']`
+                `.alert[data-id="${options.id}"]`
             );
             for (const $alert of $alerts) {
                 $alert.remove();
