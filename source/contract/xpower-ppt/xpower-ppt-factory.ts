@@ -44,7 +44,7 @@ export async function XPowerPptMockFactory(
                 real_id: id.toString() as NftRealId,
                 token: Nft.token(token)
             });
-            return `/ipfs/QmP1HdbVWnuUJzKZZVp4gNYa9bKpBVQCmzDPEinhz2MBo2/ppts/320x427/${full_id}.json`;
+            return `/ipfs/QmYfHKkkm26y8Xd7Aur8uvaXmca82s3Nrve74RY8BrhckS/320x427/${full_id}.json`;
         },
         idBy: (
             year: BigNumber, level: NftLevel, index?: BigNumber
