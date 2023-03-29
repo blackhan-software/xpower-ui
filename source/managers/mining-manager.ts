@@ -2,7 +2,7 @@
 import { Dispatch, MiddlewareAPI } from '@reduxjs/toolkit';
 import { HashManager, IntervalManager } from '.';
 import { address as addressOf } from '../contract/address';
-import { alert, Alert, Alerts } from '../functions';
+import { error } from '../functions';
 import { Miner } from '../miner';
 import { ROParams } from '../params';
 import { addNonce } from '../redux/actions';
@@ -40,7 +40,6 @@ export function MiningManager(
         address: Address, token: Token
     }): Promise<void> {
         const miner = my_miner({ address, token });
-        Alerts.hide();
         if (miner.running) {
             return await miner.stop();
         }
@@ -81,23 +80,9 @@ export function MiningManager(
             const init = await moe_wallet.init();
             console.debug('[init]', init);
         } catch (ex: any) {
-            /* eslint no-ex-assign: [off] */
-            if (ex.error) {
-                ex = ex.error;
-            }
-            if (ex.message) {
-                if (ex.data && ex.data.message) {
-                    ex.message = `${ex.message} [${ex.data.message}]`;
-                }
-                const $toggle = document.getElementById('toggle-mining');
-                alert(ex.message, Alert.warning, {
-                    style: { margin: '0.5em 0 -0.5em 0' },
-                    after: $toggle?.parentElement
-                });
-            }
             HashManager.me.removeAllListeners('block-hash');
             miner.emit('initialized', { block_hash: null });
-            console.error(ex);
+            throw error(ex);
         }
         async function mine(
             address: Address, block_hash: BlockHash
