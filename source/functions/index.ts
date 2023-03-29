@@ -7,6 +7,7 @@ export * from './dom';
 export * from './dom-query';
 export * from './ellipse';
 export * from './ensure';
+export * from './error';
 export * from './message';
 export * from './mobile';
 export * from './nice';
