@@ -1,16 +1,19 @@
 import { Meta } from '../../../source/contract';
 import { x40 } from '../../../source/functions';
+import { ROParams } from '../../../source/params';
 import { Address, Token } from '../../../source/redux/types';
 import { NftIssue, NftLevel } from '../../../source/redux/types';
 import { PptWallet, PptWalletMock } from '../../../source/wallet';
 
 export class PptImageMeta {
     static key(address: Address | null, {
-        issue: i, level: l, token: t
+        token: t, issue: i, level: l
     }: {
-        issue: NftIssue; level: NftLevel; token: Token;
+        token: Token; issue: NftIssue; level: NftLevel;
     }) {
-        return `ppt-image-meta:${x40(address ?? 0n)}:${t}:${l}:${i}#000`;
+        const prefix = `ppt-image-meta:${x40(address ?? 0n)}`;
+        const suffix = `${t}:${i}:${l}:${ROParams.version}`;
+        return `${prefix}:${suffix}#000`;
     }
     static get_cache(address: Address | null, nft: {
         issue: NftIssue; level: NftLevel; token: Token;
