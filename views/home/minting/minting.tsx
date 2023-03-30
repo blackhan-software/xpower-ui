@@ -30,7 +30,7 @@ export function UiMinting(
     ]);
     return <React.Fragment>
         <label className='form-label'>
-            Mined Amounts (not minted yet)
+            Mined Amounts Mintable
         </label>
         {Object.values(rows).map((row, i) => $mint(
             { token, level: i + 1, row, onMint, onForget },
@@ -123,7 +123,7 @@ function $forget(
         row: MintingRow
     }
 ) {
-    const title = 'Forget the tokens mined so far (w/o minting them)';
+    const title = 'Forget the tokens mined so far (without minting them)';
     return <span
         className='d-inline-block' title={nomobi(title)}
         data-bs-toggle='tooltip' data-bs-placement='top'
