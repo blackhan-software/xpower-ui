@@ -148,5 +148,8 @@ export class Tokenizer {
                 return 'SOV';
         }
     }
+    public static similar(lhs: Token, rhs: Token) {
+        return this.xify(lhs) === this.xify(rhs);
+    }
 }
 export default Tokenizer;

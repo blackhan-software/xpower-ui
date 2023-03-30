@@ -40,23 +40,29 @@ export const MintingService = (
             }
         }));
     });
-    onTokenSwitch(store, function resetMinters() {
-        if (Page.Home !== pageOf(store.getState())) {
-            return;
-        }
-        store.dispatch(clearMintingRows());
-    });
     onPageSwitch(store, function forgetNonces(next, prev) {
         if (Page.Home !== prev) {
             return;
         }
         store.dispatch(removeNonces());
     });
-    onTokenSwitch(store, function forgetNonces() {
+    onTokenSwitch(store, function forgetNonces(token, oldToken) {
         if (Page.Home !== pageOf(store.getState())) {
             return;
         }
+        if (Tokenizer.similar(token, oldToken)) {
+            return;
+        }
         store.dispatch(removeNonces());
+    });
+    onTokenSwitch(store, function resetMinters(token, oldToken) {
+        if (Page.Home !== pageOf(store.getState())) {
+            return;
+        }
+        if (Tokenizer.similar(token, oldToken)) {
+            return;
+        }
+        store.dispatch(clearMintingRows());
     });
     Blockchain.onceConnect(function forgetNonces() {
         const im = new IntervalManager({ start: true });

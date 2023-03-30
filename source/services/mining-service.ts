@@ -7,7 +7,7 @@ import { setMiningSpeed, setMiningStatus } from '../redux/actions';
 import { onPageSwitch, onTokenSwitch } from '../redux/observers';
 import { xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { MinerStatus, Token, XTokens } from '../redux/types';
+import { MinerStatus } from '../redux/types';
 import { Tokenizer } from '../token';
 import { MoeWallet, OnInit, OtfManager } from '../wallet';
 
@@ -41,24 +41,15 @@ export const MiningService = (
         miner.on('resumed', () => store.dispatch(
             setMiningStatus({ status: MinerStatus.resumed })));
         miner.on('increased', (e) => store.dispatch(
-            setMiningSpeed({ speed: { [token]: e.speed } })));
+            setMiningSpeed({ speed: { [miner.token]: e.speed } })));
         miner.on('decreased', (e) => store.dispatch(
-            setMiningSpeed({ speed: { [token]: e.speed } })));
+            setMiningSpeed({ speed: { [miner.token]: e.speed } })));
         store.dispatch(
             setMiningStatus({ status: MinerStatus.stopped })
         );
     }, {
         per: () => xtokenOf(store.getState())
     });
-    onTokenSwitch(store, async function resetSpeed(token) {
-        const address = await Blockchain.selectedAddress;
-        if (address) {
-            const miner = MM(store).miner({ address, token });
-            store.dispatch(
-                setMiningSpeed({ speed: { [token]: miner.speed } })
-            );
-        }
-    })
     onPageSwitch(store, async function stopMining() {
         const address = await Blockchain.selectedAddress;
         if (address) {
@@ -69,18 +60,26 @@ export const MiningService = (
             if (running) miner.stop();
         }
     });
-    Blockchain.onConnect(function stopMining({
-        address
-    }) {
-        for (const token of XTokens()) {
-            if (token === Token.HELA) {
-                continue;
-            }
+    onTokenSwitch(store, async function stopMining(token, oldToken) {
+        if (Tokenizer.similar(token, oldToken)) {
+            return;
+        }
+        const address = await Blockchain.selectedAddress;
+        if (address) {
             const miner = MM(store).miner({
-                address, token
+                address, token: oldToken
             });
             const running = miner.running;
             if (running) miner.stop();
+        }
+    });
+    onTokenSwitch(store, async function resetSpeed(token) {
+        const address = await Blockchain.selectedAddress;
+        if (address) {
+            const miner = MM(store).miner({ address, token });
+            store.dispatch(
+                setMiningSpeed({ speed: { [token]: miner.speed } })
+            );
         }
     });
     Blockchain.onceConnect(function refreshBlockHash({
