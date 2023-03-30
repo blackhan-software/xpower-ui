@@ -1,4 +1,3 @@
-import { Bus } from '../../source/bus';
 import { delayed, nice, nice_si, nomobi, x40 } from '../../source/functions';
 import { switchToken } from '../../source/redux/actions';
 import { AppDispatch } from '../../source/redux/store';
@@ -28,7 +27,6 @@ export function UiAftWallet(
         } else {
             dispatch(switchToken(Tokenizer.xify(props.token)));
         }
-        Bus.emit('refresh-tips');
     };
     return <div id='aft-wallet'>
         <label className='form-label'>

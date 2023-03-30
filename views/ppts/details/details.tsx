@@ -99,7 +99,6 @@ export function UiPptDetails(
                 ppt_token, ppt_level, ppt_issue
             );
             set_state((s) => $.extend(true, {}, s, patch));
-            Bus.emit('refresh-tips');
         });
     }, [
         address, token, ppt_level
@@ -121,7 +120,6 @@ export function UiPptDetails(
                         ppt_token, ppt_level, ppt_issue
                     );
                     set_state((s) => $.extend(true, {}, s, patch));
-                    Bus.emit('refresh-tips');
                 });
             }
         });
@@ -156,7 +154,6 @@ export function UiPptDetails(
                 ppt_token, ppt_level, Nft.issue(full_id)
             );
             set_state((s) => $.extend(true, {}, s, patch));
-            Bus.emit('refresh-tips');
         });
     }, [
         address, token, ppt_level, store
