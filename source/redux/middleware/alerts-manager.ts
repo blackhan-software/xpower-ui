@@ -12,7 +12,7 @@ export const AlertManager: AppMiddleware = ({ dispatch, getState }) => (next) =>
         actions.switchToken.match(action) ||
         isPending(action)
     ) {
-        Alerts.hide();
+        Alerts.hide({ id: 'am-warning' });
     }
     if (isRejected(action)) {
         warning(action.error.message);
