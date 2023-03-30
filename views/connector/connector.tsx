@@ -36,7 +36,7 @@ export function UiConnector() {
     useEffect(() => {
         if (chain !== Chain.CONNECTED) {
             const $ref = globalRef<HTMLElement>(
-                '#connect-metamask'
+                '#connect-wallet'
             );
             $ref.current?.focus();
         }
@@ -64,7 +64,7 @@ export function UiConnector() {
         }
     };
     return <div
-        className='btn-group connect-metamask' role='group'
+        className='btn-group connect-wallet' role='group'
     >
         {$connector(chain)}
         {$info(chain)}
@@ -88,10 +88,10 @@ function $connector(
         }
     };
     return <button
-        ref={globalRef('#connect-metamask')}
+        ref={globalRef('#connect-wallet')}
         className='btn btn-outline-warning'
         disabled={connecting(chain)}
-        id='connect-metamask'
+        id='connect-wallet'
         onClick={on_click}
         type='button'
     >
@@ -121,15 +121,15 @@ function label(
 ) {
     switch (chain) {
         case Chain.UNAVAILABLE:
-            return 'Install Metamask';
+            return 'Install Wallet';
         case Chain.WRONG_ID:
             return 'Switch to Avalanche';
         case Chain.UNCONNECTED:
-            return 'Connect to Metamask';
+            return 'Connect to Wallet';
         case Chain.CONNECTING:
-            return 'Connecting to Metamask…';
+            return 'Connecting to Wallet';
         case Chain.CONNECTED:
-            return 'Connected to Metamask';
+            return 'Connected to Wallet';
     }
 }
 function $info(
@@ -147,9 +147,9 @@ function tooltip(
     chain: State['chain']
 ) {
     if (chain === Chain.UNAVAILABLE) {
-        return 'Install Metamask (and then reload the application)';
+        return 'Install Wallet (and then reload the application)';
     }
-    return 'Authorize your Metamask to be connected to';
+    return 'Authorize your Wallet to be connected to';
 }
 function ms(
     fallback?: number

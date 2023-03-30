@@ -1,15 +1,15 @@
 form#connector
-  div.btn-group.connect-metamask(role="group")
-    button#connect-metamask.btn.btn-outline-warning(
+  div.btn-group.connect-wallet(role="group")
+    button#connect-wallet.btn.btn-outline-warning(
       type="button" disabled
     )
       span.spinner.spinner-border.spinner-border-sm.float-start.spinner-grow(
         role="status" style="visibility: hidden;"
       )
-      span.text: | Connecting to Metamask…
+      span.text: | Connecting to Wallet…
     button.btn.btn-outline-warning.info(
       data-bs-toggle="tooltip" data-bs-placement="top"
-      title="Authorize your Metamask to be connected to"
+      title="Authorize your wallet to be connected to"
       type="button"
     )
       include ../../public/images/pug/info-circle-fill.svg.pug
