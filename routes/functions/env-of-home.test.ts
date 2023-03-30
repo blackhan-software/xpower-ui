@@ -22,6 +22,9 @@ describe('env_of_home', () => {
                 SELECT0R_ODIN: '',
                 SELECT0R_THOR: 'active',
             }, ...{
+                POWER: 'XPOWER',
+                power: 'xpower',
+            }, ...{
                 TOKEN: 'THOR',
                 token: 'thor',
                 Token: 'Thor',

@@ -15,6 +15,7 @@ import { connect, Provider, useDispatch } from 'react-redux';
 import { Avalanche } from '../../public/images/tsx';
 import { UiAbout } from '../about/about';
 import { UiConnector } from '../connector/connector';
+import { UiCover } from '../cover/cover';
 import { UiHome } from '../home/home';
 import { UiNfts } from '../nfts/nfts';
 import { UiPpts } from '../ppts/ppts';
@@ -58,6 +59,7 @@ export function SPA(
         {$notify(history, token)}
         {$h1(page)}
         {$connector(page)}
+        {$cover(page, token, mining)}
         {$wallet(page, token, aft_wallet, otf_wallet)}
         {$selector(page, token)}
         {$home(page, token, mining, minting)}
@@ -90,6 +92,11 @@ function $connector(
     >
         <UiConnector />
     </form>;
+}
+function $cover(
+    page: Page, token: Token, mining: Mining
+) {
+    return <UiCover page={page} token={token} status={mining.status} />;
 }
 function $wallet(
     page: Page, token: Token,

@@ -13,8 +13,12 @@ export const env_of = (req: Request): Record<string, string> => {
   const token_lc = Tokenizer.lower(token);
   const xtoken_lc = Tokenizer.lower(xtoken);
   const atoken_lc = Tokenizer.lower(atoken);
+  const power = token_lc.startsWith('a') ? 'APOWER' : 'XPOWER';
+  const power_lc = power.toLowerCase();
   return {
     ...{
+      POWER: power,
+      power: power_lc,
       TOKEN: token,
       token: token_lc,
       Token: capitalize(token_lc),
@@ -23,7 +27,7 @@ export const env_of = (req: Request): Record<string, string> => {
       xToken: capitalize(xtoken_lc),
       aTOKEN: atoken,
       atoken: atoken_lc,
-      aToken: 'a' + capitalize(atoken_lc.slice(1))
+      aToken: 'a' + capitalize(atoken_lc.slice(1)),
     }, ...{
       ...theme(xtoken),
       ...header_page(req),
