@@ -21,7 +21,7 @@ export function UiMining(
     const { token } = props;
     return <React.Fragment>
         <UiMiningToggle
-            disabled={!togglable} status={status}
+            disabled={!togglable} status={status} token={token}
             onToggle={() => onToggle && onToggle(token)}
         />
         <UiMiningSpeed
