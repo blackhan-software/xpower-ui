@@ -31,7 +31,7 @@ export function nftLevel(params: URLSearchParams): {
         params.get('min-nft-level'), NftLevel.UNIT
     );
     const max = Parser.number(
-        params.get('max-nft-level'), NftLevel.YOTTA
+        params.get('max-nft-level'), NftLevel.PETA
     );
     return { min, max };
 }
