@@ -106,7 +106,7 @@ export const PptsUiService = (
     const ppt_approval = async (
         address: Address, token: Token
     ) => {
-        const ppt_treasury = await PptTreasuryFactory({ token });
+        const ppt_treasury = PptTreasuryFactory({ token });
         const nft_wallet = new NftWallet(address, token);
         const approved = await nft_wallet.isApprovedForAll(
             ppt_treasury.address

@@ -413,7 +413,7 @@ export const pptsApprove = AppThunk('ppts/approve', async (args: {
             set_approval(PptMinterApproval.approving);
             nft_wallet.onApprovalForAll(on_approval);
             tx = await nft_wallet.setApprovalForAll(
-                await ppt_treasury.then((c) => c.address), true
+                ppt_treasury.address, true
             );
         } catch (ex) {
             set_approval(PptMinterApproval.error);
@@ -475,7 +475,7 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
     const ppt_ids = ppt_mints.map((mint) => mint.ppt_id);
     const amounts = ppt_mints.map((mint) => mint.amount);
     const on_stake_batch: OnStakeBatch = async (
-        from, nftIds, amounts, ev
+        account, nft_ids, amounts, ev
     ) => {
         if (ev.transactionHash !== tx?.hash) {
             return;
@@ -488,14 +488,9 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
     let tx: Transaction | undefined;
     try {
         set_status(PptMinterStatus.minting);
-        ppt_treasury.then(
-            (c) => c?.on('StakeBatch', on_stake_batch)
-        );
-        const contract = await OtfManager.connect(
-            await ppt_treasury
-        );
-        tx = await contract.stakeBatch(
-            x40(address), Nft.realIds(ppt_ids), amounts
+        ppt_treasury.onStakeBatch(on_stake_batch);
+        tx = await ppt_treasury.stakeBatch(
+            address, ppt_ids, amounts
         );
     } catch (ex: any) {
         set_status(PptMinterStatus.error);
@@ -556,7 +551,7 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
     const ppt_ids = ppt_burns.map((burn) => burn.ppt_id);
     const amounts = ppt_burns.map((burn) => burn.amount);
     const on_unstake_batch: OnUnstakeBatch = async (
-        from, nftIds, amounts, ev
+        account, nft_ids, amounts, ev
     ) => {
         if (ev.transactionHash !== tx?.hash) {
             return;
@@ -569,14 +564,9 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
     let tx: Transaction | undefined;
     try {
         set_status(PptBurnerStatus.burning);
-        ppt_treasury.then(
-            (c) => c?.on('UnstakeBatch', on_unstake_batch)
-        );
-        const contract = await OtfManager.connect(
-            await ppt_treasury
-        );
-        tx = await contract.unstakeBatch(
-            x40(address), Nft.realIds(ppt_ids), amounts
+        ppt_treasury.onUnstakeBatch(on_unstake_batch);
+        tx = await ppt_treasury.unstakeBatch(
+            address, ppt_ids, amounts
         );
     } catch (ex: any) {
         set_status(PptBurnerStatus.error);
@@ -598,14 +588,14 @@ export const pptsClaim = AppThunk('ppts/claim', async (args: {
     if (!address) {
         throw new Error('missing selected-address');
     }
-    const full_id = Nft.fullId({
+    const ppt_id = Nft.fullId({
         issue, level, token: Nft.token(token)
     });
     const moe_treasury = MoeTreasuryFactory({
         token
     });
     const on_claim_tx: OnClaim = (
-        account, id, amount, ev
+        account, nft_id, amount, ev
     ) => {
         if (ev.transactionHash !== tx?.hash) {
             return;
@@ -620,7 +610,7 @@ export const pptsClaim = AppThunk('ppts/claim', async (args: {
         set_status(PptClaimerStatus.claiming);
         moe_treasury.onClaim(on_claim_tx);
         tx = await moe_treasury.claimFor(
-            address, full_id
+            address, ppt_id
         );
     } catch (ex: any) {
         set_status(PptClaimerStatus.error);
@@ -673,7 +663,7 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
         throw error(`Insufficient treasury; cannot claim all rewards.`);
     }
     const on_claim_batch: OnClaimBatch = (
-        account, ids, amounts, ev
+        account, nft_ids, amounts, ev
     ) => {
         if (ev.transactionHash !== tx?.hash) {
             return;

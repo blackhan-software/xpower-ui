@@ -3,7 +3,7 @@ import './nft-migrate.scss';
 
 import { BigNumber, Contract, Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { OnApprovalForAll, OnStakeBatch, OnTransferBatch, OnUnstakeBatch, PptTreasuryFactory, XPowerNftFactory, XPowerPptFactory } from '../../source/contract';
+import { OnApprovalForAll, OnStakeBatch, OnTransferBatch, OnUnstakeBatch, PptTreasury, PptTreasuryFactory, XPowerNftFactory, XPowerPptFactory } from '../../source/contract';
 import { Alert, alert, Alerts, x40 } from '../../source/functions';
 import { Nft, NftLevels, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
@@ -98,8 +98,8 @@ async function nftUnstakeOld(token: Token, { $unstake, $approve }: {
     const reset = $unstake.ing();
     Alerts.hide();
     try {
-        nty_source.on('UnstakeBatch', <OnUnstakeBatch>((
-            from, nftIds, amounts, ev
+        nty_source.onUnstakeBatch(<OnUnstakeBatch>((
+            account, nft_ids, amounts, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
                 return;
@@ -115,7 +115,8 @@ async function nftUnstakeOld(token: Token, { $unstake, $approve }: {
             zero: false
         });
         tx = await nty_source.unstakeBatch(
-            x40(address), Nft.realIds(nz.ids, { version: src_version }), nz.balances
+            address, Nft.realIds(nz.ids, { version: src_version }),
+            nz.balances.map((bn) => bn.toBigInt())
         );
     } catch (ex: any) {
         if (ex.message) {
@@ -531,8 +532,8 @@ async function nftRestakeNew(token: Token, { $restake }: {
     const reset = $restake.ing();
     Alerts.hide();
     try {
-        nty_target.on('StakeBatch', <OnStakeBatch>((
-            from, nftIds, amounts, ev
+        nty_target.onStakeBatch(<OnStakeBatch>((
+            accound, nft_ids, amounts, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
                 return;
@@ -547,7 +548,8 @@ async function nftRestakeNew(token: Token, { $restake }: {
             zero: false
         });
         tx = await nty_target.stakeBatch(
-            x40(address), Nft.realIds(nz.ids, { version: tgt_version }), nz.balances
+            address, Nft.realIds(nz.ids, { version: src_version }),
+            nz.balances.map((bn) => bn.toBigInt())
         );
     } catch (ex: any) {
         if (ex.message) {
@@ -641,9 +643,9 @@ async function contracts({
     } catch (ex) {
         console.error(ex);
     }
-    let nty_source: Contract | undefined;
+    let nty_source: PptTreasury | undefined;
     try {
-        nty_source = await PptTreasuryFactory({
+        nty_source = PptTreasuryFactory({
             token, version: src_version
         });
         console.debug(
@@ -652,9 +654,9 @@ async function contracts({
     } catch (ex) {
         console.error(ex);
     }
-    let nty_target: Contract | undefined;
+    let nty_target: PptTreasury | undefined;
     try {
-        nty_target = await PptTreasuryFactory({
+        nty_target = PptTreasuryFactory({
             token, version: tgt_version
         });
         console.debug(
