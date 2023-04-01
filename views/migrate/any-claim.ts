@@ -1,11 +1,11 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import './any-claim.scss';
 
-import { BigNumber, Contract, Transaction } from 'ethers';
+import { Contract, Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { MoeTreasuryFactory, OnClaimBatch, XPowerMoeFactory } from '../../source/contract';
-import { Alert, alert, Alerts, x40 } from '../../source/functions';
-import { Nft, NftLevels, Token } from '../../source/redux/types';
+import { MoeTreasury, MoeTreasuryFactory, OnClaimBatch, XPowerMoeFactory } from '../../source/contract';
+import { Alert, Alerts, alert } from '../../source/functions';
+import { Balance, Nft, NftLevels, Token } from '../../source/redux/types';
 import { Version } from '../../source/types';
 import { Years } from '../../source/years';
 
@@ -51,36 +51,36 @@ async function claim(token: Token, { $claim }: {
         levels: Array.from(NftLevels()),
         token: Nft.token(token)
     });
-    const src_claimables: BigNumber[] = await mty_source.claimableForBatch(
-        x40(address), Nft.realIds(ids, { version: src_version })
+    const src_claimables = await mty_source.claimableForBatch(
+        address, Nft.realIds(ids, { version: src_version })
     );
     console.debug(
-        `[${src_version}:claimables]`, src_claimables.map((b) => b.toString())
+        `[${src_version}:claimables]`, src_claimables
     );
     const src_claimable = src_claimables.reduce(
-        (acc, c) => acc.add(c), BigNumber.from(0)
+        (acc, c) => acc + c, 0n
     );
-    if (src_claimable.isZero()) {
+    if (src_claimable === 0n) {
         alert(
             `No claimable rewards; you can continue now.`,
             Alert.info, { after: $claim.parent('div')[0] }
         );
         return;
     }
-    const src_treasure: BigNumber = await mtyBalanceOf(token, {
+    const src_treasure = await mtyBalanceOf(token, {
         $claim
     });
     console.debug(
         `[${src_version}:balance]`, src_treasure.toString()
     );
-    if (src_treasure.isZero()) {
+    if (src_treasure === 0n) {
         alert(
             `Empty treasury; you cannot claim any rewards.`,
             Alert.warning, { after: $claim.parent('div')[0] }
         );
         return;
     }
-    if (src_treasure.lt(src_claimable)) {
+    if (src_treasure < src_claimable) {
         alert(
             `Insufficient treasury; you cannot claim all rewards.`,
             Alert.warning, { after: $claim.parent('div')[0] }
@@ -93,25 +93,21 @@ async function claim(token: Token, { $claim }: {
     const reset = $claim.ing();
     Alerts.hide();
     try {
-        const nz = filter(ids, src_claimables, {
-            zero: false
-        });
-        mty_source.on(
-            'ClaimBatch', <OnClaimBatch>((
-                account, ids, amounts, ev
-            ) => {
-                if (ev.transactionHash !== tx?.hash) {
-                    return;
-                }
-                alert(
-                    `Rewards have been claimed; you can continue now.`,
-                    Alert.success, { after: $claim.parent('div')[0] }
-                );
-                reset();
-            })
-        );
+        const nz = filter(ids, src_claimables);
+        mty_source.onClaimBatch(<OnClaimBatch>((
+            account, nft_ids, amounts, ev
+        ) => {
+            if (ev.transactionHash !== tx?.hash) {
+                return;
+            }
+            alert(
+                `Rewards have been claimed; you can continue now.`,
+                Alert.success, { after: $claim.parent('div')[0] }
+            );
+            reset();
+        }));
         const tx: Transaction = await mty_source.claimForBatch(
-            x40(address), Nft.realIds(nz.ids, { version: src_version })
+            address, Nft.realIds(nz.ids, { version: src_version })
         );
     } catch (ex: any) {
         if (ex.message) {
@@ -141,37 +137,27 @@ async function mtyBalanceOf(token: Token, { $claim }: {
     if (!mty_source) {
         throw new Error('undefined mty_treasury');
     }
-    //
-    // v6a (or earlier):
-    //
-    try {
-        return await mty_source.balance();
-    } catch (ex) {
-        console.error(ex);
-    }
-    //
-    // v6b (or later):
-    //
     try {
         const moe_index = await mty_source.moeIndexOf(
-            src_xpower.address
+            BigInt(src_xpower.address)
         );
         return await mty_source.moeBalanceOf(moe_index);
     } catch (ex) {
         console.error(ex);
     }
-    return BigNumber.from(0);
+    return 0n;
 }
-function filter<I, B extends BigNumber>(
-    ids: Array<I>, balances: Array<B>, { zero }: { zero: boolean }
+function filter<I>(
+    ids: Array<I>, balances: Balance[]
 ) {
     const ids_nz = [];
     const balances_nz = [];
     for (let i = 0; i < balances.length; i++) {
-        if (balances[i].isZero() === zero) {
-            balances_nz.push(balances[i]);
-            ids_nz.push(ids[i]);
+        if (balances[i] === 0n) {
+            continue;
         }
+        balances_nz.push(balances[i]);
+        ids_nz.push(ids[i]);
     }
     return { ids: ids_nz, balances: balances_nz };
 }
@@ -208,7 +194,7 @@ async function contracts({
     } catch (ex) {
         console.error(ex);
     }
-    let mty_source: Contract | undefined;
+    let mty_source: MoeTreasury | undefined;
     try {
         mty_source = await MoeTreasuryFactory({
             token, version: src_version

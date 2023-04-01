@@ -16,7 +16,7 @@ import { Years } from '../../source/years';
 import { Web3Provider } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import { AnyAction } from '@reduxjs/toolkit';
-import { BigNumber, Transaction } from 'ethers';
+import { Transaction } from 'ethers';
 /**
  * mining:
  */
@@ -604,8 +604,8 @@ export const pptsClaim = AppThunk('ppts/claim', async (args: {
     const moe_treasury = MoeTreasuryFactory({
         token
     });
-    const on_claim_tx: OnClaim = async (
-        acc, id, amount, ev
+    const on_claim_tx: OnClaim = (
+        account, id, amount, ev
     ) => {
         if (ev.transactionHash !== tx?.hash) {
             return;
@@ -618,14 +618,9 @@ export const pptsClaim = AppThunk('ppts/claim', async (args: {
     let tx: Transaction | undefined;
     try {
         set_status(PptClaimerStatus.claiming);
-        moe_treasury.then(
-            (c) => c.on('Claim', on_claim_tx)
-        );
-        const contract = await OtfManager.connect(
-            await moe_treasury
-        );
-        tx = await contract.claimFor(
-            x40(address), Nft.realId(full_id)
+        moe_treasury.onClaim(on_claim_tx);
+        tx = await moe_treasury.claimFor(
+            address, full_id
         );
     } catch (ex: any) {
         set_status(PptClaimerStatus.error);
@@ -656,29 +651,28 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
         token: ppt_token
     });
     const moe_info = TokenInfo(token);
-    const moe_treasury = await MoeTreasuryFactory({ token });
-    const claimables: BigNumber[] = await moe_treasury.claimableForBatch(
-        x40(address), Nft.realIds(ppt_ids)
-    );
-    const claimable = claimables.reduce(
-        (acc, c) => acc.add(c), BigNumber.from(0)
-    );
-    if (claimable.isZero()) {
+    const moe_treasury = MoeTreasuryFactory({
+        token
+    });
+    const claimables = await moe_treasury
+        .claimableForBatch(address, ppt_ids);
+    const claimable = claimables
+        .reduce((acc, c) => acc + c, 0n);
+    if (claimable === 0n) {
         set_status(PptClaimerStatus.error);
         throw error(`No claimable rewards yet; need to wait.`);
     }
-    const treasure: BigNumber = await moe_treasury.moeBalanceOf(
-        moe_treasury.moeIndexOf(x40(moe_info.address))
-    );
-    if (treasure.isZero()) {
+    const treasure = await moe_treasury
+        .moeBalanceOf(moe_treasury.moeIndexOf(moe_info.address));
+    if (treasure === 0n) {
         set_status(PptClaimerStatus.error);
         throw error(`Empty treasury; cannot claim any rewards.`);
     }
-    if (treasure.lt(claimable)) {
+    if (treasure < claimable) {
         set_status(PptClaimerStatus.error);
         throw error(`Insufficient treasury; cannot claim all rewards.`);
     }
-    const on_claim_batch: OnClaimBatch = async (
+    const on_claim_batch: OnClaimBatch = (
         account, ids, amounts, ev
     ) => {
         if (ev.transactionHash !== tx?.hash) {
@@ -691,12 +685,11 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
     }
     let tx: Transaction | undefined;
     try {
-        moe_treasury.on('ClaimBatch', on_claim_batch);
-        const contract = await OtfManager.connect(moe_treasury);
-        tx = await contract.claimForBatch(x40(address), Nft.realIds(
-            ppt_ids.filter((_, i) => !claimables[i].isZero())
-        ));
-        set_claimable(claimable.toBigInt());
+        moe_treasury.onClaimBatch(on_claim_batch);
+        tx = await moe_treasury.claimForBatch(
+            address, ppt_ids.filter((_, i) => claimables[i])
+        );
+        set_claimable(claimable);
     } catch (ex: any) {
         set_status(PptClaimerStatus.error);
         throw error(ex);

@@ -1,9 +1,8 @@
-import { BigNumber } from 'ethers';
 import { useContext, useEffect, useState } from 'react';
 
 import { Bus } from '../../../source/bus';
 import { MoeTreasuryFactory } from '../../../source/contract';
-import { buffered, nice_si, x40 } from '../../../source/functions';
+import { buffered, nice_si } from '../../../source/functions';
 import { AddressContext } from '../../../source/react';
 import { Address, Nft, NftLevels, PptClaimerStatus, Token, TokenInfo } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
@@ -39,14 +38,14 @@ const claimable = buffered(async (
         levels: Array.from(NftLevels()),
         token: Nft.token(token)
     });
-    const moe_treasury = await MoeTreasuryFactory({
+    const moe_treasury = MoeTreasuryFactory({
         token
     });
-    const claimables: BigNumber[] = await moe_treasury
-        .claimableForBatch(x40(address), Nft.realIds(ppt_ids));
+    const claimables = await moe_treasury
+        .claimableForBatch(address, ppt_ids);
     const claimable = claimables
-        .reduce((acc, c) => acc.add(c), BigNumber.from(0));
-    return nice_si(claimable.toBigInt(), {
+        .reduce((acc, c) => acc + c, 0n);
+    return nice_si(claimable, {
         base: 10 ** TokenInfo(token).decimals
     });
 }, 0);

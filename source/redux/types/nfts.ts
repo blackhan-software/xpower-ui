@@ -118,6 +118,11 @@ export class Nft {
         return version < Version.v6a && !ROParams.versionFaked
             ? id.slice(-6) as NftCoreId : id;
     }
+    static fullIdsOf(
+        real_ids: NftRealId[], token: NftToken
+    ): NftFullId[] {
+        return real_ids.map((id) => this.fullIdOf({ real_id: id, token }));
+    }
     static fullIdOf({ real_id, token }: {
         real_id: NftRealId, token: NftToken
     }): NftFullId {

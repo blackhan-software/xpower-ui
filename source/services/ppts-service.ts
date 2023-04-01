@@ -125,10 +125,10 @@ export const PptsService = (
         per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(async function updateClaims() {
-        const moe_treasury = await MoeTreasuryFactory({
+        const moe_treasury = MoeTreasuryFactory({
             token: xtokenOf(store.getState())
         });
-        moe_treasury.provider.on('block', buffered(() => {
+        moe_treasury.onBlock(buffered(() => {
             const nft_token = Nft.token(xtokenOf(store.getState()));
             const { details } = store.getState().ppts_ui;
             const by_token = details[nft_token];

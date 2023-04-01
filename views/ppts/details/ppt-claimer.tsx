@@ -2,17 +2,17 @@ import { globalRef } from '../../../source/react';
 import { Amount, Nft, NftIssue, NftLevel, PptClaimerStatus, Rate, Token } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 import { UiPptToggle } from './ui-toggle';
+import { Bus } from '../../../source/bus';
 
 type Props = {
     token: Token;
     issue: NftIssue;
     level: NftLevel;
 } & {
-    apr: Rate;
-    aprBonus: Rate;
+    rate: Rate;
     claimed: Amount;
     claimable: Amount;
 } & {
@@ -89,6 +89,9 @@ function $info(
     props: Props
 ) {
     const rate = rateOf(props);
+    useEffect(
+        () => Bus.emit('refresh-tips'), [rate]
+    );
     const { level, token } = props;
     const atoken = Tokenizer.aify(token);
     return <button type='button'
@@ -100,9 +103,9 @@ function $info(
     </button>;
 }
 function rateOf(
-    { apr, aprBonus }: Props
+    { rate }: Props
 ) {
-    return Number(apr + aprBonus) / 1_000;
+    return Number(rate) / 1_000;
 }
 function Spinner(
     { show, grow }: { show: boolean, grow?: boolean }

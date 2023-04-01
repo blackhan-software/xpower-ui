@@ -1,6 +1,6 @@
 import { Bus } from '../../../source/bus';
 import { MoeTreasuryFactory } from '../../../source/contract';
-import { nice, x40 } from '../../../source/functions';
+import { nice } from '../../../source/functions';
 import { AddressContext, globalRef } from '../../../source/react';
 import { onPptChanged } from '../../../source/redux/observers';
 import { AppState } from '../../../source/redux/store';
@@ -52,14 +52,12 @@ type Props = {
     ) => void;
 }
 type State = Record<NftLevel, Record<NftIssue, {
-    apr: Record<NftToken, Amount>;
-    aprBonus: Record<NftToken, Amount>;
+    rate: Record<NftToken, Amount>;
     claimable: Record<NftToken, Amount>;
     claimed: Record<NftToken, Amount>;
 }>>
 function initialState(
-    apr = 0n, aprBonus = 0n,
-    claimable = 0n, claimed = 0n
+    rate = 0n, claimable = 0n, claimed = 0n
 ) {
     const ppt_tokens = Array.from(NftTokens());
     const ppt_issues = Array.from(Years({ reverse: true }));
@@ -67,11 +65,8 @@ function initialState(
     const state = Object.fromEntries(
         ppt_levels.map((level) => [level, Object.fromEntries(
             ppt_issues.map((issue) => [issue, {
-                apr: Object.assign({}, ...ppt_tokens.map((t) => ({
-                    [t]: apr
-                }))),
-                aprBonus: Object.assign({}, ...ppt_tokens.map((t) => ({
-                    [t]: aprBonus
+                rate: Object.assign({}, ...ppt_tokens.map((t) => ({
+                    [t]: rate
                 }))),
                 claimable: Object.assign({}, ...ppt_tokens.map((t) => ({
                     [t]: claimable
@@ -177,35 +172,25 @@ function claims(
         const full_id = Nft.fullId({
             level: ppt_level, issue: ppt_issue, token: ppt_token
         });
-        const moe_treasury = MoeTreasuryFactory({ token });
-        const [apr, aprBonus, claimed, claimable] = await Promise.all([
-            await moe_treasury.then(
-                (c) => c.aprOf(Nft.realId(full_id))
-            ),
-            await moe_treasury.then(
-                (c) => c.aprBonusOf(Nft.realId(full_id))
-            ),
-            await moe_treasury.then(
-                (c) => c.claimedFor(x40(address), Nft.realId(full_id))
-            ),
-            await moe_treasury.then(
-                (c) => c.claimableFor(x40(address), Nft.realId(full_id))
-            )
+        const moe_treasury = MoeTreasuryFactory({
+            token
+        });
+        const [rate, claimed, claimable] = await Promise.all([
+            moe_treasury.rateOf(full_id),
+            moe_treasury.claimedFor(address, full_id),
+            moe_treasury.claimableFor(address, full_id)
         ]);
         return {
             [ppt_level]: {
                 [ppt_issue]: {
-                    apr: {
-                        [ppt_token]: apr.toBigInt()
-                    },
-                    aprBonus: {
-                        [ppt_token]: aprBonus.toBigInt()
+                    rate: {
+                        [ppt_token]: rate
                     },
                     claimable: {
-                        [ppt_token]: claimable.toBigInt()
+                        [ppt_token]: claimable
                     },
                     claimed: {
-                        [ppt_token]: claimed.toBigInt()
+                        [ppt_token]: claimed
                     }
                 }
             }
@@ -400,14 +385,13 @@ function $claimer(
     { state }: { state: State }
 ) {
     const { details, level: ppt_level, token } = props;
-    const { apr, aprBonus } = state[ppt_level][ppt_issue];
+    const { rate } = state[ppt_level][ppt_issue];
     const { claimer, toggled } = details[ppt_level][ppt_issue];
     const { claimable, claimed } = state[ppt_level][ppt_issue];
     return <UiPptClaimer
         issue={ppt_issue}
         level={ppt_level}
-        apr={apr[Nft.token(token)]}
-        aprBonus={aprBonus[Nft.token(token)]}
+        rate={rate[Nft.token(token)]}
         claimable={claimable[Nft.token(token)]}
         claimed={claimed[Nft.token(token)]}
         onClaim={props.onPptClaim}
