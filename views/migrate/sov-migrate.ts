@@ -3,7 +3,7 @@ import './sov-migrate.scss';
 
 import { Contract, Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { OnApproval, OnTransfer, XPowerMoeFactory, XPowerSovFactory } from '../../source/contract';
+import { XPowerMoeFactory, XPowerSovFactory } from '../../source/contract';
 import { Alert, alert, Alerts, x40 } from '../../source/functions';
 import { MAX_UINT256, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
@@ -101,14 +101,14 @@ async function moeApproveOld(token: Token, { $approve }: {
     const reset = $approve.ing();
     Alerts.hide();
     try {
-        src_xpower.on('Approval', <OnApproval>((
+        src_xpower.on('Approval', (
             owner, spender, value, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
             reset();
-        }));
+        });
         tx = await src_xpower.approve(
             tgt_xpower.address, MAX_UINT256
         );
@@ -165,14 +165,14 @@ async function moeApproveNew(token: Token, { $approve }: {
     const reset = $approve.ing();
     Alerts.hide();
     try {
-        tgt_xpower.on('Approval', <OnApproval>((
+        tgt_xpower.on('Approval', (
             owner, spender, value, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
             reset();
-        }));
+        });
         tx = await tgt_xpower.approve(
             tgt_apower.address, MAX_UINT256
         );
@@ -231,7 +231,7 @@ async function sovApproveOld(token: Token, { $approve, $migrate }: {
     const reset = $approve.ing();
     Alerts.hide();
     try {
-        src_apower.on('Approval', <OnApproval>((
+        src_apower.on('Approval', (
             owner, spender, value, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
@@ -243,7 +243,7 @@ async function sovApproveOld(token: Token, { $approve, $migrate }: {
             );
             $migrate.prop('disabled', false);
             reset();
-        }));
+        });
         tx = await src_apower.approve(
             tgt_apower.address, MAX_UINT256
         );
@@ -334,7 +334,7 @@ async function sovMigrateOld(token: Token, { $migrate }: {
     const reset = $migrate.ing();
     Alerts.hide();
     try {
-        tgt_apower.on('Transfer', <OnTransfer>((
+        tgt_apower.on('Transfer', (
             from, to, amount, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
@@ -345,7 +345,7 @@ async function sovMigrateOld(token: Token, { $migrate }: {
                 Alert.success, { after: $migrate.parent('div')[0], id: 'success' }
             );
             reset();
-        }));
+        });
         const sov_index = await tgt_apower.oldIndexOf(src_apower.address);
         const moe_index = await tgt_xpower.oldIndexOf(src_xpower.address);
         tx = await tgt_apower.migrate(src_balance, [sov_index, moe_index]);
@@ -388,7 +388,7 @@ async function contracts({
     try {
         src_xpower = await XPowerMoeFactory({
             token, version: src_version
-        });
+        }).connect();
         console.debug(
             `[${src_version}:src_xpower]`, src_xpower.address
         );
@@ -399,7 +399,7 @@ async function contracts({
     try {
         tgt_xpower = await XPowerMoeFactory({
             token, version: tgt_version
-        });
+        }).connect();
         console.debug(
             `[${tgt_version}:tgt_xpower]`, tgt_xpower.address
         );
@@ -410,7 +410,7 @@ async function contracts({
     try {
         src_apower = await XPowerSovFactory({
             token, version: src_version
-        });
+        }).connect();
         console.debug(
             `[${src_version}:src_apower]`, src_apower.address
         );
@@ -421,7 +421,7 @@ async function contracts({
     try {
         tgt_apower = await XPowerSovFactory({
             token, version: tgt_version
-        });
+        }).connect();
         console.debug(
             `[${tgt_version}:tgt_apower]`, tgt_apower.address
         );

@@ -3,7 +3,7 @@ import './moe-migrate.scss';
 
 import { Contract, Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { OnApproval, OnTransfer, XPowerMoeFactory } from '../../source/contract';
+import { XPowerMoeFactory } from '../../source/contract';
 import { Alert, alert, Alerts, x40 } from '../../source/functions';
 import { MAX_UINT256, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
@@ -82,7 +82,7 @@ async function moeApproveOld(token: Token, { $approve, $migrate }: {
     const reset = $approve.ing();
     Alerts.hide();
     try {
-        src_xpower.on('Approval', <OnApproval>((
+        src_xpower.on('Approval', (
             owner, spender, value, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
@@ -94,7 +94,7 @@ async function moeApproveOld(token: Token, { $approve, $migrate }: {
             );
             $migrate.prop('disabled', false);
             reset();
-        }));
+        });
         tx = await src_xpower.approve(
             tgt_xpower.address, MAX_UINT256
         );
@@ -176,7 +176,7 @@ async function moeMigrateOld(token: Token, { $migrate }: {
     const reset = $migrate.ing();
     Alerts.hide();
     try {
-        src_xpower.on('Transfer', <OnTransfer>((
+        src_xpower.on('Transfer', (
             from, to, amount, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
@@ -187,7 +187,7 @@ async function moeMigrateOld(token: Token, { $migrate }: {
                 Alert.success, { after: $migrate.parent('div')[0], id: 'success' }
             );
             reset();
-        }));
+        });
         const index = await tgt_xpower.oldIndexOf(src_xpower.address);
         tx = await tgt_xpower.migrate(src_balance, [index]);
     } catch (ex: any) {
@@ -229,7 +229,7 @@ async function contracts({
     try {
         src_xpower = await XPowerMoeFactory({
             token, version: src_version
-        });
+        }).connect();
         console.debug(
             `[${src_version}:src_xpower]`, src_xpower.address
         );
@@ -240,7 +240,7 @@ async function contracts({
     try {
         tgt_xpower = await XPowerMoeFactory({
             token, version: tgt_version
-        });
+        }).connect();
         console.debug(
             `[${tgt_version}:tgt_xpower]`, tgt_xpower.address
         );

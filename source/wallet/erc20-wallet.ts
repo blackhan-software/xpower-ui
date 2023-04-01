@@ -1,9 +1,6 @@
-import { OnApproval as on_approval } from '../contract';
-import { OnTransfer as on_transfer } from '../contract';
-import { BigNumber, Contract, Transaction, Event } from 'ethers';
-import { Address, Allowance, Amount, Balance, Decimals, Supply } from '../redux/types';
-
+import { BigNumber, Contract, Event, Transaction } from 'ethers';
 import { x40 } from '../functions';
+import { Address, Allowance, Amount, Balance, Decimals, Supply } from '../redux/types';
 
 export type OnApproval = (
     owner: Address, spender: Address, value: Amount, ev: Event
@@ -30,7 +27,7 @@ export abstract class ERC20Wallet {
     async burn(
         amount: Amount
     ): Promise<Transaction> {
-        return this.contract.then((c) => c?.burn(amount));
+        return this.contract.then((c) => c.burn(amount));
     }
     async allowance(
         address: Address | string, spender_address: Address | string
@@ -41,96 +38,90 @@ export abstract class ERC20Wallet {
         if (typeof spender_address === 'bigint') {
             spender_address = x40(spender_address);
         }
-        const allowance: BigNumber = await this.contract.then((c) => c?.allowance(
+        const allowance: BigNumber = await this.contract.then((c) => c.allowance(
             address, spender_address
         ));
         return allowance.toBigInt();
     }
-    approve(
+    async approve(
         spender_address: Address | string, allowance: Allowance
     ): Promise<Transaction> {
         if (typeof spender_address === 'bigint') {
             spender_address = x40(spender_address);
         }
-        return this.contract.then((c) => c?.approve(
+        return this.contract.then((c) => c.approve(
             spender_address, allowance
         ));
     }
-    increaseAllowance(
+    async increaseAllowance(
         spender_address: Address | string, delta_allowance: Allowance
     ): Promise<Transaction> {
         if (typeof spender_address === 'bigint') {
             spender_address = x40(spender_address);
         }
-        return this.contract.then((c) => c?.increaseAllowance(
+        return this.contract.then((c) => c.increaseAllowance(
             spender_address, delta_allowance
         ));
     }
-    decreaseAllowance(
+    async decreaseAllowance(
         spender_address: Address | string, delta_allowance: Allowance
     ): Promise<Transaction> {
         if (typeof spender_address === 'bigint') {
             spender_address = x40(spender_address);
         }
-        return this.contract.then((c) => c?.decreaseAllowance(
+        return this.contract.then((c) => c.decreaseAllowance(
             spender_address, delta_allowance
         ));
     }
     onApproval(
         handler: OnApproval, { once } = { once: false }
     ) {
-        const on_approval: on_approval = (
-            owner, spender, value, ev
+        const on_approval = (
+            owner: string, spender: string, value: BigNumber, ev: Event
         ) => {
             handler(BigInt(owner), BigInt(spender), value.toBigInt(), ev);
         };
         if (once) {
-            this.contract.then((c) => c?.once('Approval', on_approval));
+            this.contract.then((c) => c.once('Approval', on_approval));
         } else {
-            this.contract.then((c) => c?.on('Approval', on_approval));
+            this.contract.then((c) => c.on('Approval', on_approval));
         }
     }
-    offApproval(handler: OnApproval) {
-        this.contract.then((c) => c?.off('Approval', handler));
-    }
     onTransfer(
-        handler: OnTransfer, { once } = { once: false }
+        listener: OnTransfer, { once } = { once: false }
     ) {
-        const on_transfer: on_transfer = (
-            from, to, amount, ev
+        const on_transfer = (
+            from: string, to: string, amount: BigNumber, ev: Event
         ) => {
             if (this._address.match(new RegExp(from, 'i')) ||
                 this._address.match(new RegExp(to, 'i'))
             ) {
-                handler(BigInt(from), BigInt(to), amount.toBigInt(), ev);
+                listener(BigInt(from), BigInt(to), amount.toBigInt(), ev);
             }
         };
         if (once) {
-            this.contract.then((c) => c?.once('Transfer', on_transfer));
+            this.contract.then((c) => c.once('Transfer', on_transfer));
         } else {
-            this.contract.then((c) => c?.on('Transfer', on_transfer));
+            this.contract.then((c) => c.on('Transfer', on_transfer));
         }
-    }
-    offTransfer(handler: OnTransfer) {
-        this.contract.then((c) => c?.off('Transfer', handler));
+        return listener;
     }
     get address(): Address {
         return BigInt(this._address);
     }
     get balance(): Promise<Balance> {
-        const balance = this.contract.then((c) => c?.balanceOf(this._address));
+        const balance = this.contract.then((c) => c.balanceOf(this._address));
         return balance.then((b: BigNumber) => b.toBigInt());
     }
     get supply(): Promise<Supply> {
-        const supply = this.contract.then((c) => c?.totalSupply());
+        const supply = this.contract.then((c) => c.totalSupply());
         return supply.then((s: BigNumber) => s.toBigInt());
     }
     get decimals(): Promise<Decimals> {
-        const decimals = this.contract.then((c) => c?.decimals());
+        const decimals = this.contract.then((c) => c.decimals());
         return decimals.then((d: number) => d);
     }
     abstract get contract(): Promise<Contract>;
-    protected readonly _address: string;
-    protected _contract: Contract | undefined;
+    private readonly _address: string;
 }
 export default ERC20Wallet;

@@ -75,7 +75,6 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
             if (ev.transactionHash !== tx?.hash) {
                 return;
             }
-            moe_wallet.offTransfer(on_transfer);
             if (api.getState().token !== token) {
                 return;
             }

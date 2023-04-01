@@ -187,7 +187,7 @@ async function contracts({
     try {
         src_xpower = await XPowerMoeFactory({
             token, version: src_version
-        });
+        }).connect();
         console.debug(
             `[${src_version}:src_xpower]`, src_xpower.address
         );

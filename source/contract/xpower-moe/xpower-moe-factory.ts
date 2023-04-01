@@ -1,20 +1,19 @@
 import { Global, Version } from '../../types';
 declare const global: Global;
 
-import { Contract } from 'ethers';
 import { Token } from '../../redux/types';
 import { Tokenizer } from '../../token';
 import { address } from '../address';
 import { XPowerMoe } from './xpower-moe';
 
-export async function XPowerMoeFactory({
+export function XPowerMoeFactory({
     token, version
 }: {
     token: Token, version?: Version
-}): Promise<Contract> {
-    const contract = new XPowerMoe(address({
+}): XPowerMoe {
+    const moe = new XPowerMoe(address({
         infix: 'MOE', token: Tokenizer.xify(token), version
     }));
-    return global.XPOWER_MOE = await contract.connect();
+    return global.XPOWER_MOE = moe;
 }
 export default XPowerMoeFactory;

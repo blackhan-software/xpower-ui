@@ -130,7 +130,7 @@ async function contracts({
     try {
         moe_contract = await XPowerMoeFactory({
             token, version
-        });
+        }).connect();
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
             console.error(ex);
@@ -140,7 +140,7 @@ async function contracts({
     try {
         sov_contract = await XPowerSovFactory({
             token, version
-        });
+        }).connect();
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
             console.error(ex);

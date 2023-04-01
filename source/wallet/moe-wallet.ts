@@ -1,15 +1,9 @@
-import { Contract, Transaction, Event } from 'ethers';
-import { OnInit as on_init } from '../contract';
-import { XPowerMoeFactory } from '../contract';
-import { x64 } from '../functions';
-import { ROParams } from '../params';
-import { Address, BlockHash, Nonce } from '../redux/types';
-import { Timestamp, Token } from '../redux/types';
-import { Version } from '../types';
+import { BigNumber, Contract, Event, Transaction } from 'ethers';
+import { XPowerMoe, XPowerMoeFactory } from '../contract';
+import { Address, BlockHash, Nonce, Timestamp, Token } from '../redux/types';
+import { ERC20Wallet, OnApproval, OnTransfer } from './erc20-wallet';
 
-import { ERC20Wallet } from './erc20-wallet';
-import { OtfManager } from './otf-manager';
-
+export { OnApproval, OnTransfer };
 export type OnInit = (
     block_hash: BlockHash, timestamp: Timestamp, ev: Event
 ) => void;
@@ -19,61 +13,38 @@ export class MoeWallet extends ERC20Wallet {
         address: Address | string, token: Token
     ) {
         super(address);
-        this._token = token;
+        this._moe = XPowerMoeFactory({ token });
     }
-    async init(): Promise<Transaction> {
-        const contract = await OtfManager.connect(
-            await this.contract
-        );
-        return contract.init();
+    init(): Promise<Transaction> {
+        return this._moe.init();
     }
-    async mint(
+    mint(
         block_hash: BlockHash, nonce: Nonce
     ): Promise<Transaction> {
-        const contract = await OtfManager.connect(
-            await this.contract
-        );
-        if (ROParams.version < Version.v3a && !ROParams.versionFaked) {
-            return contract['mint(uint256,bytes32)'](
-                x64(nonce), x64(block_hash)
-            );
-        }
-        return contract['mint(address,bytes32,uint256)'](
-            this._address, x64(block_hash), x64(nonce), {
-                gasLimit: 250_000
-            }
-        );
+        return this._moe.mint(this.address, block_hash, nonce);
     }
-    async onInit(
-        handler: OnInit, { once } = { once: false }
+    onInit(
+        listener: OnInit, { once } = { once: false }
     ) {
-        const on_init: on_init = (
-            block_hash, timestamp, ev
+        const on_init = (
+            block_hash: string, timestamp: BigNumber, ev: Event
         ) => {
-            handler(BigInt(block_hash), timestamp.toBigInt(), ev);
+            listener(BigInt(block_hash), timestamp.toBigInt(), ev);
         };
-        const contract = await OtfManager.connect(
-            await this.contract
-        );
         if (once) {
-            contract.once('Init', on_init);
+            this.contract.then((c) => c.once('Init', on_init));
         } else {
-            contract.on('Init', on_init);
+            this.contract.then((c) => c.on('Init', on_init));
         }
-    }
-    offInit(handler: OnInit) {
-        this.contract.then((c) => c?.off('Init', handler));
     }
     get contract(): Promise<Contract> {
         if (this._contract === undefined) {
-            return XPowerMoeFactory({
-                token: this._token
-            }).then((c) => {
-                return this._contract = c;
-            });
+            const connected = this._moe.connect();
+            return connected.then((c) => (this._contract = c));
         }
         return Promise.resolve(this._contract);
     }
-    protected readonly _token: Token;
+    private _contract: Contract | undefined;
+    private _moe: XPowerMoe;
 }
 export default MoeWallet;
