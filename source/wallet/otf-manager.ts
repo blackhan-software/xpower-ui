@@ -1,4 +1,3 @@
-/* eslint @typescript-eslint/no-explicit-any: [off] */
 import { Global } from '../types';
 declare const global: Global;
 
@@ -12,12 +11,6 @@ import { parseUnits } from '@ethersproject/units';
 import { Contract, Wallet } from 'ethers';
 
 export class OtfManager {
-    private static get me(): OtfManager {
-        if (this._me === undefined) {
-            this._me = new OtfManager();
-        }
-        return this._me;
-    }
     public static get threshold() {
         return parseUnits('0.005');
     }
@@ -48,8 +41,9 @@ export class OtfManager {
         // @info: disabled due to potential rate-limiting!
         //
         // if (await Blockchain.isAvalanche()) {
-        //     provider._pollingInterval = 900; // ms
+        //     provider._pollingInterval = 200; // ms
         // }
+        //
         const wallet = new Wallet(JSON.parse(atob(value)), provider);
         return this._wallet = global.OTF_WALLET = new NonceManager(wallet);
     }
@@ -66,6 +60,5 @@ export class OtfManager {
         return fallback;
     }
     private static _wallet: NonceManager | undefined;
-    private static _me: any;
 }
 export default OtfManager;
