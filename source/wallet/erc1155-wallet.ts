@@ -1,9 +1,6 @@
 import { BigNumber, Contract, Event, Transaction } from 'ethers';
-import { OnApprovalForAll as on_approval_for_all, OnTransferBatch as on_transfer_batch, OnTransferSingle as on_transfer_single } from '../contract';
-import { Address, Amount, Balance, Nft, NftFullId, NftIssue, NftLevel, NftRealId, NftToken, Supply, Token } from '../redux/types';
-
-import { Meta } from '../contract';
 import { x40 } from '../functions';
+import { Address, Amount, Balance, Nft, NftFullId, NftIssue, NftLevel, NftRealId, NftToken, Supply, Token } from '../redux/types';
 
 export type OnTransferBatch = (
     operator: Address,
@@ -28,6 +25,11 @@ export type OnApprovalForAll = (
     ev: Event
 ) => void;
 
+export type Meta = {
+    name: string,
+    description: string,
+    image: string
+};
 export abstract class ERC1155Wallet {
     constructor(
         address: Address | string, token: Token
@@ -49,7 +51,7 @@ export abstract class ERC1155Wallet {
         id: NftFullId
     ): Promise<Balance> {
         const balance: BigNumber = await this.contract
-            .then((c) => c?.balanceOf(this._address, Nft.realId(id)));
+            .then((c) => c.balanceOf(this._address, Nft.realId(id)));
         console.debug(
             '[balance-of]', id, '=>', Nft.realId(id), '=', balance.toBigInt()
         );
@@ -61,7 +63,7 @@ export abstract class ERC1155Wallet {
         const ids = Nft.fullIds({ issues, levels, token });
         const addresses = ids.map(() => this._address);
         const balances: BigNumber[] = await this.contract
-            .then((c) => c?.balanceOfBatch(addresses, Nft.realIds(ids)));
+            .then((c) => c.balanceOfBatch(addresses, Nft.realIds(ids)));
         return balances.map((b) => b.toBigInt());
     }
     async isApprovedForAll(
@@ -70,7 +72,7 @@ export abstract class ERC1155Wallet {
         if (typeof operator === 'bigint') {
             operator = x40(operator);
         }
-        return this.contract.then((c) => c?.isApprovedForAll(
+        return this.contract.then((c) => c.isApprovedForAll(
             this._address, operator
         ));
     }
@@ -80,43 +82,49 @@ export abstract class ERC1155Wallet {
         if (typeof operator === 'bigint') {
             operator = x40(operator);
         }
-        return this.contract.then((c) => c?.setApprovalForAll(
+        return this.contract.then((c) => c.setApprovalForAll(
             operator, approved
         ));
     }
     onApprovalForAll(
-        handler: OnApprovalForAll, { once } = { once: false }
+        listener: OnApprovalForAll, { once } = { once: false }
     ) {
-        const on_approval: on_approval_for_all = (
-            account, op, flag, ev
+        const on_approval = (
+            account: string,
+            operator: string,
+            approved: boolean,
+            ev: Event
         ) => {
             if (this._address.match(new RegExp(account, 'i'))) {
-                handler(
-                    BigInt(account), BigInt(op), flag, ev
-                );
+                listener(BigInt(account), BigInt(operator), approved, ev);
             }
         };
         if (once) {
-            this.contract.then((c) => c?.once('ApprovalForAll', on_approval));
+            this.contract.then((c) => c.once('ApprovalForAll', on_approval));
         } else {
-            this.contract.then((c) => c?.on('ApprovalForAll', on_approval));
+            this.contract.then((c) => c.on('ApprovalForAll', on_approval));
         }
     }
-    safeTransfer(
+    async safeTransfer(
         to: Address | string, id: NftFullId, amount: Amount
     ): Promise<Transaction> {
         if (typeof to === 'bigint') {
             to = x40(to);
         }
-        return this.contract.then((c) => c?.safeTransferFrom(
+        return this.contract.then((c) => c.safeTransferFrom(
             this._address, to, Nft.realId(id), amount, []
         ));
     }
     onTransferSingle(
-        handler: OnTransferSingle, { once } = { once: false }
+        listener: OnTransferSingle, { once } = { once: false }
     ) {
-        const on_transfer: on_transfer_single = (
-            op, from, to, id, value, ev
+        const on_transfer = (
+            operator: string,
+            from: string,
+            to: string,
+            id: BigNumber,
+            value: BigNumber,
+            ev: Event
         ) => {
             if (this._address.match(new RegExp(from, 'i')) ||
                 this._address.match(new RegExp(to, 'i'))
@@ -125,33 +133,38 @@ export abstract class ERC1155Wallet {
                     real_id: id.toString() as NftRealId,
                     token: this._nftToken
                 });
-                handler(
-                    BigInt(op), BigInt(from), BigInt(to),
+                listener(
+                    BigInt(operator), BigInt(from), BigInt(to),
                     full_id, value.toBigInt(), ev
                 );
             }
         };
         if (once) {
-            this.contract.then((c) => c?.once('TransferSingle', on_transfer));
+            this.contract.then((c) => c.once('TransferSingle', on_transfer));
         } else {
-            this.contract.then((c) => c?.on('TransferSingle', on_transfer));
+            this.contract.then((c) => c.on('TransferSingle', on_transfer));
         }
     }
-    safeBatchTransfer(
+    async safeBatchTransfer(
         to: Address | string, ids: NftFullId[], amounts: Amount[]
     ): Promise<Transaction> {
         if (typeof to === 'bigint') {
             to = x40(to);
         }
-        return this.contract.then((c) => c?.safeBatchTransferFrom(
+        return this.contract.then((c) => c.safeBatchTransferFrom(
             this._address, to, Nft.realIds(ids), amounts, []
         ));
     }
     onTransferBatch(
-        handler: OnTransferBatch, { once } = { once: false }
+        listener: OnTransferBatch, { once } = { once: false }
     ) {
-        const on_transfer: on_transfer_batch = (
-            op, from, to, ids, values, ev
+        const on_transfer = (
+            operator: string,
+            from: string,
+            to: string,
+            ids: BigNumber[],
+            values: BigNumber[],
+            ev: Event
         ) => {
             if (this._address.match(new RegExp(from, 'i')) ||
                 this._address.match(new RegExp(to, 'i'))
@@ -161,53 +174,66 @@ export abstract class ERC1155Wallet {
                     .map((id) => Nft.fullIdOf({
                         real_id: id, token: this._nftToken
                     }));
-                handler(
-                    BigInt(op), BigInt(from), BigInt(to), full_ids,
+                listener(
+                    BigInt(operator), BigInt(from), BigInt(to), full_ids,
                     values.map((value) => value.toBigInt()), ev
                 );
             }
         };
         if (once) {
-            this.contract.then((c) => c?.once('TransferBatch', on_transfer));
+            this.contract.then((c) => c.once('TransferBatch', on_transfer));
         } else {
-            this.contract.then((c) => c?.on('TransferBatch', on_transfer));
+            this.contract.then((c) => c.on('TransferBatch', on_transfer));
         }
     }
+    async uri(
+        id: NftFullId | Promise<NftFullId>
+    ): Promise<string> {
+        return this.contract.then(
+            async (c) => c.uri(Nft.realId(await id))
+        );
+    }
     async meta(
-        id: NftFullId
+        id: NftFullId | Promise<NftFullId>
     ): Promise<Meta> {
         let meta = this._meta[id.toString()];
         if (typeof meta === 'undefined') {
-            const nft_uri = await this.contract.then((c) => c?.uri(Nft.realId(id)));
-            const uri = nft_uri.replace(/{id}/g, Nft.realId(id));
+            const nft_uri = await this.uri(id);
+            const uri = nft_uri.replace(/{id}/g, Nft.realId(await id));
             meta = await fetch(uri).then((res) => res.json());
             this._meta[id.toString()] = meta;
         }
         return meta;
     }
     async totalSupply(
-        id: NftFullId
+        id: NftFullId | Promise<NftFullId>
     ): Promise<Supply> {
-        const supply: BigNumber = await this.contract
-            .then((c) => c?.totalSupply(Nft.realId(id)));
+        const supply: BigNumber = await this.contract.then(
+            async (c) => c.totalSupply(Nft.realId(await id))
+        );
         return supply.toBigInt();
     }
-    totalSupplies({ issues, levels, token }: {
+    async totalSupplies({ issues, levels, token }: {
         issues: NftIssue[], levels: NftLevel[], token: NftToken
-    }): Promise<Supply>[] {
-        return Array.from(totalSupplies(
+    }): Promise<Supply[]> {
+        return Promise.all(Array.from(totalSupplies(
             this.contract, { issues, levels, token }
-        ));
+        )));
     }
     get address(): Address {
         return BigInt(this._address);
     }
+    get nftToken(): NftToken {
+        return this._nftToken;
+    }
+    get token(): Token {
+        return this._token;
+    }
     abstract get contract(): Promise<Contract>;
-    protected readonly _address: string;
-    protected _contract: Contract | undefined;
-    protected _meta: Record<string, Meta> = {};
-    protected readonly _nftToken: NftToken;
-    protected readonly _token: Token;
+    private readonly _address: string;
+    private readonly _meta: Record<string, Meta> = {};
+    private readonly _nftToken: NftToken;
+    private readonly _token: Token;
 }
 function* totalSupplies(
     nft: Promise<Contract>, { issues, levels, token }: {
@@ -219,7 +245,7 @@ function* totalSupplies(
     });
     for (const id of full_ids) {
         const supply = nft
-            .then((c) => c?.totalSupply(Nft.realId(id)))
+            .then((c) => c.totalSupply(Nft.realId(id)))
             .then((s: BigNumber) => s.toBigInt());
         yield supply as Promise<Supply>;
     }

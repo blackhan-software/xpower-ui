@@ -122,7 +122,7 @@ async function contracts({
     try {
         nft_contract = await XPowerNftFactory({
             token, version
-        });
+        }).connect();
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
             console.error(ex);
@@ -132,7 +132,7 @@ async function contracts({
     try {
         ppt_contract = await XPowerPptFactory({
             token, version
-        });
+        }).connect();
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
             console.error(ex);

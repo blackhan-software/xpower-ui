@@ -2,7 +2,7 @@
 import { Global, Version } from '../../../source/types';
 declare const global: Global;
 
-import { BigNumber, Contract } from 'ethers';
+import { BigNumber } from 'ethers';
 import { ROParams } from '../../params';
 import { Nft, NftLevel, NftRealId, Token } from '../../redux/types';
 import { Tokenizer } from '../../token';
@@ -10,33 +10,37 @@ import { MAX_YEAR } from '../../years';
 import { address } from '../address';
 import { XPowerNft } from './xpower-nft';
 
-export async function XPowerNftFactory({
+export function XPowerNftFactory({
     token, version
 }: {
     token: Token, version?: Version
-}): Promise<Contract> {
+}): XPowerNft {
     if (version === undefined) {
         version = ROParams.version;
     }
     const xtoken = version < Version.v6a
         ? Tokenizer.xify(token) : 'XPOW';
-    const contract = new XPowerNft(address({
+    const nft = new XPowerNft(address({
         infix: 'NFT', token: xtoken, version
     }));
-    return global.XPOWER_NFT = await contract.connect();
+    return global.XPOWER_NFT = nft;
 }
-export async function XPowerNftMockFactory(
+export function XPowerNftMockFactory(
     { token }: { token: Token }
-): Promise<Contract> {
+): XPowerNft {
     const nft_token = Nft.token(token);
     const mock = {
-        totalSupply: (/*id:string*/) => {
+        totalSupply: (
+            /*id: string*/
+        ) => {
             return BigNumber.from(0);
         },
         year: () => {
             return BigNumber.from(MAX_YEAR());
         },
-        uri: (id: BigNumber) => {
+        uri: (
+            id: BigNumber
+        ) => {
             if (!BigNumber.isBigNumber(id)) {
                 id = BigNumber.from(id);
             }
@@ -47,7 +51,9 @@ export async function XPowerNftMockFactory(
             return `/ipfs/QmcmK4qk2vCCzVTnggzZeJes3Leontx3ZH1tNNQ2QZK3F3/320x427/${full_id}.json`;
         },
         idBy: (
-            year: BigNumber, level: NftLevel, index?: BigNumber
+            year: BigNumber,
+            level: NftLevel,
+            index?: BigNumber
         ) => {
             if (!BigNumber.isBigNumber(year)) {
                 year = BigNumber.from(year);
@@ -60,6 +66,8 @@ export async function XPowerNftMockFactory(
             );
         },
     };
-    return mock as any;
+    return <XPowerNft>{
+        connect: () => Promise.resolve(mock) as any
+    };
 }
 export default XPowerNftFactory;

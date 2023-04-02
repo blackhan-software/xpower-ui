@@ -1,32 +1,36 @@
-import { ipfs_gateway } from '../../../test/env-ipfs-gateway';
-import { XPowerNftMockFactory } from './xpower-nft-factory';
-import { Token } from '../../redux/types';
+import { ipfs_gateway } from '../../test/env-ipfs-gateway';
+import { Token } from '../redux/types';
+import { NftWalletMock } from '.';
 
 import request from 'supertest';
 
-describe('XPowerNftMockFactory', () => {
+describe('NftWalletMock', () => {
     it('should return totalSupply(id=1202100) = 0', async () => {
-        const nft = await XPowerNftMockFactory({ token: Token.THOR });
-        expect(nft.totalSupply(1202100) == 0).toBeTruthy();
+        const nft = new NftWalletMock(0n, Token.THOR);
+        const supply = await nft.totalSupply('1202100');
+        expect(supply === 0n).toBeTruthy();
     });
     it('should return year() >= 2021', async () => {
-        const nft = await XPowerNftMockFactory({ token: Token.THOR });
-        expect(nft.year() >= 2021).toBeTruthy();
+        const nft = new NftWalletMock(0n, Token.THOR);
+        const year = await nft.year();
+        expect(year >= 2021).toBeTruthy();
     });
     it('should return uri(id=1202100)', async () => {
-        const nft = await XPowerNftMockFactory({ token: Token.THOR });
-        expect(nft.uri(1202100)).toBeDefined();
+        const nft = new NftWalletMock(0n, Token.THOR);
+        const uri = await nft.uri('1202100');
+        expect(uri).toBeDefined();
     });
-    it('should return idBy(year=2021, level=0, index=0)', async () => {
-        const nft = await XPowerNftMockFactory({ token: Token.THOR });
-        expect(nft.idBy(2021, 0, 0) == 1202100).toBeTruthy();
+    it('should return idBy(year=2021, level=0)', async () => {
+        const nft = new NftWalletMock(0n, Token.THOR);
+        const id = await nft.idBy(2021, 0);
+        expect(id === '1202100').toBeTruthy();
     });
 });
-describe('XPowerPptMockFactory', () => {
+describe('NftWalletMock', () => {
     const year = new Date().getFullYear();
     it(`should fetch & validate uri(id=1${year}00)`, async () => {
-        const nft = await XPowerNftMockFactory({ token: Token.THOR });
-        const uri = nft.uri(nft.idBy(year, 0, 0)); // current!
+        const nft = new NftWalletMock(0n, Token.THOR);
+        const uri = await nft.uri(nft.idBy(year, 0));
         expect(uri).toBeDefined();
         const gateway = ipfs_gateway();
         expect(gateway).toBeDefined();
@@ -42,8 +46,8 @@ describe('XPowerPptMockFactory', () => {
             });
     });
     it(`should fetch & validate uri(id=2${year}03)`, async () => {
-        const nft = await XPowerNftMockFactory({ token: Token.LOKI });
-        const uri = nft.uri(nft.idBy(year, 3, 1)); // current!
+        const nft = new NftWalletMock(0n, Token.LOKI);
+        const uri = await nft.uri(nft.idBy(year, 3));
         expect(uri).toBeDefined();
         const gateway = ipfs_gateway();
         expect(gateway).toBeDefined();
@@ -59,8 +63,8 @@ describe('XPowerPptMockFactory', () => {
             });
     });
     it(`should fetch & validate uri(id=3${year}06)`, async () => {
-        const nft = await XPowerNftMockFactory({ token: Token.ODIN });
-        const uri = nft.uri(nft.idBy(nft.year(), 6, 2)); // current!
+        const nft = new NftWalletMock(0n, Token.ODIN);
+        const uri = await nft.uri(nft.idBy(nft.year(), 6));
         expect(uri).toBeDefined();
         const gateway = ipfs_gateway();
         expect(gateway).toBeDefined();
@@ -76,8 +80,8 @@ describe('XPowerPptMockFactory', () => {
             });
     });
     it(`should fetch & validate uri(id=4${year}09)`, async () => {
-        const nft = await XPowerNftMockFactory({ token: Token.HELA });
-        const uri = nft.uri(nft.idBy(nft.year(), 9, 3)); // current!
+        const nft = new NftWalletMock(0n, Token.HELA);
+        const uri = await nft.uri(nft.idBy(nft.year(), 9));
         expect(uri).toBeDefined();
         const gateway = ipfs_gateway();
         expect(gateway).toBeDefined();

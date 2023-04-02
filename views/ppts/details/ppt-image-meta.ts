@@ -1,9 +1,7 @@
-import { Meta } from '../../../source/contract';
 import { x40 } from '../../../source/functions';
 import { ROParams } from '../../../source/params';
-import { Address, Token } from '../../../source/redux/types';
-import { NftIssue, NftLevel } from '../../../source/redux/types';
-import { PptWallet, PptWalletMock } from '../../../source/wallet';
+import { Address, NftIssue, NftLevel, Token } from '../../../source/redux/types';
+import { Meta, PptWallet, PptWalletMock } from '../../../source/wallet';
 
 export class PptImageMeta {
     static key(address: Address | null, {

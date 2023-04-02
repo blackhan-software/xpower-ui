@@ -24,13 +24,13 @@ export const PptsService = (
         const balances = await wallet.balances({
             issues, levels, token: ppt_token
         });
-        const supplies = wallet.totalSupplies({
+        const supplies = await wallet.totalSupplies({
             issues, levels, token: ppt_token
         });
         for (const issue of issues) {
             for (const level of levels) {
                 const amount = balances[index];
-                const supply = await supplies[index];
+                const supply = supplies[index];
                 store.dispatch(setPpt({
                     issue, level, token: ppt_token
                 }, {

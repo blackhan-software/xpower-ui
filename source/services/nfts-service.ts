@@ -22,13 +22,13 @@ export const NftsService = (
         const balances = await wallet.balances({
             issues, levels, token: nft_token
         });
-        const supplies = wallet.totalSupplies({
+        const supplies = await wallet.totalSupplies({
             issues, levels, token: nft_token
         });
         for (const issue of issues) {
             for (const level of levels) {
                 const amount = balances[index];
-                const supply = await supplies[index];
+                const supply = supplies[index];
                 store.dispatch(setNft({
                     issue, level, token: nft_token
                 }, {

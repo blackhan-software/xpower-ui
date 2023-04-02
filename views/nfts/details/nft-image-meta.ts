@@ -1,8 +1,7 @@
-import { Meta } from '../../../source/contract';
 import { x40 } from '../../../source/functions';
 import { ROParams } from '../../../source/params';
 import { Address, NftIssue, NftLevel, Token } from '../../../source/redux/types';
-import { NftWallet, NftWalletMock } from '../../../source/wallet';
+import { Meta, NftWallet, NftWalletMock } from '../../../source/wallet';
 
 export class NftImageMeta {
     static key(address: Address | null, {

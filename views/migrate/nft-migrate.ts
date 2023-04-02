@@ -3,7 +3,7 @@ import './nft-migrate.scss';
 
 import { BigNumber, Contract, Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { OnApprovalForAll, OnStakeBatch, OnTransferBatch, OnUnstakeBatch, PptTreasury, PptTreasuryFactory, XPowerNftFactory, XPowerPptFactory } from '../../source/contract';
+import { PptTreasury, PptTreasuryFactory, XPowerNftFactory, XPowerPptFactory } from '../../source/contract';
 import { Alert, alert, Alerts, x40 } from '../../source/functions';
 import { Nft, NftLevels, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
@@ -98,7 +98,7 @@ async function nftUnstakeOld(token: Token, { $unstake, $approve }: {
     const reset = $unstake.ing();
     Alerts.hide();
     try {
-        nty_source.onUnstakeBatch(<OnUnstakeBatch>((
+        nty_source.onUnstakeBatch((
             account, nft_ids, amounts, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
@@ -110,7 +110,7 @@ async function nftUnstakeOld(token: Token, { $unstake, $approve }: {
             );
             $approve.prop('disabled', false);
             reset();
-        }));
+        });
         const nz = filter(ids, src_balances, {
             zero: false
         });
@@ -212,8 +212,8 @@ async function nftApproveOld(token: Token, { $approve, $migrate }: {
     const reset = $approve.ing();
     Alerts.hide();
     try {
-        nft_source.on('ApprovalForAll', <OnApprovalForAll>((
-            address, operator, approved, ev
+        nft_source.on('ApprovalForAll', (
+            account, operator, approved, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
                 return;
@@ -224,7 +224,7 @@ async function nftApproveOld(token: Token, { $approve, $migrate }: {
             );
             $migrate.prop('disabled', false);
             reset();
-        }));
+        });
         tx = await nft_source.setApprovalForAll(
             nft_target.address, true
         );
@@ -330,7 +330,7 @@ async function nftMigrateOld(token: Token, { $migrate, $approve }: {
     const reset = $migrate.ing();
     Alerts.hide();
     try {
-        nft_target.on('TransferBatch', <OnTransferBatch>((
+        nft_target.on('TransferBatch', (
             op, from, to, ids, values, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
@@ -342,7 +342,7 @@ async function nftMigrateOld(token: Token, { $migrate, $approve }: {
             );
             $approve.prop('disabled', false);
             reset();
-        }));
+        });
         const nz = filter(ids, src_balances, { zero: false });
         const index = await nft_target.oldIndexOf(nft_source.address);
         tx = await nft_target.migrateBatch(
@@ -442,8 +442,8 @@ async function nftApproveNew(token: Token, { $approve, $restake }: {
     const reset = $approve.ing();
     Alerts.hide();
     try {
-        nft_target.on('ApprovalForAll', <OnApprovalForAll>((
-            address, operator, approved, ev
+        nft_target.on('ApprovalForAll', (
+            account, operator, approved, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
                 return;
@@ -454,7 +454,7 @@ async function nftApproveNew(token: Token, { $approve, $restake }: {
             );
             $restake.prop('disabled', false);
             reset();
-        }));
+        });
         tx = await nft_target.setApprovalForAll(
             nty_target.address, true
         );
@@ -532,7 +532,7 @@ async function nftRestakeNew(token: Token, { $restake }: {
     const reset = $restake.ing();
     Alerts.hide();
     try {
-        nty_target.onStakeBatch(<OnStakeBatch>((
+        nty_target.onStakeBatch((
             accound, nft_ids, amounts, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
@@ -543,7 +543,7 @@ async function nftRestakeNew(token: Token, { $restake }: {
                 Alert.success, { after: $restake.parent('div')[0] }
             );
             reset();
-        }));
+        });
         const nz = filter(ids, tgt_balances, {
             zero: false
         });
@@ -603,7 +603,7 @@ async function contracts({
     try {
         nft_source = await XPowerNftFactory({
             token, version: src_version
-        });
+        }).connect();
         console.debug(
             `[${src_version}:nft_source]`, nft_source.address
         );
@@ -614,7 +614,7 @@ async function contracts({
     try {
         nft_target = await XPowerNftFactory({
             token, version: tgt_version
-        });
+        }).connect();
         console.debug(
             `[${tgt_version}:nft_target]`, nft_target.address
         );
@@ -625,7 +625,7 @@ async function contracts({
     try {
         ppt_source = await XPowerPptFactory({
             token, version: src_version
-        });
+        }).connect();
         console.debug(
             `[${src_version}:ppt_source]`, ppt_source.address
         );
@@ -636,7 +636,7 @@ async function contracts({
     try {
         ppt_target = await XPowerPptFactory({
             token, version: tgt_version
-        });
+        }).connect();
         console.debug(
             `[${tgt_version}:ppt_target]`, ppt_target.address
         );

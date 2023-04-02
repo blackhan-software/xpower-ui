@@ -3,11 +3,12 @@ import './nft-burn.scss';
 
 import { BigNumber, Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { OnTransferBatch, XPowerNftFactory } from '../../source/contract';
+import { XPowerNftFactory } from '../../source/contract';
 import { Alert, alert, Alerts, x40 } from '../../source/functions';
 import { Nft, NftLevels, Token } from '../../source/redux/types';
 import { Version } from '../../source/types';
 import { Years } from '../../source/years';
+import { OnTransferBatch } from '../../source/wallet';
 
 Blockchain.onConnect(function enableBurnButton() {
     const $burn_nft = $('button.burn-empty-nft').filter((i, el) => {
@@ -127,7 +128,7 @@ async function contracts({
 }) {
     const nft_source = await XPowerNftFactory({
         token, version: src_version
-    });
+    }).connect();
     console.debug(
         `[${src_version}:contract]`, nft_source.address
     );

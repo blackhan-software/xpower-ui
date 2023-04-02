@@ -1,5 +1,5 @@
-import ABI from './xpower-ppt.abi.json';
 import { Base } from '../base';
+import ABI from './xpower-ppt.abi.json';
 
 export class XPowerPpt extends Base {
     public constructor(

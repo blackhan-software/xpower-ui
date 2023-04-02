@@ -1,142 +1,104 @@
-import { BigNumber, Contract, Transaction } from 'ethers';
-import { XPowerNftFactory, XPowerNftMockFactory } from '../contract';
-import address from '../contract/address';
+import { Contract, Transaction } from 'ethers';
+import { XPowerNft, XPowerNftFactory, XPowerNftMockFactory } from '../contract';
+import { address } from '../contract/address';
 import { ROParams } from '../params';
-import { Address, Amount, Nft, NftFullId, NftLevel, NftRealId, Token, Year } from '../redux/types';
-import Tokenizer from '../token';
-import { Version } from '../types';
+import { Address, Amount, Index, Nft, NftFullId, NftIssue, NftLevel, NftRealId, Token, Year } from '../redux/types';
+import { Tokenizer } from '../token';
 
 import { ERC1155Wallet } from './erc1155-wallet';
-import { OtfManager } from './otf-manager';
 
 export class NftWallet extends ERC1155Wallet {
     constructor(
-        address: Address | string, token: Token
+        address: Address | string, token: Token, nft?: XPowerNft
     ) {
         super(address, token);
+        if (nft === undefined) {
+            nft = XPowerNftFactory({ token });
+        }
+        this._nft = nft;
     }
-    async mint(
-        level: NftLevel, amount: Amount
+    mint(
+        level: NftLevel | Promise<NftLevel>,
+        amount: Amount | Promise<Amount>,
     ): Promise<Transaction> {
-        const contract = await OtfManager.connect(
-            await this.contract
-        );
-        if (ROParams.version < Version.v2b && !ROParams.versionFaked) {
-            return contract['mint(uint256,uint256)'](
-                level, amount
-            );
-        }
-        if (ROParams.version < Version.v6a && !ROParams.versionFaked) {
-            return contract['mint(address,uint256,uint256)'](
-                this._address, level, amount
-            );
-        }
-        const moe_address = address({
-            token: Tokenizer.xify(this._token),
-            version: ROParams.version,
-            infix: 'MOE',
-        });
-        return contract['mint(address,uint256,uint256,uint256)'](
-            this._address, level, amount, contract.moeIndexOf(moe_address)
+        const moe_index = this.moeIndexOf(moeAddress(this.token));
+        return this._nft.mint(
+            this.address, level, amount, moe_index
         );
     }
-    async mintBatch(
-        levels: NftLevel[], amounts: Amount[]
+    mintBatch(
+        levels: NftLevel[] | Promise<NftLevel[]>,
+        amounts: Amount[] | Promise<Amount[]>,
     ): Promise<Transaction> {
-        const contract = await OtfManager.connect(
-            await this.contract
-        );
-        if (ROParams.version < Version.v2b && !ROParams.versionFaked) {
-            return contract['mintBatch(uint256[],uint256[])'](
-                levels, amounts
-            );
-        }
-        if (ROParams.version < Version.v6a && !ROParams.versionFaked) {
-            return contract['mintBatch(address,uint256[],uint256[])'](
-                this._address, levels, amounts
-            );
-        }
-        const moe_address = address({
-            token: Tokenizer.xify(this._token),
-            version: ROParams.version,
-            infix: 'MOE',
-        });
-        return contract['mintBatch(address,uint256[],uint256[],uint256)'](
-            this._address, levels, amounts, contract.moeIndexOf(moe_address)
+        const moe_index = this.moeIndexOf(moeAddress(this.token));
+        return this._nft.mintBatch(
+            this.address, levels, amounts, moe_index
         );
     }
-    async upgrade(
-        issue: NftLevel, level: NftLevel, amount: Amount
+    upgrade(
+        issue: NftIssue | Promise<NftIssue>,
+        level: NftLevel | Promise<NftLevel>,
+        amount: Amount | Promise<Amount>,
     ): Promise<Transaction> {
-        const contract = await OtfManager.connect(
-            await this.contract
-        );
-        const moe_address = address({
-            token: Tokenizer.xify(this._token),
-            version: ROParams.version,
-            infix: 'MOE',
-        });
-        return contract['upgrade(address,uint256,uint256,uint256,uint256)'](
-            this._address, issue, level, amount, contract.moeIndexOf(moe_address)
+        const moe_index = this.moeIndexOf(moeAddress(this.token));
+        return this._nft.upgrade(
+            this.address, issue, level, amount, moe_index
         );
     }
-    async upgradeBatch(
-        issues: NftLevel[], levels: NftLevel[][], amounts: Amount[][]
+    upgradeBatch(
+        issues: NftIssue[] | Promise<NftIssue[]>,
+        levels: NftLevel[][] | Promise<NftLevel[][]>,
+        amounts: Amount[][] | Promise<Amount[][]>,
     ): Promise<Transaction> {
-        const contract = await OtfManager.connect(
-            await this.contract
+        const moe_index = this.moeIndexOf(moeAddress(this.token));
+        return this._nft.upgradeBatch(
+            this.address, issues, levels, amounts, moe_index
         );
-        const moe_address = address({
-            token: Tokenizer.xify(this._token),
-            version: ROParams.version,
-            infix: 'MOE',
-        });
-        return contract['upgradeBatch(address,uint256[],uint256[][],uint256[][],uint256)'](
-            this._address, issues, levels, amounts, contract.moeIndexOf(moe_address)
-        );
+    }
+    moeIndexOf(
+        moe: Address | Promise<Address>
+    ): Promise<Index> {
+        return this._nft.moeIndexOf(moe);
     }
     async idBy(
-        year: Year, level: NftLevel
+        year: Year | Promise<Year>,
+        level: NftLevel | Promise<NftLevel>,
     ): Promise<NftFullId> {
+        const [y, l] = await Promise.all([year, level]);
         return Nft.fullIdOf({
-            real_id: `${100 * year + level}` as NftRealId,
-            token: this._nftToken
+            real_id: `${100 * y + l}` as NftRealId,
+            token: this.nftToken
         });
     }
     async year(
-        delta_years: number
+        delta: Year | Promise<Year> = 0
     ): Promise<Year> {
-        const year: BigNumber = await this.contract.then((c) => {
-            return c?.year();
-        });
-        return year.sub(delta_years).toNumber();
+        return Promise.resolve(new Date().getFullYear() - await delta);
     }
     get contract(): Promise<Contract> {
         if (this._contract === undefined) {
-            return XPowerNftFactory({
-                token: this._token
-            }).then((c) => {
-                return this._contract = c;
-            });
+            const connected = this._nft.connect();
+            return connected.then((c) => (this._contract = c));
         }
         return Promise.resolve(this._contract);
     }
+    private _contract: Contract | undefined;
+    private _nft: XPowerNft;
 }
 export class NftWalletMock extends NftWallet {
     constructor(
         address: Address | string = 0n, token: Token
     ) {
-        super(address, token);
+        super(address, token, XPowerNftMockFactory({ token }));
     }
-    get contract(): Promise<Contract> {
-        if (this._contract === undefined) {
-            return XPowerNftMockFactory({
-                token: this._token
-            }).then((c) => {
-                return this._contract = c;
-            });
-        }
-        return Promise.resolve(this._contract);
-    }
+}
+function moeAddress(
+    token: Token
+): Address {
+    return BigInt(address({
+        token: Tokenizer.xify(token),
+        version: ROParams.version,
+        infix: 'MOE',
+    }));
 }
 export default NftWallet;

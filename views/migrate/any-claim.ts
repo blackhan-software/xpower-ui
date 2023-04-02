@@ -3,7 +3,7 @@ import './any-claim.scss';
 
 import { Contract, Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { MoeTreasury, MoeTreasuryFactory, OnClaimBatch, XPowerMoeFactory } from '../../source/contract';
+import { MoeTreasury, MoeTreasuryFactory, XPowerMoeFactory } from '../../source/contract';
 import { Alert, Alerts, alert } from '../../source/functions';
 import { Balance, Nft, NftLevels, Token } from '../../source/redux/types';
 import { Version } from '../../source/types';
@@ -94,7 +94,7 @@ async function claim(token: Token, { $claim }: {
     Alerts.hide();
     try {
         const nz = filter(ids, src_claimables);
-        mty_source.onClaimBatch(<OnClaimBatch>((
+        mty_source.onClaimBatch((
             account, nft_ids, amounts, ev
         ) => {
             if (ev.transactionHash !== tx?.hash) {
@@ -105,7 +105,7 @@ async function claim(token: Token, { $claim }: {
                 Alert.success, { after: $claim.parent('div')[0] }
             );
             reset();
-        }));
+        });
         const tx: Transaction = await mty_source.claimForBatch(
             address, Nft.realIds(nz.ids, { version: src_version })
         );
