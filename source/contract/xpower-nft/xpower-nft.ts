@@ -21,7 +21,7 @@ export class XPowerNft extends Base {
         moe_index: Index | Promise<Index>
     ): Promise<Transaction> {
         const contract = await OtfManager.connect(
-            await this.connect()
+            this.connect()
         );
         if (ROParams.version < Version.v2b && !ROParams.versionFaked) {
             return contract['mint(uint256,uint256)'](
@@ -44,7 +44,7 @@ export class XPowerNft extends Base {
         moe_index: Index | Promise<Index>,
     ): Promise<Transaction> {
         const contract = await OtfManager.connect(
-            await this.connect()
+            this.connect()
         );
         if (ROParams.version < Version.v2b && !ROParams.versionFaked) {
             return contract['mintBatch(uint256[],uint256[])'](
@@ -68,7 +68,7 @@ export class XPowerNft extends Base {
         moe_index: Index | Promise<Index>,
     ): Promise<Transaction> {
         const contract = await OtfManager.connect(
-            await this.connect()
+            this.connect()
         );
         return contract['upgrade(address,uint256,uint256,uint256,uint256)'](
             x40(await to), issue, level, amount, moe_index
@@ -82,7 +82,7 @@ export class XPowerNft extends Base {
         moe_index: Index | Promise<Index>,
     ): Promise<Transaction> {
         const contract = await OtfManager.connect(
-            await this.connect()
+            this.connect()
         );
         return contract['upgradeBatch(address,uint256[],uint256[][],uint256[][],uint256)'](
             x40(await to), issues, levels, amounts, moe_index

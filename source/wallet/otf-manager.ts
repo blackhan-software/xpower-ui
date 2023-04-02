@@ -48,13 +48,13 @@ export class OtfManager {
         return this._wallet = global.OTF_WALLET = new NonceManager(wallet);
     }
     public static async connect(
-        fallback: Contract
+        fallback: Promise<Contract>
     ): Promise<Contract> {
         if (OtfManager.enabled) {
             const wallet = await OtfManager.init();
             const balance = await wallet.getBalance();
-            if (balance.gt(0)) {
-                return fallback.connect(wallet);
+            if (balance.gt(this.threshold)) {
+                return fallback.then((c) => c.connect(wallet));
             }
         }
         return fallback;

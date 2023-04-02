@@ -41,7 +41,7 @@ export class PptTreasury extends Base {
         account: Address, nft_id: NftRealId, balance: Balance
     ): Promise<Transaction> {
         const contract = await OtfManager.connect(
-            await this.connect()
+            this.connect()
         );
         return contract.stake(
             x40(account), Nft.realId(nft_id), balance
@@ -51,7 +51,7 @@ export class PptTreasury extends Base {
         account: Address, nft_id: NftRealId, balance: Balance
     ): Promise<Transaction> {
         const contract = await OtfManager.connect(
-            await this.connect()
+            this.connect()
         );
         return contract.unstake(
             x40(account), Nft.realId(nft_id), balance
@@ -61,7 +61,7 @@ export class PptTreasury extends Base {
         account: Address, nft_ids: NftRealId[], balances: Balance[]
     ): Promise<Transaction> {
         const contract = await OtfManager.connect(
-            await this.connect()
+            this.connect()
         );
         return contract.stakeBatch(
             x40(account), Nft.realIds(nft_ids), balances
@@ -71,7 +71,7 @@ export class PptTreasury extends Base {
         account: Address, nft_ids: NftRealId[], balances: Balance[]
     ): Promise<Transaction> {
         const contract = await OtfManager.connect(
-            await this.connect()
+            this.connect()
         );
         return contract.unstakeBatch(
             x40(account), Nft.realIds(nft_ids), balances

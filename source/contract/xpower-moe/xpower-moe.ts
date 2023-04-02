@@ -16,7 +16,7 @@ export class XPowerMoe extends Base {
     }
     async init(): Promise<Transaction> {
         const contract = await OtfManager.connect(
-            await this.connect()
+            this.connect()
         );
         return contract.init();
     }
@@ -24,11 +24,11 @@ export class XPowerMoe extends Base {
         to: Address, block_hash: BlockHash, nonce: Nonce
     ): Promise<Transaction> {
         const contract = await OtfManager.connect(
-            await this.connect()
+            this.connect()
         );
         if (ROParams.version < Version.v3a && !ROParams.versionFaked) {
             return contract['mint(uint256,bytes32)'](
-                x64(nonce), x64(block_hash)
+                x64(nonce), x64(block_hash), { gasLimit: 250_000 }
             );
         }
         return contract['mint(address,bytes32,uint256)'](

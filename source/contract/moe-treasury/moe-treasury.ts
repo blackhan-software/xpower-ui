@@ -32,7 +32,7 @@ export class MoeTreasury extends Base {
         address: Address, ppt_id: NftRealId
     ): Promise<Transaction> {
         const contract = await OtfManager.connect(
-            await this.connect()
+            this.connect()
         );
         return contract.claimFor(
             x40(address), Nft.realId(ppt_id)
@@ -42,7 +42,7 @@ export class MoeTreasury extends Base {
         address: Address, ppt_ids: NftRealId[]
     ): Promise<Transaction> {
         const contract = await OtfManager.connect(
-            await this.connect()
+            this.connect()
         );
         return contract.claimForBatch(
             x40(address), Nft.realIds(ppt_ids)
