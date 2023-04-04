@@ -4,6 +4,7 @@ export const MIN_UINT256 = 0n;
 export type Amount = bigint;
 export type Address = bigint;
 export type Allowance = bigint;
+export type Area = bigint;
 export type Balance = bigint;
 export type Decimals = number;
 export type Index = number;

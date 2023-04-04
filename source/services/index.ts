@@ -2,14 +2,15 @@ import { AnyAction, EnhancedStore, Middleware } from '@reduxjs/toolkit';
 import { ROParams } from '../params';
 import { AppState } from '../redux/store';
 
-import { LocationService } from './location-service';
 import { HistoryService } from './history-service';
+import { LocationService } from './location-service';
 import { MiningService } from './mining-service';
 import { MintingService } from './minting-service';
 import { NftsService } from './nfts-service';
 import { NftsUiService } from './nfts-ui-service';
 import { PptsService } from './ppts-service';
 import { PptsUiService } from './ppts-ui-service';
+import { RatesService } from './rates-service';
 import { ThemeService } from './theme-service';
 import { TooltipService } from './tooltip-service';
 import { WalletService } from './wallet-service';
@@ -44,6 +45,9 @@ export default <
     }
     if (ROParams.service('ppts-ui')) {
         PptsUiService(store);
+    }
+    if (ROParams.service('rates')) {
+        RatesService(store);
     }
     if (ROParams.service('theme')) {
         ThemeService(store);

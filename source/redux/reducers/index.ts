@@ -9,5 +9,6 @@ export * from './otf-wallet-reducer';
 export * from './page-reducer';
 export * from './ppts-reducer';
 export * from './ppts-ui-reducer';
+export * from './rates-reducer';
 export * from './refresh-reducer';
 export * from './token-reducer';

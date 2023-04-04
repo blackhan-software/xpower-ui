@@ -9,6 +9,7 @@ export * from './nonces';
 export * from './otf-wallet';
 export * from './page';
 export * from './ppts-ui';
+export * from './rates';
 export * from './refresh';
 export * from './token';
 
