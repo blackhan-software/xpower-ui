@@ -2,7 +2,7 @@ import { Listener } from '@ethersproject/providers';
 import { BigNumber, ContractInterface, Event, Transaction } from 'ethers';
 import { x40 } from '../../functions';
 import { ROParams } from '../../params';
-import { Address, Amount, Index, Nft, NftRealId } from '../../redux/types';
+import { Address, Amount, Balance, Index, Nft, NftRealId, NftToken, Rate } from '../../redux/types';
 import { Version } from '../../types';
 import { OtfManager } from '../../wallet';
 import { Base } from '../base';
@@ -22,11 +22,46 @@ export type OnClaimBatch = (
     ev: Event
 ) => void;
 
+export type APR = {
+    stamp: bigint;
+    value: bigint;
+    area: bigint;
+};
+export type APRBonus = {
+    stamp: bigint;
+    value: bigint;
+    area: bigint;
+};
+
 export class MoeTreasury extends Base {
     public constructor(
         address: string, abi: ContractInterface = ABI
     ) {
         super(address, abi);
+    }
+    public async aprs(
+        prefix: NftToken, index: Index
+    ): Promise<APR> {
+        const contract = await this.connect();
+        return contract
+            .aprs(prefix, index)
+            .then(([stamp, value, area]: BigNumber[]) => ({
+                stamp: stamp.toBigInt(),
+                value: value.toBigInt(),
+                area: area.toBigInt()
+            }));
+    }
+    public async bonuses(
+        prefix: NftToken, index: Index
+    ): Promise<APRBonus> {
+        const contract = await this.connect();
+        return contract
+            .bonuses(prefix, index)
+            .then(([stamp, value, area]: BigNumber[]) => ({
+                stamp: stamp.toBigInt(),
+                value: value.toBigInt(),
+                area: area.toBigInt()
+            }));
     }
     public async claimFor(
         address: Address, ppt_id: NftRealId
@@ -83,21 +118,21 @@ export class MoeTreasury extends Base {
     }
     public async rateOf(
         ppt_id: NftRealId
-    ): Promise<Amount> {
-        const contract = await this.connect();
+    ): Promise<Rate> {
         if (ROParams.version < Version.v6c) {
             const [apr, apr_bonus] = await Promise.all([
                 this.aprOf(ppt_id), this.aprBonusOf(ppt_id)
             ]);
             return apr + apr_bonus;
         }
+        const contract = await this.connect();
         return contract
             .rateOf(Nft.realId(ppt_id))
             .then((bn: BigNumber) => bn.toBigInt());
     }
     public async aprOf(
         ppt_id: NftRealId
-    ): Promise<Amount> {
+    ): Promise<Rate> {
         const contract = await this.connect();
         return contract
             .aprOf(Nft.realId(ppt_id))
@@ -105,10 +140,34 @@ export class MoeTreasury extends Base {
     }
     public async aprBonusOf(
         ppt_id: NftRealId
-    ): Promise<Amount> {
+    ): Promise<Rate> {
         const contract = await this.connect();
         return contract
             .aprBonusOf(Nft.realId(ppt_id))
+            .then((bn: BigNumber) => bn.toBigInt());
+    }
+    public async rateTargetOf(
+        ppt_id: NftRealId
+    ): Promise<Rate> {
+        const [apr, apr_bonus] = await Promise.all([
+            this.aprTargetOf(ppt_id), this.aprBonusTargetOf(ppt_id)
+        ]);
+        return apr + apr_bonus;
+    }
+    public async aprTargetOf(
+        ppt_id: NftRealId
+    ): Promise<Rate> {
+        const contract = await this.connect();
+        return contract
+            .aprTargetOf(Nft.realId(ppt_id))
+            .then((bn: BigNumber) => bn.toBigInt());
+    }
+    public async aprBonusTargetOf(
+        ppt_id: NftRealId
+    ): Promise<Rate> {
+        const contract = await this.connect();
+        return contract
+            .aprBonusTargetOf(Nft.realId(ppt_id))
             .then((bn: BigNumber) => bn.toBigInt());
     }
     public async onBlock(
@@ -143,7 +202,7 @@ export class MoeTreasury extends Base {
     }
     public async moeBalanceOf(
         index: Index | Promise<Index>
-    ): Promise<Index> {
+    ): Promise<Balance> {
         const contract = await this.connect();
         if (ROParams.version < Version.v6b) {
             return contract.balance()
@@ -159,7 +218,7 @@ export class MoeTreasury extends Base {
         const contract = await this.connect();
         return contract
             .moeIndexOf(x40(address))
-            .then((bn: BigNumber) => bn.toBigInt());
+            .then((bn: BigNumber) => bn.toNumber());
     }
 }
 export default MoeTreasury;

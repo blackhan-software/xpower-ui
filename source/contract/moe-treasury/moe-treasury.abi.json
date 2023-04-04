@@ -256,25 +256,6 @@
                 "type": "uint256"
             }
         ],
-        "name": "rateOf",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "nftId",
-                "type": "uint256"
-            }
-        ],
         "name": "aprOf",
         "outputs": [
             {
@@ -306,12 +287,67 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "balance",
-        "outputs": [
+        "inputs": [
             {
                 "internalType": "uint256",
                 "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "aprs",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "stamp",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "area",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "bonuses",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "stamp",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "area",
                 "type": "uint256"
             }
         ],
@@ -456,11 +492,6 @@
                 "internalType": "uint256",
                 "name": "nftPrefix",
                 "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "nftYear",
-                "type": "uint256"
             }
         ],
         "name": "getAPR",
@@ -479,11 +510,6 @@
             {
                 "internalType": "uint256",
                 "name": "nftPrefix",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "nftYear",
                 "type": "uint256"
             }
         ],
@@ -643,6 +669,25 @@
     {
         "inputs": [
             {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            }
+        ],
+        "name": "rateOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "bytes32",
                 "name": "role",
                 "type": "bytes32"
@@ -732,11 +777,6 @@
                 "type": "uint256"
             },
             {
-                "internalType": "uint256",
-                "name": "nftYear",
-                "type": "uint256"
-            },
-            {
                 "internalType": "uint256[]",
                 "name": "array",
                 "type": "uint256[]"
@@ -750,13 +790,26 @@
     {
         "inputs": [
             {
-                "internalType": "uint256",
-                "name": "nftPrefix",
-                "type": "uint256"
+                "internalType": "uint256[]",
+                "name": "nftPrefixes",
+                "type": "uint256[]"
             },
             {
+                "internalType": "uint256[]",
+                "name": "array",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "setAPRBatch",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "uint256",
-                "name": "nftYear",
+                "name": "nftPrefix",
                 "type": "uint256"
             },
             {
@@ -766,6 +819,24 @@
             }
         ],
         "name": "setAPRBonus",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "nftPrefixes",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "array",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "setAPRBonusBatch",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
