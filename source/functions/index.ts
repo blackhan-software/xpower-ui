@@ -15,6 +15,7 @@ export * from './queued';
 export * from './random';
 export * from './range';
 export * from './rotate';
+export * from './shift';
 export * from './testing';
 export * from './trim';
 export * from './zip';
