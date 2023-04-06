@@ -16,3 +16,4 @@ export * from './random';
 export * from './range';
 export * from './testing';
 export * from './trim';
+export * from './zip';
