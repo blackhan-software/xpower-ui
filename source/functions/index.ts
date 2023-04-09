@@ -12,6 +12,7 @@ export * from './memoized';
 export * from './message';
 export * from './mobile';
 export * from './nice';
+export * from './ordinal';
 export * from './queued';
 export * from './random';
 export * from './range';
