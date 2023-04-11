@@ -6,11 +6,11 @@ import { AddressContext, AddressProvider, DebugContext, DebugProvider } from '..
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiToggled, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
 import { AppDispatch, AppState, Store } from '../../source/redux/store';
-import { AftWallet, History, Mining, Minting, Nft, NftLevels, Nfts, NftsUi, NftTokens, OtfWallet, Page, PptsUi, Token } from '../../source/redux/types';
+import { AftWallet, History, Mining, Minting, Nft, NftLevels, NftTokens, Nfts, NftsUi, OtfWallet, Page, PptsUi, Token } from '../../source/redux/types';
 
 import React, { createElement, useContext, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { connect, Provider, useDispatch } from 'react-redux';
+import { Provider, connect, useDispatch } from 'react-redux';
 
 import { Avalanche } from '../../public/images/tsx';
 import { UiAbout } from '../about/about';
@@ -23,6 +23,7 @@ import { UiSelector } from '../selector/selector';
 import { UiWallet } from '../wallet/wallet';
 
 import Tokenizer from '../../source/token';
+import Years from '../../source/years';
 import * as actions from './spa-actions';
 import { $notify } from './spa-notify';
 
@@ -224,13 +225,17 @@ function $nfts(
             onNftSenderExpanded={(
                 nft_issue, nft_level, expanded
             ) => {
-                const details = Object.fromEntries(
-                    Array.from(NftTokens()).map((t) => [t, {
-                        [nft_level]: { [nft_issue]: { expanded } }
-                    }])
+                const by_issues = Object.fromEntries(
+                    Array.from(Years()).map((y) => [y, { expanded }])
                 );
-                dispatch(setNftsUiDetails({ details }));
-                dispatch(setPptsUiDetails({ details }));
+                const by_levels = Object.fromEntries(
+                    Array.from(NftLevels()).map((l) => [l, by_issues])
+                );
+                const by_tokens = Object.fromEntries(
+                    Array.from(NftTokens()).map((t) => [t, by_levels])
+                );
+                dispatch(setNftsUiDetails({ details: by_tokens }));
+                dispatch(setPptsUiDetails({ details: by_tokens }));
             }}
             onNftAmountChanged={(
                 nft_issue, nft_level, value, valid
@@ -340,13 +345,17 @@ function $ppts(
             onPptClaimerExpanded={(
                 ppt_issue, ppt_level, expanded
             ) => {
-                const details = Object.fromEntries(
-                    Array.from(NftTokens()).map((t) => [t, {
-                        [ppt_level]: { [ppt_issue]: { expanded } }
-                    }])
+                const by_issues = Object.fromEntries(
+                    Array.from(Years()).map((y) => [y, { expanded }])
                 );
-                dispatch(setNftsUiDetails({ details }));
-                dispatch(setPptsUiDetails({ details }));
+                const by_levels = Object.fromEntries(
+                    Array.from(NftLevels()).map((l) => [l, by_issues])
+                );
+                const by_tokens = Object.fromEntries(
+                    Array.from(NftTokens()).map((t) => [t, by_levels])
+                );
+                dispatch(setNftsUiDetails({ details: by_tokens }));
+                dispatch(setPptsUiDetails({ details: by_tokens }));
             }}
             onPptAmountChanged={(
                 ppt_issue, ppt_level, value, valid
