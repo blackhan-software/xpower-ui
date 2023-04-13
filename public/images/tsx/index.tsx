@@ -1,3 +1,7 @@
+export * from './arrow-down-circle-fill';
+export * from './arrow-left-circle-fill';
+export * from './arrow-right-circle-fill';
+export * from './arrow-up-circle-fill';
 export * from './avalanche';
 export * from './dash-circle-fill';
 export * from './fire';
