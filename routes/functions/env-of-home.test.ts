@@ -42,6 +42,8 @@ describe('env_of_home', () => {
                 XP_POWEREDi: "--xp-yellow-i",
                 XP_POWERED_DARKi: "--xp-yellow-dark-i",
             }, ...{
+                COVER_IMAGE: 'cover-apower',
+            }, ...{
                 AMOUNT_1: "1",
                 AMOUNT_2: "2",
                 AMOUNT_3: "3",

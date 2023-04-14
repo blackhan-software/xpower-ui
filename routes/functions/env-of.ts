@@ -31,6 +31,7 @@ export const env_of = (req: Request): Record<string, string> => {
     }, ...{
       ...theme(xtoken),
       ...header_page(req),
+      ...cover_image(req),
       ...otf_wallet(req),
       ...selector_token(req)
     }
@@ -47,6 +48,13 @@ const header_page = (req: Request) => {
       page === Page.Ppts ? 'active' : '',
     HEADER_ABOUT:
       page === Page.About ? 'active' : '',
+  };
+};
+const cover_image = (req: Request) => {
+  const page = Pager.parse(req.path);
+  return {
+    COVER_IMAGE:
+      page === Page.Home ? 'cover-xpower' : 'cover-apower',
   };
 };
 const otf_wallet = (req: Request) => {
