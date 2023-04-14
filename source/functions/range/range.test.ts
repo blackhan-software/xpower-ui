@@ -3,7 +3,7 @@ import { range } from './range';
 describe('range', () => {
     it('should return a range of [0..10)', () => {
         let j = 0;
-        for (const i of range(0, 10)) {
+        for (const i of range(0, 10, 1)) {
             expect(i).toEqual(j++);
         }
     });
