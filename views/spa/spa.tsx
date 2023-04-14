@@ -6,7 +6,7 @@ import { AddressContext, AddressProvider, DebugContext, DebugProvider } from '..
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiToggled, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
 import { AppDispatch, AppState, Store } from '../../source/redux/store';
-import { AftWallet, History, Mining, Minting, Nft, NftLevels, NftTokens, Nfts, NftsUi, OtfWallet, Page, PptsUi, Token } from '../../source/redux/types';
+import { AftWallet, History, MinerStatus, Mining, Minting, Nft, NftLevels, NftTokens, Nfts, NftsUi, OtfWallet, Page, PptsUi, Rates, Token } from '../../source/redux/types';
 
 import React, { createElement, useContext, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -39,6 +39,7 @@ type Props = {
     ppts_ui: PptsUi;
     aft_wallet: AftWallet;
     otf_wallet: OtfWallet;
+    rates: Rates;
 }
 export function SPA(
     props: Props
@@ -55,12 +56,12 @@ export function SPA(
     const { nfts, nfts_ui } = props;
     const { ppts, ppts_ui } = props;
     const { page, token } = props;
-    const { history } = props;
+    const { history, rates } = props;
     return <React.StrictMode>
         {$notify(history, token)}
         {$h1(page)}
         {$connector(page)}
-        {$cover(page, token, mining)}
+        {$cover(page, token, mining, rates)}
         {$wallet(page, token, aft_wallet, otf_wallet)}
         {$selector(page, token)}
         {$home(page, token, mining, minting)}
@@ -95,9 +96,22 @@ function $connector(
     </form>;
 }
 function $cover(
-    page: Page, token: Token, mining: Mining
+    page: Page, token: Token, mining: Mining, rates: Rates
 ) {
-    return <UiCover page={page} token={token} status={mining.status} />;
+    const pulsate = () => {
+        switch (mining.status) {
+            case MinerStatus.stopping:
+            case MinerStatus.started:
+            case MinerStatus.pausing:
+                return true;
+        }
+        return false;
+    };
+    return <UiCover
+        page={page} token={token}
+        pulsate={pulsate()}
+        rates={rates}
+    />;
 }
 function $wallet(
     page: Page, token: Token,

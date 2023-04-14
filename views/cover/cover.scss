@@ -2,20 +2,12 @@ div#cover {
     border: 1px solid var(--xp-powered);
     border-radius: 4px;
     margin-bottom: 0.5em;
+    user-select: none;
 }
-div#cover > img {
-    border-radius: inherit;
-    height: auto;
-    width: 100%;
-}
-div#cover > img.pulsate {
-    animation: 3s linear infinite pulsate;
-}
-@keyframes pulsate {
-    from {
-        filter: hue-rotate(0deg);
+div#cover {
+    .cover-layer {
+        grid-column: 1;
+        grid-row: 1;
     }
-    to {
-        filter: hue-rotate(360deg);
-    }
+    display: grid;
 }

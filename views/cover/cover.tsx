@@ -1,42 +1,32 @@
 import './cover.scss';
 
 import React from 'react';
-import { MinerStatus, Page, Token } from '../../source/redux/types';
-import { Tokenizer } from '../../source/token';
+import { Page, Rates, Token } from '../../source/redux/types';
+import { UiCoverGraph } from './cover-graph';
+import { UiCoverImage } from './cover-image';
 
 type Props = {
     page: Page;
     token: Token;
-    status: MinerStatus | null;
+    rates: Rates;
+    pulsate: boolean;
 }
 export function UiCover(
-    { page, token, status }: Props
+    { page, token, rates, pulsate }: Props
 ) {
     switch (page) {
         case Page.Home:
+            return <div id='cover'>
+                <UiCoverImage page={page} pulsate={pulsate} />
+            </div>;
         case Page.Nfts:
         case Page.Ppts:
-            return <div id='cover'>{$image({ token, status })}</div>;
+            return <div id='cover'>
+                <UiCoverImage page={page} pulsate={pulsate} />
+                <UiCoverGraph page={page} token={token} rates={rates} />
+            </div>;
         default:
             return null;
     }
 }
-function $image(
-    { token, status }: Pick<Props, 'token' | 'status'>
-) {
-    const pulsate = (status: Props['status']) => {
-        switch (status) {
-            case MinerStatus.stopping:
-            case MinerStatus.started:
-            case MinerStatus.pausing:
-                return 'pulsate';
-        }
-        return undefined;
-    };
-    const power = Tokenizer.aified(token)
-        ? 'apower' : 'xpower';
-    return <img className={pulsate(status)}
-        src={`/images/jpg/cover-${power}.jpg`}
-        id='cover' width="736" height="246"
-    ></img>;
-}
+export default UiCover;

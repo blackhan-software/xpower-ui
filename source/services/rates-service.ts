@@ -86,7 +86,7 @@ function aprify(
         const last = list[list.length - 1];
         const area = value * (stamp - last.stamp);
         return {
-            stamp: last.stamp, value, area: last.area + area
+            stamp, value, area: last.area + area
         };
     }
     return {

@@ -1,0 +1,27 @@
+div#cover {
+    div.chart-line {
+        canvas:active {
+            cursor: col-resize;
+        }
+        canvas {
+            cursor: pointer;
+        }
+    }
+    div.chart {
+        canvas {
+            height: 100%;
+            position: absolute;
+            width: 100%;
+            top: 0;
+        }
+        border-radius: inherit;
+        height: auto;
+        position: relative;
+        width: 100%;
+    }
+    div.chart {
+        margin: 0.25em;
+        margin-bottom: 0;
+        width: calc(100% - 0.5em);
+    }
+}

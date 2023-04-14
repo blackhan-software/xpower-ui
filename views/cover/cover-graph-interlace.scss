@@ -1,0 +1,17 @@
+div#cover {
+    div.interlace {
+        canvas {
+            height: 100%;
+            position: absolute;
+            width: 100%;
+            top: 0;
+        }
+        border-radius: inherit;
+        height: auto;
+        position: relative;
+        width: 100%;
+    }
+    div.interlace {
+        opacity: 20%;
+    }
+}
