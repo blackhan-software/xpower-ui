@@ -6,7 +6,7 @@ import { Blockchain } from '../blockchain';
 import { IntervalManager, MiningManager as MM } from '../managers';
 import { ROParams } from '../params';
 import { clearMintingRows, removeNonces, setMintingRow } from '../redux/actions';
-import { onNonceChanged, onPageSwitch, onTokenSwitch } from '../redux/observers';
+import { onNonceChanged, onTokenSwitch } from '../redux/observers';
 import { mintingRowBy, pageOf, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { Page } from '../redux/types';
@@ -39,12 +39,6 @@ export const MintingService = (
                 nn_counter: Number(total / amount),
             }
         }));
-    });
-    onPageSwitch(store, function forgetNonces(next, prev) {
-        if (Page.Home !== prev) {
-            return;
-        }
-        store.dispatch(removeNonces());
     });
     onTokenSwitch(store, function forgetNonces(token, oldToken) {
         if (Page.Home !== pageOf(store.getState())) {
