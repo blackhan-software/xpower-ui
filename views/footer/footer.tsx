@@ -3,17 +3,19 @@ import './footer.scss';
 import { Blockchain, Chain, ChainId } from '../../source/blockchain';
 import { ROParams } from '../../source/params';
 import { AppState, Store } from '../../source/redux/store';
-import { Token, TokenInfo } from '../../source/redux/types';
+import { NFTokenInfo, PPTokenInfo, Page, Token, TokenInfo } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { Version } from '../../source/types';
 
 import React, { createElement, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { connect, Provider } from 'react-redux';
+import { Provider, connect } from 'react-redux';
 import { x40 } from '../../source/functions';
 
 type Props = {
-    token: Token; version: Version;
+    page: Page;
+    token: Token;
+    version: Version;
 }
 export function UiFooter(
     props: Props
@@ -81,7 +83,9 @@ function $linkedin() {
         </a>
     </li>;
 }
-function $migrate({ token }: Props) {
+function $migrate(
+    { token }: Props
+) {
     return <li className='nav-item pb-1 pt-1 pe-1'>
         <a className='nav-link link-light lower migrate'
             data-bs-toggle='tooltip' data-bs-placement='top'
@@ -92,19 +96,23 @@ function $migrate({ token }: Props) {
         </a>
     </li>;
 }
-function $contract({ chainId, token, version }: Props & { chainId: ChainId }) {
+function $contract(
+    { chainId, page, token, version }: Props & { chainId: ChainId }
+) {
+    const { url, tip } = contractInfo(chainId, page, token, version);
     return <li className='nav-item pb-1 pt-1 pe-1'>
         <a className='nav-link link-light lower smart-contract'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            title={`Smart contract of the ${token} token`}
-            target='_blank' href={contractUrl(chainId, token, version)}
+            title={tip} target='_blank' href={url}
         >
             <i className='bi bi-cpu-fill'></i>
             <i className='bi bi-cpu'></i>
         </a>
     </li>;
 }
-function $addToken({ token, version }: Props) {
+function $addToken(
+    { token, version }: Props
+) {
     return <li className='nav-item pb-1 pt-1 pe-1'>
         <a className='nav-link link-light lower add-token'
             data-bs-toggle='tooltip' data-bs-placement='top'
@@ -199,13 +207,38 @@ function $avalanche() {
         </a>
     </li>;
 }
-function contractUrl(
-    chainId: ChainId, token: Token, version: Version
-) {
+function contractInfo(
+    chainId: ChainId, page: Page, token: Token, version: Version
+): {
+    url: string; tip: string;
+} {
     const urls = new Chain(chainId).explorerUrls;
     const explorer = urls.length ? urls[0] : '';
-    const { address } = TokenInfo(token, version);
-    return `${explorer}/address/${x40(address)}`;
+    switch (page) {
+        case Page.Nfts: {
+            const { address } = NFTokenInfo(token, version);
+            const xtoken = Tokenizer.xify(token);
+            return {
+                url: `${explorer}/address/${x40(address)}`,
+                tip: `Smart contract of the ${xtoken} NFTs`,
+            };
+        }
+        case Page.Ppts: {
+            const { address } = PPTokenInfo(token, version);
+            const xtoken = Tokenizer.xify(token);
+            return {
+                url: `${explorer}/address/${x40(address)}`,
+                tip: `Smart contract of the staked ${xtoken} NFTs`,
+            }
+        }
+        default: {
+            const { address } = TokenInfo(token, version);
+            return {
+                url: `${explorer}/address/${x40(address)}`,
+                tip: `Smart contract of the ${token} tokens`,
+            }
+        }
+    }
 }
 async function addToken(
     token: Token, version: Version
@@ -303,8 +336,8 @@ function $consent(
     </li>;
 }
 if (require.main === module) {
-    const mapper = ({ token }: AppState) => ({
-        token, version: ROParams.version
+    const mapper = ({ page, token }: AppState) => ({
+        page, token, version: ROParams.version
     });
     const $ui_footer = createElement(connect(mapper)(UiFooter));
     const $footer = document.querySelector('footer');

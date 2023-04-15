@@ -92,3 +92,33 @@ export function TokenInfo(
         };
     }
 }
+export function NFTokenInfo(
+    token: Token, version?: Version
+): Pick<TokenInfo, 'address'> {
+    if (version === undefined) {
+        version = ROParams.version;
+    }
+    const slug = version < Version.v6a
+        ? Tokenizer.xify(token) : 'XPOW';
+    const $nft = document.getElementById(
+        `g-${slug}_NFT_${version}`
+    );
+    return {
+        address: BigInt($nft?.dataset.value as string),
+    };
+}
+export function PPTokenInfo(
+    token: Token, version?: Version
+): Pick<TokenInfo, 'address'> {
+    if (version === undefined) {
+        version = ROParams.version;
+    }
+    const slug = version < Version.v6a
+        ? Tokenizer.xify(token) : 'XPOW';
+    const $sov = document.getElementById(
+        `g-${slug}_PPT_${version}`
+    );
+    return {
+        address: BigInt($sov?.dataset.value as string),
+    };
+}
