@@ -11,6 +11,7 @@
     ],
     "configurations": [
         {
+            "console": "integratedTerminal",
             "name": "Debug via NPM",
             "request": "launch",
             "runtimeArgs": [
@@ -21,9 +22,10 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "type": "pwa-node",
+            "type": "node",
         },
         {
+            "console": "integratedTerminal",
             "name": "Watch via NPM",
             "request": "launch",
             "runtimeArgs": [
@@ -34,13 +36,13 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "type": "pwa-node",
+            "type": "node",
         },
         {
             "name": "Attach to Chrome",
             "port": 9222,
             "request": "attach",
-            "type": "pwa-chrome",
+            "type": "chrome",
             "webRoot": "${workspaceFolder}"
         },
     ],
