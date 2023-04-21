@@ -1,5 +1,7 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ESLintWebpackPlugin = require('eslint-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
+
 const { Years } = require('./source/years');
 const { mkdir } = require('fs/promises');
 const { resolve } = require('path');
@@ -11,27 +13,38 @@ const env = require('./env');
 const configuration = ({
     mode, ...options
 }) => ({
+    externals: {
+        ethers: 'ethers',
+        jquery: 'jQuery',
+        react: 'React',
+    },
     entry: {
-        spa: [
-            './library/index.ts',
-            './views/header/header.tsx',
-            './views/spa/spa.tsx',
-            './views/footer/footer.tsx',
-        ],
-        error: [
-            './library/index.ts',
-            './views/header/header.tsx',
-            './views/error/error.ts',
-            './views/footer/footer.tsx',
-        ],
-        migrate: [
-            './library/index.ts',
-            './views/header/header.tsx',
-            './views/connector/connector.tsx',
-            './views/selector/selector.tsx',
-            './views/migrate/index.ts',
-            './views/footer/footer.tsx',
-        ],
+        spa: {
+            import: [
+                './library/index.ts',
+                './views/header/header.tsx',
+                './views/spa/spa.tsx',
+                './views/footer/footer.tsx',
+            ],
+        },
+        error: {
+            import: [
+                './library/index.ts',
+                './views/header/header.tsx',
+                './views/error/error.ts',
+                './views/footer/footer.tsx',
+            ],
+        },
+        migrate: {
+            import: [
+                './library/index.ts',
+                './views/header/header.tsx',
+                './views/connector/connector.tsx',
+                './views/selector/selector.tsx',
+                './views/migrate/index.ts',
+                './views/footer/footer.tsx',
+            ],
+        },
         worker_dev: {
             import: './source/miner/scripts/worker.ts',
             filename: 'worker.js',
@@ -70,8 +83,8 @@ const configuration = ({
         }]
     },
     plugins: [
-        new (require('eslint-webpack-plugin'))({
-            extensions: ['ts', 'tsx']
+        new ESLintWebpackPlugin({
+            extensions: ['tsx', 'ts']
         }),
         new HTMLWebpackPlugin({
             templateContent: pug.renderFile('./views/error/error.pug', {
@@ -126,7 +139,9 @@ const configuration = ({
         })
     ],
     resolve: {
-        extensions: ['.ts', '.tsx', '.js'],
+        extensions: [
+            '.tsx', '.ts', '.js'
+        ],
         fallback: {
             buffer: false, fs: false, path: false
         }
