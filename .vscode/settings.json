@@ -1,8 +1,8 @@
 {
     "files.associations": {
-        ".env-avalanche-test": "ini",
-        ".env-avalanche-main": "ini",
-        ".env-hardhat": "ini"
+        ".env-avalanche-test": "properties",
+        ".env-avalanche-main": "properties",
+        ".env-hardhat": "properties"
     },
     "files.exclude": {
         "**/*.css.map": {
@@ -26,6 +26,5 @@
         "**/*?.js": {
             "when": "$(basename).tsx"
         },
-    },
-    "git.ignoreLimitWarning": true
+    }
 }
