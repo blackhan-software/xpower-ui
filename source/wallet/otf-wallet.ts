@@ -2,7 +2,7 @@ import { BigNumberish, BlockTag, Provider, SigningKey, TransactionRequest, Walle
 
 export class OtfWallet extends Wallet {
     constructor(
-        key: string | SigningKey, provider: Provider
+        key: string | SigningKey, provider: Provider | null
     ) {
         super(key, provider);
     }
