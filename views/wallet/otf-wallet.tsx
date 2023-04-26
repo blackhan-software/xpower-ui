@@ -23,7 +23,7 @@ export function UiOtfWallet(
             </label>
             <div className='input-group otf-wallet-address'>
                 {$transmitter(props)}
-                {$address(props)}
+                {$account(props)}
                 {$balance(props)}
                 {$info()}
             </div>
@@ -106,14 +106,14 @@ function transact(
         }
     }
 }
-function $address(
-    { address }: Pick<Props, 'address'>
+function $account(
+    { account }: Pick<Props, 'account'>
 ) {
     return <input type='text' readOnly
         className='form-control' id='otf-wallet-address'
         data-bs-toggle='tooltip' data-bs-placement='top'
         title='Minter address to pre-fund for transaction fees'
-        value={x40(address ?? 0n)}
+        value={x40(account ?? 0n)}
     />;
 }
 function $balance(
@@ -136,6 +136,6 @@ function $info() {
     </button>;
 }
 function threshold_lte(amount: Amount) {
-    return OtfManager.threshold.lte(amount);
+    return OtfManager.threshold < amount;
 }
 export default UiOtfWallet;

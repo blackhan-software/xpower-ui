@@ -1,7 +1,7 @@
 import { delayed, nice, nice_si, nomobi, x40 } from '../../source/functions';
 import { switchToken } from '../../source/redux/actions';
 import { AppDispatch } from '../../source/redux/store';
-import { Address, AftWallet, AftWalletBurner, Amount, Token, TokenInfo } from '../../source/redux/types';
+import { Account, AftWallet, AftWalletBurner, Amount, Token, TokenInfo } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 
 import React from 'react';
@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 import { Fire, XPower } from '../../public/images/tsx';
 
 type Props = {
-    address: Address | null;
+    account: Account | null;
     onBurn?: (token: Token, amount: Amount) => void;
     token: Token;
     toggled: boolean;
@@ -34,7 +34,7 @@ export function UiAftWallet(
         </label>
         <div className='input-group wallet-address'>
             {$otfToggle(props)}
-            {$address(props)}
+            {$account(props)}
             {$sovBurner(props)}
             {$balance(props)}
             {$sovToggle({
@@ -60,14 +60,14 @@ function $otfToggle(
         <i className={icon} />
     </button>;
 }
-function $address(
-    { address }: Props
+function $account(
+    { account }: Props
 ) {
     return <input type='text' readOnly
         className='form-control' id='aft-wallet-address'
         data-bs-toggle='tooltip' data-bs-placement='top'
         title='Wallet address'
-        value={x40(address ?? 0n)}
+        value={x40(account ?? 0n)}
     />;
 }
 function $sovBurner(
