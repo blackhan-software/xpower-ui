@@ -1,12 +1,13 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import './any-claim.scss';
 
-import { Contract, Transaction } from 'ethers';
+import { Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { MoeTreasury, MoeTreasuryFactory, XPowerMoeFactory } from '../../source/contract';
+import { MoeTreasury, MoeTreasuryFactory } from '../../source/contract';
 import { Alert, Alerts, alert } from '../../source/functions';
-import { Balance, Nft, NftLevels, Token } from '../../source/redux/types';
+import { Account, Balance, Nft, NftLevels, Token } from '../../source/redux/types';
 import { Version } from '../../source/types';
+import { MoeWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
 
 Blockchain.onConnect(function enableAllowanceButton() {
@@ -31,11 +32,11 @@ $('button.claim-any').on('click', async function claimTokens(e) {
 async function claim(token: Token, { $claim }: {
     $claim: JQuery<HTMLElement>
 }) {
-    const { address, src_version } = await context({
+    const { account, src_version } = await context({
         $el: $claim
     });
     const { src_xpower, mty_source } = await contracts({
-        token, src_version
+        account, token, src_version
     });
     if (!src_xpower) {
         throw new Error('undefined src_xpower');
@@ -52,7 +53,7 @@ async function claim(token: Token, { $claim }: {
         token: Nft.token(token)
     });
     const src_claimables = await mty_source.claimableForBatch(
-        address, Nft.realIds(ids, { version: src_version })
+        account, Nft.realIds(ids, { version: src_version })
     );
     console.debug(
         `[${src_version}:claimables]`, src_claimables
@@ -97,7 +98,7 @@ async function claim(token: Token, { $claim }: {
         mty_source.onClaimBatch((
             account, nft_ids, amounts, ev
         ) => {
-            if (ev.transactionHash !== tx?.hash) {
+            if (ev.log.transactionHash !== tx?.hash) {
                 return;
             }
             alert(
@@ -107,7 +108,7 @@ async function claim(token: Token, { $claim }: {
             reset();
         });
         const tx: Transaction = await mty_source.claimForBatch(
-            address, Nft.realIds(nz.ids, { version: src_version })
+            account, Nft.realIds(nz.ids, { version: src_version })
         );
     } catch (ex: any) {
         if (ex.message) {
@@ -125,11 +126,11 @@ async function claim(token: Token, { $claim }: {
 async function mtyBalanceOf(token: Token, { $claim }: {
     $claim: JQuery<HTMLElement>
 }) {
-    const { src_version } = await context({
+    const { account, src_version } = await context({
         $el: $claim
     });
     const { src_xpower, mty_source } = await contracts({
-        token, src_version
+        account, token, src_version
     });
     if (!src_xpower) {
         throw new Error('undefined src_xpower');
@@ -139,7 +140,7 @@ async function mtyBalanceOf(token: Token, { $claim }: {
     }
     try {
         const moe_index = await mty_source.moeIndexOf(
-            BigInt(src_xpower.address)
+            BigInt(await src_xpower.address)
         );
         return await mty_source.moeBalanceOf(moe_index);
     } catch (ex) {
@@ -164,9 +165,9 @@ function filter<I>(
 async function context({ $el: $approve }: {
     $el: JQuery<HTMLElement>
 }) {
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const account = await Blockchain.account;
+    if (!account) {
+        throw new Error('missing account');
     }
     const src_version = $approve.data('source');
     if (!src_version) {
@@ -176,27 +177,27 @@ async function context({ $el: $approve }: {
     if (!tgt_version) {
         throw new Error('missing data-target');
     }
-    return { address, src_version, tgt_version };
+    return { account, src_version, tgt_version };
 }
 async function contracts({
-    token, src_version
+    account, token, src_version
 }: {
-    token: Token, src_version: Version
+    account: Account, token: Token, src_version: Version
 }) {
-    let src_xpower: Contract | undefined;
+    let src_xpower: MoeWallet | undefined;
     try {
-        src_xpower = await XPowerMoeFactory({
-            token, version: src_version
-        }).connect();
+        src_xpower = new MoeWallet(
+            account, token, src_version
+        );
         console.debug(
-            `[${src_version}:src_xpower]`, src_xpower.address
+            `[${src_version}:src_xpower]`, await src_xpower.address
         );
     } catch (ex) {
         console.error(ex);
     }
     let mty_source: MoeTreasury | undefined;
     try {
-        mty_source = await MoeTreasuryFactory({
+        mty_source = MoeTreasuryFactory({
             token, version: src_version
         });
         console.debug(

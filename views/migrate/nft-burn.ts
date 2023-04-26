@@ -1,14 +1,13 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import './nft-burn.scss';
 
-import { BigNumber, Transaction } from 'ethers';
+import { Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { XPowerNftFactory } from '../../source/contract';
 import { Alert, alert, Alerts, x40 } from '../../source/functions';
-import { Nft, NftLevels, Token } from '../../source/redux/types';
+import { Account, Balance, Nft, NftLevels, Token } from '../../source/redux/types';
 import { Version } from '../../source/types';
+import { NftWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
-import { OnTransferBatch } from '../../source/wallet';
 
 Blockchain.onConnect(function enableBurnButton() {
     const $burn_nft = $('button.burn-empty-nft').filter((i, el) => {
@@ -34,11 +33,11 @@ $('button.burn-empty-nft').on('click', async function burnEmpty(e) {
 async function burn(token: Token, { $burn }: {
     $burn: JQuery<HTMLElement>
 }) {
-    const { address, src_version } = await context({
+    const { account, src_version } = await context({
         $el: $burn
     });
     const { nft_source } = await contracts({
-        token, src_version
+        account, token, src_version
     });
     //
     // Check balances:
@@ -49,10 +48,12 @@ async function burn(token: Token, { $burn }: {
         token: Nft.token(token)
     });
     const accounts = ids.map(() => {
-        return x40(address);
+        return x40(account);
     });
-    const src_balances: BigNumber[] = await nft_source.balanceOfBatch(
-        accounts, Nft.realIds(ids, { version: src_version })
+    const src_balances: Balance[] = await nft_source.wsc.then(
+        (c) => c.balanceOfBatch(accounts, Nft.realIds(ids, {
+            version: src_version
+        }))
     );
     console.debug(
         `[${src_version}:balances]`, src_balances.map((b) => b.toString())
@@ -67,10 +68,10 @@ async function burn(token: Token, { $burn }: {
     const reset = $burn.ing();
     Alerts.hide();
     try {
-        nft_source.on('TransferBatch', <OnTransferBatch>((
+        nft_source.onTransferBatch((
             operator, from, to, ids, values, ev
         ) => {
-            if (ev.transactionHash !== tx?.hash) {
+            if (ev.log.transactionHash !== tx?.hash) {
                 return;
             }
             alert(
@@ -78,10 +79,10 @@ async function burn(token: Token, { $burn }: {
                 Alert.success, { id: 'success', after: $burn.parent('div')[0] }
             );
             reset();
-        }));
-        tx = await nft_source.burnBatch(
-            x40(address), Nft.realIds(zz.ids, { version: src_version }), zz.balances
-        );
+        });
+        tx = await nft_source.wsc.then((c) => c.burnBatch(
+            x40(account), Nft.realIds(zz.ids, { version: src_version }), zz.balances
+        ));
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
@@ -95,13 +96,13 @@ async function burn(token: Token, { $burn }: {
         reset();
     }
 }
-function filter<I, B extends BigNumber>(
+function filter<I, B extends bigint>(
     ids: Array<I>, balances: Array<B>, { zero }: { zero: boolean }
 ) {
     const ids_nz = [];
     const balances_nz = [];
     for (let i = 0; i < balances.length; i++) {
-        if (balances[i].isZero() === zero) {
+        if (!balances[i] === zero) {
             balances_nz.push(balances[i]);
             ids_nz.push(ids[i]);
         }
@@ -111,26 +112,26 @@ function filter<I, B extends BigNumber>(
 async function context({ $el: $approve }: {
     $el: JQuery<HTMLElement>
 }) {
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const account = await Blockchain.account;
+    if (!account) {
+        throw new Error('missing account');
     }
     const src_version = $approve.data('source');
     if (!src_version) {
         throw new Error('missing data-source');
     }
-    return { address, src_version };
+    return { account, src_version };
 }
 async function contracts({
-    token, src_version
+    account, token, src_version
 }: {
-    token: Token, src_version: Version
+    account: Account, token: Token, src_version: Version
 }) {
-    const nft_source = await XPowerNftFactory({
-        token, version: src_version
-    }).connect();
+    const nft_source = new NftWallet(
+        account, token, src_version
+    );
     console.debug(
-        `[${src_version}:contract]`, nft_source.address
+        `[${src_version}:contract]`, await nft_source.address
     );
     return {
         nft_source,

@@ -1,13 +1,13 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import './moe-migrate.scss';
 
-import { Contract, Transaction } from 'ethers';
+import { Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { XPowerMoeFactory } from '../../source/contract';
-import { Alert, alert, Alerts, x40 } from '../../source/functions';
-import { MAX_UINT256, Token } from '../../source/redux/types';
+import { Alert, Alerts, alert, x40 } from '../../source/functions';
+import { Account, MAX_UINT256, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { Version } from '../../source/types';
+import { MoeWallet } from '../../source/wallet';
 
 Blockchain.onConnect(function enableAllowance() {
     const $approve = $('.approve-moe-allowance');
@@ -43,11 +43,11 @@ $('button.approve-moe-allowance').on(
 async function moeApproveOld(token: Token, { $approve, $migrate }: {
     $approve: JQuery<HTMLElement>, $migrate: JQuery<HTMLElement>
 }) {
-    const { address, src_version, tgt_version } = await context({
+    const { account, src_version, tgt_version } = await context({
         $el: $approve
     });
     const { src_xpower, tgt_xpower } = await contracts({
-        token, src_version, tgt_version
+        account, token, src_version, tgt_version
     });
     if (!src_xpower) {
         throw new Error('undefined src_xpower');
@@ -59,15 +59,13 @@ async function moeApproveOld(token: Token, { $approve, $migrate }: {
     // Check allowance:
     //
     const src_allowance = await src_xpower.allowance(
-        x40(address), tgt_xpower.address
+        x40(account), await tgt_xpower.address
     );
     console.debug(
         `[${src_version}:allowance]`, src_allowance.toString()
     );
-    const src_balance = await src_xpower.balanceOf(
-        x40(address)
-    );
-    if (src_allowance.eq(MAX_UINT256) || src_balance.isZero()) {
+    const src_balance = await src_xpower.balance;
+    if (src_allowance === MAX_UINT256 || !src_balance) {
         alert(
             `Allowance has already been approved for; you can migrate now.`,
             Alert.info, { after: $approve.parent('div')[0] }
@@ -82,10 +80,10 @@ async function moeApproveOld(token: Token, { $approve, $migrate }: {
     const reset = $approve.ing();
     Alerts.hide();
     try {
-        src_xpower.on('Approval', (
+        src_xpower.onApproval((
             owner, spender, value, ev
         ) => {
-            if (ev.transactionHash !== tx?.hash) {
+            if (ev.log.transactionHash !== tx?.hash) {
                 return;
             }
             alert(
@@ -96,7 +94,7 @@ async function moeApproveOld(token: Token, { $approve, $migrate }: {
             reset();
         });
         tx = await src_xpower.approve(
-            tgt_xpower.address, MAX_UINT256
+            await tgt_xpower.address, MAX_UINT256
         );
     } catch (ex: any) {
         if (ex.message) {
@@ -128,11 +126,11 @@ $('button.moe-migrate').on(
 async function moeMigrateOld(token: Token, { $migrate }: {
     $migrate: JQuery<HTMLElement>
 }) {
-    const { address, src_version, tgt_version } = await context({
+    const { account, src_version, tgt_version } = await context({
         $el: $migrate
     });
     const { src_xpower, tgt_xpower } = await contracts({
-        token, src_version, tgt_version
+        account, src_version, tgt_version, token
     });
     if (!src_xpower) {
         throw new Error('undefined src_xpower');
@@ -143,13 +141,11 @@ async function moeMigrateOld(token: Token, { $migrate }: {
     //
     // Check allowance:
     //
-    const src_balance = await src_xpower.balanceOf(
-        x40(address)
-    );
+    const src_balance = await src_xpower.balance;
     console.debug(
         `[${src_version}:balance]`, src_balance.toString()
     );
-    if (src_balance.isZero()) {
+    if (!src_balance) {
         alert(
             `Old balance is zero; nothing to migrate here.`,
             Alert.warning, { after: $migrate.parent('div')[0] }
@@ -157,12 +153,12 @@ async function moeMigrateOld(token: Token, { $migrate }: {
         return;
     }
     const src_allowance = await src_xpower.allowance(
-        x40(address), tgt_xpower.address
+        x40(account), await tgt_xpower.address
     );
     console.debug(
         `[${src_version}:allowance]`, src_allowance.toString()
     );
-    if (src_allowance.isZero()) {
+    if (!src_allowance) {
         alert(
             `No allowance; did your allowance transaction confirm?`,
             Alert.warning, { after: $migrate.parent('div')[0] }
@@ -176,10 +172,10 @@ async function moeMigrateOld(token: Token, { $migrate }: {
     const reset = $migrate.ing();
     Alerts.hide();
     try {
-        src_xpower.on('Transfer', (
+        src_xpower.onTransfer((
             from, to, amount, ev
         ) => {
-            if (ev.transactionHash !== tx?.hash) {
+            if (ev.log.transactionHash !== tx?.hash) {
                 return;
             }
             alert(
@@ -188,8 +184,12 @@ async function moeMigrateOld(token: Token, { $migrate }: {
             );
             reset();
         });
-        const index = await tgt_xpower.oldIndexOf(src_xpower.address);
-        tx = await tgt_xpower.migrate(src_balance, [index]);
+        const index = await tgt_xpower.mmc.then(
+            (c) => c.oldIndexOf(src_xpower.address)
+        );
+        tx = await tgt_xpower.mmc.then(
+            (c) => c.migrate(src_balance, [index])
+        );
     } catch (ex: any) {
         if (ex.message) {
             if (ex.data && ex.data.message) {
@@ -206,9 +206,9 @@ async function moeMigrateOld(token: Token, { $migrate }: {
 async function context({ $el: $approve }: {
     $el: JQuery<HTMLElement>
 }) {
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const account = await Blockchain.account;
+    if (!account) {
+        throw new Error('missing account');
     }
     const src_version = $approve.data('source');
     if (!src_version) {
@@ -218,31 +218,31 @@ async function context({ $el: $approve }: {
     if (!tgt_version) {
         throw new Error('missing data-target');
     }
-    return { address, src_version, tgt_version };
+    return { account, src_version, tgt_version };
 }
 async function contracts({
-    token, src_version, tgt_version
+    account, token, src_version, tgt_version
 }: {
-    token: Token, src_version: Version, tgt_version: Version
+    account: Account, token: Token, src_version: Version, tgt_version: Version
 }) {
-    let src_xpower: Contract | undefined;
+    let src_xpower: MoeWallet | undefined;
     try {
-        src_xpower = await XPowerMoeFactory({
-            token, version: src_version
-        }).connect();
+        src_xpower = new MoeWallet(
+            account, token, src_version
+        );
         console.debug(
-            `[${src_version}:src_xpower]`, src_xpower.address
+            `[${src_version}:src_xpower]`, await src_xpower.address
         );
     } catch (ex) {
         console.error(ex);
     }
-    let tgt_xpower: Contract | undefined;
+    let tgt_xpower: MoeWallet | undefined;
     try {
-        tgt_xpower = await XPowerMoeFactory({
-            token, version: tgt_version
-        }).connect();
+        tgt_xpower = new MoeWallet(
+            account, token, tgt_version
+        );
         console.debug(
-            `[${tgt_version}:tgt_xpower]`, tgt_xpower.address
+            `[${tgt_version}:tgt_xpower]`, await tgt_xpower.address
         );
     } catch (ex) {
         console.error(ex);

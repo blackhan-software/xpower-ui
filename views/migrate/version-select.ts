@@ -1,13 +1,12 @@
 import './version-select.scss';
 
-import { BigNumber, Contract } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { XPowerMoeFactory, XPowerNftFactory, XPowerPptFactory, XPowerSovFactory } from '../../source/contract';
-import { x40 } from '../../source/functions';
+import { x40, zip } from '../../source/functions';
 import { ROParams, RWParams } from '../../source/params';
-import { Nft, NftLevels, Token } from '../../source/redux/types';
+import { Account, Balance, Nft, NftLevels, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { Version, Versions } from '../../source/types';
+import { MoeWallet, NftWallet, PptWallet, SovWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
 
 $(window).on('load', function setVersion() {
@@ -18,10 +17,10 @@ $(window).on('load', function setVersion() {
 Blockchain.onConnect(async function setBalances() {
     const versions = Array.from(Versions())
         .filter((v) => v < ROParams.versionTarget).reverse();
-    const balances = versions.map((version) => ({
-        version, balance: get_balances(RWParams.token, version)
-    }));
-    for (const { version, balance } of balances) {
+    const balances = versions.map(
+        (version) => get_balances(RWParams.token, version)
+    );
+    for (const [version, balance] of zip(versions, balances)) {
         set_balances(RWParams.token, version, await balance);
     }
     const $select = $('#version-select');
@@ -31,9 +30,9 @@ Blockchain.onConnect(async function setBalances() {
 async function get_balances(
     token: Token, version: Version
 ) {
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const account = await Blockchain.account;
+    if (!account) {
+        throw new Error('missing account');
     }
     const ids = Nft.fullIds({
         issues: Array.from(Years()),
@@ -41,41 +40,41 @@ async function get_balances(
         token: Nft.token(token)
     });
     const accounts = ids.map(() => {
-        return x40(address);
+        return x40(account);
     });
     const {
         moe_contract, sov_contract,
         nft_contract, ppt_contract,
     } = await contracts({
-        token, version
+        account, token, version
     });
-    let moe = BigNumber.from(0);
+    let moe = 0n;
     if (moe_contract) {
-        moe = await moe_contract.balanceOf(x40(address));
+        moe = await moe_contract.balance;
     }
-    let sov = BigNumber.from(0);
+    let sov = 0n;
     if (sov_contract) {
-        sov = await sov_contract.balanceOf(x40(address));
+        sov = await sov_contract.balance;
     }
-    let nft = BigNumber.from(0);
+    let nft = 0n;
     if (nft_contract) {
-        const nfts: BigNumber[] = await nft_contract.balanceOfBatch(
-            accounts, Nft.realIds(ids, { version })
+        const nfts: Balance[] = await nft_contract.wsc.then(
+            (c) => c.balanceOfBatch(accounts, Nft.realIds(ids, { version }))
         );
-        nft = nfts.reduce((a, n) => a.add(n), BigNumber.from(0));
+        nft = nfts.reduce((a, n) => a + n, 0n);
     }
-    let ppt = BigNumber.from(0);
+    let ppt = 0n;
     if (ppt_contract) {
-        const ppts: BigNumber[] = await ppt_contract.balanceOfBatch(
-            accounts, Nft.realIds(ids, { version })
+        const ppts: Balance[] = await ppt_contract.wsc.then(
+            (c) => c.balanceOfBatch(accounts, Nft.realIds(ids, { version }))
         );
-        ppt = ppts.reduce((a, p) => a.add(p), BigNumber.from(0));
+        ppt = ppts.reduce((a, p) => a + p, 0n);
     }
-    return { moe, sov, nft: nft.add(ppt) };
+    return { moe, sov, nft: nft + ppt };
 }
 function set_balances(
     token: Token, version: Version, balance: {
-        moe: BigNumber, sov: BigNumber, nft: BigNumber
+        moe: Balance, sov: Balance, nft: Balance
     }
 ) {
     const $option = $(
@@ -83,13 +82,13 @@ function set_balances(
     );
     const xtoken = Tokenizer.xify(token);
     const moe_text
-        = `${xtoken}${balance.moe.isZero() ? '=' : '>'}0`;
+        = `${xtoken}${!balance.moe ? '=' : '>'}0`;
     const atoken = Tokenizer.aify(token);
     const sov_text
-        = `${atoken}${balance.sov.isZero() ? '=' : '>'}0`;
+        = `${atoken}${!balance.sov ? '=' : '>'}0`;
     const ntoken = 'NFTs';
     const nft_text
-        = `${ntoken}${balance.nft.isZero() ? '=' : '>'}0`;
+        = `${ntoken}${!balance.nft ? '=' : '>'}0`;
     const opt_text = $option.text()
         .replace(new RegExp(xtoken + '=0'), moe_text)
         .replace(new RegExp(atoken + '=0'), sov_text)
@@ -122,45 +121,37 @@ $('.selectors>a').on('click', function selectToken(e) {
     location.reload();
 });
 async function contracts({
-    token, version
+    account, token, version
 }: {
-    token: Token, version: Version
+    account: Account, token: Token, version: Version
 }) {
-    let moe_contract: Contract | undefined;
+    let moe_contract: MoeWallet | undefined;
     try {
-        moe_contract = await XPowerMoeFactory({
-            token, version
-        }).connect();
+        moe_contract = new MoeWallet(account, token, version);
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
             console.error(ex);
         }
     }
-    let sov_contract: Contract | undefined;
+    let sov_contract: SovWallet | undefined;
     try {
-        sov_contract = await XPowerSovFactory({
-            token, version
-        }).connect();
+        sov_contract = new SovWallet(account, token, version);
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
             console.error(ex);
         }
     }
-    let nft_contract: Contract | undefined;
+    let nft_contract: NftWallet | undefined;
     try {
-        nft_contract = await XPowerNftFactory({
-            token, version
-        }).connect();
+        nft_contract = new NftWallet(account, token, version);
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
             console.error(ex);
         }
     }
-    let ppt_contract: Contract | undefined;
+    let ppt_contract: PptWallet | undefined;
     try {
-        ppt_contract = await XPowerPptFactory({
-            token, version
-        }).connect();
+        ppt_contract = new PptWallet(account, token, version);
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
             console.error(ex);
