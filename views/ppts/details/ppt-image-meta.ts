@@ -1,10 +1,10 @@
 import { x40 } from '../../../source/functions';
 import { ROParams } from '../../../source/params';
-import { Address, NftIssue, NftLevel, Token } from '../../../source/redux/types';
+import { Account, NftIssue, NftLevel, Token } from '../../../source/redux/types';
 import { Meta, PptWallet, PptWalletMock } from '../../../source/wallet';
 
 export class PptImageMeta {
-    static key(address: Address | null, {
+    static key(address: Account | null, {
         token: t, issue: i, level: l
     }: {
         token: Token; issue: NftIssue; level: NftLevel;
@@ -13,7 +13,7 @@ export class PptImageMeta {
         const suffix = `${t}:${i}:${l}:${ROParams.version}`;
         return `${prefix}:${suffix}#000`;
     }
-    static get_cache(address: Address | null, nft: {
+    static get_cache(address: Account | null, nft: {
         issue: NftIssue; level: NftLevel; token: Token;
     }) {
         const key = this.key(address, nft);
@@ -23,7 +23,7 @@ export class PptImageMeta {
         }
         return null;
     }
-    static set_cache(address: Address | null, nft: {
+    static set_cache(address: Account | null, nft: {
         issue: NftIssue; level: NftLevel; token: Token;
     }, meta: Meta) {
         const key = this.key(address, nft);
@@ -31,7 +31,7 @@ export class PptImageMeta {
         localStorage.setItem(key, value);
         return meta;
     }
-    static async get(address: Address | null, nft: {
+    static async get(address: Account | null, nft: {
         issue: NftIssue; level: NftLevel; token: Token;
     }) {
         const meta = this.get_cache(address, nft);

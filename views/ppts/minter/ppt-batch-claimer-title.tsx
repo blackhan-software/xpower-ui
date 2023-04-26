@@ -3,8 +3,8 @@ import { useContext, useEffect, useState } from 'react';
 import { Bus } from '../../../source/bus';
 import { MoeTreasuryFactory } from '../../../source/contract';
 import { buffered, nice_si } from '../../../source/functions';
-import { AddressContext } from '../../../source/react';
-import { Address, Nft, NftLevels, PptClaimerStatus, Token, TokenInfo } from '../../../source/redux/types';
+import { AccountContext } from '../../../source/react';
+import { Account, Nft, NftLevels, PptClaimerStatus, Token, TokenInfo } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
 import { Years } from '../../../source/years';
 
@@ -16,21 +16,21 @@ export function UiPptBatchClaimerTitle(
     { status, token }: Props
 ) {
     const [title, set_title] = useState<string | undefined>();
-    const [address] = useContext(AddressContext);
+    const [account] = useContext(AccountContext);
     useEffect(() => {
-        claimable(address, token).then((a) => {
+        claimable(account, token).then((a) => {
             set_title(`${a} ${Tokenizer.aify(token)}`);
             Bus.emit('refresh-tips');
         });
     }, [
-        address, status, token
+        account, status, token
     ]);
     return title;
 }
 const claimable = buffered(async (
-    address: Address | null, token: Props['token']
+    account: Account | null, token: Props['token']
 ) => {
-    if (address === null) {
+    if (account === null) {
         return Promise.resolve(undefined);
     }
     const ppt_ids = Nft.fullIds({
@@ -42,7 +42,7 @@ const claimable = buffered(async (
         token
     });
     const claimables = await moe_treasury
-        .claimableForBatch(address, ppt_ids);
+        .claimableForBatch(account, ppt_ids);
     const claimable = claimables
         .reduce((acc, c) => acc + c, 0n);
     return nice_si(claimable, {

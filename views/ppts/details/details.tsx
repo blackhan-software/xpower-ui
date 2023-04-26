@@ -1,10 +1,10 @@
 import { Bus } from '../../../source/bus';
 import { MoeTreasuryFactory } from '../../../source/contract';
 import { nice } from '../../../source/functions';
-import { AddressContext, globalRef } from '../../../source/react';
+import { AccountContext, globalRef } from '../../../source/react';
 import { onPptChanged } from '../../../source/redux/observers';
 import { AppState } from '../../../source/redux/store';
-import { Address, Amount, Nft, NftFullId, NftIssue, NftLevel, NftLevels, Nfts, NftToken, NftTokens, PptDetails, Supply, Token } from '../../../source/redux/types';
+import { Account, Amount, Nft, NftFullId, NftIssue, NftLevel, NftLevels, Nfts, NftToken, NftTokens, PptDetails, Supply, Token } from '../../../source/redux/types';
 import { Years } from '../../../source/years';
 
 import React, { useContext, useEffect, useState } from 'react';
@@ -83,20 +83,20 @@ export function UiPptDetails(
     props: Props
 ) {
     const [state, set_state] = useState(initialState());
-    const [address] = useContext(AddressContext);
+    const [account] = useContext(AccountContext);
     const { token, level: ppt_level } = props;
     useEffect(/*init*/() => {
         const ppt_token = Nft.token(token);
         Array.from(Years()).forEach(async (
             ppt_issue: NftIssue
         ) => {
-            const patch = await claims(address, token)(
+            const patch = await claims(account, token)(
                 ppt_token, ppt_level, ppt_issue
             );
             set_state((s) => $.extend(true, {}, s, patch));
         });
     }, [
-        address, token, ppt_level
+        account, token, ppt_level
     ]);
     useEffect(/*sync[on:refresh-claims]*/() => {
         const ppt_token = Nft.token(token);
@@ -111,7 +111,7 @@ export function UiPptDetails(
             );
             if (ref.current) {
                 on_refresh(ref.current, async () => {
-                    const patch = await claims(address, token)(
+                    const patch = await claims(account, token)(
                         ppt_token, ppt_level, ppt_issue
                     );
                     set_state((s) => $.extend(true, {}, s, patch));
@@ -131,7 +131,7 @@ export function UiPptDetails(
             $el.onrefresh = listener;
         }
     }, [
-        address, token, ppt_level
+        account, token, ppt_level
     ]);
     const store = useStore<AppState>();
     useEffect(/*sync[on:ppt-changed]*/() => {
@@ -145,13 +145,13 @@ export function UiPptDetails(
             if (Nft.level(full_id) !== ppt_level) {
                 return;
             }
-            const patch = await claims(address, token)(
+            const patch = await claims(account, token)(
                 ppt_token, ppt_level, Nft.issue(full_id)
             );
             set_state((s) => $.extend(true, {}, s, patch));
         });
     }, [
-        address, token, ppt_level, store
+        account, token, ppt_level, store
     ]);
     const issues = Array.from(Years({ reverse: true }));
     return <React.Fragment>{
@@ -159,10 +159,10 @@ export function UiPptDetails(
     }</React.Fragment>;
 }
 function claims(
-    address: Address | null, token: Token
+    account: Account | null, token: Token
 ) {
-    if (!address) {
-        throw new Error('missing selected-address');
+    if (!account) {
+        throw new Error('missing account');
     }
     return async (
         ppt_token: NftToken,
@@ -177,8 +177,8 @@ function claims(
         });
         const [rate, claimed, claimable] = await Promise.all([
             moe_treasury.rateOf(full_id),
-            moe_treasury.claimedFor(address, full_id),
-            moe_treasury.claimableFor(address, full_id)
+            moe_treasury.claimedFor(account, full_id),
+            moe_treasury.claimableFor(account, full_id)
         ]);
         return {
             [ppt_level]: {
