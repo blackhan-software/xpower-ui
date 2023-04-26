@@ -1,17 +1,17 @@
 /* eslint @typescript-eslint/no-unused-vars: [off] */
 import { AppState } from '../store';
-import { Address, Amount, BlockHash, Nonce, Token } from '../types';
+import { Account, Amount, BlockHash, Nonce, Token } from '../types';
 
 export function noncesBy(
     { nonces }: Pick<AppState, 'nonces'>, item?: {
-        address?: Address,
+        account?: Account,
         amount?: Amount,
         block_hash?: BlockHash,
         token?: Token,
     }
 ): Array<{
     nonce: Nonce, item: {
-        address: Address,
+        account: Account,
         amount: Amount,
         block_hash: BlockHash
         token: Token,
@@ -19,8 +19,8 @@ export function noncesBy(
 }> {
     const filtered = Object.entries(nonces.items).filter(([n, i]) => {
         if (item !== undefined) {
-            if (item.address !== undefined &&
-                item.address !== i.address
+            if (item.account !== undefined &&
+                item.account !== i.account
             ) {
                 return false;
             }

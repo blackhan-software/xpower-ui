@@ -1,10 +1,10 @@
 /* eslint @typescript-eslint/no-unused-vars: [off] */
 import { AppState } from '../store';
-import { Address, Amount, BlockHash, Token } from '../types';
+import { Account, Amount, BlockHash, Token } from '../types';
 
 export function totalBy(
     { nonces }: Pick<AppState, 'nonces'>, item: Partial<{
-        address: Address;
+        account: Account;
         amount: Amount;
         block_hash: BlockHash;
         token: Token;
@@ -12,8 +12,8 @@ export function totalBy(
 ): Amount {
     const filtered = Object.entries(nonces.items).filter(([n, i]) => {
         const by_address =
-            item.address !== undefined &&
-            item.address === i.address;
+            item.account !== undefined &&
+            item.account === i.account;
         if (!by_address) {
             return false;
         }

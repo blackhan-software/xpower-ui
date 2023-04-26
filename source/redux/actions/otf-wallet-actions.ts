@@ -1,8 +1,8 @@
 import { createAction } from '@reduxjs/toolkit';
 import { OtfWallet } from '../types/otf-wallet';
 
-export const setOtfWalletAddress
-    = createAction<Pick<OtfWallet, 'address'>>('otf-wallet/set-address');
+export const setOtfWalletAccount
+    = createAction<Pick<OtfWallet, 'account'>>('otf-wallet/set-account');
 export const setOtfWalletAmount
     = createAction<Pick<OtfWallet, 'amount'>>('otf-wallet/set-amount');
 export const setOtfWalletProcessing

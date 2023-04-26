@@ -5,8 +5,8 @@ import { OtfWallet } from '../types';
 export function otfWalletReducer(
     otf_wallet: OtfWallet = otfWalletState(), action: Action
 ): OtfWallet {
-    if (actions.setOtfWalletAddress.match(action)) {
-        return { ...otf_wallet, address: action.payload.address };
+    if (actions.setOtfWalletAccount.match(action)) {
+        return { ...otf_wallet, account: action.payload.account };
     }
     if (actions.setOtfWalletAmount.match(action)) {
         return { ...otf_wallet, amount: action.payload.amount };
@@ -24,7 +24,7 @@ export function otfWalletReducer(
 }
 export function otfWalletState() {
     return {
-        address: null, amount: null,
+        account: null, amount: null,
         processing: null, toggled: null
     };
 }

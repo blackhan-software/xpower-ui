@@ -1,9 +1,9 @@
 import { createAction } from '@reduxjs/toolkit';
-import { Address, Amount, BlockHash, Nonce, Token } from '../types';
+import { Account, Amount, BlockHash, Nonce, Token } from '../types';
 
 export const addNonce = createAction(
     'nonces/add', (nonce: Nonce, item: {
-        address: Address,
+        account: Account,
         amount: Amount,
         block_hash: BlockHash,
         token: Token,
@@ -14,7 +14,7 @@ export const addNonce = createAction(
 );
 export const removeNonce = createAction(
     'nonces/remove', (nonce: Nonce, item: {
-        address: Address,
+        account: Account,
         block_hash: BlockHash,
         token: Token,
     }) => ({
@@ -23,7 +23,7 @@ export const removeNonce = createAction(
 );
 export const removeNonceByAmount = createAction(
     'nonces/remove-by-amount', (item: {
-        address: Address,
+        account: Account,
         amount: Amount,
         block_hash: BlockHash,
         token: Token,
@@ -33,12 +33,12 @@ export const removeNonceByAmount = createAction(
 );
 export const removeNonces = createAction(
     'nonces/remove-all', (item?: {
-        address: Address | null,
+        account: Account | null,
         token: Token | null,
     }) => ({
         payload: {
             item: item ?? {
-                address: null, token: null
+                account: null, token: null
             }
         }
     })

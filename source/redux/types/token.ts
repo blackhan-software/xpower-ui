@@ -1,7 +1,7 @@
 import { ROParams } from '../../params';
 import { Tokenizer } from '../../token';
 import { Version } from '../../types';
-import { Address } from './base';
+import { Account } from './base';
 
 export enum Token {
     THOR = 'THOR',
@@ -48,7 +48,7 @@ export function Tokens(): Set<Token> {
 }
 export type TokenInfo = {
     /** address of token */
-    address: Address,
+    address: Account,
     /** ticker symbol or shorthand */
     symbol: string,
     /** number of decimals of the token */

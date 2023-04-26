@@ -1,4 +1,4 @@
-import { Address, Amount } from './base';
+import { Account, Amount } from './base';
 import { NftIssue, NftLevel, NftToken } from './nfts';
 
 export type NftsUi = {
@@ -15,7 +15,7 @@ export type NftDetails = Record<NftLevel, Record<NftIssue, {
     };
     target: {
         valid: boolean | null;
-        value: Address | null;
+        value: Account | null;
     };
     amount: {
         valid: boolean | null;

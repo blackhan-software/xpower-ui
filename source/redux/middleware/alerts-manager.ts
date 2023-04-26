@@ -20,9 +20,7 @@ export const AlertManager: AppMiddleware = ({ dispatch, getState }) => (next) =>
     return next(action);
 };
 function warning(message: string) {
-    if (message.match(/^user rejected the transaction/i) ||
-        message.match(/^user rejected transaction/i)
-    ) {
+    if (message.match(/^user rejected/i)) {
         return;
     }
     alert(message, Alert.warning, {

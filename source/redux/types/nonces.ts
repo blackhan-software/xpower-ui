@@ -1,4 +1,4 @@
-import { Address, Amount } from './base';
+import { Account, Amount } from './base';
 import { Token } from './token';
 
 export type BlockHash = bigint;
@@ -9,7 +9,7 @@ export type Nonces = {
     /** nonce => { address, block-hash, amount } */
     items: {
         [nonce: Nonce]: {
-            address: Address,
+            account: Account,
             amount: Amount,
             block_hash: BlockHash,
             token: Token,

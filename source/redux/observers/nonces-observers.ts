@@ -4,7 +4,7 @@ import { observe } from './observe';
 
 import { hex, max, x40 } from '../../functions';
 import { AppState } from '../store';
-import { Address, Amount, BlockHash, Empty, Nonce, Nonces, Token } from '../types';
+import { Account, Amount, BlockHash, Empty, Nonce, Nonces, Token } from '../types';
 
 enum Sign {
     positive = +1,
@@ -13,13 +13,13 @@ enum Sign {
 const TOTAL = {} as {
     [token: string]: { [address: string]: bigint };
 };
-const inc_total = (sign: Sign, { address, amount, token }: {
-    address: Address, amount: Amount, token: Token
+const inc_total = (sign: Sign, { account, amount, token }: {
+    account: Account, amount: Amount, token: Token
 }) => {
     if (TOTAL[token] === undefined) {
         TOTAL[token] = {};
     }
-    const x_address = x40(address);
+    const x_address = x40(account);
     if (TOTAL[token][x_address] === undefined) {
         TOTAL[token][x_address] = 0n;
     }
@@ -32,13 +32,13 @@ const inc_total = (sign: Sign, { address, amount, token }: {
 const TOTAL_BY = {} as {
     [token: string]: { [address: string]: { [amount: string]: bigint; } }
 };
-const inc_total_by = (sign: Sign, { address, amount, token }: {
-    address: Address, amount: Amount, token: Token
+const inc_total_by = (sign: Sign, { account, amount, token }: {
+    account: Account, amount: Amount, token: Token
 }) => {
     if (TOTAL_BY[token] === undefined) {
         TOTAL_BY[token] = {};
     }
-    const x_address = x40(address);
+    const x_address = x40(account);
     if (TOTAL_BY[token][x_address] === undefined) {
         TOTAL_BY[token][x_address] = {};
     }
@@ -55,7 +55,7 @@ const inc_total_by = (sign: Sign, { address, amount, token }: {
 
 export type OnNonceAdded = (
     nonce: Nonce, item: {
-        address: Address,
+        account: Account,
         amount: Amount,
         block_hash: BlockHash,
         token: Token,
@@ -64,7 +64,7 @@ export type OnNonceAdded = (
 ) => void;
 export type OnNonceRemoved = (
     nonce: Nonce, item: {
-        address: Address,
+        account: Account,
         amount: Amount,
         block_hash: BlockHash,
         token: Token,
