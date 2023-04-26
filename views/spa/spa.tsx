@@ -2,7 +2,7 @@ import './spa.scss';
 
 import { Bus } from '../../source/bus';
 import { leafKeys } from '../../source/functions';
-import { AddressContext, AddressProvider, DebugContext, DebugProvider } from '../../source/react';
+import { AccountContext, AccountProvider, DebugContext, DebugProvider } from '../../source/react';
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiToggled, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
 import { AppDispatch, AppState, Store } from '../../source/redux/store';
@@ -118,7 +118,7 @@ function $wallet(
     aft_wallet: AftWallet,
     otf_wallet: OtfWallet
 ) {
-    const [address] = useContext(AddressContext);
+    const [account] = useContext(AccountContext);
     const dispatch = useDispatch<AppDispatch>();
     return <form id='wallet'
         className={page === Page.About ? 'd-none' : ''}
@@ -127,16 +127,16 @@ function $wallet(
         <UiWallet
             aft={{
                 onBurn: (token, amount) =>
-                    dispatch(actions.aftBurn({ address, token, amount })),
-                ...aft_wallet, address
+                    dispatch(actions.aftBurn({ account, token, amount })),
+                ...aft_wallet, account
             }}
             otf={{
                 onToggled: (toggled) =>
                     dispatch(actions.otfToggle({ toggled })),
                 onDeposit: (processing) =>
-                    dispatch(actions.otfDeposit({ address, processing })),
+                    dispatch(actions.otfDeposit({ account, processing })),
                 onWithdraw: (processing) =>
-                    dispatch(actions.otfWithdraw({ address, processing })),
+                    dispatch(actions.otfWithdraw({ account, processing })),
                 ...otf_wallet
             }}
             token={token}
@@ -158,7 +158,7 @@ function $home(
     mining: Mining, minting: Minting
 ) {
     const xtoken = Tokenizer.xify(token);
-    const [address] = useContext(AddressContext);
+    const [account] = useContext(AccountContext);
     const dispatch = useDispatch<AppDispatch>();
     if (page !== Page.Home) {
         return null;
@@ -169,18 +169,18 @@ function $home(
         <UiHome
             mining={{
                 onToggle: (token) =>
-                    dispatch(actions.miningToggle({ address, token })),
+                    dispatch(actions.miningToggle({ account, token })),
                 togglable: miningTogglable(mining, xtoken),
                 onSpeed: (token, by) =>
-                    dispatch(actions.miningSpeed({ address, token, by })),
+                    dispatch(actions.miningSpeed({ account, token, by })),
                 speedable: miningSpeedable(mining),
                 ...mining
             }}
             minting={{
                 onForget: (token, level) =>
-                    dispatch(actions.mintingForget({ address, token, level })),
+                    dispatch(actions.mintingForget({ account, token, level })),
                 onMint: (token, level) =>
-                    dispatch(actions.mintingMint({ address, token, level })),
+                    dispatch(actions.mintingMint({ account, token, level })),
                 ...minting
             }}
             speed={mining.speed[xtoken]}
@@ -192,7 +192,7 @@ function $nfts(
     page: Page, token: Token,
     nfts: Nfts, nfts_ui: NftsUi
 ) {
-    const [address] = useContext(AddressContext);
+    const [account] = useContext(AccountContext);
     const dispatch = useDispatch<AppDispatch>();
     if (page !== Page.Nfts) {
         return null;
@@ -280,16 +280,16 @@ function $nfts(
                 dispatch(setNftsUiDetails({ details }));
             }}
             onNftTransfer={(issue, level) =>
-                dispatch(actions.nftsTransfer({ address, token: xtoken, issue, level }))
+                dispatch(actions.nftsTransfer({ account, token: xtoken, issue, level }))
             }
             onNftMinterApproval={(token) =>
-                dispatch(actions.nftsApprove({ address, token }))
+                dispatch(actions.nftsApprove({ account, token }))
             }
             onNftMinterBatchMint={(token, list) =>
-                dispatch(actions.nftsBatchMint({ address, token, list }))
+                dispatch(actions.nftsBatchMint({ account, token, list }))
             }
             onNftMinterBatchUpgrade={(token, list) =>
-                dispatch(actions.nftsBatchUpgrade({ address, token, list }))
+                dispatch(actions.nftsBatchUpgrade({ account, token, list }))
             }
             onNftMinterToggled={(toggled) => {
                 const flags = Object.fromEntries(
@@ -312,7 +312,7 @@ function $ppts(
     page: Page, token: Token,
     ppts: Nfts, ppts_ui: PptsUi
 ) {
-    const [address] = useContext(AddressContext);
+    const [account] = useContext(AccountContext);
     const dispatch = useDispatch<AppDispatch>();
     if (page !== Page.Ppts) {
         return null;
@@ -401,20 +401,20 @@ function $ppts(
             }}
             onPptClaim={(issue, level) =>
                 dispatch(actions.pptsClaim({
-                    address, token: xtoken, issue, level
+                    account, token: xtoken, issue, level
                 }))
             }
             onPptMinterApproval={(t) =>
-                dispatch(actions.pptsApprove({ address, token: t }))
+                dispatch(actions.pptsApprove({ account, token: t }))
             }
             onPptMinterBatchMint={(token, list) =>
-                dispatch(actions.pptsBatchMint({ address, token, list }))
+                dispatch(actions.pptsBatchMint({ account, token, list }))
             }
             onPptMinterBatchBurn={(token, list) =>
-                dispatch(actions.pptsBatchBurn({ address, token, list }))
+                dispatch(actions.pptsBatchBurn({ account, token, list }))
             }
             onPptMinterBatchClaim={(token) => {
-                dispatch(actions.pptsBatchClaim({ address, token }));
+                dispatch(actions.pptsBatchClaim({ account, token }));
             }}
             onPptMinterToggled={(toggled) => {
                 const flags = Object.fromEntries(
@@ -452,7 +452,7 @@ if (require.main === module) {
     createRoot($content!).render(
         <Provider store={Store()}>
             <DebugProvider>
-                <AddressProvider>{$spa}</AddressProvider>
+                <AccountProvider>{$spa}</AccountProvider>
             </DebugProvider>
         </Provider>
     );

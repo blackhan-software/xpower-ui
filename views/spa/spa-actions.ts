@@ -1,10 +1,10 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import { removeNonce, removeNonceByAmount, setAftWalletBurner, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter, switchToken } from '../../source/redux/actions';
-import { mintingRowBy, nftsBy, nftTotalBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
+import { mintingRowBy, nftTotalBy, nftsBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
 import { AppThunk } from '../../source/redux/store';
-import { Address, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftMintApproval, NftMinterList, NftMintStatus, NftSendStatus, NftUpgradeStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token, TokenInfo } from '../../source/redux/types';
+import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftMintApproval, NftMintStatus, NftMinterList, NftSendStatus, NftUpgradeStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token, TokenInfo } from '../../source/redux/types';
 
-import { Blockchain } from '../../source/blockchain';
+import { MMProvider } from '../../source/blockchain';
 import { MoeTreasuryFactory, OnClaim, OnClaimBatch, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
 import { error, x40 } from '../../source/functions';
 import { HashManager, MiningManager as MM } from '../../source/managers';
@@ -13,30 +13,28 @@ import { Tokenizer } from '../../source/token';
 import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTransferBatch, OnTransferSingle, OtfManager, SovWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
 
-import { Web3Provider } from '@ethersproject/providers';
-import { parseUnits } from '@ethersproject/units';
 import { AnyAction } from '@reduxjs/toolkit';
-import { Transaction } from 'ethers';
+import { Transaction, parseUnits } from 'ethers';
 /**
  * mining:
  */
 export const miningToggle = AppThunk('mining/toggle', (args: {
-    address: Address | null, token: Token
+    account: Account | null, token: Token
 }, api) => {
-    const { address, token } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
-    return MM(api).toggle({ address, token });
+    return MM(api).toggle({ account, token });
 });
 export const miningSpeed = AppThunk('mining/speed', (args: {
-    address: Address | null, token: Token, by: number
+    account: Account | null, token: Token, by: number
 }, api) => {
-    const { address, token, by } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token, by } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
-    const miner = MM(api).miner({ address, token });
+    const miner = MM(api).miner({ account, token });
     if (by > 0) {
         return miner.increase(by * (+1));
     } else {
@@ -47,11 +45,11 @@ export const miningSpeed = AppThunk('mining/speed', (args: {
  * minting:
  */
 export const mintingMint = AppThunk('minting/mint', async (args: {
-    address: Address | null, token: Token, level: Level
+    account: Account | null, token: Token, level: Level
 }, api) => {
-    const { address, token, level } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token, level } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
     const amount = Tokenizer.amount(token, level);
     const block_hash = HashManager.latestHash({
@@ -61,18 +59,18 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
         throw new Error('missing block-hash');
     }
     const { nonce } = nonceBy(api.getState(), {
-        address, amount, block_hash, token
+        account, amount, block_hash, token
     });
     if (!nonce) {
         throw new Error(`missing nonce for amount=${amount}`);
     }
-    const moe_wallet = new MoeWallet(address, token);
+    const moe_wallet = new MoeWallet(account, token);
     let tx: Transaction | undefined;
     try {
         const on_transfer: OnTransfer = async (
             from, to, amount, ev
         ) => {
-            if (ev.transactionHash !== tx?.hash) {
+            if (ev.log.transactionHash !== tx?.hash) {
                 return;
             }
             if (api.getState().token !== token) {
@@ -100,7 +98,7 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
             level, row: { tx_counter: tx_counter + 1 }
         }));
         api.dispatch(removeNonce(nonce, {
-            address, block_hash, token
+            account, block_hash, token
         }));
         set_status(MinterStatus.minted);
     } catch (ex: any) {
@@ -116,7 +114,7 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
                 /gas required exceeds allowance/i
             )) {
                 if (OtfManager.enabled) {
-                    const miner = MM(api).miner({ address, token });
+                    const miner = MM(api).miner({ account, token });
                     if (miner.running) {
                         miner.pause();
                     }
@@ -126,7 +124,7 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
                 /empty nonce-hash/i
             )) {
                 api.dispatch(removeNonce(nonce, {
-                    address, block_hash, token
+                    account, block_hash, token
                 }));
             }
         }
@@ -137,17 +135,17 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
     }
 });
 export const mintingForget = AppThunk('minting/forget', (args: {
-    address: Address | null, token: Token, level: Level
+    account: Account | null, token: Token, level: Level
 }, api) => {
-    const { address, token, level } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token, level } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
     const amount = Tokenizer.amount(
         token, level
     );
     const result = noncesBy(api.getState(), {
-        address, amount, token
+        account, amount, token
     });
     for (const { item } of result) {
         api.dispatch(removeNonceByAmount(item));
@@ -157,11 +155,11 @@ export const mintingForget = AppThunk('minting/forget', (args: {
  * nft-sender:
  */
 export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
-    address: Address | null, token: Token, issue: NftIssue, level: NftLevel
+    account: Account | null, token: Token, issue: NftIssue, level: NftLevel
 }, api) => {
-    const { address, token, issue, level } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token, issue, level } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
     const nft_token = Nft.token(
         token
@@ -173,15 +171,15 @@ export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
     const by_token = details[nft_token];
     const by_level = by_token[level];
     const by_issue = by_level[issue];
-    const target = by_issue.target.value as Address;
+    const target = by_issue.target.value as Account;
     const amount = by_issue.amount.value as Amount;
     const nft_wallet = new NftWallet(
-        address, token
+        account, token
     );
     const on_single_tx: OnTransferSingle = async (
         op, from, to, id, value, ev
     ) => {
-        if (ev.transactionHash !== tx?.hash) {
+        if (ev.log.transactionHash !== tx?.hash) {
             return;
         }
         api.dispatch(setNftsUiDetails({
@@ -224,18 +222,18 @@ export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
  * nft-minter:
  */
 export const nftsApprove = AppThunk('nfts/approve', async (args: {
-    address: Address | null, token: Token
+    account: Account | null, token: Token
 }, api) => {
-    const { address, token } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
-    const moe_wallet = new MoeWallet(address, token);
-    const nft_wallet = new NftWallet(address, token);
+    const moe_wallet = new MoeWallet(account, token);
+    const nft_wallet = new NftWallet(account, token);
     const on_approval: OnApproval = (
         owner, spender, value, ev
     ) => {
-        if (ev.transactionHash !== tx?.hash) {
+        if (ev.log.transactionHash !== tx?.hash) {
             return;
         }
         set_approval(NftMintApproval.approved);
@@ -244,10 +242,8 @@ export const nftsApprove = AppThunk('nfts/approve', async (args: {
     try {
         set_approval(NftMintApproval.approving);
         moe_wallet.onApproval(on_approval);
-        const nft_contract = await nft_wallet.contract;
-        tx = await moe_wallet.approve(
-            nft_contract.address, MAX_UINT256
-        );
+        const nft_address = await nft_wallet.address;
+        tx = await moe_wallet.approve(nft_address, MAX_UINT256);
     } catch (ex) {
         set_approval(NftMintApproval.error);
         throw error(ex);
@@ -259,11 +255,11 @@ export const nftsApprove = AppThunk('nfts/approve', async (args: {
     }
 });
 export const nftsBatchMint = AppThunk('nfts/batch-mint', async (args: {
-    address: Address | null, token: Token, list: NftMinterList
+    account: Account | null, token: Token, list: NftMinterList
 }, api) => {
-    const { address, token, list } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token, list } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
     const nft_token = Nft.token(
         token
@@ -282,12 +278,12 @@ export const nftsBatchMint = AppThunk('nfts/batch-mint', async (args: {
     const on_batch_tx: OnTransferBatch = async (
         op, from, to, ids, values, ev
     ) => {
-        if (ev.transactionHash !== tx?.hash) {
+        if (ev.log.transactionHash !== tx?.hash) {
             return;
         }
         set_status(NftMintStatus.minted);
     };
-    const nft_wallet = new NftWallet(address, token);
+    const nft_wallet = new NftWallet(account, token);
     let tx: Transaction | undefined;
     try {
         set_status(NftMintStatus.minting);
@@ -304,11 +300,11 @@ export const nftsBatchMint = AppThunk('nfts/batch-mint', async (args: {
     }
 });
 export const nftsBatchUpgrade = AppThunk('nfts/batch-upgrade', async (args: {
-    address: Address | null, token: Token, list: NftMinterList
+    account: Account | null, token: Token, list: NftMinterList
 }, api) => {
-    const { address, token, list } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token, list } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
     const nft_token = Nft.token(
         token
@@ -350,12 +346,12 @@ export const nftsBatchUpgrade = AppThunk('nfts/batch-upgrade', async (args: {
     const on_batch_tx: OnTransferBatch = async (
         op, from, to, ids, values, ev
     ) => {
-        if (ev.transactionHash !== tx?.hash) {
+        if (ev.log.transactionHash !== tx?.hash) {
             return;
         }
         set_status(NftUpgradeStatus.upgraded);
     };
-    const nft_wallet = new NftWallet(address, token);
+    const nft_wallet = new NftWallet(account, token);
     let tx: Transaction | undefined;
     try {
         set_status(NftUpgradeStatus.upgrading);
@@ -375,11 +371,11 @@ export const nftsBatchUpgrade = AppThunk('nfts/batch-upgrade', async (args: {
  * ppt-minter:
  */
 export const pptsApprove = AppThunk('ppts/approve', async (args: {
-    address: Address | null, token: Token
+    account: Account | null, token: Token
 }, api) => {
-    const { address, token } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
     const ppt_token = Nft.token(
         token
@@ -387,9 +383,9 @@ export const pptsApprove = AppThunk('ppts/approve', async (args: {
     const ppt_treasury = PptTreasuryFactory({
         token
     });
-    const nft_wallet = new NftWallet(address, token);
+    const nft_wallet = new NftWallet(account, token);
     const approved = await nft_wallet.isApprovedForAll(
-        address
+        account
     );
     if (approved) {
         const minter = {
@@ -402,7 +398,7 @@ export const pptsApprove = AppThunk('ppts/approve', async (args: {
         const on_approval: OnApprovalForAll = (
             account, op, flag, ev
         ) => {
-            if (ev.transactionHash !== tx?.hash) {
+            if (ev.log.transactionHash !== tx?.hash) {
                 return;
             }
             set_approval(PptMinterApproval.approved);
@@ -426,11 +422,11 @@ export const pptsApprove = AppThunk('ppts/approve', async (args: {
     }
 });
 export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
-    address: Address | null, token: Token, list: PptMinterList
+    account: Account | null, token: Token, list: PptMinterList
 }, api) => {
-    const { address, token, list } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token, list } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
     const ppt_token = Nft.token(
         token
@@ -476,7 +472,7 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
     const on_stake_batch: OnStakeBatch = async (
         account, nft_ids, amounts, ev
     ) => {
-        if (ev.transactionHash !== tx?.hash) {
+        if (ev.log.transactionHash !== tx?.hash) {
             return;
         }
         set_status(PptMinterStatus.minted);
@@ -489,7 +485,7 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
         set_status(PptMinterStatus.minting);
         ppt_treasury.onStakeBatch(on_stake_batch);
         tx = await ppt_treasury.stakeBatch(
-            address, ppt_ids, amounts
+            account, ppt_ids, amounts
         );
     } catch (ex: any) {
         set_status(PptMinterStatus.error);
@@ -502,11 +498,11 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
     }
 });
 export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
-    address: Address | null, token: Token, list: PptMinterList
+    account: Account | null, token: Token, list: PptMinterList
 }, api) => {
-    const { address, token, list } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token, list } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
     const ppt_token = Nft.token(
         token
@@ -552,7 +548,7 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
     const on_unstake_batch: OnUnstakeBatch = async (
         account, nft_ids, amounts, ev
     ) => {
-        if (ev.transactionHash !== tx?.hash) {
+        if (ev.log.transactionHash !== tx?.hash) {
             return;
         }
         set_status(PptBurnerStatus.burned);
@@ -565,7 +561,7 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
         set_status(PptBurnerStatus.burning);
         ppt_treasury.onUnstakeBatch(on_unstake_batch);
         tx = await ppt_treasury.unstakeBatch(
-            address, ppt_ids, amounts
+            account, ppt_ids, amounts
         );
     } catch (ex: any) {
         set_status(PptBurnerStatus.error);
@@ -581,11 +577,11 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
  * ppt-claimer:
  */
 export const pptsClaim = AppThunk('ppts/claim', async (args: {
-    address: Address | null, token: Token, issue: NftIssue, level: NftLevel
+    account: Account | null, token: Token, issue: NftIssue, level: NftLevel
 }, api) => {
-    const { address, token, issue, level } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token, issue, level } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
     const ppt_id = Nft.fullId({
         issue, level, token: Nft.token(token)
@@ -596,7 +592,7 @@ export const pptsClaim = AppThunk('ppts/claim', async (args: {
     const on_claim_tx: OnClaim = (
         account, nft_id, amount, ev
     ) => {
-        if (ev.transactionHash !== tx?.hash) {
+        if (ev.log.transactionHash !== tx?.hash) {
             return;
         }
         set_status(PptClaimerStatus.claimed);
@@ -609,7 +605,7 @@ export const pptsClaim = AppThunk('ppts/claim', async (args: {
         set_status(PptClaimerStatus.claiming);
         moe_treasury.onClaim(on_claim_tx);
         tx = await moe_treasury.claimFor(
-            address, ppt_id
+            account, ppt_id
         );
     } catch (ex: any) {
         set_status(PptClaimerStatus.error);
@@ -626,11 +622,11 @@ export const pptsClaim = AppThunk('ppts/claim', async (args: {
     }
 });
 export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
-    address: Address | null, token: Token
+    account: Account | null, token: Token
 }, api) => {
-    const { address, token } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
     const ppt_token = Nft.token(token);
     set_status(PptClaimerStatus.claiming);
@@ -644,7 +640,7 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
         token
     });
     const claimables = await moe_treasury
-        .claimableForBatch(address, ppt_ids);
+        .claimableForBatch(account, ppt_ids);
     const claimable = claimables
         .reduce((acc, c) => acc + c, 0n);
     if (claimable === 0n) {
@@ -664,7 +660,7 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
     const on_claim_batch: OnClaimBatch = (
         account, nft_ids, amounts, ev
     ) => {
-        if (ev.transactionHash !== tx?.hash) {
+        if (ev.log.transactionHash !== tx?.hash) {
             return;
         }
         set_status(PptClaimerStatus.claimed);
@@ -676,7 +672,7 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
     try {
         moe_treasury.onClaimBatch(on_claim_batch);
         tx = await moe_treasury.claimForBatch(
-            address, ppt_ids.filter((_, i) => claimables[i])
+            account, ppt_ids.filter((_, i) => claimables[i])
         );
         set_claimable(claimable);
     } catch (ex: any) {
@@ -698,27 +694,27 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
  * aft-wallet:
  */
 export const aftBurn = AppThunk('aft/burn', async (args: {
-    address: Address | null, token: Token, amount: Amount
+    account: Account | null, token: Token, amount: Amount
 }, api) => {
     const action = Tokenizer.aified(args.token)
         ? aftBurnAPower(args) : aftBurnXPower(args);
     api.dispatch(action as unknown as AnyAction);
 });
 export const aftBurnAPower = AppThunk('aft/burn-apower', async (args: {
-    address: Address | null, token: Token, amount: Amount
+    account: Account | null, token: Token, amount: Amount
 }, api) => {
-    const { address, token, amount } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token, amount } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
     if (!Tokenizer.aified(token)) {
         throw new Error('APower token required');
     }
-    const sov_wallet = new SovWallet(address, token);
+    const sov_wallet = new SovWallet(account, token);
     const on_transfer_tx: OnTransfer = async (
         from, to, amount, ev
     ) => {
-        if (ev.transactionHash !== tx?.hash) {
+        if (ev.log.transactionHash !== tx?.hash) {
             return;
         }
         set_status(AftWalletBurner.burned);
@@ -737,20 +733,20 @@ export const aftBurnAPower = AppThunk('aft/burn-apower', async (args: {
     }
 });
 export const aftBurnXPower = AppThunk('aft/burn-xpower', async (args: {
-    address: Address | null, token: Token, amount: Amount
+    account: Account | null, token: Token, amount: Amount
 }, api) => {
-    const { address, token, amount } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, token, amount } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
     if (!Tokenizer.xified(token)) {
         throw new Error('XPower token required');
     }
-    const moe_wallet = new MoeWallet(address, token);
+    const moe_wallet = new MoeWallet(account, token);
     const on_transfer_tx: OnTransfer = async (
         from, to, amount, ev
     ) => {
-        if (ev.transactionHash !== tx?.hash) {
+        if (ev.log.transactionHash !== tx?.hash) {
             return;
         }
         set_status(AftWalletBurner.burned);
@@ -777,11 +773,11 @@ export const otfToggle = AppThunk('otf-wallet/toggle', (args: {
     api.dispatch(setOtfWalletToggle(args));
 });
 export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
-    address: OtfWallet['address'], processing: OtfWallet['processing']
+    account: OtfWallet['account'], processing: OtfWallet['processing']
 }, api) => {
-    const { address, processing } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, processing } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
     if (processing) {
         return;
@@ -790,14 +786,14 @@ export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
         processing: true
     }));
     const unit = parseUnits('1.0');
-    const provider = new Web3Provider(await Blockchain.provider);
-    const mmw_signer = provider.getSigner(x40(address));
-    const mmw_balance = await mmw_signer.getBalance();
+    const provider = await MMProvider();
+    const mmw_signer = await provider.getSigner(x40(account));
+    const mmw_balance = await provider.getBalance(x40(account));
     let gas_limit = parseUnits('0');
     try {
         gas_limit = await mmw_signer.estimateGas({
-            value: mmw_balance.lt(unit) ? mmw_balance : unit,
-            to: x40(address),
+            value: mmw_balance < unit ? mmw_balance : unit,
+            to: x40(account),
         });
     } catch (ex) {
         api.dispatch(setOtfWalletProcessing({
@@ -805,11 +801,12 @@ export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
         }));
         throw error(ex);
     }
-    const gas_price_base = await mmw_signer.getGasPrice();
-    const gas_price = gas_price_base.add(parseUnits('1.5', 'gwei'));
-    const fee = gas_limit.mul(gas_price);
-    const value = mmw_balance.lt(unit.add(fee))
-        ? mmw_balance.sub(fee) : unit;
+    const fee_data = await provider.getFeeData();
+    const gas_price_base = fee_data.gasPrice ?? 25n;
+    const gas_price = gas_price_base + parseUnits('1.5', 'gwei');
+    const fee = gas_limit * gas_price;
+    const value = mmw_balance < unit + fee
+        ? mmw_balance - fee : unit;
     const otf_wallet = await OtfManager.init();
     const otf_address = await otf_wallet.getAddress();
     try {
@@ -830,11 +827,11 @@ export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
     }
 });
 export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
-    address: OtfWallet['address'], processing: OtfWallet['processing']
+    account: OtfWallet['account'], processing: OtfWallet['processing']
 }, api) => {
-    const { address, processing } = args;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const { account, processing } = args;
+    if (!account) {
+        throw new Error('missing account');
     }
     if (processing) {
         return;
@@ -843,11 +840,11 @@ export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
         processing: true
     }));
     const otf_signer = await OtfManager.init();
-    const otf_balance = await otf_signer.getBalance();
+    const otf_balance = await OtfManager.getBalance();
     let gas_limit = parseUnits('0');
     try {
         gas_limit = await otf_signer.estimateGas({
-            to: x40(address), value: otf_balance
+            to: x40(account), value: otf_balance
         });
     } catch (ex) {
         api.dispatch(setOtfWalletProcessing({
@@ -855,14 +852,16 @@ export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
         }));
         throw error(ex);
     }
-    const gas_price_base = await otf_signer.getGasPrice();
-    const gas_price = gas_price_base.mul(1125).div(1000);
-    const fee = gas_limit.mul(gas_price);
-    const value = otf_balance.sub(fee);
+    const provider = await MMProvider();
+    const fee_data = await provider.getFeeData();
+    const gas_price_base = fee_data.gasPrice ?? 25n;
+    const gas_price = gas_price_base * 1125n / 1000n;
+    const fee = gas_limit * gas_price;
+    const value = otf_balance - fee;
     try {
         const tx = await otf_signer.sendTransaction({
             gasLimit: gas_limit, gasPrice: gas_price,
-            to: x40(address), value
+            to: x40(account), value
         });
         tx.wait(1).then(() => {
             api.dispatch(setOtfWalletProcessing({

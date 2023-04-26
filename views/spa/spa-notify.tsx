@@ -1,6 +1,7 @@
 import { Alert, Alerts } from '../../source/functions';
 import { versionBy } from '../../source/redux/selectors';
 import { History, Token } from '../../source/redux/types';
+import { Tokenizer } from '../../source/token';
 import { Version } from '../../source/types';
 
 import React from 'react';
@@ -8,7 +9,9 @@ import React from 'react';
 export function $notify(
     history: History, token: Token
 ) {
-    const versions = versionBy({ history }, token);
+    const versions = versionBy(
+        { history }, Tokenizer.xify(token)
+    );
     if (versions.length) {
         const $alert = Alerts.show(
             $message(versions[0], token), Alert.primary, {
