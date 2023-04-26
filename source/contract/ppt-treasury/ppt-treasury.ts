@@ -1,127 +1,129 @@
-import { BigNumber, ContractInterface, Event, Transaction } from 'ethers';
+import { InterfaceAbi, Transaction } from 'ethers';
+import { WSProvider } from '../../blockchain';
 import { x40 } from '../../functions';
-import { Address, Amount, Balance, Nft, NftRealId } from '../../redux/types';
+import { Account, Address, Amount, Balance, Nft, NftRealId } from '../../redux/types';
+import { TxEvent } from '../../types';
 import { OtfManager } from '../../wallet';
 import { Base } from '../base';
 
 import ABI from './ppt-treasury.abi.json';
 
 export type OnStake = (
-    account: Address,
+    account: Account,
     nftId: NftRealId,
     amount: Amount,
-    ev: Event
+    ev: TxEvent
 ) => void;
 export type OnUnstake = (
-    account: Address,
+    account: Account,
     nftId: NftRealId,
     amount: Amount,
-    ev: Event
+    ev: TxEvent
 ) => void;
 export type OnStakeBatch = (
-    account: Address,
+    account: Account,
     nftIds: NftRealId[],
     amounts: Amount[],
-    ev: Event
+    ev: TxEvent
 ) => void;
 export type OnUnstakeBatch = (
-    account: Address,
+    account: Account,
     nftIds: NftRealId[],
     amounts: Amount[],
-    ev: Event
+    ev: TxEvent
 ) => void;
 
 export class PptTreasury extends Base {
     public constructor(
-        address: string, abi: ContractInterface = ABI
+        address: Address, abi: InterfaceAbi = ABI
     ) {
         super(address, abi);
     }
     public async stake(
-        account: Address, nft_id: NftRealId, balance: Balance
+        account: Account, nft_id: NftRealId, balance: Balance
     ): Promise<Transaction> {
-        const contract = await OtfManager.connect(
-            this.connect()
-        );
+        const contract = await this.otf;
         return contract.stake(
             x40(account), Nft.realId(nft_id), balance
         );
     }
     public async unstake(
-        account: Address, nft_id: NftRealId, balance: Balance
+        account: Account, nft_id: NftRealId, balance: Balance
     ): Promise<Transaction> {
-        const contract = await OtfManager.connect(
-            this.connect()
-        );
+        const contract = await this.otf;
         return contract.unstake(
             x40(account), Nft.realId(nft_id), balance
         );
     }
     public async stakeBatch(
-        account: Address, nft_ids: NftRealId[], balances: Balance[]
+        account: Account, nft_ids: NftRealId[], balances: Balance[]
     ): Promise<Transaction> {
-        const contract = await OtfManager.connect(
-            this.connect()
-        );
+        const contract = await this.otf;
         return contract.stakeBatch(
             x40(account), Nft.realIds(nft_ids), balances
         );
     }
     public async unstakeBatch(
-        account: Address, nft_ids: NftRealId[], balances: Balance[]
+        account: Account, nft_ids: NftRealId[], balances: Balance[]
     ): Promise<Transaction> {
-        const contract = await OtfManager.connect(
-            this.connect()
-        );
+        const contract = await this.otf;
         return contract.unstakeBatch(
             x40(account), Nft.realIds(nft_ids), balances
         );
     }
     public async onStake(
         listener: OnStake
-    ) {
-        const contract = await this.connect();
-        return contract.on('Stake', (
-            account: string, id: BigNumber, amount: BigNumber, ev: Event
+    ): Promise<void> {
+        const contract = await this.wsc;
+        contract.on('Stake', (
+            account: string, id: bigint, amount: Amount, ev: TxEvent
         ) => {
             const address = BigInt(account);
             const nft_id = id.toString() as NftRealId;
-            listener(address, nft_id, amount.toBigInt(), ev);
+            listener(address, nft_id, amount, ev);
         });
     }
     public async onUnstake(
         listener: OnUnstake
-    ) {
-        const contract = await this.connect();
-        return contract.on('Unstake', (
-            account: string, id: BigNumber, amount: BigNumber, ev: Event
+    ): Promise<void> {
+        const contract = await this.wsc;
+        contract.on('Unstake', (
+            account: string, id: bigint, amount: Amount, ev: TxEvent
         ) => {
             const address = BigInt(account);
             const nft_id = id.toString() as NftRealId;
-            listener(address, nft_id, amount.toBigInt(), ev);
+            listener(address, nft_id, amount, ev);
         });
     }
     public async onStakeBatch(
         listener: OnStakeBatch
-    ) {
-        const contract = await this.connect();
-        return contract.on('StakeBatch', (
-            account: string, ids: BigNumber[], amounts: BigNumber[], ev: Event
+    ): Promise<void> {
+        const contract = await this.wsc;
+        contract.on('StakeBatch', (
+            account: string, ids: bigint[], amounts: Amount[], ev: TxEvent
         ) => {
             const address = BigInt(account);
             const nft_ids = ids.map((id) => id.toString() as NftRealId);
-            listener(address, nft_ids, amounts.map((a) => a.toBigInt()), ev);
+            listener(address, nft_ids, amounts, ev);
         });
     }
-    public async onUnstakeBatch(listener: OnUnstakeBatch) {
-        const contract = await this.connect();
-        return contract.on('UnstakeBatch', (
-            account: string, ids: BigNumber[], amounts: BigNumber[], ev: Event
+    public async onUnstakeBatch(
+        listener: OnUnstakeBatch
+    ): Promise<void> {
+        const contract = await this.wsc;
+        contract.on('UnstakeBatch', (
+            account: string, ids: bigint[], amounts: Amount[], ev: TxEvent
         ) => {
             const address = BigInt(account);
             const nft_ids = ids.map((id) => id.toString() as NftRealId);
-            listener(address, nft_ids, amounts.map((a) => a.toBigInt()), ev);
+            listener(address, nft_ids, amounts, ev);
         });
+    }
+    private get otf() {
+        return OtfManager.connect(this.connect());
+    }
+    private get wsc() {
+        return WSProvider().then((wsp) => this.connect(wsp));
     }
 }
 export default PptTreasury;

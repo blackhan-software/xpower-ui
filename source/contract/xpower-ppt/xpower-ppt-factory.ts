@@ -2,7 +2,6 @@
 import { Global, Version } from '../../../source/types';
 declare const global: Global;
 
-import { BigNumber } from 'ethers';
 import { ROParams } from '../../params';
 import { Nft, NftLevel, NftRealId, Token } from '../../redux/types';
 import { Tokenizer } from '../../token';
@@ -33,14 +32,14 @@ export function XPowerPptMockFactory(
         totalSupply: (
             /*id: string*/
         ) => {
-            return BigNumber.from(0);
+            return 0n;
         },
         year: () => {
-            return BigNumber.from(MAX_YEAR());
+            return BigInt(MAX_YEAR());
         },
-        uri: (id: BigNumber) => {
-            if (!BigNumber.isBigNumber(id)) {
-                id = BigNumber.from(id);
+        uri: (id: bigint) => {
+            if (typeof id !== 'bigint') {
+                id = BigInt(id);
             }
             const full_id = Nft.fullIdOf({
                 real_id: id.toString() as NftRealId,
@@ -49,19 +48,17 @@ export function XPowerPptMockFactory(
             return `/ipfs/QmYfHKkkm26y8Xd7Aur8uvaXmca82s3Nrve74RY8BrhckS/320x427/${full_id}.json`;
         },
         idBy: (
-            year: BigNumber,
+            year: bigint,
             level: NftLevel,
-            index?: BigNumber
+            index?: bigint
         ) => {
-            if (!BigNumber.isBigNumber(year)) {
-                year = BigNumber.from(year);
+            if (typeof year !== 'bigint') {
+                year = BigInt(year);
             }
-            if (!BigNumber.isBigNumber(index)) {
-                index = BigNumber.from(index ?? Nft.oldIndexOf(nft_token));
+            if (typeof index !== 'bigint') {
+                index = BigInt(index ?? Nft.oldIndexOf(nft_token));
             }
-            return index.add(1).mul(1_000_000).add(
-                year.mul(100).add(level)
-            );
+            return 1_000_000n * (index + 1n) + 100n * year + BigInt(level);
         },
     };
     return <XPowerPpt>{

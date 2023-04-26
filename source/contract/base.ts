@@ -1,13 +1,10 @@
-import { Global } from '../types';
-declare const global: Global;
-
-import { Web3Provider } from '@ethersproject/providers';
-import { Contract, ContractInterface, Signer } from 'ethers';
-import { Blockchain } from '../blockchain';
+import { Contract, ContractRunner, InterfaceAbi } from 'ethers';
+import { MMProvider } from '../blockchain';
+import { Address } from '../redux/types';
 
 export class Base {
     public constructor(
-        address: string, abi: ContractInterface
+        address: Address, abi: InterfaceAbi
     ) {
         if (!address) {
             throw new Error('missing contract address');
@@ -18,44 +15,38 @@ export class Base {
         }
         this._abi = abi;
     }
-    public async connect(pos?: Web3Provider | Signer): Promise<Contract> {
-        if (pos == undefined) {
+    public async connect(
+        runner?: ContractRunner | null
+    ): Promise<Contract> {
+        if (!runner) {
             if (this._connected === undefined) {
-                if (this._provider === undefined) {
-                    this._provider = global.WEB3_PROVIDER = new Web3Provider(
-                        await Blockchain.provider
-                    );
-                }
-                //
-                // @info: disabled due to potential rate-limiting!
-                //
-                // if (await Blockchain.isAvalanche()) {
-                //     this._provider._pollingInterval = 200; // ms
-                // }
-                //
-                const signer = this._provider.getSigner();
-                this._connected = this.contract.connect(signer);
+                const provider = await MMProvider();
+                const signer = await provider.getSigner();
+                this._connected = this.contract(signer);
             }
             return this._connected;
         }
-        return this.contract.connect(pos);
+        return this.contract(runner);
     }
-    protected get contract(): Contract {
-        if (this._contract === undefined) {
-            this._contract = new Contract(this.address, this.abi);
+    protected contract(
+        runner: ContractRunner
+    ): Contract {
+        let contract = this._contracts.get(runner);
+        if (contract === undefined) {
+            contract = new Contract(this.address, this.abi, runner);
+            this._contracts.set(runner, contract);
         }
-        return this._contract;
+        return contract;
     }
     protected get abi() {
         return this._abi;
     }
-    public get address() {
+    public get address(): Address {
         return this._address;
     }
-    private _abi: ContractInterface;
-    private _address: string;
-    private _contract: Contract | undefined;
+    private _abi: InterfaceAbi;
+    private _address: Address;
     private _connected: Contract | undefined;
-    private _provider: Web3Provider | undefined;
+    private _contracts: Map<ContractRunner, Contract> = new Map();
 }
 export default Base;

@@ -1,13 +1,13 @@
 import { Version } from '../../source/types';
 import { ROParams } from '../params';
-import { Token } from '../redux/types';
+import { Address, Token } from '../redux/types';
 import { Tokenizer } from '../token';
 
 export function address({
     infix, token, version
 }: {
     infix: string, token: Token | 'XPOW', version?: Version
-}): string {
+}): Address {
     if (version === undefined) {
         version = ROParams.version;
     }
@@ -20,6 +20,9 @@ export function address({
     if (!address) {
         throw new Error(`missing ${id}`);
     }
-    return address;
+    if (!address.match(/^0x[0-9a-f]+/i)) {
+        throw new Error(`invalid ${address}`);
+    }
+    return address as Address;
 }
 export default address;
