@@ -12,13 +12,13 @@ export const NftsService = (
     store: Store<AppState>
 ) => {
     Blockchain.onceConnect(async function initNfts({
-        address, token
+        account, token
     }) {
         let index = 0;
         const nft_token = Nft.token(token);
         const levels = Array.from(NftLevels());
         const issues = Array.from(Years({ reverse: true }));
-        const wallet = new NftWallet(address, token);
+        const wallet = new NftWallet(account, token);
         const balances = await wallet.balances({
             issues, levels, token: nft_token
         });
@@ -51,7 +51,7 @@ export const NftsService = (
         }
     });
     Blockchain.onceConnect(async function onNftSingleTransfers({
-        address, token
+        account, token
     }) {
         const on_transfer: OnTransferSingle = async (
             op, from, to, id, value, ev
@@ -68,25 +68,25 @@ export const NftsService = (
                 level: Nft.level(id),
                 token: Nft.token(id)
             });
-            if (address === from) {
+            if (account === from) {
                 store.dispatch(removeNft(nft_id, {
                     kind: to ? 'transfer' : 'burn',
                     amount: value
                 }));
             }
-            if (address === to) {
+            if (account === to) {
                 store.dispatch(addNft(nft_id, {
                     amount: value
                 }));
             }
         };
-        const nft_wallet = new NftWallet(address, token);
+        const nft_wallet = new NftWallet(account, token);
         nft_wallet.onTransferSingle(on_transfer)
     }, {
         per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(async function onNftBatchTransfers({
-        address, token
+        account, token
     }) {
         const on_transfer: OnTransferBatch = async (
             op, from, to, ids, values, ev
@@ -104,20 +104,20 @@ export const NftsService = (
                     level: Nft.level(ids[i]),
                     token: Nft.token(ids[i])
                 });
-                if (address === from) {
+                if (account === from) {
                     store.dispatch(removeNft(nft_id, {
                         kind: to ? 'transfer' : 'burn',
                         amount: values[i]
                     }));
                 }
-                if (address === to) {
+                if (account === to) {
                     store.dispatch(addNft(nft_id, {
                         amount: values[i]
                     }));
                 }
             }
         };
-        const nft_wallet = new NftWallet(address, token);
+        const nft_wallet = new NftWallet(account, token);
         nft_wallet.onTransferBatch(on_transfer);
     }, {
         per: () => xtokenOf(store.getState())

@@ -7,7 +7,7 @@ import { onAftWalletChanged, onNftChanged, onTokenSwitch } from '../redux/observ
 import { nftAmounts } from '../redux/reducers';
 import { aftWalletBy, nftsBy, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Address, Amount, MAX_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMintApproval, NftTokens, Token, TokenInfo } from '../redux/types';
+import { Account, Amount, MAX_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMintApproval, NftTokens, Token, TokenInfo } from '../redux/types';
 import { Tokenizer } from '../token';
 import { MoeWallet, NftWallet, NftWalletMock } from '../wallet';
 import { Years } from '../years';
@@ -120,7 +120,7 @@ export const NftsUiService = (
      * ui-{image,minter}:
      */
     Blockchain.onceConnect(async function initImagesAndMinter({
-        address, token
+        account, token
     }) {
         const nft_images = [];
         for (const level of NftLevels()) {
@@ -129,7 +129,7 @@ export const NftsUiService = (
             }
         }
         const [approval, ...images] = await Promise.all([
-            nft_approval(address, token), ...nft_images
+            nft_approval(account, token), ...nft_images
         ]);
         store.dispatch(setNftsUiMinter(
             approval
@@ -141,13 +141,12 @@ export const NftsUiService = (
         per: () => xtokenOf(store.getState())
     });
     const nft_approval = async (
-        address: Address, token: Token
+        address: Account, token: Token
     ) => {
         const moe_wallet = new MoeWallet(address, token);
         const nft_wallet = new NftWallet(address, token);
-        const nft_contract = await nft_wallet.contract;
         const allowance = await moe_wallet.allowance(
-            address, nft_contract.address
+            address, await nft_wallet.address
         );
         const approval = allowance === MAX_UINT256
             ? NftMintApproval.approved
@@ -185,7 +184,7 @@ export const NftsUiService = (
     async function nft_meta({ level, issue, token }: {
         level: NftLevel, issue: NftIssue, token: Token
     }) {
-        const address = await Blockchain.selectedAddress;
+        const address = await Blockchain.account;
         const avalanche = await Blockchain.isAvalanche();
         return address && avalanche
             ? await NftImageMeta.get(address, { level, issue, token })
@@ -194,7 +193,7 @@ export const NftsUiService = (
     async function nft_href({ level, issue, token }: {
         level: NftLevel, issue: NftIssue, token: Token
     }) {
-        const address = await Blockchain.selectedAddress;
+        const address = await Blockchain.account;
         const avalanche = await Blockchain.isAvalanche();
         const nft_wallet = address && avalanche
             ? new NftWallet(address, token)
@@ -204,9 +203,10 @@ export const NftsUiService = (
         });
         const supply = await nft_wallet.totalSupply(nft_id);
         if (supply > 0) {
-            const nft_contract = await nft_wallet.contract;
+            const nft_contract = await nft_wallet.mmc;
+            const nft_address = await nft_contract.getAddress();
             const market = 'https://opensea.io/assets/avalanche';
-            return new URL(`${market}/${nft_contract.address}/${Nft.realId(nft_id)}`);
+            return new URL(`${market}/${nft_address}/${Nft.realId(nft_id)}`);
         }
         return null;
     }

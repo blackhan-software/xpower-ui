@@ -15,10 +15,10 @@ export const MiningService = (
     store: Store<AppState>
 ) => {
     Blockchain.onceConnect(function setupMining({
-        address, token
+        account, token
     }) {
         const miner = MM(store).miner({
-            address, token
+            account, token
         });
         miner.on('initializing', () => store.dispatch(
             setMiningStatus({ status: MinerStatus.initializing })));
@@ -51,10 +51,10 @@ export const MiningService = (
         per: () => xtokenOf(store.getState())
     });
     onPageSwitch(store, async function stopMining() {
-        const address = await Blockchain.selectedAddress;
-        if (address) {
+        const account = await Blockchain.account;
+        if (account) {
             const miner = MM(store).miner({
-                address, token: xtokenOf(store.getState())
+                account, token: xtokenOf(store.getState())
             });
             const running = miner.running;
             if (running) miner.stop();
@@ -64,65 +64,60 @@ export const MiningService = (
         if (Tokenizer.similar(token, oldToken)) {
             return;
         }
-        const address = await Blockchain.selectedAddress;
-        if (address) {
+        const account = await Blockchain.account;
+        if (account) {
             const miner = MM(store).miner({
-                address, token: oldToken
+                account, token: oldToken
             });
             const running = miner.running;
             if (running) miner.stop();
         }
     });
     onTokenSwitch(store, async function resetSpeed(token) {
-        const address = await Blockchain.selectedAddress;
-        if (address) {
-            const miner = MM(store).miner({ address, token });
+        const account = await Blockchain.account;
+        if (account) {
+            const miner = MM(store).miner({ account, token });
             store.dispatch(
                 setMiningSpeed({ speed: { [token]: miner.speed } })
             );
         }
     });
     Blockchain.onceConnect(function refreshBlockHash({
-        address, token
+        account, token
     }) {
         const on_init: OnInit = async (block_hash, timestamp, ev) => {
-            const contract = await moe_wallet.contract;
-            if (contract.address === ev.address) {
-                console.debug('[on:init]', x64(block_hash), timestamp, ev);
-            } else {
-                return;
-            }
+            console.debug('[on:init]', x64(block_hash), timestamp, ev);
             HashManager.set(block_hash, timestamp, {
                 token: Tokenizer.xify(token), version: ROParams.version
             });
         };
-        const moe_wallet = new MoeWallet(address, token);
+        const moe_wallet = new MoeWallet(account, token);
         moe_wallet.onInit(on_init);
     }, {
         per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(function restartMining({
-        address
+        account
     }) {
         const im = new IntervalManager({ start: true });
         im.on('tick', async () => {
             const token = xtokenOf(store.getState());
             const miner = MM(store).miner({
-                address, token
+                account, token
             });
             const running = miner.running;
             if (running) {
                 await miner.stop();
             }
             if (running) {
-                MM(store).toggle({ address, token });
+                MM(store).toggle({ account, token });
             }
         });
     });
     Blockchain.onceConnect(function benchmarkMining({
-        address, token
+        account, token
     }) {
-        const miner = MM(store).miner({ address, token });
+        const miner = MM(store).miner({ account, token });
         miner.on('started', function (
             { now: beg_ms }: { now: number; }
         ) {
@@ -137,14 +132,14 @@ export const MiningService = (
         per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(async function resumeMiningIf({
-        address
+        account
     }) {
         const on_block = async () => {
             if (OtfManager.enabled) {
-                const otf_balance = await otf_wallet.getBalance();
-                if (otf_balance.gt(OtfManager.threshold)) {
+                const otf_balance = await OtfManager.getBalance();
+                if (otf_balance > OtfManager.threshold) {
                     const miner = MM(store).miner({
-                        address, token: xtokenOf(store.getState())
+                        account, token: xtokenOf(store.getState())
                     });
                     if (miner.running) {
                         miner.resume();

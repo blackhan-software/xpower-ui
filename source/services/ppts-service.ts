@@ -14,13 +14,13 @@ export const PptsService = (
     store: Store<AppState>
 ) => {
     Blockchain.onceConnect(async function initPpts({
-        address, token
+        account, token
     }) {
         let index = 0;
         const ppt_token = Nft.token(token);
         const levels = Array.from(NftLevels());
         const issues = Array.from(Years({ reverse: true }));
-        const wallet = new PptWallet(address, token);
+        const wallet = new PptWallet(account, token);
         const balances = await wallet.balances({
             issues, levels, token: ppt_token
         });
@@ -53,7 +53,7 @@ export const PptsService = (
         }
     });
     Blockchain.onceConnect(async function onPptSingleTransfers({
-        address, token
+        account, token
     }) {
         const on_transfer: OnTransferSingle = async (
             op, from, to, id, value, ev
@@ -70,25 +70,25 @@ export const PptsService = (
                 level: Nft.level(id),
                 token: Nft.token(id)
             });
-            if (address === from) {
+            if (account === from) {
                 store.dispatch(removePpt(nft_id, {
                     kind: to ? 'transfer' : 'burn',
                     amount: value
                 }));
             }
-            if (address === to) {
+            if (account === to) {
                 store.dispatch(addPpt(nft_id, {
                     amount: value
                 }));
             }
         };
-        const ppt_wallet = new PptWallet(address, token);
+        const ppt_wallet = new PptWallet(account, token);
         ppt_wallet.onTransferSingle(on_transfer)
     }, {
         per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(async function onPptBatchTransfers({
-        address, token
+        account, token
     }) {
         const on_transfer: OnTransferBatch = async (
             op, from, to, ids, values, ev
@@ -106,20 +106,20 @@ export const PptsService = (
                     level: Nft.level(ids[i]),
                     token: Nft.token(ids[i])
                 });
-                if (address === from) {
+                if (account === from) {
                     store.dispatch(removePpt(ppt_id, {
                         kind: to ? 'transfer' : 'burn',
                         amount: values[i]
                     }));
                 }
-                if (address === to) {
+                if (account === to) {
                     store.dispatch(addPpt(ppt_id, {
                         amount: values[i]
                     }));
                 }
             }
         };
-        const ppt_wallet = new PptWallet(address, token);
+        const ppt_wallet = new PptWallet(account, token);
         ppt_wallet.onTransferBatch(on_transfer);
     }, {
         per: () => xtokenOf(store.getState())

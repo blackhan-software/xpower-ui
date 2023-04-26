@@ -17,9 +17,9 @@ export const MintingService = (
     store: Store<AppState>
 ) => {
     onNonceChanged(store, async function updateMinters(
-        nonce, { address, amount, token }, total
+        nonce, { account, amount, token }, total
     ) {
-        if (address !== await Blockchain.selectedAddress) {
+        if (account !== await Blockchain.account) {
             return;
         }
         if (token !== xtokenOf(store.getState())) {
@@ -63,9 +63,9 @@ export const MintingService = (
         im.on('tick', () => store.dispatch(removeNonces()));
     });
     Blockchain.onceConnect(function autoMint({
-        address, token
+        account, token
     }) {
-        const miner = MM(store).miner({ address, token });
+        const miner = MM(store).miner({ account, token });
         miner.on('stopping', () => {
             if (global.MINTER_IID) {
                 clearInterval(global.MINTER_IID);

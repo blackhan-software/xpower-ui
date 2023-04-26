@@ -8,7 +8,7 @@ import { onNftChanged, onPptChanged, onTokenSwitch } from '../redux/observers';
 import { pptAmounts } from '../redux/reducers';
 import { nftTotalBy, pptTotalBy, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Address, Nft, NftIssue, NftLevel, NftLevels, NftToken, NftTokens, PptAmounts, PptDetails, PptMinterApproval, Token } from '../redux/types';
+import { Account, Nft, NftIssue, NftLevel, NftLevels, NftToken, NftTokens, PptAmounts, PptDetails, PptMinterApproval, Token } from '../redux/types';
 import { NftWallet, PptWallet, PptWalletMock } from '../wallet';
 import { Years } from '../years';
 
@@ -83,7 +83,7 @@ export const PptsUiService = (
      * ui-{image,minter}:
      */
     Blockchain.onceConnect(async function initImagesAndMinter({
-        address, token
+        account, token
     }) {
         const ppt_images = [];
         for (const level of NftLevels()) {
@@ -92,7 +92,7 @@ export const PptsUiService = (
             }
         }
         const [approval, ...images] = await Promise.all([
-            ppt_approval(address, token), ...ppt_images
+            ppt_approval(account, token), ...ppt_images
         ]);
         store.dispatch(setPptsUiMinter(
             approval
@@ -104,7 +104,7 @@ export const PptsUiService = (
         per: () => xtokenOf(store.getState())
     });
     const ppt_approval = async (
-        address: Address, token: Token
+        address: Account, token: Token
     ) => {
         const ppt_treasury = PptTreasuryFactory({ token });
         const nft_wallet = new NftWallet(address, token);
@@ -147,28 +147,29 @@ export const PptsUiService = (
     async function ppt_meta({ level, issue, token }: {
         level: NftLevel, issue: NftIssue, token: Token
     }) {
-        const address = await Blockchain.selectedAddress;
+        const account = await Blockchain.account;
         const avalanche = await Blockchain.isAvalanche();
-        return address && avalanche
-            ? await PptImageMeta.get(address, { level, issue, token })
+        return account && avalanche
+            ? await PptImageMeta.get(account, { level, issue, token })
             : await PptImageMeta.get(null, { level, issue, token });
     }
     async function ppt_href({ level, issue, token }: {
         level: NftLevel, issue: NftIssue, token: Token
     }) {
-        const address = await Blockchain.selectedAddress;
+        const account = await Blockchain.account;
         const avalanche = await Blockchain.isAvalanche();
-        const ppt_wallet = address && avalanche
-            ? new PptWallet(address, token)
+        const ppt_wallet = account && avalanche
+            ? new PptWallet(account, token)
             : new PptWalletMock(0n, token);
         const ppt_id = Nft.fullId({
             level, issue, token: Nft.token(token)
         });
         const supply = await ppt_wallet.totalSupply(ppt_id);
         if (supply > 0) {
-            const ppt_contract = await ppt_wallet.contract;
+            const ppt_contract = await ppt_wallet.mmc;
+            const ppt_address = await ppt_contract.getAddress();
             const market = 'https://opensea.io/assets/avalanche';
-            return new URL(`${market}/${ppt_contract.address}/${Nft.realId(ppt_id)}`);
+            return new URL(`${market}/${ppt_address}/${Nft.realId(ppt_id)}`);
         }
         return null;
     }

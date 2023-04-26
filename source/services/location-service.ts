@@ -49,20 +49,20 @@ export const LocationService = (
         RWParams.token = token;
     });
     onTokenSwitch(store, async function syncLocationSpeed(token) {
-        const address = await Blockchain.selectedAddress;
-        if (!address) {
-            throw new Error('missing selected-address')
+        const account = await Blockchain.account;
+        if (!account) {
+            throw new Error('missing account')
         }
         const miner = MM(store).miner({
-            address, token
+            account, token
         });
         RWParams.speed = miner.speed;
     });
     Blockchain.onceConnect(function syncLocationSpeed({
-        address, token
+        account, token
     }) {
         const miner = MM(store).miner({
-            address, token
+            account, token
         });
         miner.on('increased', (e) => {
             RWParams.speed = e.speed;
