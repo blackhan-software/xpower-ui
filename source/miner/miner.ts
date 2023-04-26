@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import { ModuleThread, spawn, Thread, Worker } from 'threads';
 import { ROParams } from '../params';
-import { Address, Amount, BlockHash, Level, Nonce, Token } from '../redux/types';
+import { Account, Address, Amount, BlockHash, Level, Nonce, Token } from '../redux/types';
 import { Tokenizer } from '../token';
 import { Version } from '../types';
 import { Item, IWorker } from './scripts/worker';
@@ -21,8 +21,8 @@ export class Miner extends EventEmitter {
         token: Token,
         /** contract to mine on */
         contract: Address,
-        /** address to mine for */
-        address: Address,
+        /** account to mine for */
+        account: Account,
         /** speed to mine with */
         speed = Miner.SPEED_DEFAULT,
         /** min. level to mine at */
@@ -33,7 +33,7 @@ export class Miner extends EventEmitter {
         versionFaked = ROParams.versionFaked
     ) {
         super();
-        this._address = address;
+        this._account = account;
         this._contract = contract;
         this._level = level;
         this._speed = speed;
@@ -139,10 +139,20 @@ export class Miner extends EventEmitter {
             const path_pro = $('#g-worker-path').data('value');
             const head_pro = await fetch(path_pro, { method: 'HEAD' });
             if (head_pro.ok) {
-                const worker = new Worker(path_pro);
+                const worker = new Worker(path_pro, {
+                    workerData: {
+                        ethers: require('ethers'),
+                        react: require('react'),
+                    }
+                });
                 thread = await spawn<IWorker>(worker);
             } else {
-                const worker = new Worker(path_dev);
+                const worker = new Worker(path_dev, {
+                    workerData: {
+                        ethers: require('ethers'),
+                        react: require('react'),
+                    }
+                });
                 thread = await spawn<IWorker>(worker);
             }
         } catch (ex) {
@@ -150,7 +160,7 @@ export class Miner extends EventEmitter {
             thread = await spawn<IWorker>(worker);
         }
         await thread.init({
-            address: this.address,
+            account: this.account,
             contract: this.contract,
             level: this.level,
             meta: { id },
@@ -164,8 +174,8 @@ export class Miner extends EventEmitter {
         const worker = this.workers.pop() as ModuleThread<IWorker>;
         await worker.stop(); await Thread.terminate(worker);
     }
-    private get address() {
-        return this._address;
+    private get account() {
+        return this._account;
     }
     private get contract() {
         return this._contract;
@@ -191,7 +201,7 @@ export class Miner extends EventEmitter {
     private get workers(): ModuleThread<IWorker>[] {
         return this._workers;
     }
-    private _address: Address;
+    private _account: Account;
     private _contract: Address;
     private _level: Level;
     private _paused = false;

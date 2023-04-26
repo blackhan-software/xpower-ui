@@ -8,7 +8,7 @@ import { ROParams } from '../params';
 import { addNonce } from '../redux/actions';
 import { miningSpeedBy } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Address, Amount, BlockHash, Token } from '../redux/types';
+import { Account, Amount, BlockHash, Token } from '../redux/types';
 import { Tokenizer } from '../token';
 import { MoeWallet } from '../wallet';
 
@@ -17,29 +17,31 @@ MiningManager._miner = {} as Record<Token, Miner | undefined>;
 export function MiningManager(
     api: MiddlewareAPI<Dispatch, AppState>
 ): {
-    miner: (args: { address: Address; token: Token; }) => Miner;
-    toggle: (args: { address: Address; token: Token; }) => Promise<void>;
+    miner: (
+        args: { account: Account; token: Token; }) => Miner;
+    toggle: (
+        args: { account: Account; token: Token; }) => Promise<void>;
 } {
-    function my_miner({ address, token }: {
-        address: Address, token: Token
+    function my_miner({ account, token }: {
+        account: Account, token: Token
     }): Miner {
         const xtoken = Tokenizer.xify(token);
         let miner = MiningManager._miner[xtoken];
         if (miner === undefined) {
-            const contract = BigInt(addressOf({
+            const contract = addressOf({
                 infix: 'MOE', token
-            }));
+            });
             const speed = miningSpeedBy(api.getState(), token);
             miner = MiningManager._miner[xtoken] = new Miner(
-                token, contract, address, speed, ROParams.level.min
+                token, contract, account, speed, ROParams.level.min
             );
         }
         return miner;
     }
-    async function my_toggle({ address, token }: {
-        address: Address, token: Token
+    async function my_toggle({ account, token }: {
+        account: Account, token: Token
     }): Promise<void> {
-        const miner = my_miner({ address, token });
+        const miner = my_miner({ account, token });
         if (miner.running) {
             return await miner.stop();
         }
@@ -61,7 +63,7 @@ export function MiningManager(
                     new Date(Number(timestamp) * 1000)
                 );
                 if (interval === IntervalManager.interval) {
-                    return mine(address, block_hash);
+                    return mine(account, block_hash);
                 }
             }
         }
@@ -73,9 +75,9 @@ export function MiningManager(
         }: {
             block_hash: BlockHash;
         }) => {
-            mine(address, block_hash);
+            mine(account, block_hash);
         });
-        const moe_wallet = new MoeWallet(address, token);
+        const moe_wallet = new MoeWallet(account, token);
         try {
             const init = await moe_wallet.init();
             console.debug('[init]', init);
@@ -85,7 +87,7 @@ export function MiningManager(
             throw error(ex);
         }
         async function mine(
-            address: Address, block_hash: BlockHash
+            account: Account, block_hash: BlockHash
         ) {
             miner.emit('initialized', { block_hash });
             const { min, max } = range(token);
@@ -97,7 +99,7 @@ export function MiningManager(
             }) => {
                 if (amount >= min && amount <= max) {
                     api.dispatch(addNonce(nonce, {
-                        address,
+                        account,
                         amount,
                         block_hash,
                         token: Tokenizer.xify(token),

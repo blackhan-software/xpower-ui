@@ -1,11 +1,14 @@
 /* eslint @typescript-eslint/no-var-requires: [off] */
-/* eslint @typescript-eslint/no-unused-vars: [off] */
+if (typeof importScripts === 'function') importScripts(
+    'https://cdn.jsdelivr.net/npm/react@18.1.0/umd/react.production.min.js',
+    'https://cdn.jsdelivr.net/npm/ethers@6.3.0/dist/ethers.umd.min.js',
+);
 
 import { x40, x64, x64_plain } from '../../functions';
-import { Address, Amount, BlockHash, Interval, Level, Nonce, Token } from '../../redux/types';
+import { Account, Address, Amount, BlockHash, Interval, Level, Nonce, Token } from '../../redux/types';
 import { Version } from '../../types';
 
-import { defaultAbiCoder as abi, randomBytes } from 'ethers/lib/utils';
+import { AbiCoder, randomBytes } from 'ethers';
 import { Observable } from 'observable-fns';
 import { WorkerFunction, WorkerModule } from 'threads/dist/types/worker';
 import { expose } from 'threads/worker';
@@ -20,7 +23,7 @@ export interface Miner extends Function {
 }
 export type Context = {
     token: Token,
-    address: Address,
+    account: Account,
     block_hash: BlockHash,
     contract: Address,
     interval: Interval,
@@ -45,7 +48,7 @@ expose({
         return worker_id;
     },
     async init({
-        address,
+        account,
         contract,
         level,
         meta,
@@ -53,7 +56,7 @@ expose({
         version,
         versionFaked,
     }: {
-        address: Address,
+        account: Account,
         contract: Address,
         level: Level,
         meta: { id: number },
@@ -68,7 +71,7 @@ expose({
             keccak256 = (a) => hash(a).toString('hex');
         }
         worker = new Worker({
-            address,
+            account,
             contract,
             level,
             meta,
@@ -117,7 +120,7 @@ expose({
 });
 class Worker {
     public constructor({
-        address,
+        account,
         contract,
         level,
         meta,
@@ -125,7 +128,7 @@ class Worker {
         version,
         versionFaked,
     }: {
-        address: Address,
+        account: Account,
         contract: Address,
         level: Level,
         meta: { id: number },
@@ -135,15 +138,14 @@ class Worker {
     }) {
         this._amount = amount(token, level);
         this._context = {
-            address,
+            account,
             block_hash: 0n,
-            contract,
+            contract: normalize(contract),
             interval: interval(),
             token,
         };
         this._miner = miner(level, version, versionFaked);
         this._nonce = nonce(meta.id);
-        this._versionFaked = versionFaked;
     }
     public start(
         block_hash: BlockHash,
@@ -242,7 +244,11 @@ class Worker {
     private _miner: Miner;
     private _nonce: Nonce;
     private _running = false;
-    private _versionFaked: boolean;
+}
+function normalize(
+    address: Address
+) {
+    return x40(BigInt(address));
 }
 function interval() {
     const time = new Date().getTime();
@@ -285,7 +291,7 @@ function amount(
                 return 0n;
             };
         default:
-            return (hash: string) => 0n;
+            return (_hash: string) => 0n;
     }
 }
 function zeros(
@@ -298,9 +304,9 @@ function zeros(
     return 0n;
 }
 function miner(
-    level: Level, version: Version, versionFaked: boolean
+    level: Level, version: Version, version_faked: boolean
 ) {
-    const abi_encode = abi_encoder(level, version, versionFaked);
+    const abi_encode = abi_encoder(level, version, version_faked);
     return (nonce: Nonce, context: Context) => keccak256(
         abi_encode(nonce, context)
     );
@@ -310,16 +316,17 @@ function abi_encoder(
 ) {
     const lazy_arrayify = arrayifier(level);
     const encoder_v2c = (nonce: Nonce, {
-        address, block_hash, interval, token
+        account, block_hash, interval, token
     }: Context) => {
         let value = abi_encoded[interval];
         if (value === undefined) {
+            const abi = AbiCoder.defaultAbiCoder();
             const template = abi.encode([
                 'string', 'uint256', 'address', 'uint256', 'bytes32'
             ], [
                 symbol_v2c(token),
                 0,
-                x40(address),
+                x40(account),
                 interval,
                 x64(block_hash)
             ]);
@@ -332,15 +339,16 @@ function abi_encoder(
         return value;
     };
     const encoder_v3b = (nonce: Nonce, {
-        address, block_hash, interval, token
+        account, block_hash, interval, token
     }: Context) => {
         let value = abi_encoded[interval];
         if (value === undefined) {
+            const abi = AbiCoder.defaultAbiCoder();
             const template = abi.encode([
                 'string', 'address', 'uint256', 'bytes32', 'uint256'
             ], [
                 symbol_v3b(token),
-                x40(address),
+                x40(account),
                 interval,
                 x64(block_hash),
                 0
@@ -354,15 +362,16 @@ function abi_encoder(
         return value;
     };
     const encoder_v5b = (nonce: Nonce, {
-        address, block_hash, interval, token
+        account, block_hash, interval, token
     }: Context) => {
         let value = abi_encoded[interval];
         if (value === undefined) {
+            const abi = AbiCoder.defaultAbiCoder();
             const template = abi.encode([
                 'string', 'address', 'uint256', 'bytes32', 'uint256'
             ], [
                 token,
-                x40(address),
+                x40(account),
                 interval,
                 x64(block_hash),
                 0
@@ -376,15 +385,16 @@ function abi_encoder(
         return value;
     };
     const encoder_v6a = (nonce: Nonce, {
-        address, block_hash, contract, interval
+        account, block_hash, contract, interval
     }: Context) => {
         let value = abi_encoded[interval];
         if (value === undefined) {
+            const abi = AbiCoder.defaultAbiCoder();
             const template = abi.encode([
                 'address', 'address', 'uint256', 'bytes32', 'uint256'
             ], [
-                x40(contract),
-                x40(address),
+                contract,
+                x40(account),
                 interval,
                 x64(block_hash),
                 0
@@ -398,15 +408,16 @@ function abi_encoder(
         return value;
     };
     const encoder_v6b = (nonce: Nonce, {
-        address, block_hash, contract, interval
+        account, block_hash, contract, interval
     }: Context) => {
         let value = abi_encoded[interval];
         if (value === undefined) {
+            const abi = AbiCoder.defaultAbiCoder();
             const template = abi.encode([
                 'address', 'address', 'bytes32', 'uint256'
             ], [
-                x40(contract),
-                x40(address),
+                contract,
+                x40(account),
                 x64(block_hash),
                 0
             ]);
