@@ -1,14 +1,12 @@
 import { Global } from '../types';
 declare const global: Global;
 
-import { Blockchain } from '../blockchain';
+import { MMProvider } from '../blockchain';
 import { RWParams } from '../params';
+import { Balance } from '../redux/types';
 
-import { NonceManager } from '@ethersproject/experimental';
-import { Web3Provider } from '@ethersproject/providers';
-import { randomBytes } from '@ethersproject/random';
-import { parseUnits } from '@ethersproject/units';
-import { Contract, Wallet } from 'ethers';
+import { Contract, SigningKey, Wallet, parseUnits, randomBytes } from 'ethers';
+import { OtfWallet } from './otf-wallet';
 
 export class OtfManager {
     public static get threshold() {
@@ -25,7 +23,7 @@ export class OtfManager {
     }
     public static async init(
         key = 'otf-wallet'
-    ): Promise<NonceManager> {
+    ): Promise<Wallet> {
         if (this._wallet !== undefined) {
             return Promise.resolve(this._wallet);
         }
@@ -34,31 +32,31 @@ export class OtfManager {
             value = btoa(JSON.stringify(Object.values(randomBytes(32))));
             localStorage.setItem(key, value);
         }
-        const provider = global.WEB3_PROVIDER_OTF = new Web3Provider(
-            await Blockchain.provider
-        );
-        //
-        // @info: disabled due to potential rate-limiting!
-        //
-        // if (await Blockchain.isAvalanche()) {
-        //     provider._pollingInterval = 200; // ms
-        // }
-        //
-        const wallet = new Wallet(JSON.parse(atob(value)), provider);
-        return this._wallet = global.OTF_WALLET = new NonceManager(wallet);
+        const secret = new Uint8Array(JSON.parse(atob(value)));
+        const provider = global.MM_PROVIDER_OTF = await MMProvider();
+        const wallet = new OtfWallet(new SigningKey(secret), provider);
+        return this._wallet = global.OTF_WALLET = wallet;
     }
     public static async connect(
         fallback: Promise<Contract>
     ): Promise<Contract> {
         if (OtfManager.enabled) {
             const wallet = await OtfManager.init();
-            const balance = await wallet.getBalance();
-            if (balance.gt(this.threshold)) {
-                return fallback.then((c) => c.connect(wallet));
+            const balance = await this.getBalance();
+            if (balance > this.threshold) {
+                return fallback.then((c) => c.connect(wallet) as Contract);
             }
         }
         return fallback;
     }
-    private static _wallet: NonceManager | undefined;
+    public static async getBalance(): Promise<Balance> {
+        const address = this._wallet?.address;
+        if (address) {
+            const provider = await MMProvider();
+            return provider.getBalance(address);
+        }
+        return 0n;
+    }
+    private static _wallet: Wallet | undefined;
 }
 export default OtfManager;

@@ -1,50 +1,49 @@
-import { BigNumber, Contract, Event, Transaction } from 'ethers';
+import { WSProvider } from '../blockchain';
 import { XPowerMoe, XPowerMoeFactory } from '../contract';
-import { Address, BlockHash, Nonce, Timestamp, Token } from '../redux/types';
+import { Account, Address, BlockHash, Nonce, Timestamp, Token } from '../redux/types';
+import { TxEvent, Version } from '../types';
 import { ERC20Wallet, OnApproval, OnTransfer } from './erc20-wallet';
 
 export { OnApproval, OnTransfer };
 export type OnInit = (
-    block_hash: BlockHash, timestamp: Timestamp, ev: Event
+    block_hash: BlockHash, timestamp: Timestamp, ev: TxEvent
 ) => void;
 
 export class MoeWallet extends ERC20Wallet {
     constructor(
-        address: Address | string, token: Token
+        account: Account | Address, token: Token, version?: Version
     ) {
-        super(address);
-        this._moe = XPowerMoeFactory({ token });
+        super(account);
+        this._moe = XPowerMoeFactory({ token, version });
     }
-    init(): Promise<Transaction> {
+    init() {
         return this._moe.init();
     }
     mint(
         block_hash: BlockHash, nonce: Nonce
-    ): Promise<Transaction> {
-        return this._moe.mint(this.address, block_hash, nonce);
+    ) {
+        return this._moe.mint(this.account, block_hash, nonce);
     }
     onInit(
         listener: OnInit, { once } = { once: false }
     ) {
         const on_init = (
-            block_hash: string, timestamp: BigNumber, ev: Event
+            block_hash: string, timestamp: Timestamp, ev: TxEvent
         ) => {
-            listener(BigInt(block_hash), timestamp.toBigInt(), ev);
+            listener(BigInt(block_hash), timestamp, ev);
         };
         if (once) {
-            this.contract.then((c) => c.once('Init', on_init));
+            this.wsc.then((c) => c.once('Init', on_init));
         } else {
-            this.contract.then((c) => c.on('Init', on_init));
+            this.wsc.then((c) => c.on('Init', on_init));
         }
     }
-    get contract(): Promise<Contract> {
-        if (this._contract === undefined) {
-            const connected = this._moe.connect();
-            return connected.then((c) => (this._contract = c));
-        }
-        return Promise.resolve(this._contract);
+    get mmc() {
+        return this._moe.connect();
     }
-    private _contract: Contract | undefined;
+    get wsc() {
+        return WSProvider().then((wsp) => this._moe.connect(wsp));
+    }
     private _moe: XPowerMoe;
 }
 export default MoeWallet;

@@ -1,22 +1,19 @@
-import { Contract } from 'ethers';
+import { WSProvider } from '../blockchain';
 import { XPowerPpt, XPowerPptFactory, XPowerPptMockFactory } from '../contract';
-import { Address, Nft, NftFullId, NftLevel, NftRealId, Token, Year } from '../redux/types';
-
+import { Account, Address, Nft, NftFullId, NftLevel, NftRealId, Token, Year } from '../redux/types';
+import { Version } from '../types';
 import { ERC1155Wallet } from './erc1155-wallet';
 
 export class PptWallet extends ERC1155Wallet {
     constructor(
-        address: Address | string, token: Token, ppt?: XPowerPpt
+        account: Account | Address, token: Token, version?: Version
     ) {
-        super(address, token);
-        if (ppt === undefined) {
-            ppt = XPowerPptFactory({ token });
-        }
-        this._ppt = ppt;
+        super(account, token);
+        this._ppt = XPowerPptFactory({ token, version });
     }
     async idBy(
         year: Year | Promise<Year>,
-        level: NftLevel | Promise<NftLevel>,
+        level: NftLevel | Promise<NftLevel>
     ): Promise<NftFullId> {
         const [y, l] = await Promise.all([year, level]);
         return Nft.fullIdOf({
@@ -29,21 +26,20 @@ export class PptWallet extends ERC1155Wallet {
     ): Promise<Year> {
         return Promise.resolve(new Date().getFullYear() - await delta);
     }
-    get contract(): Promise<Contract> {
-        if (this._contract === undefined) {
-            const connected = this._ppt.connect();
-            return connected.then((c) => (this._contract = c));
-        }
-        return Promise.resolve(this._contract);
+    get mmc() {
+        return this._ppt.connect();
     }
-    protected _contract: Contract | undefined;
+    get wsc() {
+        return WSProvider().then((wsp) => this._ppt.connect(wsp));
+    }
     protected _ppt: XPowerPpt;
 }
 export class PptWalletMock extends PptWallet {
     constructor(
-        address: Address | string = 0n, token: Token
+        address: Account | Address = 0n, token: Token, version?: Version
     ) {
-        super(address, token, XPowerPptMockFactory({ token }));
+        super(address, token, version);
+        this._ppt = XPowerPptMockFactory({ token });
     }
 }
 export default PptWallet;

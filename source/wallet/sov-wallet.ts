@@ -1,23 +1,22 @@
-import { Contract } from 'ethers';
+import { WSProvider } from '../blockchain';
 import { XPowerSov, XPowerSovFactory } from '../contract';
-import { Address, Token } from '../redux/types';
+import { Account, Address, Token } from '../redux/types';
+import { Version } from '../types';
 import { ERC20Wallet } from './erc20-wallet';
 
 export class SovWallet extends ERC20Wallet {
     constructor(
-        address: Address | string, token: Token
+        account: Account | Address, token: Token, version?: Version
     ) {
-        super(address);
-        this._sov = XPowerSovFactory({ token });
+        super(account);
+        this._sov = XPowerSovFactory({ token, version });
     }
-    get contract(): Promise<Contract> {
-        if (this._contract === undefined) {
-            const connected = this._sov.connect();
-            return connected.then((c) => (this._contract = c));
-        }
-        return Promise.resolve(this._contract);
+    get mmc() {
+        return this._sov.connect();
     }
-    private _contract: Contract | undefined;
+    get wsc() {
+        return WSProvider().then((wsp) => this._sov.connect(wsp));
+    }
     private _sov: XPowerSov;
 }
 export default SovWallet;
