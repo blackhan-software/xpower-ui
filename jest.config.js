@@ -8,5 +8,5 @@ module.exports = {
     './test/$.extend.ts',
     './test/local-storage.ts',
   ],
-  testPathIgnorePatterns : ['\.js$']
+  testPathIgnorePatterns: ['\.js$'],
 };
