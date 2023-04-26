@@ -1,6 +1,9 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
+import { Address } from "../../redux/types";
+
 const prototype = BigInt.prototype as any;
 prototype.toJson = (b: bigint) => `${b}n`;
+
 export function max(
     lhs: bigint, rhs: bigint
 ) {
@@ -28,7 +31,7 @@ export function x40(
 ) {
     const string = value.toString(16);
     const length = min_length - string.length;
-    return `0x${'0'.repeat(length)}` + string;
+    return `0x${'0'.repeat(length)}` + string as Address;
 }
 export function x40_plain(
     value: bigint | number, min_length = 40
