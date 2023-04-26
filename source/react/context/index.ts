@@ -1,2 +1,2 @@
-export * from './address-context';
+export * from './account-context';
 export * from './debug-context';
