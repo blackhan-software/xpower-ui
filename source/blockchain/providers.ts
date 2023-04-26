@@ -6,24 +6,26 @@ declare const global: Global;
 
 export async function MMProvider() {
     if (global.MM_PROVIDER === undefined) {
-        global.MM_PROVIDER = new BrowserProvider(
-            await Blockchain.provider
-        );
+        const provider = await Blockchain.provider;
+        if (provider) {
+            global.MM_PROVIDER = new BrowserProvider(
+                provider
+            );
+        }
     }
-    return global.MM_PROVIDER as BrowserProvider;
+    return global.MM_PROVIDER as BrowserProvider | undefined;
 }
 export async function WSProvider(
     url = 'wss://api.avax.network/ext/bc/C/ws'
 ) {
-    const chain_id = await Blockchain.chainId();
-    if (chain_id !== undefined) {
-        const ws = localStorage.getItem('ws') ?? url;
-        if (global.WS_PROVIDER === undefined) {
+    if (global.WS_PROVIDER === undefined) {
+        const chain_id = await Blockchain.chainId();
+        if (chain_id !== undefined) {
+            const ws = localStorage.getItem('ws') ?? url;
             global.WS_PROVIDER = new WebSocketProvider(
                 new WebSocket(ws), Number(chain_id)
             );
         }
-        return global.WS_PROVIDER as WebSocketProvider;
     }
-    return null;
+    return global.WS_PROVIDER as WebSocketProvider | undefined;
 }

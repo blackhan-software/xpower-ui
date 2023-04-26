@@ -16,12 +16,12 @@ export class Base {
         this._abi = abi;
     }
     public async connect(
-        runner?: ContractRunner | null
+        runner?: ContractRunner
     ): Promise<Contract> {
         if (!runner) {
             if (this._connected === undefined) {
                 const provider = await MMProvider();
-                const signer = await provider.getSigner();
+                const signer = await provider?.getSigner();
                 this._connected = this.contract(signer);
             }
             return this._connected;
@@ -29,7 +29,7 @@ export class Base {
         return this.contract(runner);
     }
     protected contract(
-        runner: ContractRunner
+        runner?: ContractRunner
     ): Contract {
         let contract = this._contracts.get(runner);
         if (contract === undefined) {
@@ -47,6 +47,6 @@ export class Base {
     private _abi: InterfaceAbi;
     private _address: Address;
     private _connected: Contract | undefined;
-    private _contracts: Map<ContractRunner, Contract> = new Map();
+    private _contracts: Map<ContractRunner | undefined, Contract> = new Map();
 }
 export default Base;

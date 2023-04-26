@@ -775,6 +775,10 @@ export const otfToggle = AppThunk('otf-wallet/toggle', (args: {
 export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
     account: OtfWallet['account'], processing: OtfWallet['processing']
 }, api) => {
+    const provider = await MMProvider();
+    if (provider === undefined) {
+        return;
+    }
     const { account, processing } = args;
     if (!account) {
         throw new Error('missing account');
@@ -786,7 +790,6 @@ export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
         processing: true
     }));
     const unit = parseUnits('1.0');
-    const provider = await MMProvider();
     const mmw_signer = await provider.getSigner(x40(account));
     const mmw_balance = await provider.getBalance(x40(account));
     let gas_limit = parseUnits('0');
@@ -829,6 +832,11 @@ export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
 export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
     account: OtfWallet['account'], processing: OtfWallet['processing']
 }, api) => {
+    const otf_wallet = await OtfManager.init();
+    const provider = otf_wallet.provider;
+    if (provider === null) {
+        return;
+    }
     const { account, processing } = args;
     if (!account) {
         throw new Error('missing account');
@@ -839,11 +847,10 @@ export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
     api.dispatch(setOtfWalletProcessing({
         processing: true
     }));
-    const otf_signer = await OtfManager.init();
     const otf_balance = await OtfManager.getBalance();
     let gas_limit = parseUnits('0');
     try {
-        gas_limit = await otf_signer.estimateGas({
+        gas_limit = await otf_wallet.estimateGas({
             to: x40(account), value: otf_balance
         });
     } catch (ex) {
@@ -852,14 +859,13 @@ export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
         }));
         throw error(ex);
     }
-    const provider = await MMProvider();
     const fee_data = await provider.getFeeData();
     const gas_price_base = fee_data.gasPrice ?? 25n;
     const gas_price = gas_price_base * 1125n / 1000n;
     const fee = gas_limit * gas_price;
     const value = otf_balance - fee;
     try {
-        const tx = await otf_signer.sendTransaction({
+        const tx = await otf_wallet.sendTransaction({
             gasLimit: gas_limit, gasPrice: gas_price,
             to: x40(account), value
         });

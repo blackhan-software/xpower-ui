@@ -15,7 +15,7 @@ export type Provider = Awaited<ReturnType<typeof detectProvider>> & {
     isConnected: () => boolean;
 } & EventEmitter;
 export type Connect = {
-    address: Account, chainId: ChainId, token: Token, version: Version
+    account: Account, chainId: ChainId, token: Token, version: Version
 };
 export class Blockchain extends EventEmitter {
     private static get me(): Blockchain {
@@ -27,15 +27,15 @@ export class Blockchain extends EventEmitter {
     private constructor() {
         super(); this.setMaxListeners(200);
     }
-    public static get provider(): Promise<Provider> {
+    public static get provider(): Promise<Provider | undefined> {
         return this.me.provider();
     }
-    private async provider(): Promise<Provider> {
+    private async provider(): Promise<Provider | undefined> {
         if (this._provider === undefined || this._provider === null) {
-            const provider = await detectProvider();
-            this._provider = provider as any;
+            const provider = await detectProvider() ?? undefined;
+            this._provider = provider as Provider | undefined;
         }
-        return this._provider as Provider;
+        return this._provider;
     }
     public static isInstalled(): Promise<boolean> {
         return this.me.isInstalled();
@@ -69,31 +69,31 @@ export class Blockchain extends EventEmitter {
         if (!accounts?.length) {
             throw new Error('missing accounts');
         }
-        const address = await this.account();
-        if (!address) {
+        const account = await this.account();
+        if (!account) {
             throw new Error('missing account');
         }
         setTimeout(async () => {
             const info = {
-                address,
+                account,
                 chainId: await this.chainId(),
                 token: RWParams.token,
                 version: ROParams.version
             };
             this.emit('connect', info);
         });
-        return address;
+        return account;
     }
-    public static get account(): Promise<Account | null> {
+    public static get account(): Promise<Account | undefined> {
         return this.me.account();
     }
-    private async account(): Promise<Account | null> {
-        if (this._account === null && this._provider) {
+    private async account(): Promise<Account | undefined> {
+        if (this._account === undefined && this._provider) {
             const req = this.provider().then((p) => p?.request({
                 method: 'eth_accounts'
             }));
             this._account = await req.then((a: string[]) =>
-                a?.length > 0 ? BigInt(a[0]) : null
+                a?.length > 0 ? BigInt(a[0]) : undefined
             );
         }
         return this._account;
@@ -229,10 +229,10 @@ export class Blockchain extends EventEmitter {
         }
         this.__provider = provider;
     }
-    private get _account(): Account | null {
+    private get _account(): Account | undefined {
         return this.__account;
     }
-    private set _account(value: Account | null) {
+    private set _account(value: Account | undefined) {
         if (ROParams.debug > 1) {
             console.debug('[Blockchain.account]', value);
         }
@@ -265,7 +265,7 @@ export class Blockchain extends EventEmitter {
         }
         this.__chainId = value;
     }
-    private __account: Account | null = null;
+    private __account: Account | undefined;
     private __isInstalled: boolean | undefined;
     private __isConnected: boolean | undefined;
     private __provider: Provider | undefined;

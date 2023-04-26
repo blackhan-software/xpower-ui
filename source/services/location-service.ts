@@ -12,9 +12,9 @@ export const LocationService = (
     store: Store<AppState>
 ) => {
     Blockchain.onceConnect(delayed(async function reloadLocation() {
-        const p = await Blockchain.provider;
-        p.on('chainChanged', () => location.reload());
-        p.on('accountsChanged', () => location.reload());
+        const provider = await Blockchain.provider;
+        provider?.on('chainChanged', () => location.reload());
+        provider?.on('accountsChanged', () => location.reload());
     }, 600));
     onPageSwitch(store, function syncLocationPath(page) {
         RWParams.page = page;
