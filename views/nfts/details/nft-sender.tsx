@@ -1,5 +1,5 @@
 import { globalRef } from '../../../source/react';
-import { Address, Amount, Nft, NftIssue, NftLevel, NftSendStatus, Token } from '../../../source/redux/types';
+import { Account, Amount, Nft, NftIssue, NftLevel, NftSendStatus, Token } from '../../../source/redux/types';
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
@@ -14,7 +14,7 @@ type Props = {
         valid: boolean | null;
     };
     target: {
-        value: Address | null;
+        value: Account | null;
         valid: boolean | null;
     };
     status: NftSendStatus | null;

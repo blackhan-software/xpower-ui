@@ -1,6 +1,6 @@
 import { Blockchain } from '../../../source/blockchain';
 import { x40 } from '../../../source/functions';
-import { Address, Amount, Nft, NftIssue, NftLevel } from '../../../source/redux/types';
+import { Account, Amount, Nft, NftIssue, NftLevel } from '../../../source/redux/types';
 
 import React, { ChangeEvent, FormEvent, useEffect, useRef } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
@@ -9,10 +9,10 @@ type Props = {
     issue: NftIssue;
     level: NftLevel;
     balance: Amount;
-    value: Address | null;
+    value: Account | null;
     valid: boolean | null;
     onTargetChanged: (
-        value: Address | null,
+        value: Account | null,
         valid: boolean | null
     ) => void;
 }
@@ -73,9 +73,9 @@ async function onChange(
     if (typeof props.onTargetChanged !== 'function') {
         return;
     }
-    const address = await Blockchain.selectedAddress;
-    if (!address) {
-        throw new Error('missing selected-address');
+    const account = await Blockchain.account;
+    if (!account) {
+        throw new Error('missing account');
     }
     const $target = e.target as HTMLInputElement;
     if (!$target.value) {
@@ -87,7 +87,7 @@ async function onChange(
         return;
     }
     if (isZeroAddress($target.value) ||
-        isSameAddress($target.value, address)
+        isSameAccount($target.value, account)
     ) {
         const value = BigInt($target.value);
         props.onTargetChanged(value, false);
@@ -102,8 +102,8 @@ function isAddress(value: string) {
 function isZeroAddress(value: string) {
     return value.match(new RegExp(`^${x40(0n)}$`, 'i'));
 }
-function isSameAddress(value: string, address: Address) {
-    return value.match(new RegExp(`^${x40(address)}$`, 'i'));
+function isSameAccount(value: string, account: Account) {
+    return value.match(new RegExp(`^${x40(account)}$`, 'i'));
 }
 function title(
     props: Props
