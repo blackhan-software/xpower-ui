@@ -1,6 +1,6 @@
 import { capitalize } from "../routes/functions";
 import { ROParams } from "../source/params";
-import { Token } from "../source/redux/types";
+import { Address, Token } from "../source/redux/types";
 import { Tokenizer } from "../source/token";
 import { Version } from "../source/types";
 
@@ -20,6 +20,9 @@ export function address({
     if (!address) {
         throw new Error(`missing ${id}`);
     }
-    return address;
+    if (!address.match(/^0x[0-9a-f]+/i)) {
+        throw new Error(`invalid ${address}`);
+    }
+    return address as Address;
 }
 export default address;
