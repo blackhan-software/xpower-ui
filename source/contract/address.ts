@@ -8,6 +8,9 @@ export function address({
 }: {
     infix: string, token: Token | 'XPOW', version?: Version
 }): Address {
+    if (typeof document === 'undefined') {
+        return '0x0'; // test-env
+    }
     if (version === undefined) {
         version = ROParams.version;
     }
