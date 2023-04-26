@@ -3,7 +3,7 @@
 
 import { x40 } from '../functions';
 import { ROParams, RWParams } from '../params';
-import { Address, Token, TokenInfo, XTokens } from '../redux/types';
+import { Account, Token, TokenInfo, XTokens } from '../redux/types';
 import { Version } from '../types';
 import { Chain, ChainId } from './chain';
 
@@ -15,7 +15,7 @@ export type Provider = Awaited<ReturnType<typeof detectProvider>> & {
     isConnected: () => boolean;
 } & EventEmitter;
 export type Connect = {
-    address: Address, chainId: ChainId, token: Token, version: Version
+    address: Account, chainId: ChainId, token: Token, version: Version
 };
 export class Blockchain extends EventEmitter {
     private static get me(): Blockchain {
@@ -59,19 +59,19 @@ export class Blockchain extends EventEmitter {
         }
         return Boolean(this._isConnected);
     }
-    public static async connect(): Promise<Address> {
+    public static async connect(): Promise<Account> {
         return this.me.connect();
     }
-    private async connect(): Promise<Address> {
+    private async connect(): Promise<Account> {
         const accounts = await this.provider().then((p) => p?.request({
             method: 'eth_requestAccounts'
         }));
         if (!accounts?.length) {
             throw new Error('missing accounts');
         }
-        const address = await this.selectedAddress();
+        const address = await this.account();
         if (!address) {
-            throw new Error('missing selected-address');
+            throw new Error('missing account');
         }
         setTimeout(async () => {
             const info = {
@@ -84,19 +84,19 @@ export class Blockchain extends EventEmitter {
         });
         return address;
     }
-    public static get selectedAddress(): Promise<Address | null> {
-        return this.me.selectedAddress();
+    public static get account(): Promise<Account | null> {
+        return this.me.account();
     }
-    private async selectedAddress(): Promise<Address | null> {
-        if (this._selectedAddress === null && this._provider) {
+    private async account(): Promise<Account | null> {
+        if (this._account === null && this._provider) {
             const req = this.provider().then((p) => p?.request({
                 method: 'eth_accounts'
             }));
-            this._selectedAddress = await req.then((a: string[]) =>
+            this._account = await req.then((a: string[]) =>
                 a?.length > 0 ? BigInt(a[0]) : null
             );
         }
-        return this._selectedAddress;
+        return this._account;
     }
     public static async isAvalanche(): Promise<boolean> {
         return this.me.isAvalanche();
@@ -229,14 +229,14 @@ export class Blockchain extends EventEmitter {
         }
         this.__provider = provider;
     }
-    private get _selectedAddress(): Address | null {
-        return this.__selectedAddress;
+    private get _account(): Account | null {
+        return this.__account;
     }
-    private set _selectedAddress(value: Address | null) {
+    private set _account(value: Account | null) {
         if (ROParams.debug > 1) {
-            console.debug('[Blockchain.selected-address]', value);
+            console.debug('[Blockchain.account]', value);
         }
-        this.__selectedAddress = value;
+        this.__account = value;
     }
     private get _isInstalled(): boolean | undefined {
         return this.__isInstalled;
@@ -265,7 +265,7 @@ export class Blockchain extends EventEmitter {
         }
         this.__chainId = value;
     }
-    private __selectedAddress: Address | null = null;
+    private __account: Account | null = null;
     private __isInstalled: boolean | undefined;
     private __isConnected: boolean | undefined;
     private __provider: Provider | undefined;
