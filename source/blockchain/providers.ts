@@ -15,17 +15,31 @@ export async function MMProvider() {
     }
     return global.MM_PROVIDER as BrowserProvider | undefined;
 }
-export async function WSProvider(
-    url = 'wss://api.avax.network/ext/bc/C/ws'
-) {
+export async function WSProvider() {
     if (global.WS_PROVIDER === undefined) {
         const chain_id = await Blockchain.chainId();
         if (chain_id !== undefined) {
-            const ws = localStorage.getItem('ws') ?? url;
             global.WS_PROVIDER = new WebSocketProvider(
-                new WebSocket(ws), Number(chain_id)
+                new WebSocket(WSProviderUrl()), Number(chain_id)
             );
         }
     }
     return global.WS_PROVIDER as WebSocketProvider | undefined;
+}
+function WSProviderUrl(
+    url = localStorage.getItem('ws')
+) {
+    if (!url) {
+        const $url = document.querySelector<HTMLElement>(
+            '#g-urls-provider-ws'
+        );
+        if (!$url) {
+            throw new Error('#g-urls-provider-ws missing');
+        }
+        url = $url.dataset.value ?? null;
+        if (!url) {
+            throw new Error('#g-urls-provider-ws[data-value] missing');
+        }
+    }
+    return new URL(url).toString();
 }

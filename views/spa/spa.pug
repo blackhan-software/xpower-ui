@@ -5,20 +5,8 @@ block styles
 
 block globals
   include ../global/contracts.pug
-  //-
-  //- Home:
-  //-
-  span#g-mining-speed(
-    style="display:none" data-value=`${UI_MINING_SPEED}`)
-  span#g-persistence(
-    style="display:none" data-value=`${UI_PERSISTENCE}`)
-  span#g-worker-path(
-    style="display:none" data-value="{{UI_WORKER_PATH}}")
-  //-
-  //- About:
-  //-
-  span#g-urls-about(
-    style="display:none" data-value=`${MD_ABOUT_URL}`)
+  include ../global/home.pug
+  include ../global/urls.pug
 
 block header
   include ../header/header.pug
