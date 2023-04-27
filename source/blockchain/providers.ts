@@ -19,9 +19,16 @@ export async function WSProvider() {
     if (global.WS_PROVIDER === undefined) {
         const chain_id = await Blockchain.chainId();
         if (chain_id !== undefined) {
-            global.WS_PROVIDER = new WebSocketProvider(
+            const wsp = global.WS_PROVIDER = new WebSocketProvider(
                 new WebSocket(WSProviderUrl()), Number(chain_id)
             );
+            wsp.once('block', () => {
+                setInterval(async function keepAlive() {
+                    const tid = setTimeout(() => location.reload(), 3000);
+                    await wsp.getBlockNumber();
+                    clearTimeout(tid);
+                }, 15000);
+            });
         }
     }
     return global.WS_PROVIDER as WebSocketProvider | undefined;
@@ -41,5 +48,5 @@ function WSProviderUrl(
             throw new Error('#g-urls-provider-ws[data-value] missing');
         }
     }
-    return new URL(url).toString();
+    return `${new URL(url)}?code=${String.random()}`;
 }
