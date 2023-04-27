@@ -79,17 +79,17 @@ function about_url(
     url?: URL
 ) {
     if (!url) {
-        const $about_url = document.querySelector<HTMLElement>(
-            '#g-urls-about'
+        const $url = document.querySelector<HTMLElement>(
+            '#g-urls-about-md'
         );
-        if (!$about_url) {
-            throw new Error('#g-urls-about missing');
+        if (!$url) {
+            throw new Error('#g-urls-about-md missing');
         }
-        const about_url = $about_url.dataset.value;
-        if (!about_url) {
-            throw new Error('#g-urls-about[data-value] missing');
+        const url_value = $url.dataset.value;
+        if (!url_value) {
+            throw new Error('#g-urls-about-md[data-value] missing');
         }
-        url = new URL(about_url, location.origin);
+        url = new URL(url_value, location.origin);
     }
     return url.toString();
 }
