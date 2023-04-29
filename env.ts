@@ -11,8 +11,8 @@ const UI_PERSISTENCE = process.env.UI_PERSISTENCE ?? '0';
 assert(UI_PERSISTENCE, 'missing UI_PERSISTENCE env variable');
 const UI_MINING_SPEED = process.env.UI_MINING_SPEED ?? '50';
 assert(UI_MINING_SPEED, 'missing UI_MINING_SPEED env variable');
-const WS_PROVIDER_URL = process.env.WS_PROVIDER_URL ?? 'wss://api.avax.network/ext/bc/C/ws';
-assert(WS_PROVIDER_URL, 'missing WS_PROVIDER_URL env variable');
+const MY_PROVIDER_URL = process.env.MY_PROVIDER_URL ?? 'https://api.avax.network/ext/bc/C/rpc';
+assert(MY_PROVIDER_URL, 'missing MY_PROVIDER_URL env variable');
 // MOE contract addresses
 const THOR_MOE_V2a = process.env.THOR_MOE_V2a ?? '0xf48C4a0394dD9F27117a43dBb6400872399AB7E7';
 assert(THOR_MOE_V2a, 'missing THOR_MOE_V2a env variable');
@@ -304,7 +304,7 @@ export default {
         MD_ABOUT_URL,
         UI_PERSISTENCE,
         UI_MINING_SPEED,
-        WS_PROVIDER_URL,
+        MY_PROVIDER_URL,
     }, ...{
         THOR_MOE_V2a,
         LOKI_MOE_V2a,
