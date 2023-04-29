@@ -52,7 +52,7 @@ export abstract class ERC1155Wallet {
     async balance(
         id: NftFullId
     ): Promise<Balance> {
-        return this.wsc.then(
+        return this.get.then(
             (c) => c.balanceOf(this._account, Nft.realId(id))
         );
     }
@@ -61,7 +61,7 @@ export abstract class ERC1155Wallet {
     }): Promise<Balance[]> {
         const ids = Nft.fullIds({ issues, levels, token });
         const addresses = ids.map(() => this._account);
-        const balances: Balance[] = await this.wsc.then(
+        const balances: Balance[] = await this.get.then(
             (c) => c.balanceOfBatch(addresses, Nft.realIds(ids))
         );
         return balances;
@@ -72,7 +72,7 @@ export abstract class ERC1155Wallet {
         if (typeof operator === 'bigint') {
             operator = x40(operator);
         }
-        return this.wsc.then((c) => c.isApprovedForAll(
+        return this.get.then((c) => c.isApprovedForAll(
             this._account, operator
         ));
     }
@@ -82,7 +82,7 @@ export abstract class ERC1155Wallet {
         if (typeof operator === 'bigint') {
             operator = x40(operator);
         }
-        return this.mmc.then((c) => c.setApprovalForAll(
+        return this.put.then((c) => c.setApprovalForAll(
             operator, approved
         ));
     }
@@ -100,9 +100,9 @@ export abstract class ERC1155Wallet {
             }
         };
         if (once) {
-            this.wsc.then((c) => c.once('ApprovalForAll', on_approval));
+            this.get.then((c) => c.once('ApprovalForAll', on_approval));
         } else {
-            this.wsc.then((c) => c.on('ApprovalForAll', on_approval));
+            this.get.then((c) => c.on('ApprovalForAll', on_approval));
         }
     }
     async safeTransfer(
@@ -111,7 +111,7 @@ export abstract class ERC1155Wallet {
         if (typeof to === 'bigint') {
             to = x40(to);
         }
-        return this.mmc.then((c) => c.safeTransferFrom(
+        return this.put.then((c) => c.safeTransferFrom(
             this._account, to, Nft.realId(id), amount, []
         ));
     }
@@ -140,9 +140,9 @@ export abstract class ERC1155Wallet {
             }
         };
         if (once) {
-            this.wsc.then((c) => c.once('TransferSingle', on_transfer));
+            this.get.then((c) => c.once('TransferSingle', on_transfer));
         } else {
-            this.wsc.then((c) => c.on('TransferSingle', on_transfer));
+            this.get.then((c) => c.on('TransferSingle', on_transfer));
         }
     }
     async safeBatchTransfer(
@@ -151,7 +151,7 @@ export abstract class ERC1155Wallet {
         if (typeof to === 'bigint') {
             to = x40(to);
         }
-        return this.mmc.then((c) => c.safeBatchTransferFrom(
+        return this.put.then((c) => c.safeBatchTransferFrom(
             this._account, to, Nft.realIds(ids), amounts, []
         ));
     }
@@ -181,15 +181,15 @@ export abstract class ERC1155Wallet {
             }
         };
         if (once) {
-            this.wsc.then((c) => c.once('TransferBatch', on_transfer));
+            this.get.then((c) => c.once('TransferBatch', on_transfer));
         } else {
-            this.wsc.then((c) => c.on('TransferBatch', on_transfer));
+            this.get.then((c) => c.on('TransferBatch', on_transfer));
         }
     }
     async uri(
         id: NftFullId | Promise<NftFullId>
     ): Promise<string> {
-        return this.wsc.then(
+        return this.get.then(
             async (c) => c.uri(Nft.realId(await id))
         );
     }
@@ -208,7 +208,7 @@ export abstract class ERC1155Wallet {
     async totalSupply(
         id: NftFullId | Promise<NftFullId>
     ): Promise<Supply> {
-        const supply: Supply = await this.wsc.then(
+        const supply: Supply = await this.get.then(
             async (c) => c.totalSupply(Nft.realId(await id))
         );
         return supply;
@@ -217,14 +217,14 @@ export abstract class ERC1155Wallet {
         issues: NftIssue[], levels: NftLevel[], token: NftToken
     }): Promise<Supply[]> {
         return Promise.all(Array.from(totalSupplies(
-            this.wsc, { issues, levels, token }
+            this.get, { issues, levels, token }
         )));
     }
     get account(): Account {
         return BigInt(this._account);
     }
     get address(): Promise<Address> {
-        return this.mmc.then((c) => c.getAddress() as Promise<Address>);
+        return this.get.then((c) => c.getAddress() as Promise<Address>);
     }
     get nftToken(): NftToken {
         return this._nftToken;
@@ -232,8 +232,8 @@ export abstract class ERC1155Wallet {
     get token(): Token {
         return this._token;
     }
-    abstract get mmc(): Promise<Contract>;
-    abstract get wsc(): Promise<Contract>;
+    abstract get put(): Promise<Contract>;
+    abstract get get(): Promise<Contract>;
     private readonly _account: Address;
     private readonly _meta: Record<string, Meta> = {};
     private readonly _nftToken: NftToken;

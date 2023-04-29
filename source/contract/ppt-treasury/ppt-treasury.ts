@@ -1,5 +1,5 @@
 import { InterfaceAbi, Transaction } from 'ethers';
-import { WSProvider } from '../../blockchain';
+import { MYProvider } from '../../blockchain';
 import { x40 } from '../../functions';
 import { Account, Address, Amount, Balance, Nft, NftRealId } from '../../redux/types';
 import { TxEvent } from '../../types';
@@ -74,7 +74,7 @@ export class PptTreasury extends Base {
     public async onStake(
         listener: OnStake
     ): Promise<void> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         contract.on('Stake', (
             account: string, id: bigint, amount: Amount, ev: TxEvent
         ) => {
@@ -86,7 +86,7 @@ export class PptTreasury extends Base {
     public async onUnstake(
         listener: OnUnstake
     ): Promise<void> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         contract.on('Unstake', (
             account: string, id: bigint, amount: Amount, ev: TxEvent
         ) => {
@@ -98,7 +98,7 @@ export class PptTreasury extends Base {
     public async onStakeBatch(
         listener: OnStakeBatch
     ): Promise<void> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         contract.on('StakeBatch', (
             account: string, ids: bigint[], amounts: Amount[], ev: TxEvent
         ) => {
@@ -110,7 +110,7 @@ export class PptTreasury extends Base {
     public async onUnstakeBatch(
         listener: OnUnstakeBatch
     ): Promise<void> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         contract.on('UnstakeBatch', (
             account: string, ids: bigint[], amounts: Amount[], ev: TxEvent
         ) => {
@@ -122,8 +122,8 @@ export class PptTreasury extends Base {
     private get otf() {
         return OtfManager.connect(this.connect());
     }
-    private get wsc() {
-        return WSProvider().then((wsp) => this.connect(wsp));
+    private get get() {
+        return MYProvider().then((p) => this.connect(p));
     }
 }
 export default PptTreasury;

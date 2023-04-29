@@ -50,7 +50,7 @@ async function burn(token: Token, { $burn }: {
     const accounts = ids.map(() => {
         return x40(account);
     });
-    const src_balances: Balance[] = await nft_source.wsc.then(
+    const src_balances: Balance[] = await nft_source.get.then(
         (c) => c.balanceOfBatch(accounts, Nft.realIds(ids, {
             version: src_version
         }))
@@ -80,7 +80,7 @@ async function burn(token: Token, { $burn }: {
             );
             reset();
         });
-        tx = await nft_source.wsc.then((c) => c.burnBatch(
+        tx = await nft_source.get.then((c) => c.burnBatch(
             x40(account), Nft.realIds(zz.ids, { version: src_version }), zz.balances
         ));
     } catch (ex: any) {

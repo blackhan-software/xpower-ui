@@ -1,7 +1,7 @@
 import { Global } from '../types';
 declare const global: Global;
 
-import { WSProvider } from '../blockchain';
+import { MYProvider } from '../blockchain';
 import { RWParams } from '../params';
 import { Balance } from '../redux/types';
 
@@ -33,7 +33,7 @@ export class OtfManager {
             localStorage.setItem(key, value);
         }
         const secret = new Uint8Array(JSON.parse(atob(value)));
-        const provider = global.MM_PROVIDER_OTF = await WSProvider();
+        const provider = global.WS_PROVIDER_OTF = await MYProvider();
         const wallet = new OtfWallet(new SigningKey(secret), provider);
         return this._wallet = global.OTF_WALLET = wallet;
     }
@@ -54,7 +54,7 @@ export class OtfManager {
         if (wallet) {
             const address = wallet.address;
             if (address) {
-                const provider = await WSProvider();
+                const provider = await MYProvider();
                 if (provider) {
                     return provider.getBalance(address);
                 }

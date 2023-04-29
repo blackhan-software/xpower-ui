@@ -166,7 +166,7 @@ export const PptsUiService = (
         });
         const supply = await ppt_wallet.totalSupply(ppt_id);
         if (supply > 0) {
-            const ppt_contract = await ppt_wallet.mmc;
+            const ppt_contract = await ppt_wallet.get;
             const ppt_address = await ppt_contract.getAddress();
             const market = 'https://opensea.io/assets/avalanche';
             return new URL(`${market}/${ppt_address}/${Nft.realId(ppt_id)}`);

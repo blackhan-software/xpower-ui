@@ -1,4 +1,4 @@
-import { WSProvider } from '../blockchain';
+import { MYProvider } from '../blockchain';
 import { XPowerNft, XPowerNftFactory, XPowerNftMockFactory } from '../contract';
 import { address } from '../contract/address';
 import { ROParams } from '../params';
@@ -80,11 +80,11 @@ export class NftWallet extends ERC1155Wallet {
     ): Promise<Year> {
         return Promise.resolve(new Date().getFullYear() - await delta);
     }
-    get mmc() {
+    get put() {
         return this._nft.connect();
     }
-    get wsc() {
-        return WSProvider().then((wsp) => this._nft.connect(wsp));
+    get get() {
+        return MYProvider().then((p) => this._nft.connect(p));
     }
     protected _nft: XPowerNft;
 }

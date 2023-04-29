@@ -1,4 +1,4 @@
-import { WSProvider } from '../blockchain';
+import { MYProvider } from '../blockchain';
 import { XPowerPpt, XPowerPptFactory, XPowerPptMockFactory } from '../contract';
 import { Account, Address, Nft, NftFullId, NftLevel, NftRealId, Token, Year } from '../redux/types';
 import { Version } from '../types';
@@ -26,11 +26,11 @@ export class PptWallet extends ERC1155Wallet {
     ): Promise<Year> {
         return Promise.resolve(new Date().getFullYear() - await delta);
     }
-    get mmc() {
+    get put() {
         return this._ppt.connect();
     }
-    get wsc() {
-        return WSProvider().then((wsp) => this._ppt.connect(wsp));
+    get get() {
+        return MYProvider().then((p) => this._ppt.connect(p));
     }
     protected _ppt: XPowerPpt;
 }

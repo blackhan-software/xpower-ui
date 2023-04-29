@@ -58,14 +58,14 @@ async function get_balances(
     }
     let nft = 0n;
     if (nft_contract) {
-        const nfts: Balance[] = await nft_contract.wsc.then(
+        const nfts: Balance[] = await nft_contract.get.then(
             (c) => c.balanceOfBatch(accounts, Nft.realIds(ids, { version }))
         );
         nft = nfts.reduce((a, n) => a + n, 0n);
     }
     let ppt = 0n;
     if (ppt_contract) {
-        const ppts: Balance[] = await ppt_contract.wsc.then(
+        const ppts: Balance[] = await ppt_contract.get.then(
             (c) => c.balanceOfBatch(accounts, Nft.realIds(ids, { version }))
         );
         ppt = ppts.reduce((a, p) => a + p, 0n);

@@ -1,5 +1,5 @@
 import { InterfaceAbi, Listener, Transaction } from 'ethers';
-import { WSProvider } from '../../blockchain';
+import { MYProvider } from '../../blockchain';
 import { x40 } from '../../functions';
 import { ROParams } from '../../params';
 import { Account, Address, Amount, Balance, Index, Nft, NftRealId, NftToken, Rate } from '../../redux/types';
@@ -42,7 +42,7 @@ export class MoeTreasury extends Base {
     public async aprs(
         prefix: NftToken, index: Index
     ): Promise<APR> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         return contract.aprs(prefix, index).then(
             ([stamp, value, area]: Rate[]) => ({ stamp, value, area })
         );
@@ -50,7 +50,7 @@ export class MoeTreasury extends Base {
     public async bonuses(
         prefix: NftToken, index: Index
     ): Promise<APRBonus> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         return contract.bonuses(prefix, index).then(
             ([stamp, value, area]: Rate[]) => ({ stamp, value, area })
         );
@@ -74,7 +74,7 @@ export class MoeTreasury extends Base {
     public async claimedFor(
         address: Account, ppt_id: NftRealId
     ): Promise<Amount> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         return contract.claimedFor(
             x40(address), Nft.realId(ppt_id)
         );
@@ -82,7 +82,7 @@ export class MoeTreasury extends Base {
     public async claimedForBatch(
         address: Account, ppt_ids: NftRealId[]
     ): Promise<Amount[]> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         return contract.claimedForBatch(
             x40(address), Nft.realIds(ppt_ids)
         );
@@ -91,7 +91,7 @@ export class MoeTreasury extends Base {
     public async claimableFor(
         address: Account, ppt_id: NftRealId
     ): Promise<Amount> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         return contract.claimableFor(
             x40(address), Nft.realId(ppt_id)
         );
@@ -99,7 +99,7 @@ export class MoeTreasury extends Base {
     public async claimableForBatch(
         address: Account, ppt_ids: NftRealId[]
     ): Promise<Amount[]> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         return contract.claimableForBatch(
             x40(address), Nft.realIds(ppt_ids)
         );
@@ -113,14 +113,14 @@ export class MoeTreasury extends Base {
             ]);
             return apr + apr_bonus;
         }
-        const contract = await this.wsc;
+        const contract = await this.get;
         return contract
             .rateOf(Nft.realId(ppt_id));
     }
     public async aprOf(
         ppt_id: NftRealId
     ): Promise<Rate> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         return contract.aprOf(
             Nft.realId(ppt_id)
         );
@@ -128,7 +128,7 @@ export class MoeTreasury extends Base {
     public async aprBonusOf(
         ppt_id: NftRealId
     ): Promise<Rate> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         return contract.aprBonusOf(
             Nft.realId(ppt_id)
         );
@@ -144,7 +144,7 @@ export class MoeTreasury extends Base {
     public async aprTargetOf(
         ppt_id: NftRealId
     ): Promise<Rate> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         return contract.aprTargetOf(
             Nft.realId(ppt_id)
         );
@@ -152,7 +152,7 @@ export class MoeTreasury extends Base {
     public async aprBonusTargetOf(
         ppt_id: NftRealId
     ): Promise<Rate> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         return contract.aprBonusTargetOf(
             Nft.realId(ppt_id)
         );
@@ -160,13 +160,13 @@ export class MoeTreasury extends Base {
     public async onBlock(
         listener: Listener
     ): Promise<void> {
-        const provider = await WSProvider();
+        const provider = await MYProvider();
         provider?.on('block', listener);
     }
     public async onClaim(
         listener: OnClaim
     ): Promise<void> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         contract.on('Claim', (
             account: string, id: bigint, amount: Amount, ev: TxEvent
         ) => {
@@ -178,7 +178,7 @@ export class MoeTreasury extends Base {
     public async onClaimBatch(
         listener: OnClaimBatch
     ): Promise<void> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         contract.on('ClaimBatch', (
             account: string, ids: bigint[], amounts: Amount[], ev: TxEvent
         ) => {
@@ -190,7 +190,7 @@ export class MoeTreasury extends Base {
     public async moeBalanceOf(
         index: Index | Promise<Index>
     ): Promise<Balance> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         if (ROParams.version < Version.v6b) {
             return contract.balance();
         }
@@ -199,7 +199,7 @@ export class MoeTreasury extends Base {
     public async moeIndexOf(
         address: Account
     ): Promise<Index> {
-        const contract = await this.wsc;
+        const contract = await this.get;
         return contract.moeIndexOf(x40(address)).then(
             (index: bigint) => Number(index)
         );
@@ -207,8 +207,8 @@ export class MoeTreasury extends Base {
     private get otf() {
         return OtfManager.connect(this.connect());
     }
-    private get wsc() {
-        return WSProvider().then((wsp) => this.connect(wsp));
+    private get get() {
+        return MYProvider().then((p) => this.connect(p));
     }
 }
 export default MoeTreasury;

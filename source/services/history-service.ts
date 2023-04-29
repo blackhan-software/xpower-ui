@@ -60,7 +60,7 @@ async function get_balances(
         ? await sov_contract.balance : 0n;
     const nft = Object.fromEntries(ids.map((id) => [id, { balance: 0n }]));
     if (nft_contract) {
-        const balances: Balance[] = await nft_contract.mmc.then(
+        const balances: Balance[] = await nft_contract.get.then(
             (c) => c.balanceOfBatch(accounts, Nft.realIds(ids, { version }))
         );
         for (let i = 0; i < ids.length; i++) {
@@ -72,7 +72,7 @@ async function get_balances(
     }
     const ppt = Object.fromEntries(ids.map((id) => [id, { balance: 0n }]));
     if (ppt_contract) {
-        const balances: Balance[] = await ppt_contract.mmc.then(
+        const balances: Balance[] = await ppt_contract.get.then(
             (c) => c.balanceOfBatch(accounts, Nft.realIds(ids, { version }))
         );
         for (let i = 0; i < ids.length; i++) {

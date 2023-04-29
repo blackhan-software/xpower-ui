@@ -1,4 +1,4 @@
-import { WSProvider } from '../blockchain';
+import { MYProvider } from '../blockchain';
 import { XPowerSov, XPowerSovFactory } from '../contract';
 import { Account, Address, Token } from '../redux/types';
 import { Version } from '../types';
@@ -11,11 +11,11 @@ export class SovWallet extends ERC20Wallet {
         super(account);
         this._sov = XPowerSovFactory({ token, version });
     }
-    get mmc() {
+    get put() {
         return this._sov.connect();
     }
-    get wsc() {
-        return WSProvider().then((wsp) => this._sov.connect(wsp));
+    get get() {
+        return MYProvider().then((p) => this._sov.connect(p));
     }
     private _sov: XPowerSov;
 }

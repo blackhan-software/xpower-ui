@@ -184,10 +184,10 @@ async function moeMigrateOld(token: Token, { $migrate }: {
             );
             reset();
         });
-        const index = await tgt_xpower.mmc.then(
+        const index = await tgt_xpower.get.then(
             (c) => c.oldIndexOf(src_xpower.address)
         );
-        tx = await tgt_xpower.mmc.then(
+        tx = await tgt_xpower.put.then(
             (c) => c.migrate(src_balance, [index])
         );
     } catch (ex: any) {

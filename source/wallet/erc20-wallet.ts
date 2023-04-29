@@ -29,7 +29,7 @@ export abstract class ERC20Wallet {
     async burn(
         amount: Amount
     ): Promise<Transaction> {
-        return this.mmc.then((c) => c.burn(amount));
+        return this.put.then((c) => c.burn(amount));
     }
     async allowance(
         address: Account | Address, spender_address: Account | Address
@@ -40,7 +40,7 @@ export abstract class ERC20Wallet {
         if (typeof spender_address === 'bigint') {
             spender_address = x40(spender_address);
         }
-        return this.wsc.then((c) => c.allowance(
+        return this.get.then((c) => c.allowance(
             address, spender_address
         ));
     }
@@ -50,7 +50,7 @@ export abstract class ERC20Wallet {
         if (typeof spender_address === 'bigint') {
             spender_address = x40(spender_address);
         }
-        return this.mmc.then((c) => c.approve(
+        return this.put.then((c) => c.approve(
             spender_address, allowance
         ));
     }
@@ -60,7 +60,7 @@ export abstract class ERC20Wallet {
         if (typeof spender_address === 'bigint') {
             spender_address = x40(spender_address);
         }
-        return this.mmc.then((c) => c.increaseAllowance(
+        return this.put.then((c) => c.increaseAllowance(
             spender_address, delta_allowance
         ));
     }
@@ -70,7 +70,7 @@ export abstract class ERC20Wallet {
         if (typeof spender_address === 'bigint') {
             spender_address = x40(spender_address);
         }
-        return this.mmc.then((c) => c.decreaseAllowance(
+        return this.put.then((c) => c.decreaseAllowance(
             spender_address, delta_allowance
         ));
     }
@@ -83,9 +83,9 @@ export abstract class ERC20Wallet {
             handler(BigInt(owner), BigInt(spender), value, ev);
         };
         if (once) {
-            this.wsc.then((c) => c.once('Approval', on_approval));
+            this.get.then((c) => c.once('Approval', on_approval));
         } else {
-            this.wsc.then((c) => c.on('Approval', on_approval));
+            this.get.then((c) => c.on('Approval', on_approval));
         }
     }
     onTransfer(
@@ -101,9 +101,9 @@ export abstract class ERC20Wallet {
             }
         };
         if (once) {
-            this.wsc.then((c) => c.once('Transfer', on_transfer));
+            this.get.then((c) => c.once('Transfer', on_transfer));
         } else {
-            this.wsc.then((c) => c.on('Transfer', on_transfer));
+            this.get.then((c) => c.on('Transfer', on_transfer));
         }
         return listener;
     }
@@ -111,19 +111,19 @@ export abstract class ERC20Wallet {
         return BigInt(this._account);
     }
     get address(): Promise<Address> {
-        return this.mmc.then((c) => c.getAddress() as Promise<Address>);
+        return this.get.then((c) => c.getAddress() as Promise<Address>);
     }
     get balance(): Promise<Balance> {
-        return this.wsc.then((c) => c.balanceOf(this._account));
+        return this.get.then((c) => c.balanceOf(this._account));
     }
     get supply(): Promise<Supply> {
-        return this.wsc.then((c) => c.totalSupply());
+        return this.get.then((c) => c.totalSupply());
     }
     get decimals(): Promise<Decimals> {
-        return this.wsc.then((c) => c.decimals());
+        return this.get.then((c) => c.decimals());
     }
-    abstract get mmc(): Promise<Contract>;
-    abstract get wsc(): Promise<Contract>;
+    abstract get put(): Promise<Contract>;
+    abstract get get(): Promise<Contract>;
     private readonly _account: Address;
 }
 export default ERC20Wallet;

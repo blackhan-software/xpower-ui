@@ -1,4 +1,4 @@
-import { WSProvider } from '../blockchain';
+import { MYProvider } from '../blockchain';
 import { XPowerMoe, XPowerMoeFactory } from '../contract';
 import { Account, Address, BlockHash, Nonce, Timestamp, Token } from '../redux/types';
 import { TxEvent, Version } from '../types';
@@ -33,16 +33,16 @@ export class MoeWallet extends ERC20Wallet {
             listener(BigInt(block_hash), timestamp, ev);
         };
         if (once) {
-            this.wsc.then((c) => c.once('Init', on_init));
+            this.get.then((c) => c.once('Init', on_init));
         } else {
-            this.wsc.then((c) => c.on('Init', on_init));
+            this.get.then((c) => c.on('Init', on_init));
         }
     }
-    get mmc() {
+    get put() {
         return this._moe.connect();
     }
-    get wsc() {
-        return WSProvider().then((wsp) => this._moe.connect(wsp));
+    get get() {
+        return MYProvider().then((p) => this._moe.connect(p));
     }
     private _moe: XPowerMoe;
 }

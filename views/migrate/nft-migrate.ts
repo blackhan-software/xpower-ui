@@ -337,10 +337,10 @@ async function nftMigrateOld(token: Token, { $migrate, $approve }: {
             reset();
         });
         const nz = filter(ids, src_balances, { zero: false });
-        const index = await nft_target.mmc.then(
+        const index = await nft_target.get.then(
             (c) => c.oldIndexOf(nft_source.address)
         );
-        tx = await nft_target.mmc.then((c) => c.migrateBatch(
+        tx = await nft_target.put.then((c) => c.migrateBatch(
             Nft.realIds(nz.ids, { version: tgt_version }), nz.balances, [index]
         ));
     } catch (ex: any) {
