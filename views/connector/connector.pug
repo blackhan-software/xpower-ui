@@ -1,7 +1,7 @@
 form#connector
   div.btn-group.connect-wallet(role="group")
-    button#connect-wallet.btn.btn-outline-warning(
-      type="button" disabled
+    a#connect-wallet.btn.btn-outline-warning(
+      type="button" target="_blank" disabled
     )
       span.spinner.spinner-border.spinner-border-sm.float-start.spinner-grow(
         role="status" style="visibility: hidden;"
@@ -12,4 +12,4 @@ form#connector
       title="Authorize your wallet to be connected to"
       type="button"
     )
-      include ../../public/images/pug/info-circle-fill.svg.pug
+      include ../../public/images/pug/wifi-1.svg.pug

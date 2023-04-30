@@ -1,16 +1,17 @@
 import './connector.scss';
 
-import { Blockchain, ChainId } from '../../source/blockchain';
-import { delayed, mobile } from '../../source/functions';
-import { ROParams } from '../../source/params';
-import { globalRef } from '../../source/react';
-import { onTokenSwitch } from '../../source/redux/observers';
-import { AppState, Store } from '../../source/redux/store';
-
 import React, { createElement, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider, useStore } from 'react-redux';
-import { InfoCircle } from '../../public/images/tsx';
+import { globalRef } from '../../source/react';
+
+import { Bug, Wifi } from '../../public/images/tsx';
+import { Blockchain, ChainId } from '../../source/blockchain';
+import { Bus } from '../../source/bus';
+import { delayed, mobile } from '../../source/functions';
+import { ROParams } from '../../source/params';
+import { onTokenSwitch } from '../../source/redux/observers';
+import { AppState, Store } from '../../source/redux/store';
 
 type State = {
     chain: Chain;
@@ -22,13 +23,19 @@ enum Chain {
     CONNECTING,
     CONNECTED,
 }
+enum WifiLevel {
+    LEVEL_0 = 0,
+    LEVEL_1 = 1,
+    LEVEL_2 = 2,
+    LEVEL_3 = 3,
+}
 export function UiConnector() {
     const [chain, set_chain] = useState(
         Chain.CONNECTING
     );
     useEffect(() => {
-        delayed(reset, ms())({ silent: false });
-    }, []);
+        Bus.emit('refresh-tips');
+    }, [chain]);
     const store = useStore<AppState>();
     useEffect(() => {
         return onTokenSwitch(store, () => reset());
@@ -63,20 +70,36 @@ export function UiConnector() {
             console.error(ex);
         }
     };
+    useEffect(() => {
+        delayed(reset, ms())({ silent: false });
+    }, []);
+    const [level, set_level] = useState(WifiLevel.LEVEL_1);
+    useEffect(() => {
+        if (chain === Chain.CONNECTING) {
+            const ms = ROParams.reloadMs ? 300 : 75;
+            const iid = setInterval(() => {
+                if (chain !== Chain.CONNECTING) {
+                    clearInterval(iid);
+                }
+                if (level === 0) set_level(1);
+                if (level === 1) set_level(2);
+                if (level === 2) set_level(3);
+                if (level === 3) set_level(1);
+            }, ms);
+            return () => clearInterval(iid);
+        }
+    }, [chain, level]);
     return <div
         className='btn-group connect-wallet' role='group'
     >
         {$connector(chain)}
-        {$info(chain)}
+        {$info(chain, level)}
     </div>;
 }
 function $connector(
     chain: State['chain']
 ) {
     const on_click = async () => {
-        if (chain === Chain.UNAVAILABLE) {
-            return open('https://metamask.io/download.html');
-        }
         if (chain === Chain.WRONG_ID) {
             await Blockchain.switchTo(
                 ChainId.AVALANCHE_MAINNET
@@ -87,17 +110,20 @@ function $connector(
             return reload(600);
         }
     };
-    return <button
+    const disabled = connecting(chain)
+        ? 'disabled' : '';
+    const href = chain === Chain.UNAVAILABLE
+        ? 'https://about.core.app' : undefined;
+    return <a type='button'
         ref={globalRef('#connect-wallet')}
-        className='btn btn-outline-warning'
-        disabled={connecting(chain)}
+        className={`btn btn-outline-warning ${disabled}`}
+        href={href} target='_blank'
         id='connect-wallet'
         onClick={on_click}
-        type='button'
     >
         {$spinner(chain)}
         {$text(chain)}
-    </button>;
+    </a>;
 }
 function $spinner(
     chain: State['chain']
@@ -133,23 +159,47 @@ function label(
     }
 }
 function $info(
-    chain: State['chain']
+    chain: State['chain'], level: WifiLevel
 ) {
     return <button
         className='btn btn-outline-warning info'
         data-bs-toggle='tooltip' data-bs-placement='top'
         title={tooltip(chain)} type='button'
     >
-        <InfoCircle fill={true} />
+        {icon(chain, level)}
     </button>;
+}
+function icon(
+    chain: State['chain'], level: WifiLevel
+) {
+    switch (chain) {
+        case Chain.UNAVAILABLE:
+            return <Wifi level={0} />;
+        case Chain.WRONG_ID:
+            return <Bug fill={true} />;
+        case Chain.UNCONNECTED:
+            return <Wifi level={0} />;
+        case Chain.CONNECTED:
+            return <Wifi level={3} />;
+        case Chain.CONNECTING:
+            return <Wifi level={level} />;
+    }
 }
 function tooltip(
     chain: State['chain']
 ) {
-    if (chain === Chain.UNAVAILABLE) {
-        return 'Install Wallet (and then reload the application)';
+    switch (chain) {
+        case Chain.UNAVAILABLE:
+            return 'No wallet found: install one and then reload the page';
+        case Chain.WRONG_ID:
+            return 'Wrong network — switch to Avalanche and/or toggle VPN connection (if any)';
+        case Chain.UNCONNECTED:
+            return 'Connect to Avalanche — and/or toggle VPN (if any)';
+        case Chain.CONNECTED:
+            return 'Connected to Avalanche';
+        case Chain.CONNECTING:
+            return 'Connecting to Avalanche';
     }
-    return 'Authorize your Wallet to be connected to';
 }
 function ms(
     fallback?: number
