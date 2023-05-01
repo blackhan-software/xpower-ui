@@ -76,7 +76,6 @@ export function UiConnector() {
     const [level, set_level] = useState(WifiLevel.LEVEL_1);
     useEffect(() => {
         if (chain === Chain.CONNECTING) {
-            const ms = ROParams.reloadMs ? 300 : 75;
             const iid = setInterval(() => {
                 if (chain !== Chain.CONNECTING) {
                     clearInterval(iid);
@@ -85,7 +84,7 @@ export function UiConnector() {
                 if (level === 1) set_level(2);
                 if (level === 2) set_level(3);
                 if (level === 3) set_level(1);
-            }, ms);
+            }, 300);
             return () => clearInterval(iid);
         }
     }, [chain, level]);
