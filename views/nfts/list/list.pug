@@ -3,7 +3,7 @@ div#nft-single-minting
     | Mint & Manage {{TOKEN}} NFTs
   - let levels = ["UNIT", "KILO", "MEGA", "GIGA", "TERA", "PETA", "EXA", "ZETTA", "YOTTA", "1E27"]
   - let index = 0
-  while index < 6
+  while index < 9
     div.btn-group.nft-minter(
       role="group"
     )
@@ -12,7 +12,7 @@ div#nft-single-minting
           type="button" data-bs-toggle="tooltip" data-bs-placement="top"
           title=`Show ${levels[index]} NFTs`
         )
-          i.bi-chevron-down
+          i(class=`bi-chevron-{{NFT_${levels[index]}_CHEVRON}}`)
       button.btn.btn-outline-warning.minter(
         type="button" data-bs-toggle="tooltip" data-bs-placement="top"
         title=`Mint ${levels[index]} NFTs (for [1${levels[index].slice(0,1)}...1${levels[index+1].toUpperCase().slice(0,1)}] {{TOKEN}} tokens)`
@@ -41,7 +41,7 @@ div#nft-single-minting
         )
           include ../../../public/images/pug/plus-circle-fill.svg.pug
     div.nft-details(
-      role="group"
+      role="group" style=`display:{{NFT_${levels[index]}_DISPLAY}}`
     )
       include ../details/details.pug
     - index++

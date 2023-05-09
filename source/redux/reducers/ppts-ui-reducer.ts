@@ -1,4 +1,5 @@
 import { Action } from '@reduxjs/toolkit';
+import { RWParams } from '../../params';
 import { Years } from '../../years';
 import * as actions from '../actions';
 import { NftLevels, NftToken, NftTokens, PptAmounts, PptDetails, PptFlags, PptMinter, PptsUi } from '../types';
@@ -116,14 +117,12 @@ export function pptMinter() {
     return pptWrap(minter as PptMinter);
 }
 export function pptFlags(
-    display = true, toggled = false
+    display = true
 ) {
     const flags = Object.fromEntries(
-        Array.from(NftLevels()).map(
-            (ppt_level) => [ppt_level, {
-                display, toggled
-            }]
-        )
+        Array.from(NftLevels()).map((l) => [l, {
+            display, toggled: RWParams.nftLevels.includes(l)
+        }])
     );
     return flags as PptFlags;
 }

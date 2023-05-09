@@ -110,7 +110,27 @@ describe('env_of_home', () => {
                 AMOUNT_64: "64",
             }, ...{
                 UI_MINING_SPEED: 50,
-            }
+            }, ...{
+                NFT_UNIT_DISPLAY: 'none',
+                NFT_KILO_DISPLAY: 'none',
+                NFT_MEGA_DISPLAY: 'none',
+                NFT_GIGA_DISPLAY: 'none',
+                NFT_TERA_DISPLAY: 'none',
+                NFT_PETA_DISPLAY: 'none',
+                NFT_EXA_DISPLAY: 'none',
+                NFT_ZETTA_DISPLAY: 'none',
+                NFT_YOTTA_DISPLAY: 'none',
+            }, ...{
+                NFT_UNIT_CHEVRON: 'down',
+                NFT_KILO_CHEVRON: 'down',
+                NFT_MEGA_CHEVRON: 'down',
+                NFT_GIGA_CHEVRON: 'down',
+                NFT_TERA_CHEVRON: 'down',
+                NFT_PETA_CHEVRON: 'down',
+                NFT_EXA_CHEVRON: 'down',
+                NFT_ZETTA_CHEVRON: 'down',
+                NFT_YOTTA_CHEVRON: 'down',
+            },
         });
     });
 });

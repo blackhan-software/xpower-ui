@@ -1,9 +1,10 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-import { Page, Pager, Token } from '../../source/redux/types';
-import { Tokenizer } from '../../source/token';
-import { theme } from '../../source/theme';
-import { capitalize } from './capitalize';
 import { Request } from 'express';
+import { nftLevels } from '../../source/params/parsers';
+import { Nft, NftLevels, Page, Pager, Token } from '../../source/redux/types';
+import { theme } from '../../source/theme';
+import { Tokenizer } from '../../source/token';
+import { capitalize } from './capitalize';
 
 export const env_of = (req: Request): Record<string, string> => {
   const params = new URLSearchParams(req.query as any);
@@ -32,12 +33,16 @@ export const env_of = (req: Request): Record<string, string> => {
       ...theme(xtoken),
       ...header_page(req),
       ...cover_image(req),
-      ...otf_wallet(req),
-      ...selector_token(req)
+      ...otf_wallet(params),
+      ...selector_token(params),
+      ...nft_display(params),
+      ...nft_chevron(params),
     }
   };
 };
-const header_page = (req: Request) => {
+const header_page = (
+  req: Request
+) => {
   const page = Pager.parse(req.path);
   return {
     HEADER_HOME:
@@ -50,15 +55,18 @@ const header_page = (req: Request) => {
       page === Page.About ? 'active' : '',
   };
 };
-const cover_image = (req: Request) => {
+const cover_image = (
+  req: Request
+) => {
   const page = Pager.parse(req.path);
   return {
     COVER_IMAGE:
       page === Page.Home ? 'cover-xpower' : 'cover-apower',
   };
 };
-const otf_wallet = (req: Request) => {
-  const params = new URLSearchParams(req.query as any);
+const otf_wallet = (
+  params: URLSearchParams
+) => {
   const value = params.get('otf-wallet');
   let toggled = false;
   try {
@@ -71,8 +79,9 @@ const otf_wallet = (req: Request) => {
     OTF_WALLET: !toggled ? 'd-none' : ''
   };
 };
-const selector_token = (req: Request) => {
-  const params = new URLSearchParams(req.query as any);
+const selector_token = (
+  params: URLSearchParams
+) => {
   const token = Tokenizer.token(params.get('token'));
   return {
     SELECT0R_THOR: token === Token.THOR ? 'active' : '',
@@ -80,5 +89,23 @@ const selector_token = (req: Request) => {
     SELECT0R_ODIN: token === Token.ODIN ? 'active' : '',
     SELECT0R_HELA: token === Token.HELA ? 'active' : ''
   };
+};
+const nft_display = (
+  params: URLSearchParams
+) => {
+  const url_levels = nftLevels(params);
+  const all_levels = Array.from(NftLevels({ min: 0, max: Infinity }));
+  return Object.fromEntries(all_levels.map((l) => [
+    `NFT_${Nft.nameOf(l)}_DISPLAY`, url_levels.includes(l) ? 'block' : 'none'
+  ]));
+};
+const nft_chevron = (
+  params: URLSearchParams
+) => {
+  const url_levels = nftLevels(params);
+  const all_levels = Array.from(NftLevels({ min: 0, max: Infinity }));
+  return Object.fromEntries(all_levels.map((l) => [
+    `NFT_${Nft.nameOf(l)}_CHEVRON`, url_levels.includes(l) ? 'up' : 'down'
+  ]));
 };
 export default env_of;

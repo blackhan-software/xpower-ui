@@ -161,9 +161,6 @@ export function UiPptDetails(
 function claims(
     account: Account | null, token: Token
 ) {
-    if (!account) {
-        throw new Error('missing account');
-    }
     return async (
         ppt_token: NftToken,
         ppt_level: NftLevel,
@@ -175,10 +172,10 @@ function claims(
         const moe_treasury = MoeTreasuryFactory({
             token
         });
-        const [rate, claimed, claimable] = await Promise.all([
+        const [claimable, claimed, rate] = await Promise.all([
+            account ? moe_treasury.claimableFor(account, full_id) : 0n,
+            account ? moe_treasury.claimedFor(account, full_id) : 0n,
             moe_treasury.rateOf(full_id),
-            moe_treasury.claimedFor(account, full_id),
-            moe_treasury.claimableFor(account, full_id)
         ]);
         return {
             [ppt_level]: {

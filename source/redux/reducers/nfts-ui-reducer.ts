@@ -1,7 +1,8 @@
 import { Action } from '@reduxjs/toolkit';
+import { RWParams } from '../../params';
 import { Years } from '../../years';
 import * as actions from '../actions';
-import { NftAmounts, NftDetails, NftFlags, NftLevels, NftMinter, NftsUi, NftToken, NftTokens } from '../types';
+import { NftAmounts, NftDetails, NftFlags, NftLevels, NftMinter, NftToken, NftTokens, NftsUi } from '../types';
 
 export function nftsUiReducer(
     nfts_ui: NftsUi = nftsUiState(), action: Action
@@ -113,14 +114,12 @@ export function nftMinter() {
     return nftWrap(minter as NftMinter);
 }
 export function nftFlags(
-    display = true, toggled = false
+    display = true
 ) {
     const flags = Object.fromEntries(
-        Array.from(NftLevels()).map(
-            (nft_level) => [nft_level, {
-                display, toggled
-            }]
-        )
+        Array.from(NftLevels()).map((l) => [l, {
+            display, toggled: RWParams.nftLevels.includes(l)
+        }])
     );
     return flags as NftFlags;
 }

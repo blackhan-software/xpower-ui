@@ -12,7 +12,7 @@ div#ppt-single-minting
           type="button" data-bs-toggle="tooltip" data-bs-placement="top"
           title=`Show ${levels[index]} NFTs`
         )
-          i.bi-chevron-down
+          i(class=`bi-chevron-{{NFT_${levels[index]}_CHEVRON}}`)
       button.btn.btn-outline-warning.minter(
         type="button" data-bs-toggle="tooltip" data-bs-placement="top"
         title=`(Un)stake ${levels[index]} NFTs`
@@ -41,7 +41,7 @@ div#ppt-single-minting
         )
           include ../../../public/images/pug/plus-circle-fill.svg.pug
     div.nft-details(
-      role="group"
+      role="group" style=`display:{{NFT_${levels[index]}_DISPLAY}}`
     )
       include ../details/details.pug
     - index++

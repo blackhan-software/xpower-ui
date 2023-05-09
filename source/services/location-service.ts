@@ -3,10 +3,10 @@ import { Blockchain } from '../blockchain';
 import { delayed } from '../functions';
 import { MiningManager as MM } from '../managers';
 import { RWParams } from '../params';
-import { onPageSwitch, onTokenSwitch } from '../redux/observers';
+import { onNftsUiFlags, onPageSwitch, onTokenSwitch } from '../redux/observers';
 import { xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Page } from '../redux/types';
+import { NftLevel, Page } from '../redux/types';
 
 export const LocationService = (
     store: Store<AppState>
@@ -72,6 +72,11 @@ export const LocationService = (
         });
     }, {
         per: () => xtokenOf(store.getState())
+    });
+    onNftsUiFlags(store, function syncLocationNftLevels(flags) {
+        RWParams.nftLevels = Object.entries(flags)
+            .filter(([_, { toggled }]) => toggled)
+            .map(([level]) => Number(level) as NftLevel);
     });
 };
 export default LocationService;

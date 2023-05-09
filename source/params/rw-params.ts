@@ -1,8 +1,20 @@
-import { Page, Pager, Token } from '../redux/types';
+import { NftLevel, Page, Pager, Token } from '../redux/types';
 import { Version } from '../types';
 import * as parsers from './parsers';
 
 export class RWParams {
+    public static get nftLevels() {
+        return parsers.nftLevels(this.search());
+    }
+    public static set nftLevels(levels: NftLevel[]) {
+        const search = this.search();
+        if (levels.length > 0) {
+            search.set('nft-levels', levels.join('.'));
+        } else {
+            search.delete('nft-levels');
+        }
+        this.push({ search });
+    }
     static get otfWallet() {
         return parsers.otfWallet(this.search());
     }
