@@ -24,7 +24,7 @@ export class OtfManager {
     public static async init(
         key = 'otf-wallet'
     ): Promise<Wallet> {
-        if (this._wallet !== undefined) {
+        if (this._wallet !== undefined && global.MY_PROVIDER_OTF) {
             return Promise.resolve(this._wallet);
         }
         let value = localStorage.getItem(key);
@@ -33,7 +33,7 @@ export class OtfManager {
             localStorage.setItem(key, value);
         }
         const secret = new Uint8Array(JSON.parse(atob(value)));
-        const provider = global.WS_PROVIDER_OTF = await MYProvider();
+        const provider = global.MY_PROVIDER_OTF = await MYProvider();
         const wallet = new OtfWallet(new SigningKey(secret), provider);
         return this._wallet = global.OTF_WALLET = wallet;
     }
