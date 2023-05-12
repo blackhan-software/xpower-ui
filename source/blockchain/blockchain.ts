@@ -59,6 +59,25 @@ export class Blockchain extends EventEmitter {
         }
         return Boolean(this._isConnected);
     }
+    public static async reconnect(): Promise<Account> {
+        return this.me.reconnect();
+    }
+    public async reconnect(): Promise<Account> {
+        const account = await this.account();
+        if (!account) {
+            throw new Error('missing account');
+        }
+        setTimeout(async () => {
+            const info = {
+                account,
+                chainId: await this.chainId(),
+                token: RWParams.token,
+                version: ROParams.version
+            };
+            this.emit('reconnect', info);
+        });
+        return account;
+    }
     public static async connect(): Promise<Account> {
         return this.me.connect();
     }
@@ -153,9 +172,11 @@ export class Blockchain extends EventEmitter {
     private onConnect(
         listener: (options: Connect) => void
     ) {
-        this.on('connect', listener);
+        this.on('reconnect', listener)
+            .on('connect', listener);
         return () => {
-            this.off('connect', listener);
+            this.off('reconnect', listener)
+                .off('connect', listener);
         };
     }
     public static onceConnect(
@@ -171,8 +192,12 @@ export class Blockchain extends EventEmitter {
         }
     ) {
         if (context === undefined) {
-            this.once('connect', listener);
-            return () => { this.off('connect', listener); }
+            this.on('reconnect', listener)
+                .once('connect', listener);
+            return () => {
+                this.off('reconnect', listener)
+                    .off('connect', listener);
+            }
         }
         if (context.tokens === undefined) {
             context.tokens = new Set(XTokens());
@@ -181,16 +206,19 @@ export class Blockchain extends EventEmitter {
         for (const token of context.tokens) {
             const handler = (options: Connect) => {
                 if (token === context.per()) {
-                    this.off('connect', handler);
+                    this.off('reconnect', handler)
+                        .off('connect', handler);
                     listener(options);
                 }
             };
-            this.on('connect', handler);
+            this.on('reconnect', handler)
+                .on('connect', handler);
             handlers.push(handler);
         }
         return () => {
             handlers.forEach((handler) => {
-                this.off('connect', handler);
+                this.off('reconnect', handler)
+                    .off('connect', handler);
             });
         };
     }
