@@ -50,11 +50,12 @@ export class MoeTreasury extends Base {
     public async aprsLength(
         prefix: NftToken
     ): Promise<number | undefined> {
-        if (ROParams.version > Version.v7a) {
-            const contract = await this.get;
-            return contract.aprsLength(prefix);
+        if (ROParams.version < Version.v7b) {
+            return undefined;
         }
-    }
+        const contract = await this.get;
+        return contract.aprsLength(prefix);
+}
     public async bonuses(
         prefix: NftToken, index: Index
     ): Promise<APRBonus> {
@@ -66,11 +67,12 @@ export class MoeTreasury extends Base {
     public async bonusesLength(
         prefix: NftToken
     ): Promise<number | undefined> {
-        if (ROParams.version > Version.v7a) {
-            const contract = await this.get;
-            return contract.bonusesLength(prefix);
+        if (ROParams.version < Version.v7b) {
+            return undefined;
         }
-    }
+        const contract = await this.get;
+        return contract.bonusesLength(prefix);
+}
     public async claimFor(
         address: Account, ppt_id: NftRealId
     ): Promise<Transaction> {
