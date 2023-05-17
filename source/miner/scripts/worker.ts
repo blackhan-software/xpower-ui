@@ -8,7 +8,7 @@ import { x40, x64, x64_plain } from '../../functions';
 import { Account, Address, Amount, BlockHash, Interval, Level, Nonce, Token } from '../../redux/types';
 import { Version } from '../../types';
 
-import { AbiCoder, randomBytes } from 'ethers';
+import { AbiCoder, solidityPacked, randomBytes } from 'ethers';
 import { Observable } from 'observable-fns';
 import { WorkerFunction, WorkerModule } from 'threads/dist/types/worker';
 import { expose } from 'threads/worker';
@@ -429,8 +429,31 @@ function abi_encoder(
         value.set(array, 96);
         return value;
     };
+    const encoder_v7b = (nonce: Nonce, {
+        account, block_hash, contract, interval
+    }: Context) => {
+        let value = abi_encoded[interval];
+        if (value === undefined) {
+            const bytes28 = (block_hash: string) => {
+                return "0x" + block_hash.slice(2).slice(0, -8);
+            };
+            const template = solidityPacked([
+                'uint160', 'bytes28', 'uint256'
+            ], [
+                BigInt(contract) ^ account,
+                bytes28(x64(block_hash)),
+                0
+            ]);
+            abi_encoded[interval] = value = arrayify(template.slice(2));
+            array_cache[level] = arrayify(x64_plain(nonce));
+            nonce_cache[level] = nonce;
+        }
+        const array = lazy_arrayify(nonce, x64_plain(nonce));
+        value.set(array, 48);
+        return value;
+    };
     if (versionFaked) {
-        return encoder_v6b;
+        return encoder_v7b;
     }
     switch (version) {
         case Version.v2a:
@@ -448,8 +471,11 @@ function abi_encoder(
         case Version.v6a:
             return encoder_v6a;
         case Version.v6b:
-        default:
+        case Version.v6c:
+        case Version.v7a:
             return encoder_v6b;
+        default:
+            return encoder_v7b;
     }
     function symbol_v2c(token: Token) {
         if (token === Token.THOR) return 'XPOW.CPU';
