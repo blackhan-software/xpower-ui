@@ -156,12 +156,14 @@ function $balance(
     />;
 }
 function $sovToggle(
-    { token, aged, set_aged }: Props & {
+    { wallet, token, aged, set_aged }: Props & {
         aged: boolean, set_aged: (aged: boolean) => void
     }
 ) {
     const title = aged
-        ? `Balance of aged proof-of-work ${token} tokens`
+        ? `Balance of ${token} tokens collateralized at ${collat({
+            wallet, token
+        })}%`
         : `Balance of proof-of-work ${token} tokens`;
     return <button
         className='form-control input-group-text info'
@@ -177,5 +179,12 @@ function $sovToggle(
             width: '20px',
         } : {}} />
     </button>;
+}
+function collat(
+    { wallet, token }: Pick<Props, 'wallet' | 'token'>,
+    precision = 1, denominator = 1e6
+) {
+    const collat = Number(wallet.items[token]?.collat ?? 0n);
+    return (100 * collat / denominator).toFixed(precision);
 }
 export default UiAftWallet;

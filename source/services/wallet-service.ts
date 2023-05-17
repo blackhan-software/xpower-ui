@@ -15,25 +15,25 @@ export const WalletService = (
     }) {
         const xtoken = Tokenizer.xify(token);
         const moe_wallet = new MoeWallet(account, xtoken);
-        const [amount, supply] = await Promise.all([
-            moe_wallet.balance, moe_wallet.supply
+        const [a, s, c] = await Promise.all([
+            moe_wallet.balance, moe_wallet.supply, 0n
         ]);
         store.dispatch(setAftWallet(
-            xtoken, { amount, supply }
+            xtoken, { amount: a, supply: s, collat: c }
         ));
     }, {
         per: () => xtokenOf(store.getState())
     });
-    Blockchain.onceConnect(async function initMoeWallet({
+    Blockchain.onceConnect(async function initSovWallet({
         account, token
     }) {
         const atoken = Tokenizer.aify(token);
         const sov_wallet = new SovWallet(account, atoken);
-        const [amount, supply] = await Promise.all([
-            sov_wallet.balance, sov_wallet.supply
+        const [a, s, c] = await Promise.all([
+            sov_wallet.balance, sov_wallet.supply, sov_wallet.collat
         ]);
         store.dispatch(setAftWallet(
-            atoken, { amount, supply }
+            atoken, { amount: a, supply: s, collat: c }
         ));
     }, {
         per: () => xtokenOf(store.getState())
@@ -51,11 +51,11 @@ export const WalletService = (
                 '[on:transfer]', x40(from), x40(to), amount
             );
             if (account === from || account === to) {
-                const [amount, supply] = await Promise.all([
-                    moe_wallet.balance, moe_wallet.supply
+                const [a, s, c] = await Promise.all([
+                    moe_wallet.balance, moe_wallet.supply, 0n
                 ]);
                 store.dispatch(setAftWallet(
-                    xtoken, { amount, supply }
+                    xtoken, { amount: a, supply: s, collat: c }
                 ));
             }
         };
@@ -78,11 +78,11 @@ export const WalletService = (
                 '[on:transfer]', x40(from), x40(to), amount
             );
             if (account === from || account === to) {
-                const [amount, supply] = await Promise.all([
-                    sov_wallet.balance, sov_wallet.supply
+                const [a, s, c] = await Promise.all([
+                    sov_wallet.balance, sov_wallet.supply, sov_wallet.collat
                 ]);
                 store.dispatch(setAftWallet(
-                    atoken, { amount, supply }
+                    atoken, { amount: a, supply: s, collat: c }
                 ));
             }
         };

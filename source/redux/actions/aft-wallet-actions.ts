@@ -1,10 +1,11 @@
 import { createAction } from '@reduxjs/toolkit';
-import { AftWallet, Amount, Supply, Token } from '../types';
+import { AftWallet, Amount, Collat, Supply, Token } from '../types';
 
 export const setAftWallet = createAction('aft-wallet/set', (
     token: Token, item: {
         amount: Amount, // new-amount = amount
         supply: Supply, // new-supply = supply
+        collat: Collat, // collateralization
     }
 ) => ({
     payload: { token, item }

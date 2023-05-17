@@ -1,6 +1,6 @@
 import { Action } from '@reduxjs/toolkit';
 import * as actions from '../actions';
-import { AftWallet, Amount, Supply, Token } from '../types';
+import { AftWallet, Amount, Collat, Supply, Token } from '../types';
 
 export function initialState() {
     return { items: {}, burner: null } as AftWallet;
@@ -9,9 +9,9 @@ export function aftWalletReducer(
     aft_wallet = initialState(), action: Action
 ): AftWallet {
     if (actions.setAftWallet.match(action)) {
-        const { token, item: { amount, supply } } = action.payload;
+        const { token, item: { amount: a, supply: s, collat: c } } = action.payload;
         const items = { ...aft_wallet.items };
-        items[token] = pack(amount, supply, { token });
+        items[token] = pack(a, s, c, token);
         return {
             ...aft_wallet, items, more: [token], less: undefined
         };
@@ -27,11 +27,12 @@ export function aftWalletReducer(
         if (item_old) {
             const s = item_new.supply ?? item_old.supply + item_new.amount;
             const a = item_old.amount + item_new.amount;
-            items[token] = pack(a, s, { token: token });
+            const c = item_old.collat;
+            items[token] = pack(a, s, c, token);
         } else {
             const s = item_new.supply ?? item_new.amount;
             const a = item_new.amount;
-            items[token] = pack(a, s, { token: token });
+            items[token] = pack(a, s, 0n, token);
         }
         return {
             ...aft_wallet, items, more: [token], less: undefined
@@ -48,11 +49,12 @@ export function aftWalletReducer(
         if (item_old) {
             const s = item_new.supply ?? item_old.supply;
             const a = item_old.amount - item_new.amount;
-            items[token] = pack(a, s, { token: token });
+            const c = item_old.collat;
+            items[token] = pack(a, s, c, token);
         } else {
             const s = item_new.supply ?? 0n;
             const a = 0n - item_new.amount;
-            items[token] = pack(a, s, { token: token });
+            items[token] = pack(a, s, 0n, token);
         }
         return {
             ...aft_wallet, items, less: [token], more: undefined
@@ -67,14 +69,14 @@ export function aftWalletReducer(
     return aft_wallet;
 }
 function pack(
-    amount: Amount, supply: Supply, { token }: { token: Token }
+    a: Amount, s: Supply, c: Collat, t: Token,
 ) {
-    if (supply < amount) {
-        throw new Error(`${token} supply=${supply} < amount=${amount}`);
+    if (s < a) {
+        throw new Error(`${t} supply=${s} < amount=${a}`);
     }
-    if (supply < 0) {
-        throw new Error(`${token} supply=${supply} < 0`);
+    if (s < 0) {
+        throw new Error(`${t} supply=${s} < 0`);
     }
-    return { amount, supply };
+    return { amount: a, supply: s, collat: c };
 }
 export default aftWalletReducer;
