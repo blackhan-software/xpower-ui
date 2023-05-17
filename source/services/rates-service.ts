@@ -1,9 +1,10 @@
 import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
 import { APR, APRBonus, MoeTreasuryFactory } from '../contract';
+import { range } from '../functions';
 import { xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Index, Nft, NftFullId, Rate, Token } from '../redux/types';
+import { Index, Nft, NftFullId, NftToken, Rate, Token } from '../redux/types';
 
 import * as actions from '../redux/actions';
 
@@ -13,69 +14,123 @@ export const RatesService = (
     Blockchain.onceConnect(async function initRates({
         token
     }) {
-        const aprs = await fetch_aprs(token);
+        const aprs = await new APRs(token).fetch();
         for (const [i, apr] of Object.entries(aprs)) {
             store.dispatch(actions.setAPR(token, Number(i), apr));
         }
-        const bonuses = await fetch_bonuses(token);
-        for (const [i, bonus] of Object.entries(bonuses)) {
-            store.dispatch(actions.setAPRBonus(token, Number(i), bonus));
+        const apbs = await new APBs(token).fetch();
+        for (const [i, apb] of Object.entries(apbs)) {
+            store.dispatch(actions.setAPRBonus(token, Number(i), apb));
         }
     }, {
         per: () => xtokenOf(store.getState())
     });
 }
-async function fetch_aprs(
-    token: Token, index: Index = 0, list = [] as APR[]
-): Promise<APR[]> {
-    const mty = MoeTreasuryFactory({ token });
-    try {
-        list.push(await mty.aprs(Nft.token(token), index));
-    } catch (ex) {
-        const target = await aprTargetOf(token, Nft.fullId({
-            issue: 2021, level: 3, token: Nft.token(token)
+class APRs {
+    constructor(token: Token) {
+        this.mty = MoeTreasuryFactory({ token });
+        this.nftToken = Nft.token(token);
+        this.token = token;
+    }
+    async fetch(): Promise<APR[]> {
+        const length = await this.mty.aprsLength(this.nftToken);
+        if (length !== undefined) {
+            return this.list(Array.from(range(length)))
+        }
+        return this.next();
+    }
+    async list(
+        indices: Index[]
+    ): Promise<APR[]> {
+        return this.tail(await Promise.all(indices.map((i) =>
+            this.mty.aprs(this.nftToken, i)
+        )));
+    }
+    async next(
+        index: Index = 0, list = [] as APR[]
+    ): Promise<APR[]> {
+        try {
+            list.push(await this.mty.aprs(this.nftToken, index));
+        } catch (ex) {
+            return this.tail(list);
+        }
+        return this.next(index + 1, list);
+    }
+    async tail(
+        list: APR[]
+    ) {
+        const target = await this.fake(Nft.fullId({
+            issue: 2021, level: 3, token: this.nftToken
         }));
         list.push(aprify(target, list));
         return list;
     }
-    return await fetch_aprs(token, index + 1, list);
-}
-async function aprTargetOf(
-    token: Token, nft_id: NftFullId
-) {
-    const mty = MoeTreasuryFactory({ token });
-    try {
-        return await mty.aprTargetOf(nft_id);
-    } catch (ex) {
-        console.error(ex);
-        return 0n;
+    async fake(
+        nft_id: NftFullId
+    ) {
+        try {
+            return this.mty.aprTargetOf(nft_id);
+        } catch (ex) {
+            console.error(ex);
+            return 0n;
+        }
     }
+    mty: ReturnType<typeof MoeTreasuryFactory>;
+    nftToken: NftToken;
+    token: Token;
 }
-async function fetch_bonuses(
-    token: Token, index: Index = 0, list = [] as APR[]
-): Promise<APRBonus[]> {
-    const mty = MoeTreasuryFactory({ token });
-    try {
-        list.push(await mty.bonuses(Nft.token(token), index));
-    } catch (ex) {
-        const target = await aprBonusTargetOf(token, Nft.fullId({
-            issue: 2021, level: 3, token: Nft.token(token)
+class APBs {
+    constructor(token: Token) {
+        this.mty = MoeTreasuryFactory({ token });
+        this.nftToken = Nft.token(token);
+        this.token = token;
+    }
+    async fetch(): Promise<APRBonus[]> {
+        const length = await this.mty.bonusesLength(this.nftToken);
+        if (length !== undefined) {
+            return this.list(Array.from(range(length)))
+        }
+        return this.next();
+    }
+    async list(
+        indices: Index[]
+    ): Promise<APRBonus[]> {
+        return this.tail(await Promise.all(indices.map((i) =>
+            this.mty.bonuses(this.nftToken, i)
+        )));
+    }
+    async next(
+        index: Index = 0, list = [] as APRBonus[]
+    ): Promise<APRBonus[]> {
+        try {
+            list.push(await this.mty.bonuses(this.nftToken, index));
+        } catch (ex) {
+            return this.tail(list);
+        }
+        return this.next(index + 1, list);
+    }
+    async tail(
+        list: APRBonus[]
+    ) {
+        const target = await this.fake(Nft.fullId({
+            issue: 2021, level: 3, token: this.nftToken
         }));
         list.push(aprify(target, list));
         return list;
     }
-    return await fetch_bonuses(token, index + 1, list);
-}
-async function aprBonusTargetOf(
-    token: Token, nft_id: NftFullId
-) {
-    const mty = MoeTreasuryFactory({ token });
-    try {
-        return await mty.aprBonusTargetOf(nft_id);
-    } catch (ex) {
-        console.error(ex);
-        return 0n;
+    async fake(
+        nft_id: NftFullId
+    ) {
+        try {
+            return this.mty.aprBonusTargetOf(nft_id);
+        } catch (ex) {
+            console.error(ex);
+            return 0n;
+        }
     }
+    mty: ReturnType<typeof MoeTreasuryFactory>;
+    nftToken: NftToken;
+    token: Token;
 }
 function aprify(
     value: Rate, list: APR[]
