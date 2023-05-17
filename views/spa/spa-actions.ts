@@ -2,7 +2,7 @@
 import { removeNonce, removeNonceByAmount, setAftWalletBurner, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter, switchToken } from '../../source/redux/actions';
 import { mintingRowBy, nftTotalBy, nftsBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
 import { AppThunk } from '../../source/redux/store';
-import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftMintApproval, NftMintStatus, NftMinterList, NftSendStatus, NftUpgradeStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token, TokenInfo } from '../../source/redux/types';
+import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftMintApproval, NftMintStatus, NftMinterList, NftSendStatus, NftUpgradeStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../source/redux/types';
 
 import { MMProvider } from '../../source/blockchain';
 import { MoeTreasuryFactory, OnClaim, OnClaimBatch, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
@@ -635,7 +635,6 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
         levels: Array.from(NftLevels()),
         token: ppt_token
     });
-    const moe_info = TokenInfo(token);
     const moe_treasury = MoeTreasuryFactory({
         token
     });
@@ -646,16 +645,6 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
     if (claimable === 0n) {
         set_status(PptClaimerStatus.error);
         throw error(`No claimable rewards yet; need to wait.`);
-    }
-    const treasure = await moe_treasury
-        .moeBalanceOf(moe_treasury.moeIndexOf(moe_info.address));
-    if (treasure === 0n) {
-        set_status(PptClaimerStatus.error);
-        throw error(`Empty treasury; cannot claim any rewards.`);
-    }
-    if (treasure < claimable) {
-        set_status(PptClaimerStatus.error);
-        throw error(`Insufficient treasury; cannot claim all rewards.`);
     }
     const on_claim_batch: OnClaimBatch = (
         account, nft_ids, amounts, ev
