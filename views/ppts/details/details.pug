@@ -1,7 +1,7 @@
 each year in Array.from(YEARS).reverse()
   - let nft_id = 100 * year + 3 * index
   - let now_year = new Date().getFullYear()
-  - let apr = 3 * index + (now_year - year) / 1000
+  - let apr = 3 * index + (now_year - year) / 1e6
   div.row.year(
     style=`display:${
       YEARS[YEARS.length-1] - year ? 'none' : 'flex'
@@ -118,7 +118,7 @@ each year in Array.from(YEARS).reverse()
           span.text: | Claim Rewards
         button.btn.btn-outline-warning.info(
           type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Claim {{aTOKEN}}s for staked ${levels[index]} NFTs at ${apr.toFixed(3)}% APR`
+          title=`Claim {{aTOKEN}}s for staked ${levels[index]} NFTs at ${apr.toFixed(2)}% APR`
         )
           include ../../../public/images/pug/info-circle-fill.svg.pug
   hr.year(style=`display:${

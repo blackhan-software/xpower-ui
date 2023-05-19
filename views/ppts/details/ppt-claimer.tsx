@@ -6,6 +6,8 @@ import React, { useEffect } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 import { UiPptToggle } from './ui-toggle';
 import { Bus } from '../../../source/bus';
+import { ROParams } from '../../../source/params';
+import { Version } from '../../../source/types';
 
 type Props = {
     token: Token;
@@ -97,7 +99,7 @@ function $info(
     return <button type='button'
         className='btn btn-outline-warning info'
         data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`Claim ${atoken}s for staked ${Nft.nameOf(level)} NFTs at ${rate.toFixed(3)}%`}
+        title={`Claim ${atoken}s for staked ${Nft.nameOf(level)} NFTs at ${rate.toFixed(2)}%`}
     >
         <InfoCircle fill={true} />
     </button>;
@@ -105,7 +107,10 @@ function $info(
 function rateOf(
     { rate }: Props
 ) {
-    return Number(rate) / 1_000;
+    if (ROParams.version < Version.v7b) {
+        return Number(rate) / 1e3;
+    }
+    return Number(rate) / 1e6;
 }
 function Spinner(
     { show, grow }: { show: boolean, grow?: boolean }

@@ -92,7 +92,7 @@ function chart(
                     }),
                     label: (ctx: any) => {
                         const label = ctx.dataset.label || '';
-                        const value = ctx.parsed.y.toFixed(3);
+                        const value = ctx.parsed.y.toFixed(2);
                         return ` ${label}: ${value}%`;
                     },
                     title: ([{ dataIndex: i }]: any) => {
@@ -120,7 +120,7 @@ function chart(
                     tickBorderDash: [1],
                 },
                 ticks: {
-                    callback: (v: string | number) => `${Number(v).toFixed(1)}%`
+                    callback: (v: string | number) => `${Number(v).toFixed(2)}%`
                 },
                 title: {
                     display: true,

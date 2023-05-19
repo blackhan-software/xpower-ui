@@ -182,7 +182,7 @@ function $sovToggle(
 }
 function collat(
     { wallet, token }: Pick<Props, 'wallet' | 'token'>,
-    precision = 1, denominator = 1e6
+    precision = 2, denominator = 1e6
 ) {
     const collat = Number(wallet.items[token]?.collat ?? 0n);
     return (100 * collat / denominator).toFixed(precision);

@@ -105,7 +105,7 @@ function chart(
                     }),
                     label: (ctx: any) => {
                         const label = ctx.dataset.label || '';
-                        const value = ctx.parsed.y.toFixed(3);
+                        const value = ctx.parsed.y.toFixed(2);
                         return ` ${label}: ${value}%`;
                     },
                     title: ([{ dataIndex: i }]: any) => {
@@ -161,7 +161,7 @@ function chart(
                 },
                 ticks: {
                     callback: (v: string | number) => {
-                        return `${Number(v).toFixed(3)}%`;
+                        return `${Number(v).toFixed(2)}%`;
                     }
                 },
                 title: {
