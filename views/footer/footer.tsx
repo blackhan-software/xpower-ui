@@ -322,7 +322,7 @@ function $cookies(
     href = 'https://cookie-consent.app.forthe.top/why-websites-use-cookies/'
 ) {
     return <li className='nav-item'>
-        › We use cookies<span className='d-none d-sm-inline'>&nbsp;to improve your experience</span>; <a className='consent' href={href} target='_blank'>see more</a>.
+        › We use cookies<span className='d-none d-sm-inline'>&nbsp;to improve your experience</span>; <a className='consent' href={href} target='_blank'>see consent</a>.
     </li>;
 }
 function $consent(
