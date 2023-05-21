@@ -1,7 +1,8 @@
 import './cover-graph.scss';
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { useSessionStorage } from 'usehooks-ts';
+import { AccountContext } from '../../source/react';
 
 import { NftLevel, Page, Rates, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
@@ -21,6 +22,7 @@ type Props = {
 export function UiCoverGraph(
     { page, token, rates }: Props
 ) {
+    const [account] = useContext(AccountContext);
     const [level, set_level] = useSessionStorage(
         'ui-cover-graph-level', NftLevel.KILO
     );
@@ -38,7 +40,7 @@ export function UiCoverGraph(
                 issue={issue} setIssue={set_issue}
             />
             <UiCoverGraphSpinner
-                show={empty(rates, xtoken)}
+                show={Boolean(account) && empty(rates, xtoken)}
             />
         </>;
     }
@@ -53,7 +55,7 @@ export function UiCoverGraph(
                 level={level} setLevel={set_level}
             />
             <UiCoverGraphSpinner
-                show={empty(rates, xtoken)}
+                show={Boolean(account) && empty(rates, xtoken)}
             />
         </>;
     }

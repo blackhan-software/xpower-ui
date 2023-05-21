@@ -15,9 +15,11 @@ export function UiCoverImage(
     ];
     const power = page === Page.Home
         ? 'xpower' : 'apower';
-    return <img className={classes.join(' ')}
+    return <img
         src={`/images/jpg/cover-${power}.jpg`}
-        id='cover' width="736" height="246"
+        className={classes.join(' ')}
+        width='736' height='246'
+        id='cover' alt='cover'
     ></img>;
 }
 export default UiCoverImage;
