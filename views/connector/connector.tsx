@@ -109,14 +109,17 @@ function $connector(
             return reload(600);
         }
     };
+    const href = chain === Chain.UNAVAILABLE
+        ? 'https://about.core.app' : '#';
+    const rel = href.length === 1
+        ? 'nofollow' : undefined;
+    const target = href.length > 1
+        ? '_blank' : undefined;
     const disabled = connecting(chain)
         ? 'disabled' : '';
-    const href = chain === Chain.UNAVAILABLE
-        ? 'https://about.core.app' : undefined;
-    return <a type='button'
-        ref={globalRef('#connect-wallet')}
+    return <a type='button' ref={globalRef('#connect-wallet')}
         className={`btn btn-outline-warning ${disabled}`}
-        href={href} target='_blank'
+        href={href} target={target} rel={rel}
         id='connect-wallet'
         onClick={on_click}
     >
