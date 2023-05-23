@@ -1,16 +1,16 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 /* eslint @typescript-eslint/ban-types: [off] */
 import { Global } from '../../source/types';
-declare const global: Global;
 import './about.scss';
+declare const global: Global;
 
-import { Token } from '../../source/redux/types';
-import { Tokenizer } from '../../source/token';
 import { capitalize } from '../../routes/functions';
 import { ensure, link, script } from '../../source/functions';
+import { Token } from '../../source/redux/types';
+import { Tokenizer } from '../../source/token';
 
-import React, { useEffect, useState } from 'react';
-import { ROParams } from '../../source/params';
+import React, { useContext, useEffect, useState } from 'react';
+import { DebugContext } from '../../source/react';
 
 type markdownIt = (options: any) => {
     use: (plugin: any, options?: any) => void;
@@ -29,8 +29,9 @@ export function UiAbout(
     const $md_content = document.querySelector<HTMLElement>(
         '#md-content'
     );
+    const [debug] = useContext(DebugContext);
     const [html, setHtml] = useState(() => {
-        return !ROParams.debug && $md_content ? $md_content.innerHTML : ''
+        return !debug && $md_content ? $md_content.innerHTML : ''
     });
     useEffect(/*set-anchor*/() => {
         const anchor = location.hash;
@@ -41,7 +42,7 @@ export function UiAbout(
             return;
         }
         const md_url = about_url(url);
-        const md = !ROParams.debug
+        const md = !debug
             ? sessionStorage.getItem(md_url) ?? '' : '';
         if (md.length) {
             renderMarkdown(md, token).then(
@@ -55,7 +56,9 @@ export function UiAbout(
                 (html) => setHtml(html)
             );
         }
-    }, [html, token, url]);
+    }, [
+        debug, html, token, url
+    ]);
     useEffect(/*render-katex*/() => {
         const $md_content = document.querySelector<HTMLElement>(
             '#md-content'
