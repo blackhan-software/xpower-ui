@@ -69,6 +69,18 @@ div#aft-wallet {
     button#aft-wallet-sov-toggle {
       img {
         border-radius: 8px;
+        overflow: hidden;
+        margin: auto;
+      }
+      div.sector {
+        clip-path: polygon(50% 50%, 50% 0, 78.9% 0);
+        border-radius: 10px;
+        border: 2px solid;
+        position: absolute;
+        height: 20px;
+        width: 20px;
+        left: 11px;
+        top: 8px;
       }
     }
     button#aft-wallet-sov-toggle:hover {

@@ -1,4 +1,4 @@
-import { delayed, nice, nice_si, nomobi, x40 } from '../../source/functions';
+import { delayed, nice, nice_si, nomobi, range, x40 } from '../../source/functions';
 import { switchToken } from '../../source/redux/actions';
 import { AppDispatch } from '../../source/redux/store';
 import { Account, AftWallet, AftWalletBurner, Amount, Token, TokenInfo } from '../../source/redux/types';
@@ -160,10 +160,11 @@ function $sovToggle(
         aged: boolean, set_aged: (aged: boolean) => void
     }
 ) {
+    const collat = collat_pct({
+        wallet, token
+    });
     const title = aged
-        ? `Balance of ${token} tokens collateralized at ${collat({
-            wallet, token
-        })}%`
+        ? `Balance of ${token} tokens collateralized at ${collat.toFixed(2)}%`
         : `Balance of proof-of-work ${token} tokens`;
     return <button
         className='form-control input-group-text info'
@@ -171,20 +172,32 @@ function $sovToggle(
         id='aft-wallet-sov-toggle' role='tooltip'
         title={title} onClick={() => set_aged(!aged)}
     >
-        <XPower token={Tokenizer.xify(token)} style={aged ? {
-            border: '2px solid var(--xp-powered)',
-            borderRadius: '10px',
-            filter: 'invert(1)',
-            height: '20px',
-            width: '20px',
-        } : {}} />
+        <XPower token={Tokenizer.xify(token)} style={{
+            filter: aged ? 'invert(1)' : undefined
+        }} />
+        {aged ? $sectors({ percent: collat }) : null}
     </button>;
 }
-function collat(
-    { wallet, token }: Pick<Props, 'wallet' | 'token'>,
-    precision = 2, denominator = 1e6
+function $sectors(
+    { percent }: { percent: number }
+) {
+    const min = percent > 0 && percent < 6.25 ? 1 : 0
+    const max = Math.floor(Math.min(100, percent) / 6.25) + min;
+    const deg = (i: number) => 22.5 * i - 11.25 * (max + 0.5) + 180;
+    return <>{
+        Array.from(range(16)).map((i) => <div
+            className='sector' key={i} style={{
+                borderColor: i < max ? 'var(--xp-powered)' : undefined,
+                transform: `rotate(${deg(i)}deg)`,
+                filter: 'invert(1)',
+            }}
+        />)
+    }</>
+}
+function collat_pct(
+    { wallet, token }: Pick<Props, 'wallet' | 'token'>, denominator = 1e6
 ) {
     const collat = Number(wallet.items[token]?.collat ?? 0n);
-    return (100 * collat / denominator).toFixed(precision);
+    return 100 * collat / denominator;
 }
 export default UiAftWallet;
