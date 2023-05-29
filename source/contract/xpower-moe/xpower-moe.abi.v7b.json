@@ -29,9 +29,9 @@
         "inputs": [
             {
                 "indexed": false,
-                "internalType": "bytes16",
+                "internalType": "bytes32",
                 "name": "blockHash",
-                "type": "bytes16"
+                "type": "bytes32"
             },
             {
                 "indexed": false,
@@ -203,7 +203,7 @@
     },
     {
         "inputs": [],
-        "name": "SHARE_ADMIN_ROLE",
+        "name": "TREASURY_SHARE_ADMIN_ROLE",
         "outputs": [
             {
                 "internalType": "bytes32",
@@ -216,7 +216,7 @@
     },
     {
         "inputs": [],
-        "name": "SHARE_ROLE",
+        "name": "TREASURY_SHARE_ROLE",
         "outputs": [
             {
                 "internalType": "bytes32",
@@ -241,25 +241,6 @@
             }
         ],
         "name": "allowance",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "level",
-                "type": "uint256"
-            }
-        ],
-        "name": "amountOf",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -324,9 +305,9 @@
         "name": "blockHashOf",
         "outputs": [
             {
-                "internalType": "bytes16",
+                "internalType": "bytes32",
                 "name": "",
-                "type": "bytes16"
+                "type": "bytes32"
             }
         ],
         "stateMutability": "view",
@@ -414,6 +395,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "fees",
+        "outputs": [
+          {
+            "internalType": "uint256[]",
+            "name": "",
+            "type": "uint256[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "bytes32",
@@ -477,7 +471,7 @@
     },
     {
         "inputs": [],
-        "name": "getShare",
+        "name": "getTreasuryShare",
         "outputs": [
             {
                 "internalType": "uint256[]",
@@ -525,35 +519,6 @@
                 "internalType": "bool",
                 "name": "",
                 "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "bytes16",
-                "name": "blockHash",
-                "type": "bytes16"
-            },
-            {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
-            }
-        ],
-        "name": "hashOf",
-        "outputs": [
-            {
-                "internalType": "bytes32",
-                "name": "",
-                "type": "bytes32"
             }
         ],
         "stateMutability": "view",
@@ -659,24 +624,55 @@
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
+                "internalType": "uint256",
+                "name": "nonce",
+                "type": "uint256"
             },
             {
-                "internalType": "bytes16",
+                "internalType": "bytes32",
                 "name": "blockHash",
-                "type": "bytes16"
-            },
-            {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
+                "type": "bytes32"
             }
         ],
         "name": "mint",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "blockHash",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint256",
+                "name": "nonce",
+                "type": "uint256"
+            }
+        ],
+        "name": "mint",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "mintingFees",
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "",
+                "type": "uint256[]"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -786,25 +782,6 @@
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "bytes16",
-                "name": "blockHash",
-                "type": "bytes16"
-            }
-        ],
-        "name": "recent",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [],
         "name": "renounceOwnership",
         "outputs": [],
@@ -888,7 +865,7 @@
                 "type": "uint256[]"
             }
         ],
-        "name": "setShare",
+        "name": "setTreasuryShare",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -925,35 +902,6 @@
             {
                 "internalType": "uint256",
                 "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "shares",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "stamp",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "value",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "area",
                 "type": "uint256"
             }
         ],
@@ -1069,44 +1017,6 @@
         "name": "transferOwnership",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "nonceHash",
-                "type": "bytes32"
-            }
-        ],
-        "name": "unique",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "nonceHash",
-                "type": "bytes32"
-            }
-        ],
-        "name": "zerosOf",
-        "outputs": [
-            {
-                "internalType": "uint8",
-                "name": "",
-                "type": "uint8"
-            }
-        ],
-        "stateMutability": "pure",
         "type": "function"
     }
 ]

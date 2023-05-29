@@ -1,6 +1,6 @@
 import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
-import { x64 } from '../functions';
+import { x32 } from '../functions';
 import { HashManager, IntervalManager, MiningManager as MM } from '../managers';
 import { ROParams } from '../params';
 import { setMiningSpeed, setMiningStatus } from '../redux/actions';
@@ -86,7 +86,7 @@ export const MiningService = (
         account, token
     }) {
         const on_init: OnInit = async (block_hash, timestamp, ev) => {
-            console.debug('[on:init]', x64(block_hash), timestamp, ev);
+            console.debug('[on:init]', x32(block_hash), timestamp, ev);
             HashManager.set(block_hash, timestamp, {
                 token: Tokenizer.xify(token), version: ROParams.version
             });

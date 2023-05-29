@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 import { ModuleThread, spawn, Thread, Worker } from 'threads';
+import { logical_cpus } from '../functions';
 import { ROParams } from '../params';
 import { Account, Address, Amount, BlockHash, Level, Nonce, Token } from '../redux/types';
 import { Tokenizer } from '../token';
@@ -7,7 +8,7 @@ import { Version } from '../types';
 import { Item, IWorker } from './scripts/worker';
 
 import { Global } from '../types';
-declare const global: Global;
+export declare const global: Global;
 
 export type OnMined = ({ nonce, amount, worker }: {
     nonce: Nonce, amount: Amount, worker: number
@@ -141,16 +142,18 @@ export class Miner extends EventEmitter {
             if (head_pro.ok) {
                 const worker = new Worker(path_pro, {
                     workerData: {
-                        ethers: require('ethers'),
-                        react: require('react'),
+                        'hash-wasm': require('hash-wasm'),
+                        'ethers': require('ethers'),
+                        'react': require('react'),
                     }
                 });
                 thread = await spawn<IWorker>(worker);
             } else {
                 const worker = new Worker(path_dev, {
                     workerData: {
-                        ethers: require('ethers'),
-                        react: require('react'),
+                        'hash-wasm': require('hash-wasm'),
+                        'ethers': require('ethers'),
+                        'react': require('react'),
                     }
                 });
                 thread = await spawn<IWorker>(worker);
@@ -210,9 +213,5 @@ export class Miner extends EventEmitter {
     private _version: Version;
     private _versionFaked: boolean;
     private _workers: ModuleThread<IWorker>[] = [];
-}
-function logical_cpus() {
-    const n_cpus = global?.navigator?.hardwareConcurrency ?? 1;
-    return n_cpus + n_cpus % 2;
 }
 export default Miner;

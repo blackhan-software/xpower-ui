@@ -4,15 +4,18 @@ if (typeof importScripts === 'function') importScripts(
     'https://cdn.jsdelivr.net/npm/ethers@6.3.0/dist/ethers.umd.min.js',
 );
 
-import { x40, x64, x64_plain } from '../../functions';
+import { x32, x40, x64 } from '../../functions';
 import { Account, Address, Amount, BlockHash, Interval, Level, Nonce, Token } from '../../redux/types';
 import { Version } from '../../types';
 
-import { AbiCoder, solidityPacked, randomBytes } from 'ethers';
+import { AbiCoder, solidityPacked } from 'ethers';
 import { Observable } from 'observable-fns';
 import { WorkerFunction, WorkerModule } from 'threads/dist/types/worker';
 import { expose } from 'threads/worker';
 
+import { createSHA256 } from 'hash-wasm';
+let sha256bin: (array: Uint8Array) => Uint8Array;
+let sha256hex: (array: Uint8Array) => string;
 const keccak = require('js-keccak-tiny/dist/node-bundle');
 let keccak256: (array: Uint8Array) => string;
 let worker: Worker | undefined;
@@ -67,17 +70,20 @@ expose({
         if (worker !== undefined) {
             throw new Error(`worker already initialized`);
         } else {
-            const { keccak256: hash } = await keccak();
-            keccak256 = (a) => hash(a).toString('hex');
+            const hash1 = await createSHA256();
+            sha256bin = (a) => hash1.init().update(a).digest('binary');
+            const hash2 = await createSHA256();
+            sha256hex = (a) => hash2.init().update(a).digest('hex');
+            const { keccak256: hash3 } = await keccak();
+            keccak256 = (a) => hash3(a).toString('hex');
         }
         worker = new Worker({
             account,
             contract,
             level,
-            meta,
             token,
             version,
-            versionFaked
+            versionFaked,
         });
         worker_id = meta.id;
     },
@@ -123,7 +129,6 @@ class Worker {
         account,
         contract,
         level,
-        meta,
         token,
         version,
         versionFaked,
@@ -131,7 +136,6 @@ class Worker {
         account: Account,
         contract: Address,
         level: Level,
-        meta: { id: number },
         token: Token,
         version: Version,
         versionFaked: boolean,
@@ -144,8 +148,8 @@ class Worker {
             interval: interval(),
             token,
         };
-        this._miner = miner(level, version, versionFaked);
-        this._nonce = nonce(meta.id);
+        this._miner = miner(version, versionFaked);
+        this._nonce = nonce(/*meta.id*/);
     }
     public start(
         block_hash: BlockHash,
@@ -254,12 +258,8 @@ function interval() {
     const time = new Date().getTime();
     return Math.floor(time / 3_600_000);
 }
-function nonce(
-    offset: number, length = 2 ** 48
-) {
-    const bytes = randomBytes(4);
-    const view = new DataView(bytes.buffer);
-    return view.getUint32(0) + offset * length;
+function nonce() {
+    return parseInt(String.random(4), 16);
 }
 function amount(
     token: Token, level: Level
@@ -304,17 +304,21 @@ function zeros(
     return 0n;
 }
 function miner(
-    level: Level, version: Version, version_faked: boolean
+    version: Version, version_faked: boolean
 ) {
-    const abi_encode = abi_encoder(level, version, version_faked);
-    return (nonce: Nonce, context: Context) => keccak256(
-        abi_encode(nonce, context)
+    const abi_encode = abi_encoder(version, version_faked);
+    if (version < Version.v7c) {
+        return (nonce: Nonce, context: Context) => keccak256(
+            abi_encode(nonce, context)
+        );
+    }
+    return (nonce: Nonce, context: Context) => sha256hex(
+        sha256bin(abi_encode(nonce, context))
     );
 }
 function abi_encoder(
-    level: Level, version: Version, versionFaked: boolean
+    version: Version, versionFaked: boolean
 ) {
-    const lazy_arrayify = arrayifier(level);
     const encoder_v2c = (nonce: Nonce, {
         account, block_hash, interval, token
     }: Context) => {
@@ -330,11 +334,10 @@ function abi_encoder(
                 interval,
                 x64(block_hash)
             ]);
-            abi_encoded[interval] = value = arrayify(template.slice(2));
-            array_cache[level] = arrayify(x64_plain(nonce));
-            nonce_cache[level] = nonce;
+            value = arrayify(template.slice(2));
+            abi_encoded[interval] = value;
         }
-        const array = lazy_arrayify(nonce, x64_plain(nonce));
+        const array = arrayify(nonce.toString(16));
         value.set(array, 32);
         return value;
     };
@@ -353,11 +356,10 @@ function abi_encoder(
                 x64(block_hash),
                 0
             ]);
-            abi_encoded[interval] = value = arrayify(template.slice(2));
-            array_cache[level] = arrayify(x64_plain(nonce));
-            nonce_cache[level] = nonce;
+            value = arrayify(template.slice(2));
+            abi_encoded[interval] = value;
         }
-        const array = lazy_arrayify(nonce, x64_plain(nonce));
+        const array = arrayify(nonce.toString(16));
         value.set(array, 128);
         return value;
     };
@@ -376,11 +378,10 @@ function abi_encoder(
                 x64(block_hash),
                 0
             ]);
-            abi_encoded[interval] = value = arrayify(template.slice(2));
-            array_cache[level] = arrayify(x64_plain(nonce));
-            nonce_cache[level] = nonce;
+            value = arrayify(template.slice(2));
+            abi_encoded[interval] = value;
         }
-        const array = lazy_arrayify(nonce, x64_plain(nonce));
+        const array = arrayify(nonce.toString(16));
         value.set(array, 128);
         return value;
     };
@@ -399,11 +400,10 @@ function abi_encoder(
                 x64(block_hash),
                 0
             ]);
-            abi_encoded[interval] = value = arrayify(template.slice(2));
-            array_cache[level] = arrayify(x64_plain(nonce));
-            nonce_cache[level] = nonce;
+            value = arrayify(template.slice(2));
+            abi_encoded[interval] = value;
         }
-        const array = lazy_arrayify(nonce, x64_plain(nonce));
+        const array = arrayify(nonce.toString(16));
         value.set(array, 128);
         return value;
     };
@@ -421,11 +421,10 @@ function abi_encoder(
                 x64(block_hash),
                 0
             ]);
-            abi_encoded[interval] = value = arrayify(template.slice(2));
-            array_cache[level] = arrayify(x64_plain(nonce));
-            nonce_cache[level] = nonce;
+            value = arrayify(template.slice(2));
+            abi_encoded[interval] = value;
         }
-        const array = lazy_arrayify(nonce, x64_plain(nonce));
+        const array = arrayify(nonce.toString(16));
         value.set(array, 96);
         return value;
     };
@@ -435,7 +434,7 @@ function abi_encoder(
         let value = abi_encoded[interval];
         if (value === undefined) {
             const bytes28 = (block_hash: string) => {
-                return "0x" + block_hash.slice(2).slice(0, -8);
+                return '0x' + block_hash.slice(2).slice(0, -8);
             };
             const template = solidityPacked([
                 'uint160', 'bytes28', 'uint256'
@@ -444,16 +443,34 @@ function abi_encoder(
                 bytes28(x64(block_hash)),
                 0
             ]);
-            abi_encoded[interval] = value = arrayify(template.slice(2));
-            array_cache[level] = arrayify(x64_plain(nonce));
-            nonce_cache[level] = nonce;
+            value = arrayify(template.slice(2));
+            abi_encoded[interval] = value;
         }
-        const array = lazy_arrayify(nonce, x64_plain(nonce));
+        const array = arrayify(nonce.toString(16));
         value.set(array, 48);
         return value;
     };
+    const encoder_v7c = (nonce: Nonce, {
+        account, block_hash, contract, interval
+    }: Context) => {
+        let value = abi_encoded[interval];
+        if (value === undefined) {
+            const template = solidityPacked([
+                'uint160', 'bytes16', 'bytes'
+            ], [
+                BigInt(contract) ^ account,
+                x32(block_hash),
+                new Uint8Array(4)
+            ]);
+            value = arrayify(template.slice(2));
+            abi_encoded[interval] = value;
+        }
+        const array = arrayify(nonce.toString(16));
+        value.set(array, 36);
+        return value;
+    };
     if (versionFaked) {
-        return encoder_v7b;
+        return encoder_v7c;
     }
     switch (version) {
         case Version.v2a:
@@ -474,8 +491,10 @@ function abi_encoder(
         case Version.v6c:
         case Version.v7a:
             return encoder_v6b;
-        default:
+        case Version.v7b:
             return encoder_v7b;
+        default:
+            return encoder_v7c;
     }
     function symbol_v2c(token: Token) {
         if (token === Token.THOR) return 'XPOW.CPU';
@@ -490,22 +509,6 @@ function abi_encoder(
         return 'XPOW';
     }
 }
-function arrayifier(
-    level: Level
-) {
-    const diff_max = 16n ** BigInt(level) - 1n;
-    const offset_2 = 64 - Math.max(64, level * 2);
-    const offset_1 = 32 - Math.max(32, level);
-    return (nonce: Nonce, x64_nonce: string) => {
-        if (nonce - nonce_cache[level] > diff_max) {
-            array_cache[level] = arrayify(x64_nonce);
-            nonce_cache[level] = nonce;
-        }
-        const array = arrayify(x64_nonce.slice(offset_2));
-        array_cache[level].set(array, offset_1);
-        return array_cache[level];
-    };
-}
 function arrayify(
     data: string, list: number[] = []
 ) {
@@ -516,7 +519,3 @@ function arrayify(
 }
 // cache: (interval: number) => abi.encode(token, nonce, ...)
 const abi_encoded = {} as Record<Interval, Uint8Array>;
-// cache: (level: number) => arrayify(x64-nonce)
-const array_cache = {} as Record<Level, Uint8Array>;
-// cache: (level: number) => nonce
-const nonce_cache = {} as Record<Level, Nonce>;

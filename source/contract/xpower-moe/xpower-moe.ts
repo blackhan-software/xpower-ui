@@ -1,5 +1,5 @@
 import { InterfaceAbi, Transaction } from 'ethers';
-import { x40, x64 } from '../../functions';
+import { hex, x32, x40, x64 } from '../../functions';
 import { ROParams } from '../../params';
 import { Account, Address, BlockHash, Nonce } from '../../redux/types';
 import { Version } from '../../types';
@@ -12,6 +12,9 @@ export class XPowerMoe extends Base {
     public constructor(
         address: Address, abi: InterfaceAbi = ABI
     ) {
+        if (ROParams.version < Version.v7c) {
+            abi = require('./xpower-moe.abi.v7b.json');
+        }
         super(address, abi);
     }
     async init(): Promise<Transaction> {
@@ -24,11 +27,22 @@ export class XPowerMoe extends Base {
         const contract = await this.otf;
         if (ROParams.version < Version.v3a && !ROParams.versionFaked) {
             return contract['mint(uint256,bytes32)'](
-                x64(nonce), x64(block_hash), { gasLimit: 250_000 }
+                x64(nonce), x64(block_hash), {
+                    gasLimit: 250_000
+                }
             );
         }
-        return contract['mint(address,bytes32,uint256)'](
-            x40(to), x64(block_hash), x64(nonce), { gasLimit: 250_000 }
+        if (ROParams.version < Version.v7c && !ROParams.versionFaked) {
+            return contract['mint(address,bytes32,uint256)'](
+                x40(to), x64(block_hash), x64(nonce), {
+                    gasLimit: 250_000
+                }
+            );
+        }
+        return contract['mint(address,bytes16,bytes)'](
+            x40(to), x32(block_hash), hex(nonce), {
+                gasLimit: 250_000
+            }
         );
     }
     private get otf() {
