@@ -1,7 +1,7 @@
 import './version-select.scss';
 
 import { Blockchain } from '../../source/blockchain';
-import { x40, zip } from '../../source/functions';
+import { nice_si, x40, zip } from '../../source/functions';
 import { ROParams, RWParams } from '../../source/params';
 import { Account, Balance, Nft, NftLevels, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
@@ -82,13 +82,13 @@ function set_balances(
     );
     const xtoken = Tokenizer.xify(token);
     const moe_text
-        = `${xtoken}${!balance.moe ? '=' : '>'}0`;
+        = `${xtoken}=${nice_si(balance.moe, { base: 1e18 })}`;
     const atoken = Tokenizer.aify(token);
     const sov_text
-        = `${atoken}${!balance.sov ? '=' : '>'}0`;
+        = `${atoken}=${nice_si(balance.sov, { base: 1e18 })}`;
     const ntoken = 'NFTs';
     const nft_text
-        = `${ntoken}${!balance.nft ? '=' : '>'}0`;
+        = `${ntoken}=${nice_si(balance.nft)}`;
     const opt_text = $option.text()
         .replace(new RegExp(xtoken + '=0'), moe_text)
         .replace(new RegExp(atoken + '=0'), sov_text)
