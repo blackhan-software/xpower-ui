@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-explicit-any: [off] */
 /* eslint @typescript-eslint/no-var-requires: [off] */
 if (typeof importScripts === 'function') importScripts(
     'https://cdn.jsdelivr.net/npm/react@18.1.0/umd/react.production.min.js',
@@ -8,7 +9,7 @@ import { x32, x40, x64 } from '../../functions';
 import { Account, Address, Amount, BlockHash, Interval, Level, Nonce, Token } from '../../redux/types';
 import { Version } from '../../types';
 
-import { AbiCoder, solidityPacked } from 'ethers';
+import { AbiCoder, randomBytes, solidityPacked } from 'ethers';
 import { Observable } from 'observable-fns';
 import { WorkerFunction, WorkerModule } from 'threads/dist/types/worker';
 import { expose } from 'threads/worker';
@@ -20,7 +21,7 @@ let worker: Worker | undefined;
 let worker_id = 0;
 
 export interface Miner extends Function {
-    (nonce: Nonce, context: Context): Uint8Array
+    (nonce: Uint8Array, context: Context): Uint8Array
 }
 export type Context = {
     token: Token,
@@ -68,7 +69,7 @@ expose({
         if (worker !== undefined) {
             throw new Error(`worker already initialized`);
         } else {
-            const keccak_hasher = await createKeccak();
+            const keccak_hasher = await createKeccak(256);
             keccak = (a) => keccak_hasher.init().update(a).digest('binary');
             const sha256_hasher = await createSHA256();
             sha256 = (a) => sha256_hasher.init().update(a).digest('binary');
@@ -191,8 +192,9 @@ class Worker {
                 const i_max = Math.ceil(khz);
                 for (let i = 0; i < i_max; i++) {
                     const item = this.work();
-                    if (item.amount > 0) {
-                        callback(item);
+                    if (item.amount > 0n) {
+                        const view = new DataView(item.nonce.buffer, 0);
+                        callback({ ...item, nonce: view.getUint32(0) });
                     }
                 }
                 dt_inner = performance.now() - dt_inner;
@@ -230,7 +232,7 @@ class Worker {
         return this._miner;
     }
     private get next_nonce() {
-        return this._nonce++;
+        return increment(this._nonce);
     }
     private get running() {
         return this._running;
@@ -242,7 +244,7 @@ class Worker {
     private _context: Context;
     private _iid?: NodeJS.Timer;
     private _miner: Miner;
-    private _nonce: Nonce;
+    private _nonce: Uint8Array;
     private _running = false;
 }
 function normalize(
@@ -255,7 +257,17 @@ function interval() {
     return Math.floor(time / 3_600_000);
 }
 function nonce() {
-    return parseInt(String.random(4), 16);
+    return randomBytes(4);
+}
+function increment(
+    nonce: Uint8Array, index = 0
+): Uint8Array {
+    if (nonce[index]++) {
+        return nonce;
+    }
+    return increment(
+        nonce, (index + 1) % nonce.length
+    );
 }
 function amount(
     token: Token, level: Level
@@ -306,11 +318,11 @@ function miner(
 ) {
     const abi_encode = abi_encoder(version, version_faked);
     if (version < Version.v7c) {
-        return (nonce: Nonce, context: Context) => keccak(
+        return (nonce: Uint8Array, context: Context) => keccak(
             abi_encode(nonce, context)
         );
     } else {
-        return (nonce: Nonce, context: Context) => sha256(sha256(
+        return (nonce: Uint8Array, context: Context) => sha256(sha256(
             abi_encode(nonce, context)
         ));
     }
@@ -318,7 +330,7 @@ function miner(
 function abi_encoder(
     version: Version, versionFaked: boolean
 ) {
-    const encoder_v2c = (nonce: Nonce, {
+    const encoder_v2c = (nonce: Uint8Array, {
         account, block_hash, interval, token
     }: Context) => {
         let value = abi_encoded[interval];
@@ -336,11 +348,10 @@ function abi_encoder(
             value = arrayify(template.slice(2));
             abi_encoded[interval] = value;
         }
-        const array = arrayify(nonce.toString(16));
-        value.set(array, 32);
+        value.set(nonce, 64 - nonce.length);
         return value;
     };
-    const encoder_v3b = (nonce: Nonce, {
+    const encoder_v3b = (nonce: Uint8Array, {
         account, block_hash, interval, token
     }: Context) => {
         let value = abi_encoded[interval];
@@ -358,11 +369,10 @@ function abi_encoder(
             value = arrayify(template.slice(2));
             abi_encoded[interval] = value;
         }
-        const array = arrayify(nonce.toString(16));
-        value.set(array, 128);
+        value.set(nonce, 128 - nonce.length);
         return value;
     };
-    const encoder_v5b = (nonce: Nonce, {
+    const encoder_v5b = (nonce: Uint8Array, {
         account, block_hash, interval, token
     }: Context) => {
         let value = abi_encoded[interval];
@@ -380,11 +390,10 @@ function abi_encoder(
             value = arrayify(template.slice(2));
             abi_encoded[interval] = value;
         }
-        const array = arrayify(nonce.toString(16));
-        value.set(array, 128);
+        value.set(nonce, 128 - nonce.length);
         return value;
     };
-    const encoder_v6a = (nonce: Nonce, {
+    const encoder_v6a = (nonce: Uint8Array, {
         account, block_hash, contract, interval
     }: Context) => {
         let value = abi_encoded[interval];
@@ -402,11 +411,10 @@ function abi_encoder(
             value = arrayify(template.slice(2));
             abi_encoded[interval] = value;
         }
-        const array = arrayify(nonce.toString(16));
-        value.set(array, 128);
+        value.set(nonce, 128 - nonce.length);
         return value;
     };
-    const encoder_v6b = (nonce: Nonce, {
+    const encoder_v6b = (nonce: Uint8Array, {
         account, block_hash, contract, interval
     }: Context) => {
         let value = abi_encoded[interval];
@@ -423,17 +431,16 @@ function abi_encoder(
             value = arrayify(template.slice(2));
             abi_encoded[interval] = value;
         }
-        const array = arrayify(nonce.toString(16));
-        value.set(array, 96);
+        value.set(nonce, 96 - nonce.length);
         return value;
     };
-    const encoder_v7b = (nonce: Nonce, {
+    const encoder_v7b = (nonce: Uint8Array, {
         account, block_hash, contract, interval
     }: Context) => {
         let value = abi_encoded[interval];
         if (value === undefined) {
-            const bytes28 = (block_hash: string) => {
-                return '0x' + block_hash.slice(2).slice(0, -8);
+            const bytes28 = (bh: string) => {
+                return '0x' + bh.slice(2).slice(0, -8);
             };
             const template = solidityPacked([
                 'uint160', 'bytes28', 'uint256'
@@ -445,11 +452,10 @@ function abi_encoder(
             value = arrayify(template.slice(2));
             abi_encoded[interval] = value;
         }
-        const array = arrayify(nonce.toString(16));
-        value.set(array, 48);
+        value.set(nonce, 80 - nonce.length);
         return value;
     };
-    const encoder_v7c = (nonce: Nonce, {
+    const encoder_v7c = (nonce: Uint8Array, {
         account, block_hash, contract, interval
     }: Context) => {
         let value = abi_encoded[interval];
@@ -464,8 +470,7 @@ function abi_encoder(
             value = arrayify(template.slice(2));
             abi_encoded[interval] = value;
         }
-        const array = arrayify(nonce.toString(16));
-        value.set(array, 36);
+        value.set(nonce, 36);
         return value;
     };
     if (versionFaked) {
