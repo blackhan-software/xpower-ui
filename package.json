@@ -51,7 +51,6 @@
     "html-minifier": "^4.0.0",
     "html-webpack-plugin": "^5.5.1",
     "http-errors": "^2.0.0",
-    "js-keccak-tiny": "^0.4.2",
     "markdown-it": "^13.0.1",
     "markdown-it-anchor": "^8.6.7",
     "mini-css-extract-plugin": "^2.7.5",

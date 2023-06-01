@@ -13,16 +13,14 @@ import { Observable } from 'observable-fns';
 import { WorkerFunction, WorkerModule } from 'threads/dist/types/worker';
 import { expose } from 'threads/worker';
 
-import { createSHA256 } from 'hash-wasm';
-let sha256bin: (array: Uint8Array) => Uint8Array;
-let sha256hex: (array: Uint8Array) => string;
-const keccak = require('js-keccak-tiny/dist/node-bundle');
-let keccak256: (array: Uint8Array) => string;
+import { createKeccak, createSHA256 } from 'hash-wasm';
+let keccak: (array: Uint8Array) => Uint8Array;
+let sha256: (array: Uint8Array) => Uint8Array;
 let worker: Worker | undefined;
 let worker_id = 0;
 
 export interface Miner extends Function {
-    (nonce: Nonce, context: Context): string
+    (nonce: Nonce, context: Context): Uint8Array
 }
 export type Context = {
     token: Token,
@@ -70,12 +68,10 @@ expose({
         if (worker !== undefined) {
             throw new Error(`worker already initialized`);
         } else {
-            const hash1 = await createSHA256();
-            sha256bin = (a) => hash1.init().update(a).digest('binary');
-            const hash2 = await createSHA256();
-            sha256hex = (a) => hash2.init().update(a).digest('hex');
-            const { keccak256: hash3 } = await keccak();
-            keccak256 = (a) => hash3(a).toString('hex');
+            const keccak_hasher = await createKeccak();
+            keccak = (a) => keccak_hasher.init().update(a).digest('binary');
+            const sha256_hasher = await createSHA256();
+            sha256 = (a) => sha256_hasher.init().update(a).digest('binary');
         }
         worker = new Worker({
             account,
@@ -242,7 +238,7 @@ class Worker {
     private set running(value: boolean) {
         this._running = value;
     }
-    private _amount: (hash: string) => Amount;
+    private _amount: (hash: Uint8Array) => Amount;
     private _context: Context;
     private _iid?: NodeJS.Timer;
     private _miner: Miner;
@@ -264,57 +260,60 @@ function nonce() {
 function amount(
     token: Token, level: Level
 ) {
-    const n_level = BigInt(level);
     switch (token) {
         case Token.THOR:
-            return (hash: string) => {
+            return (hash: Uint8Array) => {
                 const lhs_zeros = zeros(hash);
-                if (lhs_zeros >= n_level) {
-                    return (lhs_zeros);
+                if (lhs_zeros >= level) {
+                    return BigInt(lhs_zeros);
                 }
                 return 0n;
             };
         case Token.LOKI:
-            return (hash: string) => {
+            return (hash: Uint8Array) => {
                 const lhs_zeros = zeros(hash);
-                if (lhs_zeros >= n_level) {
-                    return 2n ** (lhs_zeros) - 1n;
+                if (lhs_zeros >= level) {
+                    return 2n ** BigInt(lhs_zeros) - 1n;
                 }
                 return 0n;
             };
         case Token.ODIN:
-            return (hash: string) => {
+            return (hash: Uint8Array) => {
                 const lhs_zeros = zeros(hash);
-                if (lhs_zeros >= n_level) {
-                    return 16n ** (lhs_zeros) - 1n;
+                if (lhs_zeros >= level) {
+                    return 16n ** BigInt(lhs_zeros) - 1n;
                 }
                 return 0n;
             };
         default:
-            return (_hash: string) => 0n;
+            return (_hash: Uint8Array) => 0n;
     }
 }
 function zeros(
-    hash: string
+    hash: Uint8Array, counter = 0
 ) {
-    const match = hash.match(/^(?<zeros>0+)/);
-    if (match && match.groups) {
-        return BigInt(match.groups.zeros.length);
+    while (hash[counter] === 0) {
+        counter++;
     }
-    return 0n;
+    if (hash[counter] < 16) {
+        return 2 * counter + 1;
+    } else {
+        return 2 * counter;
+    }
 }
 function miner(
     version: Version, version_faked: boolean
 ) {
     const abi_encode = abi_encoder(version, version_faked);
     if (version < Version.v7c) {
-        return (nonce: Nonce, context: Context) => keccak256(
+        return (nonce: Nonce, context: Context) => keccak(
             abi_encode(nonce, context)
         );
+    } else {
+        return (nonce: Nonce, context: Context) => sha256(sha256(
+            abi_encode(nonce, context)
+        ));
     }
-    return (nonce: Nonce, context: Context) => sha256hex(
-        sha256bin(abi_encode(nonce, context))
-    );
 }
 function abi_encoder(
     version: Version, versionFaked: boolean
