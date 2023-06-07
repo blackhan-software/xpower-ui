@@ -68,26 +68,6 @@ async function claim(token: Token, { $claim }: {
         );
         return;
     }
-    const src_treasure = await mtyBalanceOf(token, {
-        $claim
-    });
-    console.debug(
-        `[${src_version}:balance]`, src_treasure.toString()
-    );
-    if (src_treasure === 0n) {
-        alert(
-            `Empty treasury; you cannot claim any rewards.`,
-            Alert.warning, { after: $claim.parent('div')[0] }
-        );
-        return;
-    }
-    if (src_treasure < src_claimable) {
-        alert(
-            `Insufficient treasury; you cannot claim all rewards.`,
-            Alert.warning, { after: $claim.parent('div')[0] }
-        );
-        return;
-    }
     //
     // Claim tokens:
     //
@@ -122,31 +102,6 @@ async function claim(token: Token, { $claim }: {
         console.error(ex);
         reset();
     }
-}
-async function mtyBalanceOf(token: Token, { $claim }: {
-    $claim: JQuery<HTMLElement>
-}) {
-    const { account, src_version } = await context({
-        $el: $claim
-    });
-    const { src_xpower, mty_source } = await contracts({
-        account, token, src_version
-    });
-    if (!src_xpower) {
-        throw new Error('undefined src_xpower');
-    }
-    if (!mty_source) {
-        throw new Error('undefined mty_treasury');
-    }
-    try {
-        const moe_index = await mty_source.moeIndexOf(
-            BigInt(await src_xpower.address)
-        );
-        return await mty_source.moeBalanceOf(moe_index);
-    } catch (ex) {
-        console.error(ex);
-    }
-    return 0n;
 }
 function filter<I>(
     ids: Array<I>, balances: Balance[]
