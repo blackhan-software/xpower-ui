@@ -293,6 +293,20 @@ async function sovMigrateOld(token: Token, { $migrate }: {
         throw new Error('undefined tgt_xpower');
     }
     //
+    // Check balance (of MOE):
+    //
+    const moe_balance = await src_xpower.balance;
+    console.debug(
+        `[${src_version}:balance]`, moe_balance.toString(), `[${token}]`
+    );
+    if (moe_balance) {
+        alert(
+            `Old ${token} balance is non-zero; migrate them first.`,
+            Alert.warning, { after: $migrate.parent('div')[0] }
+        );
+        return;
+    }
+    //
     // Check allowance:
     //
     const src_balance = await src_apower.balance;
