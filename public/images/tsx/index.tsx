@@ -15,3 +15,4 @@ export * from './info-circle-fill';
 export * from './plus-circle-fill';
 export * from './wifi';
 export * from './xpower';
+export * from './yin-yang-circle';
