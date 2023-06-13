@@ -4,7 +4,7 @@ import { APR, APRBonus, MoeTreasuryFactory } from '../contract';
 import { range } from '../functions';
 import { xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Index, Nft, NftFullId, NftToken, Rate, Token } from '../redux/types';
+import { Index, Nft, NftFullId, NftLevel, NftLevels, NftToken, Rate, Token } from '../redux/types';
 
 import * as actions from '../redux/actions';
 
@@ -14,13 +14,23 @@ export const RatesService = (
     Blockchain.onceConnect(async function initRates({
         token
     }) {
-        const aprs = await new APRs(token).fetch();
-        for (const [i, apr] of Object.entries(aprs)) {
-            store.dispatch(actions.setAPR(token, Number(i), apr));
-        }
-        const apbs = await new APBs(token).fetch();
-        for (const [i, apb] of Object.entries(apbs)) {
-            store.dispatch(actions.setAPRBonus(token, Number(i), apb));
+        const rates = await Promise.all(
+            Array.from(NftLevels()).map((l) => Promise.all([
+                new APRs(token).fetch(l),
+                new APBs(token).fetch(l),
+            ]))
+        );
+        for (const [l, [aprs, apbs]] of Object.entries(rates)) {
+            for (const [i, apr] of Object.entries(aprs)) {
+                store.dispatch(actions.setAPR(
+                    token, 3 * Number(l), Number(i), apr)
+                );
+            }
+            for (const [i, apb] of Object.entries(apbs)) {
+                store.dispatch(actions.setAPRBonus(
+                    token, 3 * Number(l), Number(i), apb)
+                );
+            }
         }
     }, {
         per: () => xtokenOf(store.getState())
@@ -32,44 +42,47 @@ class APRs {
         this.nftToken = Nft.token(token);
         this.token = token;
     }
-    async fetch(): Promise<APR[]> {
-        const length = await this.mty.aprsLength(this.nftToken);
+    async fetch(
+        level: NftLevel
+    ): Promise<APR[]> {
+        const ppt_id = Nft.fullId({
+            issue: 2021, level, token: this.nftToken
+        });
+        const length = await this.mty.aprsLength(ppt_id);
         if (length !== undefined) {
-            return this.list(Array.from(range(length)))
+            return this.list(ppt_id, Array.from(range(length)))
         }
-        return this.next();
+        return this.next(ppt_id);
     }
     async list(
-        indices: Index[]
+        ppt_id: NftFullId, indices: Index[]
     ): Promise<APR[]> {
-        return this.tail(await Promise.all(indices.map((i) =>
-            this.mty.aprs(this.nftToken, i)
+        return this.tail(ppt_id, await Promise.all(indices.map((i) =>
+            this.mty.aprs(ppt_id, i)
         )));
     }
     async next(
-        index: Index = 0, list = [] as APR[]
+        ppt_id: NftFullId, index: Index = 0, list = [] as APR[]
     ): Promise<APR[]> {
         try {
-            list.push(await this.mty.aprs(this.nftToken, index));
+            list.push(await this.mty.aprs(ppt_id, index));
         } catch (ex) {
-            return this.tail(list);
+            return this.tail(ppt_id, list);
         }
-        return this.next(index + 1, list);
+        return this.next(ppt_id, index + 1, list);
     }
     async tail(
-        list: APR[]
+        ppt_id: NftFullId, list: APR[]
     ) {
-        const target = await this.fake(Nft.fullId({
-            issue: 2021, level: 3, token: this.nftToken
-        }));
+        const target = await this.fake(ppt_id);
         list.push(aprify(target, list));
         return list;
     }
     async fake(
-        nft_id: NftFullId
+        ppt_id: NftFullId
     ) {
         try {
-            return this.mty.aprTargetOf(nft_id);
+            return this.mty.aprTargetOf(ppt_id);
         } catch (ex) {
             console.error(ex);
             return 0n;
@@ -85,44 +98,47 @@ class APBs {
         this.nftToken = Nft.token(token);
         this.token = token;
     }
-    async fetch(): Promise<APRBonus[]> {
-        const length = await this.mty.bonusesLength(this.nftToken);
+    async fetch(
+        level: NftLevel
+    ): Promise<APR[]> {
+        const ppt_id = Nft.fullId({
+            issue: 2021, level, token: this.nftToken
+        });
+        const length = await this.mty.bonusesLength(ppt_id);
         if (length !== undefined) {
-            return this.list(Array.from(range(length)))
+            return this.list(ppt_id, Array.from(range(length)))
         }
-        return this.next();
+        return this.next(ppt_id);
     }
     async list(
-        indices: Index[]
+        ppt_id: NftFullId, indices: Index[]
     ): Promise<APRBonus[]> {
-        return this.tail(await Promise.all(indices.map((i) =>
-            this.mty.bonuses(this.nftToken, i)
+        return this.tail(ppt_id, await Promise.all(indices.map((i) =>
+            this.mty.bonuses(ppt_id, i)
         )));
     }
     async next(
-        index: Index = 0, list = [] as APRBonus[]
+        ppt_id: NftFullId, index: Index = 0, list = [] as APRBonus[]
     ): Promise<APRBonus[]> {
         try {
             list.push(await this.mty.bonuses(this.nftToken, index));
         } catch (ex) {
-            return this.tail(list);
+            return this.tail(ppt_id, list);
         }
-        return this.next(index + 1, list);
+        return this.next(ppt_id, index + 1, list);
     }
     async tail(
-        list: APRBonus[]
+        ppt_id: NftFullId, list: APRBonus[]
     ) {
-        const target = await this.fake(Nft.fullId({
-            issue: 2021, level: 3, token: this.nftToken
-        }));
+        const target = await this.fake(ppt_id);
         list.push(aprify(target, list));
         return list;
     }
     async fake(
-        nft_id: NftFullId
+        ppt_id: NftFullId
     ) {
         try {
-            return this.mty.aprBonusTargetOf(nft_id);
+            return this.mty.aprBonusTargetOf(ppt_id);
         } catch (ex) {
             console.error(ex);
             return 0n;
