@@ -4,7 +4,7 @@ import Chart from 'chart.js/auto';
 import React, { useEffect, useRef } from 'react';
 import { useIsFirstRender } from 'usehooks-ts';
 
-import { ordinal } from '../../source/functions';
+import { mobile, ordinal } from '../../source/functions';
 import { useMouseDragX } from '../../source/react';
 import { Nft, NftIssue, NftLevel, Rates, Token } from '../../source/redux/types';
 import { theme } from '../../source/theme';
@@ -44,9 +44,9 @@ function chart(
     if ($ref.current === null) {
         return;
     }
-    const re = RateEvaluator(rates, token, issue, delta);
-    const targets = re.targets.map((t) => scaleBy(t, level));
-    const actuals = re.actuals.map((a) => scaleBy(a, level));
+    const re = RateEvaluator(rates, token, level, issue, delta, 360n);
+    const targets = re.targets.map(([apr, apb]) => normalize(apr + apb));
+    const actuals = re.actuals.map(([apr, apb]) => normalize(apr + apb));
     const xp_color = style(theme(token).XP_POWERED);
     const xp_alpha = xp_color.replace(/1\)$/, '0.125)');
     const data = {
@@ -159,6 +159,12 @@ function chart(
                     lineWidth: 0.125,
                     tickBorderDash: [1],
                 },
+                max: max(
+                    targets.concat(actuals), level
+                ),
+                suggestedMin: min(
+                    targets.concat(actuals), level
+                ),
                 ticks: {
                     callback: (v: string | number) => {
                         return `${Number(v).toFixed(2)}%`;
@@ -168,17 +174,12 @@ function chart(
                     display: true,
                     text: `${Nft.nameOf(level)} Rewards '${issue % 100}`,
                 },
-                max: max(
-                    targets.concat(actuals), level
-                ),
-                suggestedMin: min(
-                    targets.concat(actuals), level
-                ),
+                type: 'logarithmic' as any,
             },
         },
         maintainAspectRatio: false,
     };
-    Chart.defaults.font.size = 10;
+    Chart.defaults.font.size = mobile() ? 8 : 10;
     Chart.defaults.color = xp_color;
     const chart = new Chart($ref.current, {
         type: 'line', data, options
@@ -195,11 +196,6 @@ function min(
     _values: number[], _level: NftLevel
 ) {
     return 0;
-}
-function scaleBy(
-    [apr, apb]: [bigint, bigint], level: NftLevel
-) {
-    return normalize(apr * BigInt(level) / 3n + apb);
 }
 function style(
     name: string

@@ -1,10 +1,10 @@
 div#cover {
     div.control-level,
     div.control-issue {
-        div.btn-group-vertical > button {
-            border-bottom-left-radius: 0;
-            border-top-left-radius: 0;
-            border: none;
+        div.btn-group-vertical {
+            float: right;
+            height: 100%;
+            width: 41.45px;
         }
         div.btn-group-vertical {
             border-bottom-right-radius: 4px;
@@ -13,9 +13,19 @@ div#cover {
         }
         div.btn-group-vertical {
             backdrop-filter: blur(2px);
-            float: right;
-            height: 100%;
-            width: 41.25px;
+        }
+        div.btn-group-vertical>button {
+            border-bottom-left-radius: 0;
+            border-top-left-radius: 0;
+            border: none;
+        }
+    }
+    .rotate {
+        animation: rotate 0.75s infinite linear;
+    }
+    @keyframes rotate {
+        100% {
+            transform: rotate(360deg)
         }
     }
 }

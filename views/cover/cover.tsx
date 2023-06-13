@@ -1,29 +1,45 @@
 import './cover.scss';
 
 import React from 'react';
-import { Page, Rates, Token } from '../../source/redux/types';
+import { Page, Rates, RefresherStatus, Token } from '../../source/redux/types';
 import { UiCoverGraph } from './cover-graph';
 import { UiCoverImage } from './cover-image';
 
 type Props = {
-    page: Page;
-    token: Token;
-    rates: Rates;
-    pulsate: boolean;
+    controls: {
+        refresher: {
+            onRefresh?: (token: Token, all_levels: boolean) => void;
+            status: RefresherStatus | null;
+        };
+    };
+    options: {
+        pulsate: boolean;
+    };
+    data: {
+        rates: Rates;
+    };
+    page: Page; token: Token;
 }
 export function UiCover(
-    { page, token, rates, pulsate }: Props
+    { controls, page, options, data, token }: Props
 ) {
     switch (page) {
         case Page.Home:
             return <div id='cover'>
-                <UiCoverImage page={page} pulsate={pulsate} />
+                <UiCoverImage
+                    page={page} pulsate={options.pulsate}
+                />
             </div>;
         case Page.Nfts:
         case Page.Ppts:
             return <div id='cover'>
-                <UiCoverImage page={page} pulsate={pulsate} />
-                <UiCoverGraph page={page} token={token} rates={rates} />
+                <UiCoverImage
+                    page={page} pulsate={options.pulsate}
+                />
+                <UiCoverGraph
+                    controls={controls} data={data}
+                    page={page} token={token}
+                />
             </div>;
         default:
             return null;

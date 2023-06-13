@@ -1,16 +1,25 @@
 import React, { Dispatch, SetStateAction, useEffect } from 'react';
-import { ArrowDownCircle, ArrowUpCircle } from '../../public/images/tsx';
+import { ArrowDownCircle, ArrowUpCircle, YinYangCircle } from '../../public/images/tsx';
 import { Bus } from '../../source/bus';
-import { ROParams } from '../../source/params';
-import { Nft, NftLevel } from '../../source/redux/types';
 import { mobile } from '../../source/functions';
+import { ROParams } from '../../source/params';
+import { Nft, NftLevel, RebalancerStatus, Token } from '../../source/redux/types';
 
 type Props = {
-    level: NftLevel,
-    setLevel: Dispatch<SetStateAction<NftLevel>>,
+    controls: {
+        rebalancer: {
+            onRebalance?: (token: Token, all_levels: boolean) => void;
+            status: RebalancerStatus | null;
+        };
+        levels: {
+            setLevel: Dispatch<SetStateAction<NftLevel>>;
+            level: NftLevel;
+        };
+    };
+    token: Token;
 }
 export function UiCoverGraphControlLevel(
-    { level, setLevel }: Props
+    { controls: { rebalancer, levels: { level, setLevel } }, token }: Props
 ) {
     useEffect(() => {
         setTimeout(() => Bus.emit('refresh-tips'), mobile() ? 600 : 0);
@@ -30,6 +39,15 @@ export function UiCoverGraphControlLevel(
             </button>
             <button
                 data-bs-toggle='tooltip' data-bs-placement='left'
+                data-disable='true' disabled={disabled(rebalancer)}
+                className='btn btn-outline-warning middle'
+                onClick={(ev) => rebalancer.onRebalance?.(token, ev.ctrlKey)}
+                type='button' title='Rebalance Reward Rates'
+            >
+                <YinYangCircle classes={rotate(rebalancer)} />
+            </button>
+            <button
+                data-bs-toggle='tooltip' data-bs-placement='left'
                 data-disable='true' disabled={minimal(level)}
                 className='btn btn-outline-warning lower'
                 onClick={() => decrease({ level, setLevel })}
@@ -39,6 +57,16 @@ export function UiCoverGraphControlLevel(
             </button>
         </div>
     </div>;
+}
+function disabled(
+    rebalancer: Props['controls']['rebalancer']
+) {
+    return rebalancer.status === RebalancerStatus.rebalancing;
+}
+function rotate(
+    rebalancer: Props['controls']['rebalancer']
+) {
+    return rebalancer.status === RebalancerStatus.rebalancing ? 'rotate' : null;
 }
 function next(
     level: NftLevel
@@ -57,14 +85,14 @@ function previous(
     return 'previous';
 }
 function increase(
-    { level, setLevel }: Props
+    { level, setLevel }: Props['controls']['levels']
 ) {
     if (!maximal(level)) {
         setLevel(level + 3);
     }
 }
 function decrease(
-    { level, setLevel }: Props
+    { level, setLevel }: Props['controls']['levels']
 ) {
     if (!minimal(level)) {
         setLevel(level - 3);

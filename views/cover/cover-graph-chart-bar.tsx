@@ -4,7 +4,7 @@ import Chart from 'chart.js/auto';
 import React, { useEffect, useRef } from 'react';
 import { useIsFirstRender } from 'usehooks-ts';
 
-import { range } from '../../source/functions';
+import { mobile, range } from '../../source/functions';
 import { ROParams } from '../../source/params';
 import { Nft, NftIssue, NftLevel, Rates, Token } from '../../source/redux/types';
 import { theme } from '../../source/theme';
@@ -41,13 +41,16 @@ function chart(
         return;
     }
     const { min, max } = ROParams.nftLevel;
-    const levels = Array.from(range(min, max + 3, 3));
+    const levels = Array.from<NftLevel>(range(min, max + 3, 3));
     const labels = levels.map((l) => Nft.nameOf(l))
-    const re = RateEvaluator(rates, token, issue);
-    const target = middle(re.targets) ?? [0n, 0n];
-    const targets = levels.map((l) => scaleBy(target, l));
-    const actual = middle(re.actuals) ?? [0n, 0n];
-    const actuals = levels.map((l) => scaleBy(actual, l));
+    const evaluators = levels
+        .map(level => RateEvaluator(rates, token, level, issue));
+    const targets = evaluators
+        .map((re) => middle(re.targets) ?? [0n, 0n])
+        .map(([apr, apb]) => normalize(apr + apb));
+    const actuals = evaluators
+        .map((re) => middle(re.actuals) ?? [0n, 0n])
+        .map(([apr, apb]) => normalize(apr + apb));
     const xp_color = style(theme(token).XP_POWERED);
     const xp_alpha = xp_color.replace(/1\)$/, '0.125)');
     const data = {
@@ -126,11 +129,12 @@ function chart(
                     display: true,
                     text: `NFT Rewards '${issue % 100}`,
                 },
+                type: 'logarithmic' as any
             },
         },
         maintainAspectRatio: false,
     }
-    Chart.defaults.font.size = 10;
+    Chart.defaults.font.size = mobile() ? 8 : 10;
     Chart.defaults.color = xp_color;
     const chart = new Chart($ref.current, {
         type: 'bar', data, options
@@ -141,11 +145,6 @@ function middle<T>(
     array: Array<T>
 ): T | undefined {
     return array[Math.floor(array.length / 2)];
-}
-function scaleBy(
-    [apr, apb]: [bigint, bigint], level: NftLevel
-) {
-    return normalize(apr * BigInt(level) / 3n + apb);
 }
 function style(
     name: string

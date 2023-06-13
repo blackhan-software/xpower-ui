@@ -1,16 +1,25 @@
 import React, { Dispatch, SetStateAction, useEffect } from 'react';
-import { ArrowDownCircle, ArrowUpCircle } from '../../public/images/tsx';
+import { ArrowDownCircle, ArrowUpCircle, YinYangCircle } from '../../public/images/tsx';
 import { Bus } from '../../source/bus';
 import { mobile } from '../../source/functions';
-import { NftIssue } from '../../source/redux/types';
+import { NftIssue, RebalancerStatus, Token } from '../../source/redux/types';
 import { MAX_YEAR, MIN_YEAR } from '../../source/years';
 
 type Props = {
-    issue: NftIssue,
-    setIssue: Dispatch<SetStateAction<NftIssue>>,
+    controls: {
+        rebalancer: {
+            onRebalance?: (token: Token, all_levels: boolean) => void;
+            status: RebalancerStatus | null;
+        };
+        issues: {
+            setIssue: Dispatch<SetStateAction<NftIssue>>;
+            issue: NftIssue;
+        };
+    };
+    token: Token;
 }
 export function UiCoverGraphControlIssue(
-    { issue, setIssue }: Props
+    { controls: { rebalancer, issues: { issue, setIssue } }, token }: Props
 ) {
     useEffect(() => {
         setTimeout(() => Bus.emit('refresh-tips'), mobile() ? 600 : 0);
@@ -30,6 +39,15 @@ export function UiCoverGraphControlIssue(
             </button>
             <button
                 data-bs-toggle='tooltip' data-bs-placement='left'
+                data-disable='true' disabled={disabled(rebalancer)}
+                className='btn btn-outline-warning middle'
+                onClick={(ev) => rebalancer.onRebalance?.(token, ev.ctrlKey)}
+                type='button' title='Rebalance Reward Rates'
+            >
+                <YinYangCircle classes={rotate(rebalancer)} />
+            </button>
+            <button
+                data-bs-toggle='tooltip' data-bs-placement='left'
                 data-disable='true' disabled={minimal(issue)}
                 className='btn btn-outline-warning lower'
                 onClick={() => decrease({ issue, setIssue })}
@@ -39,6 +57,16 @@ export function UiCoverGraphControlIssue(
             </button>
         </div>
     </div>;
+}
+function disabled(
+    rebalancer: Props['controls']['rebalancer']
+) {
+    return rebalancer.status === RebalancerStatus.rebalancing;
+}
+function rotate(
+    rebalancer: Props['controls']['rebalancer']
+) {
+    return rebalancer.status === RebalancerStatus.rebalancing ? 'rotate' : null;
 }
 function next(
     issue: NftIssue
@@ -57,14 +85,14 @@ function previous(
     return 'previous';
 }
 function increase(
-    { issue, setIssue }: Props
+    { issue, setIssue }: Props['controls']['issues']
 ) {
     if (!maximal(issue)) {
         setIssue(issue + 1);
     }
 }
 function decrease(
-    { issue, setIssue }: Props
+    { issue, setIssue }: Props['controls']['issues']
 ) {
     if (!minimal(issue)) {
         setIssue(issue - 1);

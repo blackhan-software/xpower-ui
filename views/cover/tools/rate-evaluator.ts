@@ -1,45 +1,34 @@
 import { APR, APRBonus } from '../../../source/contract';
-import { memoized, range, zip } from '../../../source/functions';
-import { NftIssue, Rates, Token } from '../../../source/redux/types';
+import { range as arange, zip } from '../../../source/functions';
+import { NftIssue, NftLevel, Rates, Token } from '../../../source/redux/types';
 import { SVA, SVAIntegrator } from './sva-integrator';
 
-export const RateEvaluator = memoized((
+export const RateEvaluator = (
     rates: Rates,
     token: Token,
+    level: NftLevel,
     issue: NftIssue,
     delta = 0n,
+    range = 1n,
 ): {
     targets: Array<[SVA['value'], SVA['value']]>;
     actuals: Array<[SVA['value'], SVA['value']]>;
     stamps: Date[];
 } => {
     const aprs = Object.values(
-        rates.items[token]?.apr ?? {}
+        rates.items[token]?.[level]?.apr ?? {}
     );
     const apbs = Object.values(
-        rates.items[token]?.bonus ?? {}
+        rates.items[token]?.[level]?.bonus ?? {}
     );
-    return evaluate(aprs, apbs, issue, delta);
-}, (
-    rates: Rates,
-    token: Token,
-    issue: NftIssue,
-    delta = 0n
-) => {
-    const aprs = Object.keys(
-        rates.items[token]?.apr ?? {}
-    );
-    const apbs = Object.keys(
-        rates.items[token]?.bonus ?? {}
-    );
-    const lhs = `${aprs.length}:${apbs.length}`;
-    const rhs = `${token}:${issue}:${delta}`;
-    return `${lhs}:${rhs}`;
-});
+    return evaluate(aprs, apbs, issue, delta, range);
+};
 function evaluate(
-    aprs: APR[], apbs: APRBonus[],
-    issue: NftIssue, delta: bigint,
-    length = 360n
+    aprs: APR[],
+    apbs: APRBonus[],
+    issue: NftIssue,
+    delta: bigint,
+    range: bigint,
 ) {
     const apr_svas = aprs.map(svaify);
     const apb_svas = apbs.map(svaify);
@@ -53,9 +42,9 @@ function evaluate(
         apb_svas.length > 0
     ) {
         const now = new Date();
-        const lhs = Number(delta - length / 2n);
-        const rhs = Number(delta + length / 2n + length % 2n);
-        const stamps = Array.from(range(lhs, rhs))
+        const lhs = Number(delta - range / 2n);
+        const rhs = Number(delta + range / 2n + range % 2n);
+        const stamps = Array.from(arange(lhs, rhs))
             .map((d) => addDays(now, d));
         const apr_targets = stamps
             .map<Point>((s) => [s, queryBy(apr_svas, s).value]);
