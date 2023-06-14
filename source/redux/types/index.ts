@@ -10,6 +10,7 @@ export * from './otf-wallet';
 export * from './page';
 export * from './ppts-ui';
 export * from './rates';
+export * from './rates-ui';
 export * from './refresh';
 export * from './token';
 

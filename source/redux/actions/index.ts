@@ -10,5 +10,6 @@ export * from './page-actions';
 export * from './ppts-actions';
 export * from './ppts-ui-actions';
 export * from './rates-actions';
+export * from './rates-ui-actions';
 export * from './refresh-actions';
 export * from './token-actions';

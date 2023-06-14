@@ -28,6 +28,7 @@ export const reducer = combineReducers({
     ppts: reducers.pptsReducer,
     ppts_ui: reducers.pptsUiReducer,
     rates: reducers.ratesReducer,
+    rates_ui: reducers.ratesUiReducer,
     refresh: reducers.refreshReducer,
     token: reducers.tokenReducer,
 });
