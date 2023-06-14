@@ -6,7 +6,7 @@ import { AccountContext, AccountProvider, DebugContext, DebugProvider } from '..
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiToggled, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
 import { AppDispatch, AppState, Store } from '../../source/redux/store';
-import { AftWallet, History, MinerStatus, Mining, Minting, Nft, NftLevels, NftTokens, Nfts, NftsUi, OtfWallet, Page, PptsUi, Rates, Token } from '../../source/redux/types';
+import { AftWallet, History, MinerStatus, Mining, Minting, Nft, NftLevels, NftTokens, Nfts, NftsUi, OtfWallet, Page, PptsUi, Rates, RatesUi, Token } from '../../source/redux/types';
 
 import React, { createElement, useContext, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -40,6 +40,7 @@ type Props = {
     aft_wallet: AftWallet;
     otf_wallet: OtfWallet;
     rates: Rates;
+    rates_ui: RatesUi;
 }
 export function SPA(
     props: Props
@@ -53,15 +54,16 @@ export function SPA(
     });
     const { aft_wallet, otf_wallet } = props;
     const { mining, minting } = props;
+    const { rates, rates_ui } = props;
     const { nfts, nfts_ui } = props;
     const { ppts, ppts_ui } = props;
     const { page, token } = props;
-    const { history, rates } = props;
+    const { history } = props;
     return <React.StrictMode>
         {$notify(history, token)}
         {$h1(page)}
         {$connector(page)}
-        {$cover(page, token, mining, rates)}
+        {$cover(page, token, mining, rates, rates_ui)}
         {$wallet(page, token, aft_wallet, otf_wallet)}
         {$selector(page, token)}
         {$home(page, token, mining, minting)}
@@ -96,8 +98,12 @@ function $connector(
     </form>;
 }
 function $cover(
-    page: Page, token: Token, mining: Mining, rates: Rates
+    page: Page, token: Token, mining: Mining, rates: Rates, rates_ui: RatesUi
 ) {
+    const refresher_status = () => {
+        const { status } = rates_ui.refresher[Nft.token(token)];
+        return status ;
+    };
     const pulsate = () => {
         switch (mining.status) {
             case MinerStatus.stopping:
@@ -107,10 +113,22 @@ function $cover(
         }
         return false;
     };
+    const dispatch = useDispatch<AppDispatch>();
     return <UiCover
+        controls={{
+            refresher: {
+                onRefresh: (token, all_levels) =>
+                    dispatch(actions.ratesRefresh({ token, all_levels })),
+                status: refresher_status()
+            }
+        }}
+        options={{
+            pulsate: pulsate()
+        }}
+        data={{
+            rates
+        }}
         page={page} token={token}
-        pulsate={pulsate()}
-        rates={rates}
     />;
 }
 function $wallet(

@@ -1,11 +1,11 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-import { removeNonce, removeNonceByAmount, setAftWalletBurner, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter, switchToken } from '../../source/redux/actions';
+import { removeNonce, removeNonceByAmount, setAftWalletBurner, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter, setRatesUiRefresher, switchToken } from '../../source/redux/actions';
 import { mintingRowBy, nftTotalBy, nftsBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
 import { AppThunk } from '../../source/redux/store';
-import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftMintApproval, NftMintStatus, NftMinterList, NftSendStatus, NftUpgradeStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../source/redux/types';
+import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftMintApproval, NftMintStatus, NftMinterList, NftSendStatus, NftUpgradeStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, RefresherStatus, Token } from '../../source/redux/types';
 
 import { MMProvider } from '../../source/blockchain';
-import { MoeTreasuryFactory, OnClaim, OnClaimBatch, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
+import { MoeTreasuryFactory, OnClaim, OnClaimBatch, OnRefresh, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
 import { error, x40 } from '../../source/functions';
 import { HashManager, MiningManager as MM } from '../../source/managers';
 import { ROParams } from '../../source/params';
@@ -676,6 +676,55 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
     function set_status(claimer_status: PptClaimerStatus) {
         api.dispatch(setPptsUiMinter({
             minter: { [ppt_token]: { claimer_status } }
+        }));
+    }
+});
+/**
+ * rates-refresher:
+ */
+export const ratesRefresh = AppThunk('rates/refresh', async (args: {
+    token: Token, all_levels: boolean
+}, api) => {
+    const { token, all_levels } = args;
+    const moe_treasury = MoeTreasuryFactory({
+        token
+    });
+    const on_refresh_tx: OnRefresh = (
+        nft_prefix: bigint, all_levels: boolean, ev
+    ) => {
+        if (ev.log.transactionHash !== tx?.hash) {
+            return;
+        }
+        set_status(RefresherStatus.refreshed);
+    };
+    const nft_prefix = Nft.token(token);
+    try {
+        set_status(RefresherStatus.refreshing);
+        const flag = await moe_treasury.refreshable(
+            nft_prefix
+        );
+        if (!flag) {
+            set_status(RefresherStatus.refreshed);
+            return;
+        }
+    } catch (ex: any) {
+        set_status(RefresherStatus.error);
+        throw error(ex);
+    }
+    let tx: Transaction | undefined;
+    try {
+        set_status(RefresherStatus.refreshing);
+        moe_treasury.onRefreshRates(on_refresh_tx);
+        tx = await moe_treasury.refreshRates(
+            nft_prefix, all_levels
+        );
+    } catch (ex: any) {
+        set_status(RefresherStatus.error);
+        throw error(ex);
+    }
+    function set_status(status: RefresherStatus) {
+        api.dispatch(setRatesUiRefresher({
+            refresher: { [nft_prefix]: { status } }
         }));
     }
 });
