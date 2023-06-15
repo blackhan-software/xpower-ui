@@ -13,6 +13,8 @@ export * from './emoji-sunglasses-fill';
 export * from './fire';
 export * from './info-circle-fill';
 export * from './plus-circle-fill';
+export * from './toggle';
+export * from './toggle-alt';
 export * from './wifi';
 export * from './xpower';
 export * from './yin-yang-circle';
