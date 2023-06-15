@@ -11,14 +11,18 @@ import { theme } from '../../source/theme';
 import { normalize } from './tools/apr-normalize';
 import { RateEvaluator } from './tools/rate-evaluator';
 
+import { Scale } from './cover-graph-chart-scale';
+export { Scale };
+
 type Props = {
     level: NftLevel;
     issue: NftIssue;
     rates: Rates;
+    scale: Scale;
     token: Token;
 }
 export function UiCoverGraphChartLine(
-    { level, issue, rates, token }: Props
+    { level, issue, rates, scale, token }: Props
 ) {
     const $ref = useRef<HTMLCanvasElement>(null);
     const animate = useIsFirstRender();
@@ -26,9 +30,9 @@ export function UiCoverGraphChartLine(
         useMouseDragX($ref)[0]
     ));
     useEffect(() => chart($ref, {
-        level, issue, rates, token, animate, delta,
+        animate, delta, level, issue, rates, scale, token,
     }), [
-        level, issue, rates, token, animate, delta,
+        animate, delta, level, issue, rates, scale, token,
     ]);
     return <div className='chart chart-line cover-layer'>
         <canvas ref={$ref} />
@@ -36,7 +40,7 @@ export function UiCoverGraphChartLine(
 }
 function chart(
     $ref: React.RefObject<HTMLCanvasElement>, {
-        level, issue, rates, token, animate, delta,
+        animate, delta, level, issue, rates, scale, token,
     }: Props & {
         animate: boolean, delta: bigint
     }
@@ -174,7 +178,7 @@ function chart(
                     display: true,
                     text: `${Nft.nameOf(level)} Rewards '${issue % 100}`,
                 },
-                type: 'logarithmic' as any,
+                type: scale,
             },
         },
         maintainAspectRatio: false,

@@ -11,20 +11,24 @@ import { theme } from '../../source/theme';
 import { normalize } from './tools/apr-normalize';
 import { RateEvaluator } from './tools/rate-evaluator';
 
+import { Scale } from './cover-graph-chart-scale';
+export { Scale };
+
 type Props = {
     issue: NftIssue;
     rates: Rates;
+    scale: Scale;
     token: Token;
 }
 export function UiCoverGraphChartBar(
-    { issue, rates, token }: Props
+    { issue, rates, scale, token }: Props
 ) {
     const $ref = useRef<HTMLCanvasElement>(null);
     const animate = useIsFirstRender();
     useEffect(() => chart($ref, {
-        animate, issue, rates, token
+        animate, issue, rates, scale, token
     }), [
-        animate, issue, rates, token
+        animate, issue, rates, scale, token
     ]);
     return <div className='chart chart-bar cover-layer'>
         <canvas ref={$ref} />
@@ -32,7 +36,7 @@ export function UiCoverGraphChartBar(
 }
 function chart(
     $ref: React.RefObject<HTMLCanvasElement>, {
-        animate, issue, rates, token
+        animate, issue, rates, scale, token
     }: Props & {
         animate: boolean
     }
@@ -129,7 +133,7 @@ function chart(
                     display: true,
                     text: `NFT Rewards '${issue % 100}`,
                 },
-                type: 'logarithmic' as any
+                type: scale,
             },
         },
         maintainAspectRatio: false,

@@ -7,7 +7,7 @@ import { AccountContext } from '../../source/react';
 import { NftLevel, Page, Rates, RebalancerStatus, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { MAX_YEAR } from '../../source/years';
-import { UiCoverGraphChartBar } from './cover-graph-chart-bar';
+import { UiCoverGraphChartBar, Scale } from './cover-graph-chart-bar';
 import { UiCoverGraphChartLine } from './cover-graph-chart-line';
 import { UiCoverGraphControlIssue } from './cover-graph-control-issue';
 import { UiCoverGraphControlLevel } from './cover-graph-control-level';
@@ -36,16 +36,24 @@ export function UiCoverGraph(
     const [issue, set_issue] = useSessionStorage(
         'ui-cover-graph-issue', MAX_YEAR()
     );
+    const [scale, set_scale] = useSessionStorage<Scale>(
+        'ui-cover-graph-scale', Scale.logarithmic
+    );
     const xtoken = Tokenizer.xify(token);
     if (page === Page.Nfts) {
         return <>
             <UiCoverGraphInterlace />
             <UiCoverGraphChartBar
-                issue={issue} rates={rates} token={xtoken}
+                issue={issue}
+                rates={rates}
+                scale={scale}
+                token={xtoken}
             />
             <UiCoverGraphControlIssue
                 token={xtoken} controls={{
-                    ...controls, issues: { issue, setIssue: set_issue }
+                    issues: { issue, setIssue: set_issue },
+                    toggle: { scale, setScale: set_scale },
+                    ...controls,
                 }}
             />
             <UiCoverGraphSpinner
@@ -57,12 +65,17 @@ export function UiCoverGraph(
         return <>
             <UiCoverGraphInterlace />
             <UiCoverGraphChartLine
-                level={level} issue={issue}
-                rates={rates} token={xtoken}
+                level={level}
+                issue={issue}
+                rates={rates}
+                scale={scale}
+                token={xtoken}
             />
             <UiCoverGraphControlLevel
                 token={xtoken} controls={{
-                    ...controls, levels: { level, setLevel: set_level }
+                    levels: { level, setLevel: set_level },
+                    toggle: { scale, setScale: set_scale },
+                    ...controls,
                 }}
             />
             <UiCoverGraphSpinner
@@ -76,6 +89,7 @@ export function UiCoverGraph(
 function empty(
     rates: Rates, token: Token, level: NftLevel
 ) {
-    return rates.items[token]?.[level]?.apr === undefined;
+    const apr = rates.items[token]?.[level]?.apr;
+    return Object.keys(apr ?? {}).length === 0;
 }
 export default UiCoverGraph;
