@@ -1,46 +1,81 @@
 import { Store } from '@reduxjs/toolkit';
+
 import { Blockchain } from '../blockchain';
-import { APR, APRBonus, MoeTreasuryFactory } from '../contract';
-import { range } from '../functions';
+import { APR, APRBonus, MoeTreasury, MoeTreasuryFactory } from '../contract';
+import { buffered, range } from '../functions';
 import { xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { Index, Nft, NftFullId, NftLevel, NftLevels, NftToken, Rate, Token } from '../redux/types';
+import { Tokenizer } from '../token';
 
 import * as actions from '../redux/actions';
 
 export const RatesService = (
     store: Store<AppState>
 ) => {
-    Blockchain.onceConnect(async function initRates({
+    Blockchain.onceConnect(function initRates({
         token
     }) {
-        const rates = await Promise.all(
-            Array.from(NftLevels()).map((l) => Promise.all([
-                new APRs(token).fetch(l),
-                new APBs(token).fetch(l),
-            ]))
-        );
-        for (const [l, [aprs, apbs]] of Object.entries(rates)) {
-            for (const [i, apr] of Object.entries(aprs)) {
-                store.dispatch(actions.setAPR(
-                    token, 3 * Number(l), Number(i), apr)
-                );
-            }
-            for (const [i, apb] of Object.entries(apbs)) {
-                store.dispatch(actions.setAPRBonus(
-                    token, 3 * Number(l), Number(i), apb)
-                );
-            }
-        }
+        const mty = MoeTreasuryFactory({
+            token
+        });
+        fetch(token, mty).then((rates) => {
+            update(store, token, rates)
+        });
+    }, {
+        per: () => xtokenOf(store.getState())
+    });
+    Blockchain.onceConnect(function syncRates({
+        token
+    }) {
+        const mty = MoeTreasuryFactory({
+            token
+        });
+        mty.onRefreshRates(buffered((
+            nft_prefix: bigint
+        ) => {
+            const token = Tokenizer.token(nft_prefix);
+            fetch(token, mty).then(
+                (rates) => update(store, token, rates)
+            );
+        }));
     }, {
         per: () => xtokenOf(store.getState())
     });
 }
+function fetch(
+    token: Token, mty: MoeTreasury
+) {
+    const nft_token = Nft.token(token);
+    return Promise.all(
+        Array.from(NftLevels()).map((l) => Promise.all([
+            new APRs(nft_token, mty).fetch(l),
+            new APBs(nft_token, mty).fetch(l),
+        ]))
+    );
+}
+function update(
+    store: Store<AppState>, token: Token, rates: Array<[APR[], APR[]]>
+) {
+    for (const [l, [aprs, apbs]] of Object.entries(rates)) {
+        for (const [i, apr] of Object.entries(aprs)) {
+            store.dispatch(actions.setAPR(
+                token, 3 * Number(l), Number(i), apr)
+            );
+        }
+        for (const [i, apb] of Object.entries(apbs)) {
+            store.dispatch(actions.setAPRBonus(
+                token, 3 * Number(l), Number(i), apb)
+            );
+        }
+    }
+}
 class APRs {
-    constructor(token: Token) {
-        this.mty = MoeTreasuryFactory({ token });
-        this.nftToken = Nft.token(token);
-        this.token = token;
+    constructor(
+        nft_token: NftToken, mty: MoeTreasury
+    ) {
+        this.nftToken = nft_token;
+        this.mty = mty;
     }
     async fetch(
         level: NftLevel
@@ -88,15 +123,15 @@ class APRs {
             return 0n;
         }
     }
-    mty: ReturnType<typeof MoeTreasuryFactory>;
     nftToken: NftToken;
-    token: Token;
+    mty: MoeTreasury;
 }
 class APBs {
-    constructor(token: Token) {
-        this.mty = MoeTreasuryFactory({ token });
-        this.nftToken = Nft.token(token);
-        this.token = token;
+    constructor(
+        nft_token: NftToken, mty: MoeTreasury
+    ) {
+        this.nftToken = nft_token;
+        this.mty = mty;
     }
     async fetch(
         level: NftLevel
@@ -144,15 +179,13 @@ class APBs {
             return 0n;
         }
     }
-    mty: ReturnType<typeof MoeTreasuryFactory>;
     nftToken: NftToken;
-    token: Token;
+    mty: MoeTreasury;
 }
 function aprify(
     value: Rate, list: APR[]
 ): APR | APRBonus {
-    const now = new Date().getTime() / 1000;
-    const stamp = BigInt(Math.round(now));
+    const stamp = BigInt(new Date().getTime()) / 1000n;
     if (list.length > 0) {
         const last = list[list.length - 1];
         const area = value * (stamp - last.stamp);
