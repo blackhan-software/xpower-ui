@@ -13,7 +13,7 @@ enum TokenLower {
     aHELA = 'ahela',
 }
 export class Tokenizer {
-    public static token(value: string | null): Token {
+    public static token(value: string | bigint | number | null): Token {
         if (typeof value === 'string') {
             const suffix = value.match(/^xpow[._]/i)
                 ? value.replace('.', '_').split('_')[1] : value;
@@ -34,6 +34,14 @@ export class Tokenizer {
                     return Token.aODIN;
                 case 'ahela':
                     return Token.aHELA;
+            }
+        }
+        if (typeof value === 'number' || typeof value === 'bigint') {
+            switch (Number(value)) {
+                case 1: return Token.THOR;
+                case 2: return Token.LOKI;
+                case 3: return Token.ODIN;
+                case 4: return Token.HELA;
             }
         }
         return Token.THOR;
