@@ -4,7 +4,7 @@ import { Token } from './token';
 export type BlockHash = bigint;
 export type Interval = number;
 export type Level = number;
-export type Nonce = number;
+export type Nonce = string;
 export type Nonces = {
     /** nonce => { address, block-hash, amount } */
     items: {

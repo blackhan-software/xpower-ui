@@ -1,4 +1,3 @@
-/* eslint @typescript-eslint/no-unused-vars: [off] */
 import { AppState } from '../store';
 import { Account, Amount, BlockHash, Nonce, Token } from '../types';
 
@@ -17,7 +16,7 @@ export function noncesBy(
         token: Token,
     }
 }> {
-    const filtered = Object.entries(nonces.items).filter(([n, i]) => {
+    const filtered = Object.entries(nonces.items).filter(([_, i]) => {
         if (item !== undefined) {
             if (item.account !== undefined &&
                 item.account !== i.account
@@ -43,7 +42,7 @@ export function noncesBy(
         return true;
     });
     const mapped = filtered.map(([n, i]) => ({
-        nonce: Number(n), item: i
+        nonce: n, item: i
     }));
     return mapped;
 }

@@ -15,41 +15,41 @@ describe('nonce-by', () => {
         const { nonce } = nonceBy({
             nonces: {
                 items: {
-                    0xffff: { account, amount: 1n, block_hash, token },
+                    '0xffff': { account, amount: 1n, block_hash, token },
                 }
             }
         }, {
             account, block_hash, amount: 1n, token,
         });
-        expect(nonce).toEqual(0xffff);
+        expect(nonce).toEqual('0xffff');
     });
     it('should return nonce = 0xfff0', () => {
         const { nonce } = nonceBy({
             nonces: {
                 items: {
-                    0xffff: { account, amount: 1n, block_hash, token },
-                    0xfff0: { account, amount: 2n, block_hash, token },
+                    '0xffff': { account, amount: 1n, block_hash, token },
+                    '0xfff0': { account, amount: 2n, block_hash, token },
                 }
             }
         }, {
             account, amount: 2n, block_hash, token
         });
-        expect(nonce).toEqual(0xfff0);
+        expect(nonce).toEqual('0xfff0');
     });
-    it('should return nonce = 0xff00', () => {
+    it('should return nonce = 0x0000', () => {
         const { nonce } = nonceBy({
             nonces: {
                 items: {
-                    0xffff: { account, amount: 1n, block_hash, token },
-                    0xfff0: { account, amount: 2n, block_hash, token },
-                    0xff00: { account, amount: 3n, block_hash, token },
-                    0xf000: { account, amount: 3n, block_hash, token },
-                    0x0000: { account, amount: 3n, block_hash, token },
+                    '0xffff': { account, amount: 1n, block_hash, token },
+                    '0xfff0': { account, amount: 2n, block_hash, token },
+                    '0xff00': { account, amount: 3n, block_hash, token },
+                    '0xf000': { account, amount: 3n, block_hash, token },
+                    '0x0000': { account, amount: 3n, block_hash, token },
                 }
             }
         }, {
             account, amount: 3n, block_hash, token
         }, 2);
-        expect(nonce).toEqual(0xff00);
+        expect(nonce).toEqual('0x0000');
     });
 });

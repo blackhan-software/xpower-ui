@@ -23,7 +23,7 @@ export function noncesReducer(
                 if (action.payload.item.account === account &&
                     action.payload.item.block_hash === block_hash &&
                     action.payload.item.token === token &&
-                    action.payload.nonce === Number(nonce)
+                    action.payload.nonce === nonce
                 ) {
                     return false;
                 }
@@ -42,7 +42,7 @@ export function noncesReducer(
                     action.payload.item.amount === amount &&
                     action.payload.item.token === token
                 ) {
-                    delta.push(Number(nonce));
+                    delta.push(nonce);
                     return false;
                 }
                 return true;
@@ -61,7 +61,7 @@ export function noncesReducer(
                     action.payload.item.token === token ||
                     action.payload.item.token === null
                 ) {
-                    delta.push(Number(nonce));
+                    delta.push(nonce);
                     return false;
                 }
                 return true;

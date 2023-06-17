@@ -23,7 +23,7 @@ describe('onNonceAdded', () => {
         onNonceAdded(store as Store<AppState, Action>, (
             n, i, t_by, t
         ) => {
-            expect(n).toEqual(0xffff);
+            expect(n).toEqual('0xffff');
             expect(i.account).toEqual(account);
             expect(i.amount).toEqual(1n);
             expect(i.block_hash).toEqual(block_hash);
@@ -31,7 +31,7 @@ describe('onNonceAdded', () => {
             expect(t_by).toEqual(1n);
             expect(t).toEqual(1n);
         });
-        store.dispatch(addNonce(0xffff, {
+        store.dispatch(addNonce('0xffff', {
             account, amount: 1n, block_hash, token, worker: 0
         }));
     });
@@ -52,7 +52,7 @@ describe('onNonceRemoved', () => {
         onNonceRemoved(store as Store<AppState, Action>, (
             n, i, t_by, t
         ) => {
-            expect(n).toEqual(0xffff);
+            expect(n).toEqual('0xffff');
             expect(i.account).toEqual(account);
             expect(i.amount).toEqual(1n);
             expect(i.block_hash).toEqual(block_hash);
@@ -60,10 +60,10 @@ describe('onNonceRemoved', () => {
             expect(t_by).toEqual(0n);
             expect(t).toEqual(0n);
         });
-        store.dispatch(addNonce(0xffff, {
+        store.dispatch(addNonce('0xffff', {
             account, amount: 1n, block_hash, token, worker: 0
         }));
-        store.dispatch(removeNonce(0xffff, {
+        store.dispatch(removeNonce('0xffff', {
             account, block_hash, token
         }));
     });
@@ -79,7 +79,7 @@ describe('onNonceRemoved', () => {
         onNonceRemoved(store as Store<AppState, Action>, (
             n, i, t_by, t
         ) => {
-            expect(n).toEqual(0xffff);
+            expect(n).toEqual('0xffff');
             expect(i.account).toEqual(account);
             expect(i.amount).toEqual(1n);
             expect(i.block_hash).toEqual(block_hash);
@@ -87,7 +87,7 @@ describe('onNonceRemoved', () => {
             expect(t_by).toEqual(0n);
             expect(t).toEqual(0n);
         });
-        store.dispatch(addNonce(0xffff, {
+        store.dispatch(addNonce('0xffff', {
             account, amount: 1n, block_hash, token, worker: 0
         }));
         store.dispatch(removeNonceByAmount({

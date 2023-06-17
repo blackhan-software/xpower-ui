@@ -91,7 +91,7 @@ export function onNonceAdded(
         if (next.more) {
             next.more.forEach(added);
         } else if (!next.less) {
-            const nonces = Object.keys(next.items).map(Number);
+            const nonces = Object.keys(next.items);
             nonces.forEach(added); // restore on:load
         }
     });
