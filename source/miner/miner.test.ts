@@ -15,7 +15,7 @@ describe('Miner', () => {
         const miner = new Miner(Token.LOKI, contract, BigInt(account));
         expect(miner).toBeDefined();
         await miner.start(0n, async ({ nonce, amount, worker }) => {
-            expect(nonce).toBeGreaterThan(0n);
+            expect(nonce).toMatch(/^0x[a-f0-9]+/);
             expect(amount).toBeGreaterThan(0n);
             expect(worker).toBeGreaterThanOrEqual(0);
             await miner.stop();

@@ -5,7 +5,7 @@ if (typeof importScripts === 'function') importScripts(
     'https://cdn.jsdelivr.net/npm/ethers@6.3.0/dist/ethers.umd.min.js',
 );
 
-import { x32, x40, x64 } from '../../functions';
+import { hex_bytes, x32, x40, x64 } from '../../functions';
 import { Account, Address, Amount, BlockHash, Interval, Level, Nonce, Token } from '../../redux/types';
 import { Version } from '../../types';
 
@@ -197,7 +197,8 @@ class Worker {
                     const item = this.work();
                     if (item.amount > 0n) {
                         const view = new DataView(item.nonce.buffer, 0);
-                        callback({ ...item, nonce: view.getUint32(0) });
+                        const nonce = hex_bytes(view.getBigUint64(0));
+                        callback({ ...item, nonce });
                     }
                 }
                 dt_inner = performance.now() - dt_inner;
@@ -260,17 +261,15 @@ function interval() {
     return Math.floor(time / 3_600_000);
 }
 function nonce(
-    id: number, id_length: number
+    id: number, id_length: number, length = 8
 ) {
-    const bytes = randomBytes(4);
-    // basis in [0,64,128,192] (for id-length = 4)
+    const bytes = randomBytes(length);
     // basis in [0,32,...,224] (for id-length = 8)
     const basis = Math.floor(256 * id / id_length);
-    // delta of [0,1,..,30,31] (for id-length = 4)
-    // delta of [0,1,..,14,15] (for id-length = 8)
-    const delta = bytes[3] % Math.floor(128 / id_length);
-    // strong uniformity (with mininmum gap-sizes)
-    bytes[3] = basis + delta;
+    // delta of [0,1,..,30,31] (for id-length = 8)
+    const delta = bytes[length - 1] % Math.floor(256 / id_length);
+    // strong uniformity with min. gap-sizes:
+    bytes[length - 1] = basis + delta;
     return bytes;
 }
 function increment(
@@ -479,7 +478,7 @@ function abi_encoder(
             ], [
                 BigInt(contract) ^ account,
                 x32(block_hash),
-                new Uint8Array(4)
+                new Uint8Array(8)
             ]);
             value = arrayify(template.slice(2));
             abi_encoded[interval] = value;
