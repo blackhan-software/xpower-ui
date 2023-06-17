@@ -4,7 +4,7 @@ import Chart from 'chart.js/auto';
 import React, { useEffect, useRef } from 'react';
 import { useIsFirstRender } from 'usehooks-ts';
 
-import { mobile, range } from '../../source/functions';
+import { mobile, nice, nice_si, range } from '../../source/functions';
 import { ROParams } from '../../source/params';
 import { Nft, NftIssue, NftLevel, Rates, Token } from '../../source/redux/types';
 import { theme } from '../../source/theme';
@@ -99,7 +99,9 @@ function chart(
                     }),
                     label: (ctx: any) => {
                         const label = ctx.dataset.label || '';
-                        const value = ctx.parsed.y.toFixed(2);
+                        const value = nice(ctx.parsed.y ?? 0, {
+                            maxPrecision: 2, minPrecision: 2
+                        });
                         return ` ${label}: ${value}%`;
                     },
                     title: ([{ dataIndex: i }]: any) => {
@@ -127,7 +129,11 @@ function chart(
                     tickBorderDash: [1],
                 },
                 ticks: {
-                    callback: (v: string | number) => `${Number(v).toFixed(2)}%`
+                    callback: (v: string | number) => {
+                        return nice_si(Number(v), {
+                            maxPrecision: 2, minPrecision: 2
+                        }) + '%';
+                    }
                 },
                 title: {
                     display: true,

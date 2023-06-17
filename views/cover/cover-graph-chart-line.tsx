@@ -4,7 +4,7 @@ import Chart from 'chart.js/auto';
 import React, { useEffect, useRef } from 'react';
 import { useIsFirstRender } from 'usehooks-ts';
 
-import { mobile, ordinal } from '../../source/functions';
+import { mobile, nice, nice_si, ordinal } from '../../source/functions';
 import { useMouseDragX } from '../../source/react';
 import { Nft, NftIssue, NftLevel, Rates, Token } from '../../source/redux/types';
 import { theme } from '../../source/theme';
@@ -109,7 +109,9 @@ function chart(
                     }),
                     label: (ctx: any) => {
                         const label = ctx.dataset.label || '';
-                        const value = ctx.parsed.y.toFixed(2);
+                        const value = nice(ctx.parsed.y ?? 0, {
+                            maxPrecision: 2, minPrecision: 2
+                        });
                         return ` ${label}: ${value}%`;
                     },
                     title: ([{ dataIndex: i }]: any) => {
@@ -171,7 +173,9 @@ function chart(
                 ),
                 ticks: {
                     callback: (v: string | number) => {
-                        return `${Number(v).toFixed(2)}%`;
+                        return nice_si(Number(v), {
+                            maxPrecision: 2, minPrecision: 2
+                        }) + '%';
                     }
                 },
                 title: {
