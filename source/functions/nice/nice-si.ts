@@ -1,33 +1,48 @@
 import nice from './nice';
 
 export function nice_si(
-    n: number | bigint, { precision = 3, base = 1 } = {}
+    n: number | bigint, { maxPrecision = 3, minPrecision = 0, base = 1 } = {}
+): string {
+    const options = {
+        maxPrecision, minPrecision, base
+    };
+    if (n < 0) {
+        return '-' + format(-n, options);
+    }
+    return format(n, options);
+}
+function format(
+    n: number | bigint, { maxPrecision = 3, minPrecision = 0, base = 1 } = {}
 ): string {
     if (n < 1e03 * base)
-        return nice(rescale(n, 1e00) / base, { precision });
+        return nice(rescale(n, 1e00) / base, { maxPrecision, minPrecision });
     if (n < 1e06 * base)
-        return nice(rescale(n, 1e03) / base, { precision, suffix: 'K' });
+        return nice(rescale(n, 1e03) / base, { maxPrecision, minPrecision, suffix: 'K' });
     if (n < 1e09 * base)
-        return nice(rescale(n, 1e06) / base, { precision, suffix: 'M' });
+        return nice(rescale(n, 1e06) / base, { maxPrecision, minPrecision, suffix: 'M' });
     if (n < 1e12 * base)
-        return nice(rescale(n, 1e09) / base, { precision, suffix: 'G' });
+        return nice(rescale(n, 1e09) / base, { maxPrecision, minPrecision, suffix: 'G' });
     if (n < 1e15 * base)
-        return nice(rescale(n, 1e12) / base, { precision, suffix: 'T' });
+        return nice(rescale(n, 1e12) / base, { maxPrecision, minPrecision, suffix: 'T' });
     if (n < 1e18 * base)
-        return nice(rescale(n, 1e15) / base, { precision, suffix: 'P' });
+        return nice(rescale(n, 1e15) / base, { maxPrecision, minPrecision, suffix: 'P' });
     if (n < 1e21 * base)
-        return nice(rescale(n, 1e18) / base, { precision, suffix: 'E' });
+        return nice(rescale(n, 1e18) / base, { maxPrecision, minPrecision, suffix: 'E' });
     if (n < 1e24 * base)
-        return nice(rescale(n, 1e21) / base, { precision, suffix: 'Z' });
+        return nice(rescale(n, 1e21) / base, { maxPrecision, minPrecision, suffix: 'Z' });
     if (n < 1e27 * base)
-        return nice(rescale(n, 1e24) / base, { precision, suffix: 'Y' });
+        return nice(rescale(n, 1e24) / base, { maxPrecision, minPrecision, suffix: 'Y' });
     if (typeof n === 'bigint') {
         return (n / BigInt(base)).toLocaleString('en-US', {
-            notation: 'scientific', maximumFractionDigits: digits(precision)
+            maximumFractionDigits: digits(maxPrecision),
+            minimumFractionDigits: digits(minPrecision),
+            notation: 'scientific',
         });
     } else {
         return (n / base).toLocaleString('en-US', {
-            notation: 'scientific', maximumFractionDigits: digits(precision)
+            maximumFractionDigits: digits(maxPrecision),
+            minimumFractionDigits: digits(minPrecision),
+            notation: 'scientific',
         });
     }
 }
