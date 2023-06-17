@@ -108,7 +108,7 @@ function $sovBurner(
             const { decimals } = TokenInfo(token);
             const text = prompt(
                 `Really? Confirm the amount of ${token} tokens to burn:`,
-                nice(amount, { base: 10 ** decimals, precision: 18 })
+                nice(amount, { base: 10 ** decimals, maxPrecision: 18 })
             );
             if (typeof text !== 'string') {
                 return;
