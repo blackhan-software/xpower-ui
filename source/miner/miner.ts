@@ -53,7 +53,7 @@ export class Miner extends EventEmitter {
         this.emit('starting', {
             running: false, now: performance.now()
         });
-        for (let i = 0; i < Miner.WORKERS_MAX * this.speed; i++) {
+        for (let i = 0; i < this.workersLength; i++) {
             this.workers.push(await this.hire(i));
         }
         this.emit('started', {
@@ -166,7 +166,7 @@ export class Miner extends EventEmitter {
             account: this.account,
             contract: this.contract,
             level: this.level,
-            meta: { id },
+            meta: { id, idLength: this.workersLength },
             token: this.token,
             version: this.version,
             versionFaked: this.versionFaked
@@ -203,6 +203,9 @@ export class Miner extends EventEmitter {
     }
     private get workers(): ModuleThread<IWorker>[] {
         return this._workers;
+    }
+    public get workersLength(): number {
+        return Miner.WORKERS_MAX * this.speed
     }
     private _account: Account;
     private _contract: Address;

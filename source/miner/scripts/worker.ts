@@ -61,7 +61,7 @@ expose({
         account: Account,
         contract: Address,
         level: Level,
-        meta: { id: number },
+        meta: { id: number, idLength: number },
         token: Token,
         version: Version,
         versionFaked: boolean,
@@ -78,6 +78,7 @@ expose({
             account,
             contract,
             level,
+            meta,
             token,
             version,
             versionFaked,
@@ -126,6 +127,7 @@ class Worker {
         account,
         contract,
         level,
+        meta,
         token,
         version,
         versionFaked,
@@ -133,6 +135,7 @@ class Worker {
         account: Account,
         contract: Address,
         level: Level,
+        meta: { id: number, idLength: number },
         token: Token,
         version: Version,
         versionFaked: boolean,
@@ -146,7 +149,7 @@ class Worker {
             token,
         };
         this._miner = miner(version, versionFaked);
-        this._nonce = nonce(/*meta.id*/);
+        this._nonce = nonce(meta.id, meta.idLength);
     }
     public start(
         block_hash: BlockHash,
@@ -256,8 +259,19 @@ function interval() {
     const time = new Date().getTime();
     return Math.floor(time / 3_600_000);
 }
-function nonce() {
-    return randomBytes(4);
+function nonce(
+    id: number, id_length: number
+) {
+    const bytes = randomBytes(4);
+    // basis in [0,64,128,192] (for id-length = 4)
+    // basis in [0,32,...,224] (for id-length = 8)
+    const basis = Math.floor(256 * id / id_length);
+    // delta of [0,1,..,30,31] (for id-length = 4)
+    // delta of [0,1,..,14,15] (for id-length = 8)
+    const delta = bytes[3] % Math.floor(128 / id_length);
+    // strong uniformity (with mininmum gap-sizes)
+    bytes[3] = basis + delta;
+    return bytes;
 }
 function increment(
     nonce: Uint8Array, index = 0
