@@ -9,7 +9,9 @@ export function error(ex: any) {
     }
     if (ex.message) {
         if (ex.data && ex.data.message) {
-            ex.message = `${ex.message} [${ex.data.message}]`;
+            if (ex.message !== ex.data.message) {
+                ex.message = `${ex.message} [${ex.data.message}]`;
+            }
         }
     }
     console.error(ex);
