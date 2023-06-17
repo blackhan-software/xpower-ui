@@ -97,9 +97,6 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
         api.dispatch(setMintingRow({
             level, row: { tx_counter: tx_counter + 1 }
         }));
-        api.dispatch(removeNonce(nonce, {
-            account, block_hash, token
-        }));
         set_status(MinterStatus.minted);
     } catch (ex: any) {
         set_status(MinterStatus.error);
@@ -120,15 +117,12 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
                     }
                 }
             }
-            if (ex.data && ex.data.message && ex.data.message.match(
-                /empty nonce-hash/i
-            )) {
-                api.dispatch(removeNonce(nonce, {
-                    account, block_hash, token
-                }));
-            }
         }
         throw error(ex);
+    } finally {
+        api.dispatch(removeNonce(nonce, {
+            account, block_hash, token
+        }));
     }
     function set_status(status: MinterStatus) {
         api.dispatch(setMintingRow({ level, row: { status } }));
