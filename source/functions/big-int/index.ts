@@ -19,6 +19,15 @@ export function hex(
 ) {
     return '0x' + value.toString(16);
 }
+export function hex_bytes(
+    value: bigint | number
+) {
+    const string = value.toString(16);
+    if (string.length % 2) {
+        return '0x0' + string;
+    }
+    return '0x' + string;
+}
 export function hex_plain(
     value: bigint | number, min_length: number
 ) {
