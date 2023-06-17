@@ -4,7 +4,7 @@ import React, { useContext } from 'react';
 import { useSessionStorage } from 'usehooks-ts';
 import { AccountContext } from '../../source/react';
 
-import { NftLevel, Page, Rates, RebalancerStatus, Token } from '../../source/redux/types';
+import { NftLevel, Page, Rates, RefresherStatus, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { MAX_YEAR } from '../../source/years';
 import { UiCoverGraphChartBar, Scale } from './cover-graph-chart-bar';
@@ -16,9 +16,9 @@ import { UiCoverGraphSpinner } from './cover-graph-spinner';
 
 type Props = {
     controls: {
-        rebalancer: {
-            onRebalance?: (token: Token, all_levels: boolean) => void;
-            status: RebalancerStatus | null;
+        refresher: {
+            onRefresh?: (token: Token, all_levels: boolean) => void;
+            status: RefresherStatus | null;
         };
     };
     data: {
@@ -36,8 +36,11 @@ export function UiCoverGraph(
     const [issue, set_issue] = useSessionStorage(
         'ui-cover-graph-issue', MAX_YEAR()
     );
-    const [scale, set_scale] = useSessionStorage<Scale>(
-        'ui-cover-graph-scale', Scale.logarithmic
+    const [scale_bar, set_scale_bar] = useSessionStorage<Scale>(
+        'ui-cover-graph-scale-bar', Scale.logarithmic
+    );
+    const [scale_tmp, set_scale_tmp] = useSessionStorage<Scale>(
+        'ui-cover-graph-scale-tmp', Scale.linear
     );
     const xtoken = Tokenizer.xify(token);
     if (page === Page.Nfts) {
@@ -46,13 +49,13 @@ export function UiCoverGraph(
             <UiCoverGraphChartBar
                 issue={issue}
                 rates={rates}
-                scale={scale}
+                scale={scale_bar}
                 token={xtoken}
             />
             <UiCoverGraphControlIssue
                 token={xtoken} controls={{
                     issues: { issue, setIssue: set_issue },
-                    toggle: { scale, setScale: set_scale },
+                    toggle: { scale: scale_bar, setScale: set_scale_bar },
                     ...controls,
                 }}
             />
@@ -68,13 +71,13 @@ export function UiCoverGraph(
                 level={level}
                 issue={issue}
                 rates={rates}
-                scale={scale}
+                scale={scale_tmp}
                 token={xtoken}
             />
             <UiCoverGraphControlLevel
                 token={xtoken} controls={{
                     levels: { level, setLevel: set_level },
-                    toggle: { scale, setScale: set_scale },
+                    toggle: { scale: scale_tmp, setScale: set_scale_tmp },
                     ...controls,
                 }}
             />
