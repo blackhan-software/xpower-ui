@@ -1,6 +1,7 @@
 import './amount';
 import './list.scss';
 
+import { nice_si } from '../../../source/functions';
 import { nftTotalBy } from '../../../source/redux/selectors';
 import { Amount, Nft, NftDetails, NftIssue, NftLevel, NftLevels, Nfts, Supply, Token } from '../../../source/redux/types';
 
@@ -172,10 +173,6 @@ function $minter(
         const nft_name = Nft.nameOf(nft_level);
         if (nft_name) return nft_name.slice(0, 1);
     };
-    const tail = (nft_level: NftLevel) => {
-        const nft_name = Nft.nameOf(nft_level);
-        if (nft_name) return nft_name.slice(1);
-    };
     const title = (
         nft_level: NftLevel, token: Token
     ) => {
@@ -191,8 +188,7 @@ function $minter(
         data-bs-placement='top' data-bs-toggle='tooltip'
         title={title(nft_level, token)}
     >
-        {head(nft_level)}<span
-            className='d-none d-sm-inline'>{tail(nft_level)} NFTs</span>
+        {Nft.nameOf(nft_level)}<span className='d-none d-sm-inline'> NFTs</span>
     </button>;
 }
 function $balance(
@@ -204,13 +200,13 @@ function $balance(
         title={`Overall personal balance & supply (${Nft.nameOf(nft_level)} NFTs)`}
     >
         <span>{
-            total_by.amount.toString()
+            nice_si(total_by.amount)
         }</span>
         <span className='d-none d-sm-inline'>
             &nbsp;/&nbsp;
         </span>
         <span className='d-none d-sm-inline'>{
-            total_by.supply.toString()
+            nice_si(total_by.supply)
         }</span>
     </button>;
 }

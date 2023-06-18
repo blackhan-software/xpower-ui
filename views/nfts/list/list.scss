@@ -31,15 +31,34 @@ div#nft-single-minting {
     .minter {
       border-left: none;
       border-right: none;
-      width: calc(50% - 125px);
+    }
+    .minter {
+      width: calc(33.33% - 42.5px + 2px);
     }
     .balance {
-      font-size: smaller;
-      width: calc(25% - 125px);
+      width: calc(33.33% - 42.5px - 4px);
     }
     .amount {
+      width: calc(33.33% - 42.5px + 2px);
+    }
+    @media (max-width: 575px) {
+      .minter {
+        width: calc(33.33% - 42.5px - 1px);
+      }
+      .balance {
+        width: calc(33.33% - 42.5px - 1px);
+      }
+      .amount {
+        width: calc(33.33% - 42.5px);
+      }
+    }
+    .minter, .balance, .amount {
       font-size: smaller;
-      width: calc(25% - 125px);
+    }
+    @media (max-width: 575px) {
+      .minter, .balance, .amount {
+        font-size: x-small;
+      }
     }
     margin-bottom: 1em;
     width: 100%;
