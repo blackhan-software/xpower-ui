@@ -1,4 +1,4 @@
-import { mobile } from '../../../source/functions';
+import { abs, mobile, nice_si } from '../../../source/functions';
 import { useBufferedIf } from '../../../source/react';
 import { Amount, Nft, NftLevel } from '../../../source/redux/types';
 
@@ -103,7 +103,11 @@ function $amount(
         data-bs-toggle='tooltip' data-bs-placement='top'
         onClick={() => extremify(props)}
         title={title(props)}
-    >{props.amount.toString()}</button>;
+    >
+        {nice_si(props.amount, {
+            minPrecision: abs(props.amount) >= 1000n ? 3 : 0
+        })}
+    </button>;
 }
 function title(
     { amount, level }: Props
