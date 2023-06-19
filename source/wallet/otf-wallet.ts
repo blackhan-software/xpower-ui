@@ -1,4 +1,5 @@
-import { BigNumberish, BlockTag, Provider, SigningKey, TransactionRequest, Wallet } from 'ethers';
+/* eslint @typescript-eslint/no-explicit-any: [off] */
+import { BigNumberish, BlockTag, Provider, SigningKey, TransactionRequest, TransactionResponse, Wallet } from 'ethers';
 
 export class OtfWallet extends Wallet {
     constructor(
@@ -12,14 +13,26 @@ export class OtfWallet extends Wallet {
         return new OtfWallet(this.privateKey, provider);
     }
     async sendTransaction(
-        tx: TransactionRequest
-    ) {
+        tx: TransactionRequest, n = 3 // max. attempts
+    ): Promise<
+        TransactionResponse
+    > {
         if (typeof tx.nonce !== 'number') {
             tx = { ...tx, nonce: await this.getTxCount('pending') };
         } else {
             this.setTxCount(tx.nonce);
         }
-        return super.sendTransaction(tx);
+        try {
+            return await super.sendTransaction(tx);
+        } catch (ex: any) {
+            const used = ex?.message?.match(/nonce has already been used/i);
+            if (used && n > 0) {
+                return this.sendTransaction({ ...tx, nonce: null }, n - 1);
+            }
+            // reset nonce back to old:
+            this.setTxCount(tx.nonce!);
+            throw ex;
+        }
     }
     private async getTxCount(
         tag?: BlockTag
