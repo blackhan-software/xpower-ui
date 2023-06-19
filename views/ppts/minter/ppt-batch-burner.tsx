@@ -41,6 +41,9 @@ function disabled(
     if (!negatives(list)) {
         return true;
     }
+    if (!inRange(list)) {
+        return true;
+    }
     return false;
 }
 function burning(
@@ -58,5 +61,15 @@ function negatives(
         (amount) => amount < 0n
     );
     return negatives.length > 0;
+}
+function inRange(
+    list: PptMinterList
+) {
+    for (const { amount, min, max } of Object.values(list)) {
+        if (amount < min || max < amount) {
+            return false;
+        }
+    }
+    return true;
 }
 export default UiPptBatchBurner;

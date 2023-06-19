@@ -1,18 +1,19 @@
-import { abs, mobile, nice_si } from '../../../source/functions';
+import { mobile } from '../../../source/functions';
 import { useBufferedIf } from '../../../source/react';
 import { Amount, Nft, NftLevel } from '../../../source/redux/types';
 
 import React, { KeyboardEvent, MouseEvent, TouchEvent, useEffect, useRef } from 'react';
 import { DashCircle, PlusCircle } from '../../../public/images/tsx';
+import useDoubleTap from '../../../source/react/hooks/use-double-tap';
 
 type Props = {
     level: NftLevel,
     amount1: Amount, max1: Amount, min1: Amount
     onUpdate?: OnUpdate
 };
-type OnUpdate = (args: Omit<Props, 'onUpdate'> & {
-    callback?: () => void
-}) => void;
+type OnUpdate = (
+    args: Omit<Props, 'onUpdate'>
+) => void;
 export function UiNftAmount(
     props: Props
 ) {
@@ -82,8 +83,15 @@ function decreaseByWheel(
 function $amount(
     props: Props
 ) {
-    const $ref = useRef<HTMLButtonElement>(null);
+    const $ref = useRef<HTMLInputElement>(null);
+    useDoubleTap($ref, () => {
+        setTimeout(() => $ref.current?.select());
+        extremify(props);
+    });
     useEffect(() => {
+        if (readOnly(props)) {
+            return;
+        }
         const current = $ref.current;
         const dbyw = decreaseByWheel.bind(null, props);
         current?.addEventListener('wheel', dbyw, {
@@ -98,25 +106,45 @@ function $amount(
             current?.removeEventListener('wheel', ibyw);
         };
     }, [props, $ref]);
-    return <button type='button' ref={$ref}
-        className='btn btn-outline-warning amount'
+    return <input type='number' ref={$ref}
+        className={`btn btn-outline-warning amount ${invalid(props)}`}
         data-bs-toggle='tooltip' data-bs-placement='top'
-        onClick={() => extremify(props)}
-        title={`${Nft.nameOf(props.level)} NFTs to mint`}
-    >
-        {nice_si(props.amount1, {
-            minPrecision: abs(props.amount1) >= 1000n ? 3 : 0
-        })}
-    </button>;
+        onChange={(e) => changeTo(props, BigInt(e.target.value))}
+        onKeyDown={(e) => changeByArrows(props, e)}
+        readOnly={readOnly(props)}
+        title={title(props)}
+        value={props.amount1.toString()}
+    />
+}
+function invalid(
+    props: Props
+) {
+    return !inRange(props) ? 'invalid' : '';
+}
+function inRange(
+    { amount1, min1 }: Props
+) {
+    return min1 <= amount1;
+}
+function readOnly(
+    { max1, min1 }: Props
+) {
+    return max1 == 0n && min1 == 0n
+}
+function title(
+    { level }: Props
+) {
+    return `${Nft.nameOf(level)} NFTs to mint`
 }
 function extremify(
     { amount1, max1, min1, level, onUpdate }: Props
 ) {
-    if (onUpdate && (amount1 === max1)) {
-        onUpdate({ amount1: min1, max1, min1, level });
-    }
-    if (onUpdate && (amount1 === min1 || amount1 < max1)) {
-        onUpdate({ amount1: max1, max1, min1, level });
+    if (onUpdate) {
+        if (amount1 === max1 || amount1 < min1) {
+            onUpdate({ amount1: min1, max1, min1, level });
+        } else {
+            onUpdate({ amount1: max1, max1, min1, level });
+        }
     }
 }
 function $increase(
@@ -164,19 +192,38 @@ function increaseByWheel(
         changeBy(props, delta(e));
     }
 }
+function changeByArrows(
+    props: Props, e: KeyboardEvent
+) {
+    if (e.code?.match(/arrowup/i)) {
+        changeBy(props, delta(e));
+        e.preventDefault();
+        return;
+    }
+    if (e.code?.match(/arrowdown/i)) {
+        changeBy(props, -delta(e));
+        e.preventDefault();
+        return;
+    }
+}
 function changeBy(
     props: Props, delta: Amount
 ) {
-    const { amount1, min1, max1, onUpdate } = props;
+    const { amount1, min1, max1 } = props;
     if (delta < 0n && amount1 + delta >= min1 ||
         delta > 0n && amount1 + delta <= max1
     ) {
-        if (onUpdate) {
-            onUpdate({ ...props, amount1: amount1 + delta });
-        }
-        return true;
+        return changeTo(props, amount1 + delta)
     }
     return false;
+}
+function changeTo(
+    props: Props, value: Amount
+) {
+    if (props.onUpdate) {
+        props.onUpdate({ ...props, amount1: value });
+    }
+    return true;
 }
 function delta(
     e: { ctrlKey: boolean, shiftKey: boolean }

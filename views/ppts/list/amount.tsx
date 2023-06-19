@@ -1,18 +1,19 @@
-import { abs, mobile, nice_si } from '../../../source/functions';
+import { mobile } from '../../../source/functions';
 import { useBufferedIf } from '../../../source/react';
 import { Amount, Nft, NftLevel } from '../../../source/redux/types';
 
 import React, { KeyboardEvent, MouseEvent, TouchEvent, useEffect, useRef } from 'react';
 import { DashCircle, PlusCircle } from '../../../public/images/tsx';
+import useDoubleTap from '../../../source/react/hooks/use-double-tap';
 
 type Props = {
     amount: Amount, level: NftLevel,
     max: Amount, min: Amount
     onUpdate?: OnUpdate
 };
-type OnUpdate = (args: Omit<Props, 'onUpdate'> & {
-    callback?: () => void
-}) => void;
+type OnUpdate = (
+    args: Omit<Props, 'onUpdate'>
+) => void;
 export function UiPptAmount(
     props: Props
 ) {
@@ -82,8 +83,15 @@ function decreaseByWheel(
 function $amount(
     props: Props
 ) {
-    const $ref = useRef<HTMLButtonElement>(null);
+    const $ref = useRef<HTMLInputElement>(null);
+    useDoubleTap($ref, () => {
+        setTimeout(() => $ref.current?.select());
+        extremify(props);
+    });
     useEffect(() => {
+        if (readOnly(props)) {
+            return;
+        }
         const current = $ref.current;
         const dbyw = decreaseByWheel.bind(null, props);
         current?.addEventListener('wheel', dbyw, {
@@ -98,16 +106,30 @@ function $amount(
             current?.removeEventListener('wheel', ibyw);
         };
     }, [props, $ref]);
-    return <button type='button' ref={$ref}
-        className='btn btn-outline-warning amount'
+    return <input type='number' ref={$ref}
+        className={`btn btn-outline-warning amount ${invalid(props)}`}
         data-bs-toggle='tooltip' data-bs-placement='top'
-        onClick={() => extremify(props)}
+        onChange={(e) => changeTo(props, BigInt(e.target.value))}
+        onKeyDown={(e) => changeByArrows(props, e)}
+        readOnly={readOnly(props)}
         title={title(props)}
-    >
-        {nice_si(props.amount, {
-            minPrecision: abs(props.amount) >= 1000n ? 3 : 0
-        })}
-    </button>;
+        value={props.amount.toString()}
+    />;
+}
+function invalid(
+    props: Props
+) {
+    return !inRange(props) ? 'invalid' : '';
+}
+function inRange(
+    { amount, max, min }: Props
+) {
+    return min <= amount && amount <= max;
+}
+function readOnly(
+    { max, min }: Props
+) {
+    return max == 0n && min == 0n
 }
 function title(
     { amount, level }: Props
@@ -123,11 +145,12 @@ function title(
 function extremify(
     { amount, level, max, min, onUpdate }: Props
 ) {
-    if (onUpdate && (amount === max)) {
-        onUpdate({ amount: min, max, min, level });
-    }
-    if (onUpdate && (amount === min || amount < max)) {
-        onUpdate({ amount: max, max, min, level });
+    if (onUpdate) {
+        if (amount === max || amount < min) {
+            onUpdate({ amount: min, max, min, level });
+        } else {
+            onUpdate({ amount: max, max, min, level });
+        }
     }
 }
 function $increase(
@@ -175,19 +198,38 @@ function increaseByWheel(
         changeBy(props, delta(e));
     }
 }
+function changeByArrows(
+    props: Props, e: KeyboardEvent
+) {
+    if (e.code?.match(/arrowup/i)) {
+        changeBy(props, delta(e));
+        e.preventDefault();
+        return;
+    }
+    if (e.code?.match(/arrowdown/i)) {
+        changeBy(props, -delta(e));
+        e.preventDefault();
+        return;
+    }
+}
 function changeBy(
     props: Props, delta: Amount
 ) {
-    const { amount, min, max, onUpdate } = props;
+    const { amount, min, max } = props;
     if (delta < 0n && amount + delta >= min ||
         delta > 0n && amount + delta <= max
     ) {
-        if (onUpdate) {
-            onUpdate({ ...props, amount: amount + delta });
-        }
-        return true;
+        return changeTo(props, amount + delta)
     }
     return false;
+}
+function changeTo(
+    props: Props, value: Amount
+) {
+    if (props.onUpdate) {
+        props.onUpdate({ ...props, amount: value });
+    }
+    return true;
 }
 function delta(
     e: { ctrlKey: boolean, shiftKey: boolean }

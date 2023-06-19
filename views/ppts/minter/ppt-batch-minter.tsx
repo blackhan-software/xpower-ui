@@ -41,6 +41,9 @@ function disabled(
     if (!positives(list)) {
         return true;
     }
+    if (!inRange(list)) {
+        return true;
+    }
     return false;
 }
 function minting(
@@ -58,5 +61,15 @@ function positives(
         (amount) => amount > 0n
     );
     return positives.length > 0;
+}
+function inRange(
+    list: PptMinterList
+) {
+    for (const { amount, min, max } of Object.values(list)) {
+        if (amount < min || max < amount) {
+            return false;
+        }
+    }
+    return true;
 }
 export default UiPptBatchMinter;

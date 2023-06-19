@@ -63,4 +63,24 @@ div#ppt-single-minting {
     margin-bottom: 1em;
     width: 100%;
   }
+  .ppt-minter {
+    input[type=number] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+    input[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number]:read-only {
+      cursor: default;
+    }
+    input[type=number] {
+      cursor: auto;
+    }
+    input[type=number].invalid {
+      border: 2px solid var(--xp-powered-i);
+      color: var(--xp-powered-i);
+    }
+  }
 }

@@ -153,6 +153,11 @@ function approving(
     }
     return approval === NftMintApproval.approving;
 }
+function minting(
+    status: NftMintStatus | null
+): boolean | null {
+    return status === NftMintStatus.minting;
+}
 function disabled1({ list, status }: {
     list: NftMinterList, status: NftMintStatus | null
 }) {
@@ -162,12 +167,10 @@ function disabled1({ list, status }: {
     if (!positives1(list)) {
         return true;
     }
+    if (!inRange1(list)) {
+        return true;
+    }
     return false;
-}
-function minting(
-    status: NftMintStatus | null
-): boolean | null {
-    return status === NftMintStatus.minting;
 }
 function positives1(
     list: NftMinterList
@@ -180,6 +183,21 @@ function positives1(
     );
     return positives.length > 0;
 }
+function inRange1(
+    list: NftMinterList
+) {
+    for (const { amount1, min1 } of Object.values(list)) {
+        if (amount1 < min1) {
+            return false;
+        }
+    }
+    return true;
+}
+function upgrading(
+    status: NftUpgradeStatus | null
+): boolean | null {
+    return status === NftUpgradeStatus.upgrading;
+}
 function disabled2({ list, status }: {
     list: NftMinterList, status: NftUpgradeStatus | null
 }) {
@@ -189,12 +207,10 @@ function disabled2({ list, status }: {
     if (!positives2(list)) {
         return true;
     }
+    if (!inRange2(list)) {
+        return true;
+    }
     return false;
-}
-function upgrading(
-    status: NftUpgradeStatus | null
-): boolean | null {
-    return status === NftUpgradeStatus.upgrading;
 }
 function positives2(
     list: NftMinterList
@@ -206,5 +222,15 @@ function positives2(
         (amount) => amount > 0n
     );
     return positives.length > 0;
+}
+function inRange2(
+    list: NftMinterList
+) {
+    for (const { amount2, min2, max2 } of Object.values(list)) {
+        if (amount2 < min2 || max2 < amount2) {
+            return false;
+        }
+    }
+    return true;
 }
 export default UiNftMinter;
