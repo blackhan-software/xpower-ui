@@ -4,6 +4,11 @@ import { Address } from "../../redux/types";
 const prototype = BigInt.prototype as any;
 prototype.toJson = (b: bigint) => `${b}n`;
 
+export function abs(
+    value: bigint
+) {
+    return value >= 0 ? value : - value;
+}
 export function max(
     lhs: bigint, rhs: bigint
 ) {
