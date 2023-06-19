@@ -79,8 +79,8 @@ div#aft-wallet {
         position: absolute;
         height: 20px;
         width: 20px;
-        left: 11px;
-        top: 8px;
+        left: calc(50% - 10px);
+        top: calc(50% - 10px);
       }
     }
     button#aft-wallet-sov-toggle:hover {
