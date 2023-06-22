@@ -109,7 +109,10 @@ export function nftDetails(
 }
 export function nftMinter() {
     const minter = {
-        approval: null, mintStatus: null, upgradeStatus: null
+        approval: null,
+        minter_status: null,
+        burner_status: null,
+        upgrader_status: null,
     };
     return nftWrap(minter as NftMinter);
 }

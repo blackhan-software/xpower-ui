@@ -6,7 +6,7 @@ import {
 
 import React from 'react';
 import { UiPptList } from './list/list';
-import { UiPptMinter } from './minter';
+import { UiPptMinter } from './minter/minter';
 
 type Props = {
     ppts: Nfts; token: Token; flags: PptFlags;

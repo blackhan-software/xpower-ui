@@ -20,7 +20,6 @@ div#ppt-batch-minting {
       border-right: none;
       width: calc(100% - 84px);
     }
-
     #ppt-batch-minter {
       span.spinner {
         margin-top: 0.25em;
@@ -39,7 +38,6 @@ div#ppt-batch-minting {
     #ppt-batch-minter.show {
       display: inline-block
     }
-
     #ppt-batch-burner {
       span.spinner {
         margin-top: 0.25em;
@@ -58,7 +56,6 @@ div#ppt-batch-minting {
     #ppt-batch-burner.show {
       display: inline-block
     }
-
     #ppt-batch-claimer {
       span.spinner {
         margin-top: 0.25em;

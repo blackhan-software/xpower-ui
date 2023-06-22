@@ -1,19 +1,20 @@
-import React from 'react';
-
 import { pptTotalBy } from '../../../source/redux/selectors';
 import { Nft, Nfts, PptClaimerStatus, Token } from '../../../source/redux/types';
-import { Spinner } from './index';
+
+import React from 'react';
 import { UiPptBatchClaimerTitle } from './ppt-batch-claimer-title';
+import { Spinner } from './spinner';
 
 type Props = {
     approved: boolean | null;
-    ppts: Nfts
+    onBatchClaim?: (token: Token) => void;
     status: PptClaimerStatus | null;
     token: Token;
-    onBatchClaim?: (token: Token) => void;
+} & {
+    ppts: Nfts;
 }
 export function UiPptBatchClaimer(
-    { approved, status, ppts, token, onBatchClaim }: Props
+    { approved, onBatchClaim, ppts, status, token }: Props
 ) {
     const classes = [
         'btn btn-outline-warning',
@@ -39,17 +40,17 @@ export function UiPptBatchClaimer(
     </button>;
 }
 function disabled(
-    { ppts, status, token, title }: Pick<Props, 'ppts' | 'status' | 'token'> & {
+    { ppts, status, token, title }: Omit<Props, 'approved'> & {
         title: string | undefined
     }
 ) {
+    if (!title || title.startsWith('0')) {
+        return true;
+    }
     if (claiming(status)) {
         return true;
     }
     if (!claimable(ppts, token)) {
-        return true;
-    }
-    if (!title || title.startsWith('0')) {
         return true;
     }
     return false;

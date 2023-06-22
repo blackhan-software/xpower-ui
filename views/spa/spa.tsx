@@ -298,16 +298,29 @@ function $nfts(
                 dispatch(setNftsUiDetails({ details }));
             }}
             onNftTransfer={(issue, level) =>
-                dispatch(actions.nftsTransfer({ account, token: xtoken, issue, level }))
+                dispatch(actions.nftsTransfer({
+                    account, token: xtoken, issue, level
+                }))
             }
             onNftMinterApproval={(token) =>
-                dispatch(actions.nftsApprove({ account, token }))
+                dispatch(actions.nftsApprove({
+                    account, token
+                }))
             }
             onNftMinterBatchMint={(token, list) =>
-                dispatch(actions.nftsBatchMint({ account, token, list }))
+                dispatch(actions.nftsBatchMint({
+                    account, token, list
+                }))
+            }
+            onNftMinterBatchBurn={(token, list) =>
+                dispatch(actions.nftsBatchBurn({
+                    account, token, list
+                }))
             }
             onNftMinterBatchUpgrade={(token, list) =>
-                dispatch(actions.nftsBatchUpgrade({ account, token, list }))
+                dispatch(actions.nftsBatchUpgrade({
+                    account, token, list
+                }))
             }
             onNftMinterToggled={(toggled) => {
                 const flags = Object.fromEntries(
@@ -423,16 +436,24 @@ function $ppts(
                 }))
             }
             onPptMinterApproval={(t) =>
-                dispatch(actions.pptsApprove({ account, token: t }))
+                dispatch(actions.pptsApprove({
+                    account, token: t
+                }))
             }
             onPptMinterBatchMint={(token, list) =>
-                dispatch(actions.pptsBatchMint({ account, token, list }))
+                dispatch(actions.pptsBatchMint({
+                    account, token, list
+                }))
             }
             onPptMinterBatchBurn={(token, list) =>
-                dispatch(actions.pptsBatchBurn({ account, token, list }))
+                dispatch(actions.pptsBatchBurn({
+                    account, token, list
+                }))
             }
             onPptMinterBatchClaim={(token) => {
-                dispatch(actions.pptsBatchClaim({ account, token }));
+                dispatch(actions.pptsBatchClaim({
+                    account, token
+                }));
             }}
             onPptMinterToggled={(toggled) => {
                 const flags = Object.fromEntries(

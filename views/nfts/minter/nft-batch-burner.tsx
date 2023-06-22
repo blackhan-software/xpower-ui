@@ -1,16 +1,16 @@
-import { PptBurnerStatus, PptMinterList, Token } from '../../../source/redux/types';
+import { NftBurnerStatus, NftMinterList, Token } from '../../../source/redux/types';
 
 import React from 'react';
 import { Spinner } from './spinner';
 
 type Props = {
     approved: boolean | null;
-    list: PptMinterList;
-    onBatchBurn?: (token: Token, list: PptMinterList) => void;
-    status: PptBurnerStatus | null;
+    list: NftMinterList;
+    onBatchBurn?: (token: Token, list: NftMinterList) => void;
+    status: NftBurnerStatus | null;
     token: Token;
 }
-export function UiPptBatchBurner(
+export function UiNftBatchBurner(
     { approved, list, status, token, onBatchBurn }: Props
 ) {
     const classes = [
@@ -18,10 +18,10 @@ export function UiPptBatchBurner(
         approved ? 'show' : ''
     ];
     const text = burning(status)
-        ? <>Unstaking<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
-        : <>Unstake<span className="d-none d-sm-inline">&nbsp;NFTs</span></>;
+        ? <>Burning<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
+        : <>Burn<span className="d-none d-sm-inline">&nbsp;NFTs</span></>;
     return <button
-        type='button' id='ppt-batch-burner'
+        type='button' id='nft-batch-burner'
         className={classes.join(' ')}
         disabled={disabled({ list, status })}
         onClick={onBatchBurn?.bind(null, token, list)}
@@ -33,9 +33,9 @@ export function UiPptBatchBurner(
     </button>;
 }
 function burning(
-    status: PptBurnerStatus | null
+    status: NftBurnerStatus | null
 ): boolean {
-    return status === PptBurnerStatus.burning;
+    return status === NftBurnerStatus.burning;
 }
 function disabled(
     { list, status }: Pick<Props, 'list' | 'status'>
@@ -52,10 +52,10 @@ function disabled(
     return false;
 }
 function negatives(
-    list: PptMinterList
+    list: NftMinterList
 ) {
     const amounts = Object.values(list).map(
-        ({ amount }) => amount
+        ({ amount1 }) => amount1
     );
     const negatives = amounts.filter(
         (amount) => amount < 0n
@@ -63,13 +63,13 @@ function negatives(
     return negatives.length > 0;
 }
 function inRange(
-    list: PptMinterList
+    list: NftMinterList
 ) {
-    for (const { amount, min, max } of Object.values(list)) {
-        if (amount < min || max < amount) {
+    for (const { amount1, min1, max1 } of Object.values(list)) {
+        if (amount1 < min1 || max1 < amount1) {
             return false;
         }
     }
     return true;
 }
-export default UiPptBatchBurner;
+export default UiNftBatchBurner;

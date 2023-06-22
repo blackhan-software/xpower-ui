@@ -2,7 +2,7 @@
 import { removeNonce, removeNonceByAmount, setAftWalletBurner, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter, setRatesUiRefresher, switchToken } from '../../source/redux/actions';
 import { mintingRowBy, nftTotalBy, nftsBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
 import { AppThunk } from '../../source/redux/store';
-import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftMintApproval, NftMintStatus, NftMinterList, NftSendStatus, NftUpgradeStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, RefresherStatus, Token } from '../../source/redux/types';
+import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterStatus, NftMinterList, NftSenderStatus, NftUpgraderStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, RefresherStatus, Token, NftBurnerStatus } from '../../source/redux/types';
 
 import { MMProvider } from '../../source/blockchain';
 import { MoeTreasuryFactory, OnClaim, OnClaimBatch, OnRefresh, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
@@ -189,20 +189,20 @@ export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
                 }
             }
         }));
-        set_status(NftSendStatus.sent);
+        set_status(NftSenderStatus.sent);
     };
     let tx: Transaction | undefined;
     try {
-        set_status(NftSendStatus.sending);
+        set_status(NftSenderStatus.sending);
         nft_wallet.onTransferSingle(on_single_tx);
         tx = await nft_wallet.safeTransfer(
             target, full_id, amount
         );
     } catch (ex: any) {
-        set_status(NftSendStatus.error);
+        set_status(NftSenderStatus.error);
         throw error(ex);
     }
-    function set_status(status: NftSendStatus) {
+    function set_status(status: NftSenderStatus) {
         api.dispatch(setNftsUiDetails({
             details: {
                 [nft_token]: {
@@ -230,19 +230,19 @@ export const nftsApprove = AppThunk('nfts/approve', async (args: {
         if (ev.log.transactionHash !== tx?.hash) {
             return;
         }
-        set_approval(NftMintApproval.approved);
+        set_approval(NftMinterApproval.approved);
     };
     let tx: Transaction | undefined;
     try {
-        set_approval(NftMintApproval.approving);
+        set_approval(NftMinterApproval.approving);
         moe_wallet.onApproval(on_approval);
         const nft_address = await nft_wallet.address;
         tx = await moe_wallet.approve(nft_address, MAX_UINT256);
     } catch (ex) {
-        set_approval(NftMintApproval.error);
+        set_approval(NftMinterApproval.error);
         throw error(ex);
     }
-    function set_approval(approval: NftMintApproval) {
+    function set_approval(approval: NftMinterApproval) {
         api.dispatch(setNftsUiMinter({
             minter: { [Nft.token(token)]: { approval } }
         }));
@@ -269,27 +269,104 @@ export const nftsBatchMint = AppThunk('nfts/batch-mint', async (args: {
     }
     const levels = nfts.map((nft) => nft.level);
     const amounts = nfts.map((nft) => nft.amount);
-    const on_batch_tx: OnTransferBatch = async (
+    const on_mint_batch: OnTransferBatch = async (
         op, from, to, ids, values, ev
     ) => {
         if (ev.log.transactionHash !== tx?.hash) {
             return;
         }
-        set_status(NftMintStatus.minted);
+        set_status(NftMinterStatus.minted);
     };
     const nft_wallet = new NftWallet(account, token);
     let tx: Transaction | undefined;
     try {
-        set_status(NftMintStatus.minting);
-        nft_wallet.onTransferBatch(on_batch_tx);
+        set_status(NftMinterStatus.minting);
+        nft_wallet.onTransferBatch(on_mint_batch);
         tx = await nft_wallet.mintBatch(levels, amounts);
     } catch (ex) {
-        set_status(NftMintStatus.error);
+        set_status(NftMinterStatus.error);
         throw error(ex);
     }
-    function set_status(mintStatus: NftMintStatus) {
+    function set_status(minter_status: NftMinterStatus) {
         api.dispatch(setNftsUiMinter({
-            minter: { [nft_token]: { mintStatus } }
+            minter: { [nft_token]: { minter_status } }
+        }));
+    }
+});
+export const nftsBatchBurn = AppThunk('nfts/batch-burn', async (args: {
+    account: Account | null, token: Token, list: NftMinterList
+}, api) => {
+    const { account, token, list } = args;
+    if (!account) {
+        throw new Error('missing account');
+    }
+    const nft_token = Nft.token(
+        token
+    );
+    const nft_burns = [] as Array<{
+        nft_id: NftFullId; amount: Amount;
+    }>;
+    for (const level of NftLevels()) {
+        const { amount1: amount } = list[level];
+        if (amount < 0n) {
+            // burn from youngest to oldest (backwards):
+            const issues = Array.from(Years()).reverse();
+            let burn_amount = -amount;
+            for (const issue of issues) {
+                const nft_total = nftTotalBy(api.getState(), {
+                    level, issue, token: nft_token
+                });
+                if (nft_total.amount === 0n) {
+                    continue; // filter empty
+                }
+                if (issue + level / 3 > issues[0]) {
+                    continue; // irredeemable
+                }
+                const nft_id = Nft.fullId({
+                    level, issue, token: nft_token
+                });
+                if (burn_amount >= nft_total.amount) {
+                    nft_burns.push({
+                        nft_id, amount: nft_total.amount
+                    });
+                    burn_amount -= nft_total.amount;
+                } else {
+                    nft_burns.push({
+                        nft_id, amount: burn_amount
+                    });
+                    burn_amount = 0n;
+                }
+                if (burn_amount === 0n) {
+                    break;
+                }
+            }
+        }
+    }
+    const nft_ids = nft_burns.map((burn) => burn.nft_id);
+    const amounts = nft_burns.map((burn) => burn.amount);
+    const on_burn_batch: OnTransferBatch = async (
+        op, from, to, ids, values, ev
+    ) => {
+        if (ev.log.transactionHash !== tx?.hash) {
+            return;
+        }
+        set_status(NftBurnerStatus.burned);
+    };
+    const nft_wallet = new NftWallet(account, token);
+    let tx: Transaction | undefined;
+    try {
+        set_status(NftBurnerStatus.burning);
+        nft_wallet.onTransferBatch(on_burn_batch);
+        tx = await nft_wallet.burnBatch(
+            nft_ids, amounts
+        );
+    } catch (ex: any) {
+        set_status(NftBurnerStatus.error);
+        throw error(ex);
+    }
+    function set_status(burner_status: NftBurnerStatus) {
+        api.dispatch(setNftsUiMinter({
+            minter: { [nft_token]: { burner_status } }
         }));
     }
 });
@@ -343,19 +420,19 @@ export const nftsBatchUpgrade = AppThunk('nfts/batch-upgrade', async (args: {
         if (ev.log.transactionHash !== tx?.hash) {
             return;
         }
-        set_status(NftUpgradeStatus.upgraded);
+        set_status(NftUpgraderStatus.upgraded);
     };
     const nft_wallet = new NftWallet(account, token);
     let tx: Transaction | undefined;
     try {
-        set_status(NftUpgradeStatus.upgrading);
+        set_status(NftUpgraderStatus.upgrading);
         nft_wallet.onTransferBatch(on_batch_tx);
         tx = await nft_wallet.upgradeBatch(issues, levels, amounts);
     } catch (ex) {
-        set_status(NftUpgradeStatus.error);
+        set_status(NftUpgraderStatus.error);
         throw error(ex);
     }
-    function set_status(upgradeStatus: NftUpgradeStatus) {
+    function set_status(upgradeStatus: NftUpgraderStatus) {
         api.dispatch(setNftsUiMinter({
             minter: { [nft_token]: { upgradeStatus } }
         }));

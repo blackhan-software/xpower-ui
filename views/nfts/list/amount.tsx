@@ -132,9 +132,13 @@ function readOnly(
     return max1 == 0n && min1 == 0n
 }
 function title(
-    { level }: Props
+    { amount1, level }: Props
 ) {
-    return `${Nft.nameOf(level)} NFTs to mint`
+    if (amount1 >= 0) {
+        return `${Nft.nameOf(level)} NFTs to mint`
+    } else {
+        return `${Nft.nameOf(level)} NFTs to burn`;
+    }
 }
 function extremify(
     { amount1, max1, min1, level, onUpdate }: Props

@@ -36,6 +36,24 @@ div#nft-batch-minting {
     #nft-batch-minter.show {
       display: inline-block;
     }
+    #nft-batch-burner {
+      span.spinner {
+        margin-top: 0.25em;
+      }
+      span.spinner {
+        height: 1em;
+        width: 1em;
+      }
+      border-left: none;
+      border-right: none;
+      width: calc(50% - 41px);
+    }
+    #nft-batch-burner {
+      display: none;
+    }
+    #nft-batch-burner.show {
+      display: inline-block
+    }
     #nft-batch-upgrader {
       span.spinner {
         margin-top: 0.25em;

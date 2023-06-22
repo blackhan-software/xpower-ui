@@ -54,6 +54,9 @@ type Props = {
     onNftMinterBatchMint?: (
         token: Token, list: NftMinterList
     ) => void;
+    onNftMinterBatchBurn?: (
+        token: Token, list: NftMinterList
+    ) => void;
     onNftMinterBatchUpgrade?: (
         token: Token, list: NftMinterList
     ) => void;
@@ -135,23 +138,29 @@ export function UiNfts(
         </div>
         <div id='nft-batch-minting'>
             <UiNftMinter
-                list={
-                    join(flags, amounts[nft_token])
-                }
                 approval={
                     minter[nft_token].approval
                 }
                 onApproval={
                     props.onNftMinterApproval
                 }
-                mintStatus={
-                    minter[nft_token].mintStatus
+                minter_list={
+                    join(flags, amounts[nft_token])
+                }
+                minter_status={
+                    minter[nft_token].minter_status
                 }
                 onBatchMint={
                     props.onNftMinterBatchMint
                 }
-                upgradeStatus={
-                    minter[nft_token].upgradeStatus
+                burner_status={
+                    minter[nft_token].burner_status
+                }
+                onBatchBurn={
+                    props.onNftMinterBatchBurn
+                }
+                upgrader_status={
+                    minter[nft_token].upgrader_status
                 }
                 onBatchUpgrade={
                     props.onNftMinterBatchUpgrade

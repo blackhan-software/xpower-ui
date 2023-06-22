@@ -36,6 +36,22 @@ export class NftWallet extends ERC1155Wallet {
             this.account, levels, amounts, moe_index
         );
     }
+    burn(
+        full_id: NftFullId | Promise<NftFullId>,
+        amount: Amount | Promise<Amount>
+    ) {
+        return this._nft.burn(
+            this.account, full_id, amount
+        );
+    }
+    burnBatch(
+        full_ids: NftFullId[] | Promise<NftFullId[]>,
+        amounts: Amount[] | Promise<Amount[]>,
+    ) {
+        return this._nft.burnBatch(
+            this.account, full_ids, amounts
+        );
+    }
     upgrade(
         issue: NftIssue | Promise<NftIssue>,
         level: NftLevel | Promise<NftLevel>,

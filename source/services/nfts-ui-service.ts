@@ -7,7 +7,7 @@ import { onAftWalletChanged, onNftChanged, onTokenSwitch } from '../redux/observ
 import { nftAmounts } from '../redux/reducers';
 import { aftWalletBy, nftsBy, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Account, Amount, MAX_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMintApproval, NftTokens, Token, TokenInfo } from '../redux/types';
+import { Account, Amount, MAX_UINT256, Nft, NftAmounts, NftDetails, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftTokens, Token, TokenInfo } from '../redux/types';
 import { Tokenizer } from '../token';
 import { MoeWallet, NftWallet, NftWalletMock } from '../wallet';
 import { Years } from '../years';
@@ -52,10 +52,15 @@ export const NftsUiService = (
         const entries = Array.from(NftLevels()).map((nft_level): [
             NftLevel, NftAmounts[NftLevel]
         ] => {
-            const amount1 = by_moe(nft_level);
-            const amount2 = by_nft(nft_level);
-            const range1 = { amount1, max1: amount1, min1: 0n };
-            const range2 = { amount2, max2: amount2, min2: 0n };
+            const amount1m = by_moe(nft_level);
+            const amount1b = by_nft_burnable(nft_level);
+            const amount2u = by_nft_upgradeable(nft_level);
+            const range1 = {
+                amount1: amount1m, max1: amount1m, min1: -amount1b
+            };
+            const range2 = {
+                amount2: amount2u, max2: amount2u, min2: 0n
+            };
             return [nft_level, { ...range1, ...range2 }];
         });
         return {
@@ -64,7 +69,7 @@ export const NftsUiService = (
             })
         };
         /**
-         * @return number of NFTs by MOE amount (for minting)
+         * @return number of NFTs (for minting)
          */
         function by_moe(nft_level: NftLevel) {
             const balance = amount / BigInt(10 ** decimals);
@@ -72,23 +77,44 @@ export const NftsUiService = (
             return remainder / 10n ** BigInt(nft_level);
         }
         /**
-         * @return number of NFTs by NFT amount (for upgradeing)
+         * @return number of NFTs (for burning)
          */
-        function by_nft(nft_level: NftLevel, nft_total = 0n) {
-            if (nft_level < 3) {
-                return nft_total;
-            }
-            for (const nft_issue of Years()) {
+        function by_nft_burnable(
+            level: NftLevel, total = 0n
+        ) {
+            // burn from youngest to oldest (backwards):
+            const issues = Array.from(Years()).reverse();
+            for (const issue of issues) {
+                if (issue + level / 3 > issues[0]) {
+                    continue; // irredeemable
+                }
                 const nfts = nftsBy(store.getState(), {
-                    level: nft_level - 3,
-                    issue: nft_issue,
-                    token: nft_token
+                    level, issue, token: nft_token
                 });
                 for (const item of Object.values(nfts.items)) {
-                    nft_total += item.amount / 1000n;
+                    total += item.amount;
                 }
             }
-            return nft_total;
+            return total;
+        }
+        /**
+         * @return number of NFTs (for upgrading)
+         */
+        function by_nft_upgradeable(
+            level: NftLevel, total = 0n
+        ) {
+            if (level < 3) {
+                return total;
+            }
+            for (const issue of Years()) {
+                const nfts = nftsBy(store.getState(), {
+                    level: level - 3, issue, token: nft_token
+                });
+                for (const item of Object.values(nfts.items)) {
+                    total += item.amount / 1000n;
+                }
+            }
+            return total;
         }
     };
     /**
@@ -149,8 +175,8 @@ export const NftsUiService = (
             address, await nft_wallet.address
         );
         const approval = allowance === MAX_UINT256
-            ? NftMintApproval.approved
-            : NftMintApproval.unapproved;
+            ? NftMinterApproval.approved
+            : NftMinterApproval.unapproved;
         return {
             minter: { [Nft.token(token)]: { approval } }
         };

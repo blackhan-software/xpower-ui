@@ -1,7 +1,7 @@
 import { InterfaceAbi, Transaction } from 'ethers';
 import { x40 } from '../../functions';
 import { ROParams } from '../../params';
-import { Account, Address, Amount, Index, NftIssue, NftLevel } from '../../redux/types';
+import { Account, Address, Amount, Index, NftIssue, NftLevel, NftRealId } from '../../redux/types';
 import { Version } from '../../types';
 import { OtfManager } from '../../wallet';
 import { Base } from '../base';
@@ -54,6 +54,26 @@ export class XPowerNft extends Base {
         }
         return contract['mintBatch(address,uint256[],uint256[],uint256)'](
             x40(await to), levels, amounts, moe_index
+        );
+    }
+    async burn(
+        from: Account | Promise<Account>,
+        id: NftRealId | Promise<NftRealId>,
+        amount: Amount | Promise<Amount>,
+    ): Promise<Transaction> {
+        const contract = await this.connect();
+        return contract['burn(address,uint256,uint256)'](
+            x40(await from), id, amount
+        );
+    }
+    async burnBatch(
+        from: Account | Promise<Account>,
+        ids: NftRealId[] | Promise<NftRealId[]>,
+        amounts: Amount[] | Promise<Amount[]>,
+    ): Promise<Transaction> {
+        const contract = await this.connect();
+        return contract['burnBatch(address,uint256[],uint256[])'](
+            x40(await from), ids, amounts
         );
     }
     async upgrade(

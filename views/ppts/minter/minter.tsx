@@ -6,6 +6,7 @@ import { Tokenizer } from '../../../source/token';
 import { UiPptBatchBurner } from './ppt-batch-burner';
 import { UiPptBatchClaimer } from './ppt-batch-claimer';
 import { UiPptBatchMinter } from './ppt-batch-minter';
+import { UiPptBurnApproval, approved } from './ppt-burn-approval';
 
 type Props = {
     ppts: Nfts;
@@ -30,8 +31,8 @@ export function UiPptMinter(
     >
         {$toggleAll(props)}
         {$burnApproval(props)}
-        {$pptBatchReminter(props)}
-        {$pptBatchClaimer(props)}
+        {$batchReminter(props)}
+        {$batchClaimer(props)}
         {$info(props)}
     </div>;
 }
@@ -55,69 +56,56 @@ function $toggleAll(
     </button>;
 }
 function $burnApproval(
-    { token, approval, onApproval }: Props
+    { approval, onApproval, token }: Props
 ) {
-    const is_approved = approved(approval);
-    const is_approving = approving(approval);
-    const text = is_approving
-        ? 'Approving NFT Staking…'
-        : 'Approve NFT Staking';
-    return <button type='button' id='ppt-burn-approval'
-        className='btn btn-outline-warning'
-        data-bs-placement='top' data-bs-toggle='tooltip'
-        disabled={is_approving || is_approved || is_approved === null}
-        onClick={onApproval?.bind(null, token)}
-        style={{ display: !is_approved ? 'block' : 'none' }}
-        title={`Approve staking (and unstaking) of NFTs`}
-    >
-        {Spinner({
-            show: !!is_approving, grow: true
-        })}
-        <span className='text'>{text}</span>
-    </button>;
+    return <UiPptBurnApproval
+        approval={approval}
+        onApproval={onApproval}
+        token={token}
+    />;
 }
-function $pptBatchReminter(
+function $batchReminter(
     props: Props
 ) {
     const negatives = Object.values(props.minter_list)
         .map(({ amount }) => amount).filter((a) => a < 0n);
-    if (negatives.length) {
-        return $pptBatchBurner(props)
+    if (negatives.length === 0) {
+        return $batchMinter(props)
     } else {
-        return $pptBatchMinter(props)
+        return $batchBurner(props)
     }
 }
-function $pptBatchMinter(
+function $batchMinter(
     { approval, minter_list, minter_status, token, onBatchMint }: Props
 ) {
     return <UiPptBatchMinter
         approved={approved(approval)}
         list={minter_list}
+        onBatchMint={onBatchMint}
         status={minter_status}
         token={token}
-        onBatchMint={onBatchMint}
     />;
 }
-function $pptBatchBurner(
+function $batchBurner(
     { approval, minter_list, burner_status, token, onBatchBurn }: Props
 ) {
     return <UiPptBatchBurner
         approved={approved(approval)}
         list={minter_list}
+        onBatchBurn={onBatchBurn}
         status={burner_status}
         token={token}
-        onBatchBurn={onBatchBurn}
     />;
 }
-function $pptBatchClaimer(
+function $batchClaimer(
     { approval, claimer_status, ppts, token, onBatchClaim }: Props
 ) {
     return <UiPptBatchClaimer
         approved={approved(approval)}
         ppts={ppts}
+        onBatchClaim={onBatchClaim}
         status={claimer_status}
         token={token}
-        onBatchClaim={onBatchClaim}
     />;
 }
 function $info(
@@ -130,33 +118,5 @@ function $info(
     >
         <InfoCircle fill={true} />
     </button>;
-}
-export function Spinner(
-    { show, grow }: { show: boolean, grow?: boolean }
-) {
-    const classes = [
-        'spinner spinner-border spinner-border-sm',
-        'float-start', grow ? 'spinner-grow' : ''
-    ];
-    return <span
-        className={classes.join(' ')} role='status'
-        style={{ display: show ? 'inline-block' : 'none' }}
-    />;
-}
-function approved(
-    approval: PptMinterApproval | null
-): boolean | null {
-    if (approval === null) {
-        return null;
-    }
-    return approval === PptMinterApproval.approved;
-}
-function approving(
-    approval: PptMinterApproval | null
-): boolean | null {
-    if (approval === null) {
-        return null;
-    }
-    return approval === PptMinterApproval.approving;
 }
 export default UiPptMinter;

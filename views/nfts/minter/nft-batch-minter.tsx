@@ -1,16 +1,16 @@
-import { PptMinterList, PptMinterStatus, Token } from '../../../source/redux/types';
+import { NftMinterList, NftMinterStatus, Token } from '../../../source/redux/types';
 
 import React from 'react';
 import { Spinner } from './spinner';
 
 type Props = {
     approved: boolean | null;
-    list: PptMinterList;
-    onBatchMint?: (token: Token, list: PptMinterList) => void;
-    status: PptMinterStatus | null;
+    list: NftMinterList;
+    onBatchMint?: (token: Token, list: NftMinterList) => void;
+    status: NftMinterStatus | null;
     token: Token;
 }
-export function UiPptBatchMinter(
+export function UiNftBatchMinter(
     { approved, list, onBatchMint, status, token }: Props
 ) {
     const classes = [
@@ -18,28 +18,28 @@ export function UiPptBatchMinter(
         approved ? 'show' : ''
     ];
     const text = minting(status)
-        ? <>Staking<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
-        : <>Stake<span className="d-none d-sm-inline">&nbsp;NFTs</span></>;
+        ? <>Minting<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
+        : <>Mint<span className="d-none d-sm-inline">&nbsp;NFTs</span></>;
     return <button
-        type='button' id='ppt-batch-minter'
+        type='button' id='nft-batch-minter'
         className={classes.join(' ')}
         disabled={disabled({ list, status })}
         onClick={onBatchMint?.bind(null, token, list)}
     >
         {Spinner({
-            show: minting(status), grow: true
+            show: Boolean(minting(status)), grow: true
         })}
         <span className='text'>{text}</span>
     </button>;
 }
 function minting(
-    status: PptMinterStatus | null
-): boolean {
-    return status === PptMinterStatus.minting;
+    status: NftMinterStatus | null
+): boolean | null {
+    return status === NftMinterStatus.minting;
 }
-function disabled(
-    { list, status }: Pick<Props, 'list' | 'status'>
-) {
+function disabled({ list, status }: {
+    list: NftMinterList, status: NftMinterStatus | null
+}) {
     if (minting(status)) {
         return true;
     }
@@ -52,10 +52,10 @@ function disabled(
     return false;
 }
 function positives(
-    list: PptMinterList
+    list: NftMinterList
 ) {
     const amounts = Object.values(list).map(
-        ({ amount }) => amount
+        ({ amount1 }) => amount1
     );
     const positives = amounts.filter(
         (amount) => amount > 0n
@@ -63,13 +63,13 @@ function positives(
     return positives.length > 0;
 }
 function inRange(
-    list: PptMinterList
+    list: NftMinterList
 ) {
-    for (const { amount, min, max } of Object.values(list)) {
-        if (amount < min || max < amount) {
+    for (const { amount1, min1 } of Object.values(list)) {
+        if (amount1 < min1) {
             return false;
         }
     }
     return true;
 }
-export default UiPptBatchMinter;
+export default UiNftBatchMinter;
