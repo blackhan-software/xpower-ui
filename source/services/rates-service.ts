@@ -3,9 +3,10 @@ import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
 import { APR, APRBonus, MoeTreasury, MoeTreasuryFactory } from '../contract';
 import { buffered, range } from '../functions';
+import { onRatesUiRefresher } from '../redux/observers';
 import { xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Index, Nft, NftFullId, NftLevel, NftLevels, NftToken, Rate, Token } from '../redux/types';
+import { Index, Nft, NftFullId, NftLevel, NftLevels, NftToken, Rate, RefresherStatus, Token } from '../redux/types';
 import { Tokenizer } from '../token';
 
 import * as actions from '../redux/actions';
@@ -34,13 +35,30 @@ export const RatesService = (
         mty.onRefreshRates(buffered((
             nft_prefix: bigint
         ) => {
-            const token = Tokenizer.token(nft_prefix);
+            if (token !== Tokenizer.token(nft_prefix)) {
+                return; // avoid multi-fetches!
+            }
             fetch(token, mty).then(
                 (rates) => update(store, token, rates)
             );
         }));
     }, {
         per: () => xtokenOf(store.getState())
+    });
+    Blockchain.onceConnect(function syncRates() {
+        onRatesUiRefresher(store, (next) => {
+            const token = xtokenOf(store.getState());
+            const { status } = next[Nft.token(token)];
+            if (status !== RefresherStatus.refetch) {
+                return;
+            }
+            const mty = MoeTreasuryFactory({
+                token
+            });
+            fetch(token, mty).then(
+                (rates) => update(store, token, rates)
+            );
+        });
     });
 }
 function fetch(

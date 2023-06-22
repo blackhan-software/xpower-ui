@@ -698,7 +698,7 @@ export const ratesRefresh = AppThunk('rates/refresh', async (args: {
             nft_prefix
         );
         if (!flag) {
-            set_status(RefresherStatus.refreshed);
+            set_status(RefresherStatus.refetch);
             return;
         }
     } catch (ex: any) {

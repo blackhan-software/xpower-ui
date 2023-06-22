@@ -9,6 +9,7 @@ export type Refresher = {
 export enum RefresherStatus {
     refreshing = 'refreshing',
     refreshed = 'refreshed',
+    refetch = 'refetch',
     error = 'error',
 }
 export default RatesUi;
