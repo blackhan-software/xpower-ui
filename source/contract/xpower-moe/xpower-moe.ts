@@ -1,5 +1,5 @@
 import { InterfaceAbi, Transaction } from 'ethers';
-import { x32, x40, x64 } from '../../functions';
+import { x40, x64 } from '../../functions';
 import { ROParams } from '../../params';
 import { Account, Address, BlockHash, Nonce } from '../../redux/types';
 import { Version } from '../../types';
@@ -35,8 +35,8 @@ export class XPowerMoe extends Base {
                 x40(to), x64(block_hash), x64(BigInt(nonce)), this.options
             );
         }
-        return contract['mint(address,bytes16,bytes)'](
-            x40(to), x32(block_hash), nonce, this.options
+        return contract['mint(address,bytes32,bytes)'](
+            x40(to), x64(block_hash), nonce, this.options
         );
     }
     private get otf() {

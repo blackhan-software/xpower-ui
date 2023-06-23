@@ -5,7 +5,7 @@ if (typeof importScripts === 'function') importScripts(
     'https://cdn.jsdelivr.net/npm/ethers@6.3.0/dist/ethers.umd.min.js',
 );
 
-import { hex_bytes, x32, x40, x64 } from '../../functions';
+import { hex_bytes, x40, x64 } from '../../functions';
 import { Account, Address, Amount, BlockHash, Interval, Level, Nonce, Token } from '../../redux/types';
 import { Version } from '../../types';
 
@@ -14,9 +14,8 @@ import { Observable } from 'observable-fns';
 import { WorkerFunction, WorkerModule } from 'threads/dist/types/worker';
 import { expose } from 'threads/worker';
 
-import { createKeccak, createSHA256 } from 'hash-wasm';
+import { createKeccak } from 'hash-wasm';
 let keccak: (array: Uint8Array) => Uint8Array;
-let sha256: (array: Uint8Array) => Uint8Array;
 let worker: Worker | undefined;
 let worker_id = 0;
 
@@ -71,8 +70,6 @@ expose({
         } else {
             const keccak_hasher = await createKeccak(256);
             keccak = (a) => keccak_hasher.init().update(a).digest('binary');
-            const sha256_hasher = await createSHA256();
-            sha256 = (a) => sha256_hasher.init().update(a).digest('binary');
         }
         worker = new Worker({
             account,
@@ -268,7 +265,7 @@ function nonce(
     const basis = Math.floor(256 * id / id_length);
     // delta of [0,1,..,30,31] (for id-length = 8)
     const delta = bytes[length - 1] % Math.floor(256 / id_length);
-    // strong uniformity with min. gap-sizes:
+    // strong uniformity with min. gap-sizes
     bytes[length - 1] = basis + delta;
     return bytes;
 }
@@ -330,15 +327,9 @@ function miner(
     version: Version, version_faked: boolean
 ) {
     const abi_encode = abi_encoder(version, version_faked);
-    if (version < Version.v7c) {
-        return (nonce: Uint8Array, context: Context) => keccak(
-            abi_encode(nonce, context)
-        );
-    } else {
-        return (nonce: Uint8Array, context: Context) => sha256(sha256(
-            abi_encode(nonce, context)
-        ));
-    }
+    return (nonce: Uint8Array, context: Context) => keccak(
+        abi_encode(nonce, context)
+    );
 }
 function abi_encoder(
     version: Version, versionFaked: boolean
@@ -474,16 +465,16 @@ function abi_encoder(
         let value = abi_encoded[interval];
         if (value === undefined) {
             const template = solidityPacked([
-                'uint160', 'bytes16', 'bytes'
+                'uint160', 'bytes32', 'bytes'
             ], [
                 BigInt(contract) ^ account,
-                x32(block_hash),
+                x64(block_hash),
                 new Uint8Array(8)
             ]);
             value = arrayify(template.slice(2));
             abi_encoded[interval] = value;
         }
-        value.set(nonce, 36);
+        value.set(nonce, 52);
         return value;
     };
     if (versionFaked) {

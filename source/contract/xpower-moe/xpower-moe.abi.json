@@ -29,9 +29,9 @@
         "inputs": [
             {
                 "indexed": false,
-                "internalType": "bytes16",
+                "internalType": "bytes32",
                 "name": "blockHash",
-                "type": "bytes16"
+                "type": "bytes32"
             },
             {
                 "indexed": false,
@@ -324,9 +324,9 @@
         "name": "blockHashOf",
         "outputs": [
             {
-                "internalType": "bytes16",
+                "internalType": "bytes32",
                 "name": "",
-                "type": "bytes16"
+                "type": "bytes32"
             }
         ],
         "stateMutability": "view",
@@ -411,6 +411,19 @@
             }
         ],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "fees",
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "",
+                "type": "uint256[]"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -538,9 +551,9 @@
                 "type": "address"
             },
             {
-                "internalType": "bytes16",
+                "internalType": "bytes32",
                 "name": "blockHash",
-                "type": "bytes16"
+                "type": "bytes32"
             },
             {
                 "internalType": "bytes",
@@ -550,6 +563,11 @@
         ],
         "name": "hashOf",
         "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            },
             {
                 "internalType": "bytes32",
                 "name": "",
@@ -594,7 +612,7 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "oldAmount",
+                "name": "amount",
                 "type": "uint256"
             },
             {
@@ -623,7 +641,7 @@
             },
             {
                 "internalType": "uint256",
-                "name": "oldAmount",
+                "name": "amount",
                 "type": "uint256"
             },
             {
@@ -664,9 +682,9 @@
                 "type": "address"
             },
             {
-                "internalType": "bytes16",
+                "internalType": "bytes32",
                 "name": "blockHash",
-                "type": "bytes16"
+                "type": "bytes32"
             },
             {
                 "internalType": "bytes",
@@ -788,9 +806,9 @@
     {
         "inputs": [
             {
-                "internalType": "bytes16",
+                "internalType": "bytes32",
                 "name": "blockHash",
-                "type": "bytes16"
+                "type": "bytes32"
             }
         ],
         "name": "recent",
@@ -955,6 +973,11 @@
                 "internalType": "uint256",
                 "name": "area",
                 "type": "uint256"
+            },
+            {
+                "internalType": "bytes",
+                "name": "meta",
+                "type": "bytes"
             }
         ],
         "stateMutability": "view",
@@ -1075,7 +1098,7 @@
         "inputs": [
             {
                 "internalType": "bytes32",
-                "name": "nonceHash",
+                "name": "pairIndex",
                 "type": "bytes32"
             }
         ],
