@@ -343,7 +343,7 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "nftPrefix",
+                "name": "nftId",
                 "type": "uint256"
             }
         ],
@@ -396,7 +396,7 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "nftPrefix",
+                "name": "nftId",
                 "type": "uint256"
             }
         ],
@@ -547,7 +547,7 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "nftPrefix",
+                "name": "nftId",
                 "type": "uint256"
             }
         ],
@@ -566,7 +566,7 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "nftPrefix",
+                "name": "nftId",
                 "type": "uint256"
             }
         ],
@@ -746,6 +746,25 @@
         "inputs": [
             {
                 "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            }
+        ],
+        "name": "rateTargetOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
                 "name": "nftPrefix",
                 "type": "uint256"
             },
@@ -867,7 +886,7 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "nftPrefix",
+                "name": "nftId",
                 "type": "uint256"
             },
             {
@@ -885,7 +904,7 @@
         "inputs": [
             {
                 "internalType": "uint256[]",
-                "name": "nftPrefixes",
+                "name": "nftIds",
                 "type": "uint256[]"
             },
             {
@@ -903,7 +922,7 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "nftPrefix",
+                "name": "nftId",
                 "type": "uint256"
             },
             {
@@ -921,7 +940,7 @@
         "inputs": [
             {
                 "internalType": "uint256[]",
-                "name": "nftPrefixes",
+                "name": "nftIds",
                 "type": "uint256[]"
             },
             {

@@ -462,7 +462,7 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "oldAmount",
+                "name": "amount",
                 "type": "uint256"
             },
             {
@@ -491,7 +491,7 @@
             },
             {
                 "internalType": "uint256",
-                "name": "oldAmount",
+                "name": "amount",
                 "type": "uint256"
             },
             {
