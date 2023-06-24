@@ -12,7 +12,7 @@ export class XPowerMoe extends Base {
     public constructor(
         address: Address, abi: InterfaceAbi = ABI
     ) {
-        if (ROParams.version < Version.v7c) {
+        if (ROParams.version < Version.v7c && !ROParams.versionFaked) {
             abi = require('./xpower-moe.abi.v7b.json');
         }
         super(address, abi);
