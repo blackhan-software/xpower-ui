@@ -21,10 +21,10 @@ $('button.approve-sov-allowance').on(
         const $approve = $(e.currentTarget);
         const $migrate = $approve.parents('form.sov-migrate');
         if ($approve.hasClass('thor')) {
-            await moeApproveNew(Token.THOR, {
+            await moeApproveOld(Token.THOR, {
                 $approve
             });
-            await moeApproveOld(Token.THOR, {
+            await moeApproveNew(Token.THOR, {
                 $approve
             });
             await sovApproveOld(Token.THOR, {
@@ -34,10 +34,10 @@ $('button.approve-sov-allowance').on(
             });
         }
         if ($approve.hasClass('loki')) {
-            await moeApproveNew(Token.LOKI, {
+            await moeApproveOld(Token.LOKI, {
                 $approve
             });
-            await moeApproveOld(Token.LOKI, {
+            await moeApproveNew(Token.LOKI, {
                 $approve
             });
             await sovApproveOld(Token.LOKI, {

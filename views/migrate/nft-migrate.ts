@@ -4,11 +4,11 @@ import './nft-migrate.scss';
 import { Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
 import { PptTreasury, PptTreasuryFactory } from '../../source/contract';
-import { Alert, Alerts, alert } from '../../source/functions';
-import { Account, Balance, Nft, NftLevels, Token } from '../../source/redux/types';
+import { Alert, Alerts, alert, x40 } from '../../source/functions';
+import { Account, Balance, MAX_UINT256, Nft, NftLevels, Token } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { Version } from '../../source/types';
-import { NftWallet, PptWallet } from '../../source/wallet';
+import { MoeWallet, NftWallet, PptWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
 
 Blockchain.onConnect(function enableUnstake() {
@@ -131,31 +131,211 @@ async function nftUnstakeOld(token: Token, { $unstake, $approve }: {
         reset();
     }
 }
-$('button.approve-old').on('click', function approveOldNfts(e) {
+$('button.approve-old').on('click', async function approveOldNfts(e) {
     const $approve = $(e.currentTarget);
     const $migrate_nft = $approve.parents('form.migrate-old');
     if ($approve.hasClass('thor')) {
-        nftApproveOld(Token.THOR, {
+        await moeApproveOld(Token.THOR, {
+            $approve
+        });
+        await moeApproveNew(Token.THOR, {
+            $approve
+        });
+        await nftApproveOld(Token.THOR, {
             $approve, $migrate: $migrate_nft.find(
                 '.migrate-old.thor'
             )
         });
     }
     if ($approve.hasClass('loki')) {
-        nftApproveOld(Token.LOKI, {
+        await moeApproveOld(Token.LOKI, {
+            $approve
+        });
+        await moeApproveNew(Token.LOKI, {
+            $approve
+        });
+        await nftApproveOld(Token.LOKI, {
             $approve, $migrate: $migrate_nft.find(
                 '.migrate-old.loki'
             )
         });
     }
     if ($approve.hasClass('odin')) {
-        nftApproveOld(Token.ODIN, {
+        await moeApproveOld(Token.ODIN, {
+            $approve
+        });
+        await moeApproveNew(Token.ODIN, {
+            $approve
+        });
+        await nftApproveOld(Token.ODIN, {
             $approve, $migrate: $migrate_nft.find(
                 '.migrate-old.odin'
             )
         });
     }
 });
+async function moeApproveOld(token: Token, { $approve }: {
+    $approve: JQuery<HTMLElement>
+}) {
+    const { account, src_version, tgt_version } = await context({
+        $el: $approve
+    });
+    const { src_xpower, tgt_xpower } = await contracts({
+        account, src_version, tgt_version, token
+    });
+    const { nft_source } = await contracts({
+        account, token, src_version, tgt_version
+    });
+    if (!src_xpower) {
+        throw new Error('undefined src_xpower');
+    }
+    if (!tgt_xpower) {
+        throw new Error('undefined tgt_xpower');
+    }
+    if (!nft_source) {
+        throw new Error('undefined nft_source');
+    }
+    //
+    // Check balances:
+    //
+    const src_balances: Balance[] = await nft_source.balances({
+        issues: Array.from(Years()),
+        levels: Array.from(NftLevels()),
+        token: Nft.token(token)
+    });
+    console.debug(
+        `[${src_version}:balances]`, src_balances.map((b) => b.toString())
+    );
+    const src_zero = src_balances.reduce(
+        (acc, b) => acc && !b, true
+    );
+    if (src_zero) {
+        return;
+    }
+    //
+    // Check allowance:
+    //
+    const src_allowance = await src_xpower.allowance(
+        x40(account), await tgt_xpower.address
+    );
+    console.debug(
+        `[${src_version}:allowance]`, src_allowance.toString()
+    );
+    if (src_allowance === MAX_UINT256) {
+        return;
+    }
+    //
+    // Increase allowance:
+    //
+    let tx: Transaction | undefined;
+    const reset = $approve.ing();
+    Alerts.hide();
+    try {
+        src_xpower.onApproval((
+            owner, spender, value, ev
+        ) => {
+            if (ev.log.transactionHash !== tx?.hash) {
+                return;
+            }
+            reset();
+        });
+        tx = await src_xpower.approve(
+            await tgt_xpower.address, MAX_UINT256
+        );
+    } catch (ex: any) {
+        if (ex.message) {
+            if (ex.data && ex.data.message) {
+                ex.message = `${ex.message} [${ex.data.message}]`;
+            }
+            alert(ex.message, Alert.warning, {
+                after: $approve.parent('div')[0]
+            });
+        }
+        console.error(ex);
+        reset();
+    }
+}
+async function moeApproveNew(token: Token, { $approve }: {
+    $approve: JQuery<HTMLElement>
+}) {
+    const { account, src_version, tgt_version } = await context({
+        $el: $approve
+    });
+    const { nft_source, nft_target } = await contracts({
+        account, token, src_version, tgt_version
+    });
+    const { tgt_xpower } = await contracts({
+        account, src_version, tgt_version, token
+    });
+    if (!nft_source) {
+        throw new Error('undefined nft_source');
+    }
+    if (!nft_target) {
+        throw new Error('undefined nft_target');
+    }
+    if (!tgt_xpower) {
+        throw new Error('undefined tgt_xpower');
+    }
+    //
+    // Check balances:
+    //
+    const src_balances: Balance[] = await nft_source.balances({
+        issues: Array.from(Years()),
+        levels: Array.from(NftLevels()),
+        token: Nft.token(token)
+    });
+    console.debug(
+        `[${src_version}:balances]`, src_balances.map((b) => b.toString())
+    );
+    const src_zero = src_balances.reduce(
+        (acc, b) => acc && !b, true
+    );
+    if (src_zero) {
+        return;
+    }
+    //
+    // Check allowance:
+    //
+    const tgt_allowance = await tgt_xpower.allowance(
+        x40(account), await nft_target.address
+    );
+    console.debug(
+        `[${tgt_version}:allowance]`, tgt_allowance.toString()
+    );
+    if (tgt_allowance === MAX_UINT256) {
+        return;
+    }
+    //
+    // Increase allowance:
+    //
+    let tx: Transaction | undefined;
+    const reset = $approve.ing();
+    Alerts.hide();
+    try {
+        tgt_xpower.onApproval((
+            owner, spender, value, ev
+        ) => {
+            if (ev.log.transactionHash !== tx?.hash) {
+                return;
+            }
+            reset();
+        });
+        tx = await tgt_xpower.approve(
+            await nft_target.address, MAX_UINT256
+        );
+    } catch (ex: any) {
+        if (ex.message) {
+            if (ex.data && ex.data.message) {
+                ex.message = `${ex.message} [${ex.data.message}]`;
+            }
+            alert(ex.message, Alert.warning, {
+                after: $approve.parent('div')[0]
+            });
+        }
+        console.error(ex);
+        reset();
+    }
+}
 async function nftApproveOld(token: Token, { $approve, $migrate }: {
     $approve: JQuery<HTMLElement>, $migrate: JQuery<HTMLElement>
 }) {
@@ -267,9 +447,18 @@ async function nftMigrateOld(token: Token, { $migrate, $approve }: {
     const { account, src_version, tgt_version } = await context({
         $el: $migrate
     });
+    const { src_xpower, tgt_xpower } = await contracts({
+        account, src_version, tgt_version, token
+    });
     const { nft_source, nft_target } = await contracts({
         account, token, src_version, tgt_version
     });
+    if (!src_xpower) {
+        throw new Error('undefined src_xpower');
+    }
+    if (!tgt_xpower) {
+        throw new Error('undefined tgt_xpower');
+    }
     if (!nft_source) {
         throw new Error('undefined nft_source');
     }
@@ -337,11 +526,16 @@ async function nftMigrateOld(token: Token, { $migrate, $approve }: {
             reset();
         });
         const nz = filter(ids, src_balances, { zero: false });
-        const index = await nft_target.get.then(
+        const nft_index = await nft_target.get.then(
             (c) => c.oldIndexOf(nft_source.address)
         );
+        const moe_index = await tgt_xpower.get.then(
+            (c) => c.oldIndexOf(src_xpower.address)
+        );
         tx = await nft_target.put.then((c) => c.migrateBatch(
-            Nft.realIds(nz.ids, { version: tgt_version }), nz.balances, [index]
+            Nft.realIds(nz.ids, { version: tgt_version }), nz.balances, [
+                nft_index, moe_index
+            ]
         ));
     } catch (ex: any) {
         if (ex.message) {
@@ -587,6 +781,28 @@ async function contracts({
 }: {
     account: Account, token: Token, src_version: Version, tgt_version: Version
 }) {
+    let src_xpower: MoeWallet | undefined;
+    try {
+        src_xpower = new MoeWallet(
+            account, token, src_version
+        );
+        console.debug(
+            `[${src_version}:src_xpower]`, await src_xpower.address
+        );
+    } catch (ex) {
+        console.error(ex);
+    }
+    let tgt_xpower: MoeWallet | undefined;
+    try {
+        tgt_xpower = new MoeWallet(
+            account, token, tgt_version
+        );
+        console.debug(
+            `[${tgt_version}:tgt_xpower]`, await tgt_xpower.address
+        );
+    } catch (ex) {
+        console.error(ex);
+    }
     let nft_source: NftWallet | undefined;
     try {
         nft_source = new NftWallet(
@@ -654,7 +870,7 @@ async function contracts({
         console.error(ex);
     }
     return {
-        nft_source, ppt_source, nty_source,
-        nft_target, ppt_target, nty_target,
+        src_xpower, nft_source, ppt_source, nty_source,
+        tgt_xpower, nft_target, ppt_target, nty_target,
     };
 }
