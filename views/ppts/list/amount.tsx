@@ -1,10 +1,9 @@
 import { mobile } from '../../../source/functions';
-import { useBufferedIf } from '../../../source/react';
 import { Amount, Nft, NftLevel } from '../../../source/redux/types';
 
 import React, { KeyboardEvent, MouseEvent, TouchEvent, useEffect, useRef } from 'react';
 import { DashCircle, PlusCircle } from '../../../public/images/tsx';
-import useDoubleTap from '../../../source/react/hooks/use-double-tap';
+import { useBufferedIf, useDoubleTap } from '../../../source/react';
 
 type Props = {
     amount: Amount, level: NftLevel,

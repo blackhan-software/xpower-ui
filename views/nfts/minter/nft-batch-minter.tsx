@@ -1,6 +1,9 @@
+import { AppState } from '../../../source/redux/store';
 import { NftMinterList, NftMinterStatus, Token } from '../../../source/redux/types';
+import { Tokenizer } from '../../../source/token';
 
-import React from 'react';
+import React, { useContext } from 'react';
+import { StateContext } from '../../../source/react';
 import { Spinner } from './spinner';
 
 type Props = {
@@ -13,6 +16,7 @@ type Props = {
 export function UiNftBatchMinter(
     { approved, list, onBatchMint, status, token }: Props
 ) {
+    const [state] = useContext(StateContext);
     const classes = [
         'btn btn-outline-warning',
         approved ? 'show' : ''
@@ -23,7 +27,7 @@ export function UiNftBatchMinter(
     return <button
         type='button' id='nft-batch-minter'
         className={classes.join(' ')}
-        disabled={disabled({ list, status })}
+        disabled={disabled({ list, status, state })}
         onClick={onBatchMint?.bind(null, token, list)}
     >
         {Spinner({
@@ -37,8 +41,8 @@ function minting(
 ): boolean | null {
     return status === NftMinterStatus.minting;
 }
-function disabled({ list, status }: {
-    list: NftMinterList, status: NftMinterStatus | null
+function disabled({ list, status, state }: {
+    list: NftMinterList, status: NftMinterStatus | null, state: AppState | null
 }) {
     if (minting(status)) {
         return true;
@@ -47,6 +51,9 @@ function disabled({ list, status }: {
         return true;
     }
     if (!inRange(list)) {
+        return true;
+    }
+    if (exRange(list, state)) {
         return true;
     }
     return false;
@@ -71,5 +78,22 @@ function inRange(
         }
     }
     return true;
+}
+function exRange(
+    list: NftMinterList, state: AppState | null, base = 10n ** 18n
+) {
+    if (state) {
+        const xtoken = Tokenizer.xify(state.token);
+        const wallet = state.aft_wallet.items[xtoken];
+        if (wallet) {
+            const total = Object.entries(list)
+                .map(([l, { amount1: a }]) => 10n ** BigInt(l) * a)
+                .reduce((acc, a) => acc + a * base, 0n);
+            if (total > wallet.amount) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 export default UiNftBatchMinter;

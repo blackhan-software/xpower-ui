@@ -1,10 +1,11 @@
 import { mobile } from '../../../source/functions';
-import { useBufferedIf } from '../../../source/react';
+import { AppState } from '../../../source/redux/store';
 import { Amount, Nft, NftLevel } from '../../../source/redux/types';
+import { Tokenizer } from '../../../source/token';
 
-import React, { KeyboardEvent, MouseEvent, TouchEvent, useEffect, useRef } from 'react';
+import React, { KeyboardEvent, MouseEvent, TouchEvent, useContext, useEffect, useRef } from 'react';
 import { DashCircle, PlusCircle } from '../../../public/images/tsx';
-import useDoubleTap from '../../../source/react/hooks/use-double-tap';
+import { StateContext, useBufferedIf, useDoubleTap } from '../../../source/react';
 
 type Props = {
     level: NftLevel,
@@ -83,6 +84,7 @@ function decreaseByWheel(
 function $amount(
     props: Props
 ) {
+    const [state] = useContext(StateContext);
     const $ref = useRef<HTMLInputElement>(null);
     useDoubleTap($ref, () => {
         setTimeout(() => $ref.current?.select());
@@ -107,7 +109,7 @@ function $amount(
         };
     }, [props, $ref]);
     return <input type='number' ref={$ref}
-        className={`btn btn-outline-warning amount ${invalid(props)}`}
+        className={`btn btn-outline-warning amount ${invalid(props, state)}`}
         data-bs-toggle='tooltip' data-bs-placement='top'
         onChange={(e) => changeTo(props, BigInt(e.target.value))}
         onKeyDown={(e) => changeByArrows(props, e)}
@@ -117,14 +119,38 @@ function $amount(
     />
 }
 function invalid(
-    props: Props
+    props: Props, state: AppState | null
 ) {
-    return !inRange(props) ? 'invalid' : '';
+    if (!inRange(props)) {
+        return 'invalid';
+    }
+    if (exRange(props, state)) {
+        return 'invalid';
+    }
+    return '';
 }
 function inRange(
     { amount1, min1 }: Props
 ) {
     return min1 <= amount1;
+}
+function exRange(
+    { amount1 }: Props, state: AppState | null, base = 10n ** 18n
+) {
+    if (amount1 && state) {
+        const xtoken = Tokenizer.xify(state.token);
+        const wallet = state.aft_wallet.items[xtoken];
+        if (wallet) {
+            const total = Object
+                .entries(state.nfts_ui.amounts[Nft.token(state.token)])
+                .map(([l, { amount1: a }]) => 10n ** BigInt(l) * a)
+                .reduce((acc, a) => acc + a * base, 0n);
+            if (total > wallet.amount) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 function readOnly(
     { max1, min1 }: Props
