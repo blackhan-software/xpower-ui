@@ -2,7 +2,7 @@ import './spa.scss';
 
 import { Bus } from '../../source/bus';
 import { leafKeys } from '../../source/functions';
-import { AccountContext, AccountProvider, DebugContext, DebugProvider } from '../../source/react';
+import { AccountContext, AccountProvider, DebugContext, DebugProvider, StateProvider } from '../../source/react';
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiToggled, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
 import { AppDispatch, AppState, Store } from '../../source/redux/store';
@@ -102,7 +102,7 @@ function $cover(
 ) {
     const refresher_status = () => {
         const { status } = rates_ui.refresher[Nft.token(token)];
-        return status ;
+        return status;
     };
     const pulsate = () => {
         switch (mining.status) {
@@ -491,7 +491,9 @@ if (require.main === module) {
     createRoot($content!).render(
         <Provider store={Store()}>
             <DebugProvider>
-                <AccountProvider>{$spa}</AccountProvider>
+                <AccountProvider>
+                    <StateProvider>{$spa}</StateProvider>
+                </AccountProvider>
             </DebugProvider>
         </Provider>
     );
