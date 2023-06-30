@@ -1,9 +1,10 @@
-import React, { Dispatch, SetStateAction, useEffect } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useRef } from 'react';
 import { ArrowDownCircle, ArrowUpCircle, Toggle, YinYangCircle } from '../../public/images/tsx';
 import { capitalize } from '../../routes/functions';
 import { Bus } from '../../source/bus';
 import { mobile } from '../../source/functions';
 import { ROParams } from '../../source/params';
+import { useLongTap } from '../../source/react';
 import { Nft, NftLevel, RefresherStatus, Token } from '../../source/redux/types';
 import { Scale } from './cover-graph-chart-scale';
 
@@ -37,45 +38,73 @@ export function UiCoverGraphControlLevel(
     ]);
     return <div className='control-level cover-layer'>
         <div className='btn-group-vertical' role='group'>
-            <button
-                data-bs-toggle='tooltip' data-bs-placement='left'
-                data-disable='true' disabled={maximal(level)}
-                className='btn btn-outline-warning'
-                onClick={() => increase({ level, setLevel })}
-                type='button' title={`${next(level)} NFTs`}
-            >
-                <ArrowUpCircle fill={true} />
-            </button>
-            <button
-                data-bs-toggle='tooltip' data-bs-placement='left'
-                data-disable='true' disabled={disabled(refresher)}
-                className='btn btn-outline-warning'
-                onClick={(ev) => refresher.onRefresh?.(token, ev.ctrlKey)}
-                type='button' title='Refresh Rates'
-            >
-                <YinYangCircle classes={rotate(refresher)} />
-            </button>
-            <button
-                data-bs-toggle='tooltip' data-bs-placement='left'
-                data-disable='true' disabled={minimal(level)}
-                className='btn btn-outline-warning'
-                onClick={() => decrease({ level, setLevel })}
-                type='button' title={`${previous(level)} NFTs`}
-            >
-                <ArrowDownCircle fill={true} />
-            </button>
-            <button
-                data-bs-toggle='tooltip' data-bs-placement='left'
-                className='btn btn-outline-warning d-none d-sm-block'
-                onClick={() => toggle({ scale, setScale })}
-                type='button' title={`${capitalize(toggled(scale))} scale`}
-            >
-                <Toggle on={true} style={{
-                    transform: `rotate(${scale === Scale.logarithmic ? 0 : 180}deg)`
-                }}/>
-            </button>
+            {$next({ level, setLevel })}
+            {$refresh(refresher, token)}
+            {$prev({ level, setLevel })}
+            {$toggle({ scale, setScale })}
         </div>
     </div>;
+}
+function $next(
+    { level, setLevel }: Props['controls']['levels']
+) {
+    return <button
+        data-bs-toggle='tooltip' data-bs-placement='left'
+        data-disable='true' disabled={maximal(level)}
+        className='btn btn-outline-warning'
+        onClick={() => increase({ level, setLevel })}
+        type='button' title={`${next(level)} NFTs`}
+    >
+        <ArrowUpCircle fill={true} />
+    </button>;
+}
+function $refresh(
+    refresher: Props['controls']['refresher'],
+    token: Props['token']
+) {
+    const $ref = useRef<HTMLButtonElement>(null);
+    const [tapped] = useLongTap($ref, () => {
+        refresher.onRefresh?.(token, true);
+    });
+    const refresh = (all: boolean) => {
+        if (!tapped) refresher.onRefresh?.(token, all);
+    };
+    return <button ref={$ref}
+        data-bs-toggle='tooltip' data-bs-placement='left'
+        data-disable='true' disabled={disabled(refresher)}
+        className='btn btn-outline-warning'
+        onClick={(e) => refresh(e.ctrlKey)}
+        type='button' title='Refresh Rates'
+    >
+        <YinYangCircle classes={rotate(refresher)} />
+    </button>;
+}
+function $prev(
+    { level, setLevel }: Props['controls']['levels']
+) {
+    return <button
+        data-bs-toggle='tooltip' data-bs-placement='left'
+        data-disable='true' disabled={minimal(level)}
+        className='btn btn-outline-warning'
+        onClick={() => decrease({ level, setLevel })}
+        type='button' title={`${previous(level)} NFTs`}
+    >
+        <ArrowDownCircle fill={true} />
+    </button>;
+}
+function $toggle(
+    { scale, setScale }: Props['controls']['toggle']
+) {
+    return <button
+        data-bs-toggle='tooltip' data-bs-placement='left'
+        className='btn btn-outline-warning d-none d-sm-block'
+        onClick={() => toggle({ scale, setScale })}
+        type='button' title={`${capitalize(toggled(scale))} scale`}
+    >
+        <Toggle on={true} style={{
+            transform: `rotate(${scale === Scale.logarithmic ? 0 : 180}deg)`
+        }} />
+    </button>;
 }
 function disabled(
     refresher: Props['controls']['refresher']
