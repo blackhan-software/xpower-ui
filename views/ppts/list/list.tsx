@@ -1,7 +1,7 @@
 import './amount';
 import './list.scss';
 
-import { nice_si } from '../../../source/functions';
+import { mobile, nice_si } from '../../../source/functions';
 import { pptTotalBy } from '../../../source/redux/selectors';
 import { Amount, Nft, NftIssue, NftLevel, NftLevels, Nfts, PptDetails, Supply, Token } from '../../../source/redux/types';
 
@@ -195,10 +195,12 @@ function $minter(
 function $balance(
     ppt_level: NftLevel, total_by: { amount: Amount, supply: Supply }
 ) {
-    return <button type='button'
+    const title = mobile()
+        ? `Overall personal balance`
+        : `Overall personal balance & supply (staked ${Nft.nameOf(ppt_level)})`;
+    return <button type='button' title={title}
         className='btn btn-outline-warning balance'
         data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`Overall personal balance & supply (staked ${Nft.nameOf(ppt_level)} NFTs)`}
     >
         <span>{
             nice_si(total_by.amount)

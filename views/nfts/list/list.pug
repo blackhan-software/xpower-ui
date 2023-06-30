@@ -30,11 +30,11 @@ div#nft-single-minting
           type="button" aria-label="Decrease" disabled
         )
           include ../../../public/images/pug/dash-circle-fill.svg.pug
-      button.btn.btn-outline-warning.amount(
-        type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+      input.btn.btn-outline-warning.amount(
+        data-bs-toggle="tooltip" data-bs-placement="top"
         title=`${levels[index]} NFTs to mint`
+        type="number" value="0"
       )
-        | 0
       div.btn-group(role="group")
         button.btn.btn-outline-warning.increase(
           type="button" aria-label="Increase" disabled
