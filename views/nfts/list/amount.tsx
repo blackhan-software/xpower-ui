@@ -36,9 +36,24 @@ export function UiNftAmount(
         {$increase(props, set_delta)}
     </React.Fragment>;
 }
+function extremify_dec(
+    { amount1, max1, min1, level, onUpdate }: Props
+) {
+    if (onUpdate) {
+        if (amount1 === max1 || amount1 < min1) {
+            onUpdate({ amount1: max1, max1, min1, level });
+        } else {
+            onUpdate({ amount1: min1, max1, min1, level });
+        }
+    }
+}
 function $decrease(
     props: Props, set_delta: (value: Amount) => void
 ) {
+    const $ref = useRef<HTMLButtonElement>(null);
+    useDoubleTap($ref, () => {
+        extremify_dec(props);
+    });
     const start = (e: MouseEvent | TouchEvent) => {
         set_delta(-delta(e)); changeBy(props, -delta(e));
     };
@@ -59,7 +74,7 @@ function $decrease(
             onTouchStart={mobile() ? start : undefined}
             onTouchCancel={mobile() ? stop : undefined}
             onTouchEnd={mobile() ? stop : undefined}
-            disabled={!decreasable}
+            disabled={!decreasable} ref={$ref}
         >
             <DashCircle fill={true} />
         </button>
@@ -88,7 +103,7 @@ function $amount(
     const $ref = useRef<HTMLInputElement>(null);
     useDoubleTap($ref, () => {
         setTimeout(() => $ref.current?.select());
-        extremify(props);
+        extremify_inc(props);
     });
     useEffect(() => {
         if (readOnly(props)) {
@@ -109,14 +124,20 @@ function $amount(
         };
     }, [props, $ref]);
     return <input type='number' ref={$ref}
-        className={`btn btn-outline-warning amount ${invalid(props, state)}`}
+        className={`btn btn-outline-warning amount ${invalid(props, state)}`.trim()}
         data-bs-toggle='tooltip' data-bs-placement='top'
-        onChange={(e) => changeTo(props, BigInt(e.target.value))}
+        onChange={(e) => changeTo(props, parse(e.target.value))}
         onKeyDown={(e) => changeByArrows(props, e)}
         readOnly={readOnly(props)}
         title={title(props)}
         value={props.amount1.toString()}
-    />
+    />;
+}
+function parse(value: string) {
+    value = value.replace(/[^-0-9]+/g, '');
+    value = value.replace(/^-$/, '0');
+    value = value.replace(/-$/, '');
+    return BigInt(value);
 }
 function invalid(
     props: Props, state: AppState | null
@@ -166,7 +187,7 @@ function title(
         return `${Nft.nameOf(level)} NFTs to burn`;
     }
 }
-function extremify(
+function extremify_inc(
     { amount1, max1, min1, level, onUpdate }: Props
 ) {
     if (onUpdate) {
@@ -180,6 +201,10 @@ function extremify(
 function $increase(
     props: Props, set_delta: (value: Amount) => void
 ) {
+    const $ref = useRef<HTMLButtonElement>(null);
+    useDoubleTap($ref, () => {
+        extremify_inc(props);
+    });
     const start = (e: MouseEvent | TouchEvent) => {
         set_delta(delta(e)); changeBy(props, delta(e));
     };
@@ -200,7 +225,7 @@ function $increase(
             onTouchStart={mobile() ? start : undefined}
             onTouchCancel={mobile() ? stop : undefined}
             onTouchEnd={mobile() ? stop : undefined}
-            disabled={!increasable}
+            disabled={!increasable} ref={$ref}
         >
             <PlusCircle fill={true} />
         </button>
