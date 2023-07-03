@@ -1,13 +1,14 @@
-import { globalRef } from '../../../source/react';
+import { Bus } from '../../../source/bus';
+import { nice } from '../../../source/functions';
+import { ROParams } from '../../../source/params';
 import { Amount, Nft, NftIssue, NftLevel, PptClaimerStatus, Rate, Token } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
+import { Version } from '../../../source/types';
 
 import React, { useEffect } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
+import { globalRef } from '../../../source/react';
 import { UiPptToggle } from './ui-toggle';
-import { Bus } from '../../../source/bus';
-import { ROParams } from '../../../source/params';
-import { Version } from '../../../source/types';
 
 type Props = {
     token: Token;
@@ -99,7 +100,9 @@ function $info(
     return <button type='button'
         className='btn btn-outline-warning info'
         data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`Claim ${atoken}s for staked ${Nft.nameOf(level)} NFTs at ${rate.toFixed(2)}%`}
+        title={`Claim ${atoken}s for staked ${Nft.nameOf(level)} NFTs at ${nice(rate, {
+            maxPrecision: 2, minPrecision: 2
+        })}%`}
     >
         <InfoCircle fill={true} />
     </button>;
