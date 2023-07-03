@@ -34,7 +34,7 @@ export function UiPptAmount(
         {$increase(props, set_delta)}
     </React.Fragment>;
 }
-function extremify_dec(
+function extremifyDec(
     { amount, level, max, min, onUpdate }: Props
 ) {
     if (onUpdate) {
@@ -50,7 +50,7 @@ function $decrease(
 ) {
     const $ref = useRef<HTMLButtonElement>(null);
     useDoubleTap($ref, () => {
-        extremify_dec(props);
+        extremifyDec(props);
     });
     const start = (e: MouseEvent | TouchEvent) => {
         set_delta(-delta(e)); changeBy(props, -delta(e));
@@ -100,7 +100,7 @@ function $amount(
     const $ref = useRef<HTMLInputElement>(null);
     useDoubleTap($ref, () => {
         setTimeout(() => $ref.current?.select());
-        extremify_inc(props);
+        extremifyInc(props);
     });
     useEffect(() => {
         if (readOnly(props)) {
@@ -162,7 +162,7 @@ function title(
         return `${Nft.nameOf(level)} NFTs to (un)stake`;
     }
 }
-function extremify_inc(
+function extremifyInc(
     { amount, level, max, min, onUpdate }: Props
 ) {
     if (onUpdate) {
@@ -178,7 +178,7 @@ function $increase(
 ) {
     const $ref = useRef<HTMLButtonElement>(null);
     useDoubleTap($ref, () => {
-        extremify_inc(props);
+        extremifyInc(props);
     });
     const start = (e: MouseEvent | TouchEvent) => {
         set_delta(delta(e)); changeBy(props, delta(e));

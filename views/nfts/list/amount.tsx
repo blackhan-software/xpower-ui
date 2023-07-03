@@ -36,7 +36,7 @@ export function UiNftAmount(
         {$increase(props, set_delta)}
     </React.Fragment>;
 }
-function extremify_dec(
+function extremifyDec(
     { amount1, max1, min1, level, onUpdate }: Props
 ) {
     if (onUpdate) {
@@ -52,7 +52,7 @@ function $decrease(
 ) {
     const $ref = useRef<HTMLButtonElement>(null);
     useDoubleTap($ref, () => {
-        extremify_dec(props);
+        extremifyDec(props);
     });
     const start = (e: MouseEvent | TouchEvent) => {
         set_delta(-delta(e)); changeBy(props, -delta(e));
@@ -103,7 +103,7 @@ function $amount(
     const $ref = useRef<HTMLInputElement>(null);
     useDoubleTap($ref, () => {
         setTimeout(() => $ref.current?.select());
-        extremify_inc(props);
+        extremifyInc(props);
     });
     useEffect(() => {
         if (readOnly(props)) {
@@ -161,7 +161,7 @@ function exRange(
     if (amount1 && state) {
         const xtoken = Tokenizer.xify(state.token);
         const wallet = state.aft_wallet.items[xtoken];
-        if (wallet) {
+        if (wallet && wallet.amount > base) {
             const total = Object
                 .entries(state.nfts_ui.amounts[Nft.token(state.token)])
                 .map(([l, { amount1: a }]) => 10n ** BigInt(l) * a)
@@ -187,7 +187,7 @@ function title(
         return `${Nft.nameOf(level)} NFTs to burn`;
     }
 }
-function extremify_inc(
+function extremifyInc(
     { amount1, max1, min1, level, onUpdate }: Props
 ) {
     if (onUpdate) {
@@ -203,7 +203,7 @@ function $increase(
 ) {
     const $ref = useRef<HTMLButtonElement>(null);
     useDoubleTap($ref, () => {
-        extremify_inc(props);
+        extremifyInc(props);
     });
     const start = (e: MouseEvent | TouchEvent) => {
         set_delta(delta(e)); changeBy(props, delta(e));
