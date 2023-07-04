@@ -106,7 +106,7 @@ function $amount(
         extremifyInc(props);
     });
     useEffect(() => {
-        if (readOnly(props)) {
+        if (readOnly(props, state)) {
             return;
         }
         const current = $ref.current;
@@ -122,13 +122,13 @@ function $amount(
             current?.removeEventListener('wheel', dbyw);
             current?.removeEventListener('wheel', ibyw);
         };
-    }, [props, $ref]);
+    }, [props, state, $ref]);
     return <input type='number' ref={$ref}
         className={`btn btn-outline-warning amount ${invalid(props, state)}`.trim()}
         data-bs-toggle='tooltip' data-bs-placement='top'
         onChange={(e) => changeTo(props, parse(e.target.value))}
         onKeyDown={(e) => changeByArrows(props, e)}
-        readOnly={readOnly(props)}
+        readOnly={readOnly(props, state)}
         title={title(props)}
         value={props.amount1.toString()}
     />;
@@ -174,9 +174,18 @@ function exRange(
     return false;
 }
 function readOnly(
-    { max1, min1 }: Props
+    { level, max1, min1 }: Props, state: AppState | null
 ) {
-    return max1 == 0n && min1 == 0n
+    if (state) {
+        for (const [l, { max1 }] of Object.entries(
+            state.nfts_ui.amounts[Nft.token(state.token)]
+        )) {
+            if (BigInt(l) > level && max1) {
+                return false; // read-write
+            }
+        }
+    }
+    return max1 == 0n && min1 == 0n;
 }
 function title(
     { amount1, level }: Props
