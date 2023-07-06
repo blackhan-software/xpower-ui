@@ -1,4 +1,4 @@
-import { delayed, nice, nice_si, nomobi, range, x40 } from '../../source/functions';
+import { delayed, nice, nice_si, nomobi, x40 } from '../../source/functions';
 import { switchToken } from '../../source/redux/actions';
 import { AppDispatch } from '../../source/redux/store';
 import { Account, AftWallet, AftWalletBurner, Amount, Token, TokenInfo } from '../../source/redux/types';
@@ -7,6 +7,7 @@ import { Tokenizer } from '../../source/token';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Fire, XPower } from '../../public/images/tsx';
+import { Sector } from './sector';
 
 type Props = {
     account: Account | null;
@@ -175,29 +176,19 @@ function $sovToggle(
         <XPower token={Tokenizer.xify(token)} style={{
             filter: aged ? 'invert(1)' : undefined
         }} />
-        {aged ? $sectors({ percent: collat }) : null}
+        {aged ? $sectors({ percent: collat / 100 }) : null}
     </button>;
 }
 function $sectors(
     { percent }: { percent: number }
 ) {
-    const min = percent > 0 && percent < 6.25 ? 1 : 0
-    const max = Math.floor(Math.min(100, percent) / 6.25) + min;
-    const deg = (i: number) => 22.5 * i - 11.25 * (max + 0.5) + 180;
-    return <>{
-        Array.from(range(16)).map((i) => <div
-            className='sector' key={i} style={{
-                borderColor: i < max ? 'var(--xp-powered)' : undefined,
-                transform: `rotate(${deg(i)}deg)`,
-                filter: 'invert(1)',
-            }}
-        />)
-    }</>
+    return <Sector
+        length={360 * percent} start={180 * (1 - percent)}
+    />;
 }
 function collat_pct(
     { wallet, token }: Pick<Props, 'wallet' | 'token'>, denominator = 1e6
 ) {
-    const collat = Number(wallet.items[token]?.collat ?? 0n);
-    return 100 * collat / denominator;
+    return 100 * Number(wallet.items[token]?.collat ?? 0n) / denominator;
 }
 export default UiAftWallet;

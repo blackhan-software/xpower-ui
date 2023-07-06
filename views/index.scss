@@ -57,13 +57,14 @@ label {
   user-select: none;
 }
 :not(span).info {
-  svg {
+  svg:not(.component) {
     position: relative;
     top: -1px;
   }
 }
 .info {
-  img, svg {
+  img:not(.component),
+  svg:not(.component) {
     margin: auto;
   }
   padding: 0;
