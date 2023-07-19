@@ -1,11 +1,12 @@
 import { Bus } from '../../../source/bus';
 import { MoeTreasuryFactory } from '../../../source/contract';
 import { nice } from '../../../source/functions';
+import { ROParams } from '../../../source/params';
 import { AccountContext, globalRef } from '../../../source/react';
 import { onPptChanged } from '../../../source/redux/observers';
 import { AppState } from '../../../source/redux/store';
-import { Account, Amount, Nft, NftFullId, NftIssue, NftLevel, NftLevels, Nfts, NftToken, NftTokens, PptDetails, Supply, Token } from '../../../source/redux/types';
-import { Years } from '../../../source/years';
+import { Account, Amount, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftToken, NftTokens, Nfts, PptDetails, Supply, Token } from '../../../source/redux/types';
+import { MAX_YEAR, MIN_YEAR, Years } from '../../../source/years';
 
 import React, { useContext, useEffect, useState } from 'react';
 import { useStore } from 'react-redux';
@@ -214,7 +215,7 @@ function $row(
     return <React.Fragment key={full_id}>
         <div className='row year'
             ref={globalRef(`:ppt.row[full-id="${full_id}"]`)}
-            style={{ display: fixed || toggled ? 'flex' : 'none' }}
+            style={{ display: (fixed || toggled) ? 'flex' : 'none' }}
         >
             <div className='col-sm nft-details-lhs'>
                 {$image(props, ppt_issue)}
@@ -230,7 +231,8 @@ function $row(
             </div>
         </div>
         <hr className='year' style={{
-            display: fixed || toggled ? 'block' : 'none'
+            display: (fixed || toggled) &&
+                !lastHR(ppt_level, ppt_issue, toggled) ? 'block' : 'none'
         }} />
     </React.Fragment>;
 }
@@ -399,5 +401,18 @@ function $claimer(
         toggled={toggled}
         token={token}
     />;
+}
+function lastHR(
+    level: NftLevel,
+    issue: NftIssue,
+    toggled: boolean
+) {
+    const level_max = level === ROParams.nftLevel.max;
+    if (level_max) {
+        const issue_min = issue === MIN_YEAR();
+        const issue_max = issue === MAX_YEAR();
+        return toggled ? issue_min : issue_max;
+    }
+    return false;
 }
 export default UiPptDetails;

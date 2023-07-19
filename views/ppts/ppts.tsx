@@ -101,6 +101,46 @@ export function UiPpts(
     const { flags, toggled } = props;
     const { amounts, minter } = props;
     return <React.Fragment>
+        <label className='form-label'>
+            Stake & Manage {token} NFTs
+        </label>
+        <div id='ppt-batch-minting'>
+            <UiPptMinter
+                approval={
+                    minter[ppt_token].approval
+                }
+                onApproval={
+                    props.onPptMinterApproval
+                }
+                minter_list={
+                    join(flags, amounts[ppt_token])
+                }
+                minter_status={
+                    minter[ppt_token].minter_status
+                }
+                onBatchMint={
+                    props.onPptMinterBatchMint
+                }
+                burner_status={
+                    minter[ppt_token].burner_status
+                }
+                onBatchBurn={
+                    props.onPptMinterBatchBurn
+                }
+                claimer_status={
+                    minter[ppt_token].claimer_status
+                }
+                onBatchClaim={
+                    props.onPptMinterBatchClaim
+                }
+                onToggled={
+                    props.onPptMinterToggled
+                }
+                toggled={toggled}
+                token={token}
+                ppts={ppts}
+            />
+        </div>
         <div id='ppt-single-minting'>
             <UiPptList
                 ppts={ppts}
@@ -137,43 +177,6 @@ export function UiPpts(
                 }
                 toggled={toggled}
                 token={token}
-            />
-        </div>
-        <div id='ppt-batch-minting'>
-            <UiPptMinter
-                approval={
-                    minter[ppt_token].approval
-                }
-                onApproval={
-                    props.onPptMinterApproval
-                }
-                minter_list={
-                    join(flags, amounts[ppt_token])
-                }
-                minter_status={
-                    minter[ppt_token].minter_status
-                }
-                onBatchMint={
-                    props.onPptMinterBatchMint
-                }
-                burner_status={
-                    minter[ppt_token].burner_status
-                }
-                onBatchBurn={
-                    props.onPptMinterBatchBurn
-                }
-                claimer_status={
-                    minter[ppt_token].claimer_status
-                }
-                onBatchClaim={
-                    props.onPptMinterBatchClaim
-                }
-                onToggled={
-                    props.onPptMinterToggled
-                }
-                toggled={toggled}
-                token={token}
-                ppts={ppts}
             />
         </div>
     </React.Fragment>;

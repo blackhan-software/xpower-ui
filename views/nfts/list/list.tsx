@@ -52,11 +52,8 @@ export type NftList = Record<NftLevel, {
 export function UiNftList(
     props: Props
 ) {
-    const { token, list } = props;
+    const { list } = props;
     return <React.Fragment>
-        <label className='form-label'>
-            Mint & Manage {token} NFTs
-        </label>
         {Array.from(NftLevels()).map((
             nft_level
         ) => {

@@ -55,11 +55,8 @@ type PptList = Record<NftLevel, {
 export function UiPptList(
     props: Props
 ) {
-    const { token, list } = props;
+    const { list } = props;
     return <React.Fragment>
-        <label className='form-label'>
-            Stake & Manage {token} NFTs
-        </label>
         {Array.from(NftLevels()).map((
             nft_level
         ) => {

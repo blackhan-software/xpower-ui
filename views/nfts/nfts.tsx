@@ -101,41 +101,9 @@ export function UiNfts(
     const { flags, toggled } = props;
     const { amounts, minter } = props;
     return <React.Fragment>
-        <div id='nft-single-minting'>
-            <UiNftList
-                nfts={nfts}
-                list={
-                    join(flags, amounts[nft_token])
-                }
-                onNftList={(
-                    list
-                ) => {
-                    const { lhs, rhs } = split(list);
-                    const { onNftList } = props;
-                    if (onNftList) onNftList(lhs, rhs);
-                }}
-                details={
-                    props.details[nft_token]
-                }
-                onNftImageLoaded={
-                    props.onNftImageLoaded
-                }
-                onNftSenderExpanded={
-                    props.onNftSenderExpanded
-                }
-                onNftAmountChanged={
-                    props.onNftAmountChanged
-                }
-                onNftTargetChanged={
-                    props.onNftTargetChanged
-                }
-                onNftTransfer={
-                    props.onNftTransfer
-                }
-                toggled={toggled}
-                token={token}
-            />
-        </div>
+        <label className='form-label'>
+            Mint & Manage {token} NFTs
+        </label>
         <div id='nft-batch-minting'>
             <UiNftMinter
                 approval={
@@ -167,6 +135,41 @@ export function UiNfts(
                 }
                 onToggled={
                     props.onNftMinterToggled
+                }
+                toggled={toggled}
+                token={token}
+            />
+        </div>
+        <div id='nft-single-minting'>
+            <UiNftList
+                nfts={nfts}
+                list={
+                    join(flags, amounts[nft_token])
+                }
+                onNftList={(
+                    list
+                ) => {
+                    const { lhs, rhs } = split(list);
+                    const { onNftList } = props;
+                    if (onNftList) onNftList(lhs, rhs);
+                }}
+                details={
+                    props.details[nft_token]
+                }
+                onNftImageLoaded={
+                    props.onNftImageLoaded
+                }
+                onNftSenderExpanded={
+                    props.onNftSenderExpanded
+                }
+                onNftAmountChanged={
+                    props.onNftAmountChanged
+                }
+                onNftTargetChanged={
+                    props.onNftTargetChanged
+                }
+                onNftTransfer={
+                    props.onNftTransfer
                 }
                 toggled={toggled}
                 token={token}
