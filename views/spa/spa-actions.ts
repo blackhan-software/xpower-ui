@@ -734,15 +734,9 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
         tx = await moe_treasury.claimForBatch(
             account, ppt_ids.filter((_, i) => claimables[i])
         );
-        set_claimable(claimable);
     } catch (ex: any) {
         set_status(PptClaimerStatus.error);
         throw error(ex);
-    }
-    function set_claimable(claimable_amount: Amount) {
-        api.dispatch(setPptsUiMinter({
-            minter: { [ppt_token]: { claimable_amount } }
-        }));
     }
     function set_status(claimer_status: PptClaimerStatus) {
         api.dispatch(setPptsUiMinter({
