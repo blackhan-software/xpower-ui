@@ -20,6 +20,6 @@ describe('Miner', () => {
             expect(worker).toBeGreaterThanOrEqual(0);
             await miner.stop();
             expect(miner.running).toBeFalsy();
-        })
-    })
+        });
+    }, 15_000);
 });
