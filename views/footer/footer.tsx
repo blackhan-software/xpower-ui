@@ -220,7 +220,7 @@ function contractInfo(
             const xtoken = Tokenizer.xify(token);
             return {
                 url: `${explorer}/address/${x40(address)}`,
-                tip: `Smart contract of the ${xtoken} NFTs`,
+                tip: `Smart contract of stakeable ${xtoken} NFTs`,
             };
         }
         case Page.Ppts: {
@@ -228,14 +228,14 @@ function contractInfo(
             const xtoken = Tokenizer.xify(token);
             return {
                 url: `${explorer}/address/${x40(address)}`,
-                tip: `Smart contract of the staked ${xtoken} NFTs`,
+                tip: `Smart contract of staked ${xtoken} NFTs`,
             }
         }
         default: {
             const { address } = TokenInfo(token, version);
             return {
                 url: `${explorer}/address/${x40(address)}`,
-                tip: `Smart contract of the ${token} tokens`,
+                tip: `Smart contract of ${token}s`,
             }
         }
     }
