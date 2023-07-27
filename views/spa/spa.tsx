@@ -19,7 +19,6 @@ import { UiCover } from '../cover/cover';
 import { UiHome } from '../home/home';
 import { UiNfts } from '../nfts/nfts';
 import { UiPpts } from '../ppts/ppts';
-import { UiSelector } from '../selector/selector';
 import { UiWallet } from '../wallet/wallet';
 
 import Tokenizer from '../../source/token';
@@ -65,7 +64,6 @@ export function SPA(
         {$connector(page)}
         {$cover(page, token, mining, rates, rates_ui)}
         {$wallet(page, token, aft_wallet, otf_wallet)}
-        {$selector(page, token)}
         {$home(page, token, mining, minting)}
         {$nfts(page, token, nfts, nfts_ui)}
         {$ppts(page, token, ppts, ppts_ui)}
@@ -159,16 +157,6 @@ function $wallet(
             }}
             token={token}
         />
-    </form>;
-}
-function $selector(
-    page: Page, token: Token
-) {
-    return <form id='selector'
-        className={page === Page.About ? 'd-none' : ''}
-        onSubmit={(e) => e.preventDefault()}
-    >
-        <UiSelector token={token} />
     </form>;
 }
 function $home(

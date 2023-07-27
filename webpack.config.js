@@ -40,7 +40,6 @@ const configuration = ({
                 './library/index.ts',
                 './views/header/header.tsx',
                 './views/connector/connector.tsx',
-                './views/selector/selector.tsx',
                 './views/migrate/index.ts',
                 './views/footer/footer.tsx',
             ],
