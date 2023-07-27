@@ -7,7 +7,7 @@ import { addPpt, removePpt } from '../actions';
 import { AppState } from '../store';
 
 describe('onNftAdded', () => {
-    const id = '1202103';
+    const id = '2202103';
     it('should invoke handler (for addPpt)', () => {
         const reducer = combineReducers({
             ppts: pptsReducer
@@ -20,7 +20,7 @@ describe('onNftAdded', () => {
         onPptAdded(store as Store<AppState, Action>, (id, i, {
             amount: t_amount, supply: t_supply
         }) => {
-            expect(id).toEqual('1202103');
+            expect(id).toEqual('2202103');
             expect(i.amount).toEqual(1n);
             expect(i.supply).toEqual(2n);
             expect(t_amount).toEqual(1n);

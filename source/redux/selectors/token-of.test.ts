@@ -4,13 +4,13 @@ import { atokenOf } from './token-of';
 
 describe('xtoken-of', () => {
     it('should return xtoken', () => {
-        const token_of = xtokenOf({ token: Token.aTHOR });
-        expect(token_of).toEqual(Token.THOR);
+        const token_of = xtokenOf({ token: Token.APOW });
+        expect(token_of).toEqual(Token.XPOW);
     });
 });
 describe('atoken-of', () => {
     it('should return atoken', () => {
-        const token_of = atokenOf({ token: Token.THOR });
-        expect(token_of).toEqual(Token.aTHOR);
+        const token_of = atokenOf({ token: Token.XPOW });
+        expect(token_of).toEqual(Token.APOW);
     });
 });

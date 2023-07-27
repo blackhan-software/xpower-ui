@@ -31,9 +31,7 @@ export function UiSelector(
     return <div
         className='btn-group selectors' role='group'
     >
-        {$anchor(Token.THOR, token, switching, dispatch)}
-        {$anchor(Token.LOKI, token, switching, dispatch)}
-        {$anchor(Token.ODIN, token, switching, dispatch)}
+        {$anchor(Token.XPOW, token, switching, dispatch)}
     </div>;
 }
 function $anchor(

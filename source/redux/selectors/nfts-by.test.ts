@@ -4,17 +4,17 @@ import { nftsBy } from './nfts-by';
 describe('nfts-by', () => {
     const issue = 2021;
     const level = NftLevel.UNIT;
-    const token = NftToken.ODIN;
+    const token = NftToken.XPOW;
     it('should return {}', () => {
         const state = { nfts: { items: {} } };
         const nfts_by = nftsBy(state);
         expect(nfts_by).toEqual(state.nfts);
     });
-    it('should return { "ODIN:2021": ... }', () => {
+    it('should return { "XPOW:2021": ... }', () => {
         const state = {
             nfts: {
                 items: {
-                    '3202100': {
+                    '2202100': {
                         amount: 1n, supply: 2n
                     }
                 }
@@ -25,14 +25,14 @@ describe('nfts-by', () => {
         });
         expect(nfts_by).toEqual(state.nfts);
     });
-    it('should return { "ODIN:2021": ..., "ODIN:2022": ... }', () => {
+    it('should return { "XPOW:2021": ..., "XPOW:2022": ... }', () => {
         const state = {
             nfts: {
                 items: {
-                    '3202100': {
+                    '2202100': {
                         amount: 1n, supply: 2n
                     },
-                    '3202103': {
+                    '2202103': {
                         amount: 2n, supply: 4n
                     }
                 }

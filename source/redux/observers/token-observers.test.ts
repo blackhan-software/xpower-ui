@@ -20,9 +20,9 @@ describe('onTokenSwitch', () => {
         onTokenSwitch(store as Store<AppState, AnyAction>, (
             next, prev
         ) => {
-            expect(next).toEqual(Token.LOKI);
-            expect(prev).toEqual(Token.THOR);
+            expect(next).toEqual(Token.XPOW);
+            expect(prev).toEqual(Token.XPOW);
         });
-        store.dispatch(switchToken(Token.LOKI));
+        store.dispatch(switchToken(Token.XPOW));
     });
 });

@@ -5,7 +5,7 @@ import { increaseAftWallet, decreaseAftWallet, setAftWallet } from '../actions';
 import { Empty, Token, AftWallet } from '../types';
 
 describe('Store w/aft-wallet-reducer (set)', () => {
-    const t = Token.THOR;
+    const t = Token.XPOW;
     it('should set-aft-wallet to amount=1', () => {
         const state_0 = Empty<AftWallet>();
         const state_1 = aftWalletReducer(state_0, setAftWallet(t, {
@@ -30,7 +30,7 @@ describe('Store w/aft-wallet-reducer (set)', () => {
     });
 });
 describe('Store w/aft-wallet-reducer (inrease)', () => {
-    const t = Token.LOKI;
+    const t = Token.XPOW;
     it('should inc-aft-wallet by amount=1 (w/rel. supply)', () => {
         const state_0 = Empty<AftWallet>();
         const state_1 = aftWalletReducer(state_0, increaseAftWallet(t, {
@@ -143,7 +143,7 @@ describe('Store w/aft-wallet-reducer (inrease)', () => {
     });
 });
 describe('Store w/aft-wallet-reducer (decrease)', () => {
-    const t = Token.ODIN;
+    const t = Token.XPOW;
     it('should dec-aft-wallet by amount=1 (w/rel. supply)', () => {
         const state_0 = Empty<AftWallet>();
         const state_1 = aftWalletReducer(state_0, increaseAftWallet(t, {

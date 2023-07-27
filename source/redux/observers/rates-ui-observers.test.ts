@@ -18,20 +18,12 @@ describe('onRatesUi', () => {
             })
         });
         onRatesUi(store as Store<AppState, AnyAction>, ({ refresher }) => {
-            expect(refresher[NftToken.THOR]).toEqual({
-                status: RefresherStatus.refreshing
-            });
-            expect(refresher[NftToken.LOKI]).toEqual({
+            expect(refresher[NftToken.XPOW]).toEqual({
                 status: RefresherStatus.refreshed
-            });
-            expect(refresher[NftToken.ODIN]).toEqual({
-                status: RefresherStatus.refetch
             });
         });
         const refresher = {
-            [NftToken.THOR]: { status: RefresherStatus.refreshing },
-            [NftToken.LOKI]: { status: RefresherStatus.refreshed },
-            [NftToken.ODIN]: { status: RefresherStatus.refetch },
+            [NftToken.XPOW]: { status: RefresherStatus.refreshed },
         };
         store.dispatch(setRatesUi({ refresher }));
     });
@@ -45,12 +37,12 @@ describe('onRatesUi', () => {
             })
         });
         onRatesUi(store as Store<AppState, AnyAction>, ({ refresher }) => {
-            expect(refresher[NftToken.HELA]).toEqual({
+            expect(refresher[NftToken.XPOW]).toEqual({
                 status: null
             });
         });
         const refresher = {
-            [NftToken.HELA]: { status: null },
+            [NftToken.XPOW]: { status: null },
         };
         store.dispatch(setRatesUiRefresher({ refresher }));
     });
@@ -66,20 +58,12 @@ describe('onRatesUiRefresher', () => {
             })
         });
         onRatesUiRefresher(store as Store<AppState, AnyAction>, (next) => {
-            expect(next[NftToken.THOR]).toEqual({
-                status: RefresherStatus.refreshing
-            });
-            expect(next[NftToken.LOKI]).toEqual({
+            expect(next[NftToken.XPOW]).toEqual({
                 status: RefresherStatus.refreshed
-            });
-            expect(next[NftToken.ODIN]).toEqual({
-                status: RefresherStatus.refetch
             });
         });
         const refresher = {
-            [NftToken.THOR]: { status: RefresherStatus.refreshing },
-            [NftToken.LOKI]: { status: RefresherStatus.refreshed },
-            [NftToken.ODIN]: { status: RefresherStatus.refetch },
+            [NftToken.XPOW]: { status: RefresherStatus.refreshed },
         };
         store.dispatch(setRatesUi({ refresher }));
     });
@@ -93,12 +77,12 @@ describe('onRatesUiRefresher', () => {
             })
         });
         onRatesUiRefresher(store as Store<AppState, AnyAction>, (next) => {
-            expect(next[NftToken.HELA]).toEqual({
+            expect(next[NftToken.XPOW]).toEqual({
                 status: null
             });
         });
         const refresher = {
-            [NftToken.HELA]: { status: null },
+            [NftToken.XPOW]: { status: null },
         };
         store.dispatch(setRatesUiRefresher({ refresher }));
     });

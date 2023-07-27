@@ -4,7 +4,7 @@ import { totalBy } from './total-by';
 describe('total-by', () => {
     const account = BigInt('0xabcd');
     const block_hash = BigInt('0xb10c');
-    const token = Token.THOR;
+    const token = Token.XPOW;
     it('should sum to 0', () => {
         const sum = totalBy({ nonces: { items: {} } }, {
             account, amount: 0n, block_hash, token

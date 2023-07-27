@@ -20,14 +20,8 @@ Blockchain.onConnect(function enableBurnButton() {
 });
 $('button.burn-empty-nft').on('click', async function burnEmpty(e) {
     const $burn = $(e.currentTarget);
-    if ($burn.hasClass('thor')) {
-        await burn(Token.THOR, { $burn });
-    }
-    if ($burn.hasClass('loki')) {
-        await burn(Token.LOKI, { $burn });
-    }
-    if ($burn.hasClass('odin')) {
-        await burn(Token.ODIN, { $burn });
+    if ($burn.hasClass('xpow')) {
+        await burn(Token.XPOW, { $burn });
     }
 });
 async function burn(token: Token, { $burn }: {

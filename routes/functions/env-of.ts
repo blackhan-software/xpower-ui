@@ -22,13 +22,13 @@ export const env_of = (req: Request): Record<string, string> => {
       power: power_lc,
       TOKEN: token,
       token: token_lc,
-      Token: capitalize(token_lc),
+      Token: capitalize(token_lc, 2),
       xTOKEN: xtoken,
       xtoken: xtoken_lc,
-      xToken: capitalize(xtoken_lc),
+      xToken: capitalize(xtoken_lc, 2),
       aTOKEN: atoken,
       atoken: atoken_lc,
-      aToken: 'a' + capitalize(atoken_lc.slice(1)),
+      aToken: 'A' + capitalize(atoken_lc.slice(1)),
     }, ...{
       ...theme(xtoken),
       ...header_page(req),
@@ -84,10 +84,7 @@ const selector_token = (
 ) => {
   const token = Tokenizer.token(params.get('token'));
   return {
-    SELECT0R_THOR: token === Token.THOR ? 'active' : '',
-    SELECT0R_LOKI: token === Token.LOKI ? 'active' : '',
-    SELECT0R_ODIN: token === Token.ODIN ? 'active' : '',
-    SELECT0R_HELA: token === Token.HELA ? 'active' : ''
+    SELECT0R_XPOW: token === Token.XPOW ? 'active' : '',
   };
 };
 const nft_display = (

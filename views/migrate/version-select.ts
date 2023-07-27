@@ -104,17 +104,8 @@ $('#version-select').on('change tap', function selectVersion(e) {
 });
 $('.selectors>a').on('click', function selectToken(e) {
     const $target = $(e.currentTarget);
-    if ($target.hasClass('selector-thor')) {
-        RWParams.token = Token.THOR;
-    }
-    if ($target.hasClass('selector-loki')) {
-        RWParams.token = Token.LOKI;
-    }
-    if ($target.hasClass('selector-odin')) {
-        RWParams.token = Token.ODIN;
-    }
-    if ($target.hasClass('selector-hela')) {
-        RWParams.token = Token.HELA;
+    if ($target.hasClass('selector-xpow')) {
+        RWParams.token = Token.XPOW;
     }
     e.stopPropagation();
     e.preventDefault();

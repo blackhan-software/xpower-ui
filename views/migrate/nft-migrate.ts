@@ -29,24 +29,10 @@ $('button.unstake-old').on('click', async function unstakeOldNfts(e) {
     const $unstake = $(e.currentTarget);
     const $unstake_ppt = $unstake.parents('form.unstake-old');
     const $migrate_nft = $unstake_ppt.next('form.migrate-old');
-    if ($unstake.hasClass('thor')) {
-        await nftUnstakeOld(Token.THOR, {
+    if ($unstake.hasClass('xpow')) {
+        await nftUnstakeOld(Token.XPOW, {
             $unstake, $approve: $migrate_nft.find(
-                '.approve-old.thor'
-            )
-        });
-    }
-    if ($unstake.hasClass('loki')) {
-        await nftUnstakeOld(Token.LOKI, {
-            $unstake, $approve: $migrate_nft.find(
-                '.approve-old.loki'
-            )
-        });
-    }
-    if ($unstake.hasClass('odin')) {
-        await nftUnstakeOld(Token.ODIN, {
-            $unstake, $approve: $migrate_nft.find(
-                '.approve-old.odin'
+                '.approve-old.xpow'
             )
         });
     }
@@ -134,42 +120,16 @@ async function nftUnstakeOld(token: Token, { $unstake, $approve }: {
 $('button.approve-old').on('click', async function approveOldNfts(e) {
     const $approve = $(e.currentTarget);
     const $migrate_nft = $approve.parents('form.migrate-old');
-    if ($approve.hasClass('thor')) {
-        await moeApproveOld(Token.THOR, {
+    if ($approve.hasClass('xpow')) {
+        await moeApproveOld(Token.XPOW, {
             $approve
         });
-        await moeApproveNew(Token.THOR, {
+        await moeApproveNew(Token.XPOW, {
             $approve
         });
-        await nftApproveOld(Token.THOR, {
+        await nftApproveOld(Token.XPOW, {
             $approve, $migrate: $migrate_nft.find(
-                '.migrate-old.thor'
-            )
-        });
-    }
-    if ($approve.hasClass('loki')) {
-        await moeApproveOld(Token.LOKI, {
-            $approve
-        });
-        await moeApproveNew(Token.LOKI, {
-            $approve
-        });
-        await nftApproveOld(Token.LOKI, {
-            $approve, $migrate: $migrate_nft.find(
-                '.migrate-old.loki'
-            )
-        });
-    }
-    if ($approve.hasClass('odin')) {
-        await moeApproveOld(Token.ODIN, {
-            $approve
-        });
-        await moeApproveNew(Token.ODIN, {
-            $approve
-        });
-        await nftApproveOld(Token.ODIN, {
-            $approve, $migrate: $migrate_nft.find(
-                '.migrate-old.odin'
+                '.migrate-old.xpow'
             )
         });
     }
@@ -419,24 +379,10 @@ $('button.migrate-old').on('click', async function migrateOldNfts(e) {
     const $migrate = $(e.currentTarget);
     const $migrate_nft = $migrate.parents('form.migrate-old');
     const $restake_nft = $migrate_nft.next('form.restake-new');
-    if ($migrate.hasClass('thor')) {
-        await nftMigrateOld(Token.THOR, {
+    if ($migrate.hasClass('xpow')) {
+        await nftMigrateOld(Token.XPOW, {
             $migrate, $approve: $restake_nft.find(
-                '.approve-new.thor'
-            )
-        });
-    }
-    if ($migrate.hasClass('loki')) {
-        await nftMigrateOld(Token.LOKI, {
-            $migrate, $approve: $restake_nft.find(
-                '.approve-new.loki'
-            )
-        });
-    }
-    if ($migrate.hasClass('odin')) {
-        await nftMigrateOld(Token.ODIN, {
-            $migrate, $approve: $restake_nft.find(
-                '.approve-new.odin'
+                '.approve-new.xpow'
             )
         });
     }
@@ -553,24 +499,10 @@ async function nftMigrateOld(token: Token, { $migrate, $approve }: {
 $('button.approve-new').on('click', async function approveNewNfts(e) {
     const $approve = $(e.currentTarget);
     const $restake_nft = $approve.parents('form.restake-new');
-    if ($approve.hasClass('thor')) {
-        await nftApproveNew(Token.THOR, {
+    if ($approve.hasClass('xpow')) {
+        await nftApproveNew(Token.XPOW, {
             $approve, $restake: $restake_nft.find(
-                '.restake-new.thor'
-            )
-        });
-    }
-    if ($approve.hasClass('loki')) {
-        await nftApproveNew(Token.LOKI, {
-            $approve, $restake: $restake_nft.find(
-                '.restake-new.loki'
-            )
-        });
-    }
-    if ($approve.hasClass('odin')) {
-        await nftApproveNew(Token.ODIN, {
-            $approve, $restake: $restake_nft.find(
-                '.restake-new.odin'
+                '.restake-new.xpow'
             )
         });
     }
@@ -656,14 +588,8 @@ async function nftApproveNew(token: Token, { $approve, $restake }: {
 }
 $('button.restake-new').on('click', async function restakeNewNfts(e) {
     const $restake = $(e.currentTarget);
-    if ($restake.hasClass('thor')) {
-        await nftRestakeNew(Token.THOR, { $restake });
-    }
-    if ($restake.hasClass('loki')) {
-        await nftRestakeNew(Token.LOKI, { $restake });
-    }
-    if ($restake.hasClass('odin')) {
-        await nftRestakeNew(Token.ODIN, { $restake });
+    if ($restake.hasClass('xpow')) {
+        await nftRestakeNew(Token.XPOW, { $restake });
     }
 });
 async function nftRestakeNew(token: Token, { $restake }: {

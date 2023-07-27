@@ -17,24 +17,10 @@ $('button.approve-moe-allowance').on(
     'click', async function approveTokens(e) {
         const $approve = $(e.currentTarget);
         const $migrate = $approve.parents('form.moe-migrate');
-        if ($approve.hasClass('thor')) {
-            await moeApproveOld(Token.THOR, {
+        if ($approve.hasClass('xpow')) {
+            await moeApproveOld(Token.XPOW, {
                 $approve, $migrate: $migrate.find(
-                    '.moe-migrate.thor'
-                )
-            });
-        }
-        if ($approve.hasClass('loki')) {
-            await moeApproveOld(Token.LOKI, {
-                $approve, $migrate: $migrate.find(
-                    '.moe-migrate.loki'
-                )
-            });
-        }
-        if ($approve.hasClass('odin')) {
-            await moeApproveOld(Token.ODIN, {
-                $approve, $migrate: $migrate.find(
-                    '.moe-migrate.odin'
+                    '.moe-migrate.xpow'
                 )
             });
         }
@@ -112,14 +98,8 @@ async function moeApproveOld(token: Token, { $approve, $migrate }: {
 $('button.moe-migrate').on(
     'click', async function migrateTokens(e) {
         const $migrate = $(e.currentTarget);
-        if ($migrate.hasClass('thor')) {
-            await moeMigrateOld(Token.THOR, { $migrate });
-        }
-        if ($migrate.hasClass('loki')) {
-            await moeMigrateOld(Token.LOKI, { $migrate });
-        }
-        if ($migrate.hasClass('odin')) {
-            await moeMigrateOld(Token.ODIN, { $migrate });
+        if ($migrate.hasClass('xpow')) {
+            await moeMigrateOld(Token.XPOW, { $migrate });
         }
     }
 );

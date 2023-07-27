@@ -4,7 +4,7 @@ import { noncesBy } from './nonces-by';
 describe('nonces-by', () => {
     const account = BigInt('0xabcd');
     const block_hash = BigInt('0xb10c');
-    const token = Token.THOR;
+    const token = Token.XPOW;
     it('should return nonces.length = 0', () => {
         const array = noncesBy({ nonces: { items: {} } }, {
             account, block_hash, amount: 0n, token

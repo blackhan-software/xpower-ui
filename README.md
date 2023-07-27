@@ -71,10 +71,10 @@ speed | number | 50 | speed percentage (w.r.t a single browser tab) between 0 an
 
 ### Examples
 
-To ignore (frequent & low-value) nonces with an amount less than 7 THOR tokens and mine with a speed of 100% use:
+To ignore (frequent & low-value) nonces with an amount less than 7 XPOW tokens and mine with a speed of 100% use:
 
 ```txt
-http://localhost:3000?min-level=7&speed=100
+http://localhost:3000?min-level=3&speed=100
 ```
 
 To persist nonces between reloads at 1st slot use (may impact mining performance):

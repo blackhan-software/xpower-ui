@@ -4,7 +4,7 @@ import { Token } from '../types';
 describe('nonce-by', () => {
     const account = BigInt('0xabcd');
     const block_hash = BigInt('0xb10c');
-    const token = Token.THOR;
+    const token = Token.XPOW;
     it('should return nonce = undefined', () => {
         const { nonce } = nonceBy({ nonces: { items: {} } }, {
             account, block_hash, amount: 0n

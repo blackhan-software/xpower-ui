@@ -19,14 +19,8 @@ Blockchain.onConnect(function enableAllowanceButton() {
 });
 $('button.claim-any').on('click', async function claimTokens(e) {
     const $claim = $(e.currentTarget);
-    if ($claim.hasClass('thor')) {
-        await claim(Token.THOR, { $claim });
-    }
-    if ($claim.hasClass('loki')) {
-        await claim(Token.LOKI, { $claim });
-    }
-    if ($claim.hasClass('odin')) {
-        await claim(Token.ODIN, { $claim });
+    if ($claim.hasClass('xpow')) {
+        await claim(Token.XPOW, { $claim });
     }
 });
 async function claim(token: Token, { $claim }: {

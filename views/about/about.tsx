@@ -145,9 +145,9 @@ async function renderMarkdown(
             .replace(/{{token}}/g, token_lc)
             .replace(/{{atoken}}/g, atoken_lc)
             .replace(/{{xtoken}}/g, xtoken_lc)
-            .replace(/{{Token}}/g, capitalize(token_lc))
-            .replace(/{{aToken}}/g, 'a' + capitalize(token_lc))
-            .replace(/{{xToken}}/g, capitalize(xtoken_lc));
+            .replace(/{{Token}}/g, capitalize(token_lc, 2))
+            .replace(/{{aToken}}/g, 'A' + capitalize(token_lc))
+            .replace(/{{xToken}}/g, capitalize(xtoken_lc, 2));
     }
     return html;
 }

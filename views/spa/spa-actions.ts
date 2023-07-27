@@ -432,9 +432,9 @@ export const nftsBatchUpgrade = AppThunk('nfts/batch-upgrade', async (args: {
         set_status(NftUpgraderStatus.error);
         throw error(ex);
     }
-    function set_status(upgradeStatus: NftUpgraderStatus) {
+    function set_status(upgrader_status: NftUpgraderStatus) {
         api.dispatch(setNftsUiMinter({
-            minter: { [nft_token]: { upgradeStatus } }
+            minter: { [nft_token]: { upgrader_status } }
         }));
     }
 });

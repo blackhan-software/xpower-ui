@@ -4,7 +4,7 @@ import { nftTotalBy } from './nft-total-by';
 describe('nft-total-by', () => {
     const issue = 2021;
     const level = NftLevel.UNIT;
-    const token = NftToken.ODIN;
+    const token = NftToken.XPOW;
     it('should return total = { amount: 0n, supply: 0n }', () => {
         const total = nftTotalBy({ nfts: { items: {} } });
         expect(total).toEqual({
@@ -15,7 +15,7 @@ describe('nft-total-by', () => {
         const total = nftTotalBy({
             nfts: {
                 items: {
-                    '3202100': {
+                    '2202100': {
                         amount: 1n, supply: 2n
                     }
                 }
@@ -31,10 +31,10 @@ describe('nft-total-by', () => {
         const total = nftTotalBy({
             nfts: {
                 items: {
-                    '3202100': {
+                    '2202100': {
                         amount: 1n, supply: 2n
                     },
-                    '3202103': {
+                    '2202103': {
                         amount: 2n, supply: 4n
                     }
                 }

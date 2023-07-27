@@ -14,7 +14,7 @@ export function address({
     if (version === undefined) {
         version = ROParams.version;
     }
-    if (token.startsWith('a') && token !== 'XPOW') {
+    if (token.startsWith('A') && token !== 'XPOW') {
         token = Tokenizer.xify(token);
     }
     const id = `g-${token}_${infix}_${version}`;

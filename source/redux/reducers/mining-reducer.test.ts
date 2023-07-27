@@ -6,9 +6,9 @@ describe('Store w/mining-reducer', () => {
     it('should set-mining [speed]', () => {
         const state_0 = miningState();
         const state_1 = miningReducer(state_0, setMiningSpeed({
-            speed: { [Token.THOR]: 0.5 }
+            speed: { [Token.XPOW]: 0.5 }
         }));
-        expect(state_1.speed[Token.THOR]).toEqual(0.5);
+        expect(state_1.speed[Token.XPOW]).toEqual(0.5);
     });
     it('should set-mining [status]', () => {
         const state_0 = miningState();

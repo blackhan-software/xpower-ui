@@ -3,46 +3,46 @@ import { capitalizeAll } from './capitalize';
 import { capitalize } from './capitalize';
 
 describe('capitalize w/length=1', () => {
-    it('should capitalize "thor token"', () => {
-        expect(capitalize('thor token')).toEqual('Thor token');
+    it('should capitalize "xpow token"', () => {
+        expect(capitalize('xpow token')).toEqual('Xpow token');
     });
-    it('should capitalize "THOR TOKEN"', () => {
-        expect(capitalize('THOR TOKEN')).toEqual('THOR TOKEN');
+    it('should capitalize "XPOW TOKEN"', () => {
+        expect(capitalize('XPOW TOKEN')).toEqual('XPOW TOKEN');
     });
-    it('should capitalize "Thor Token"', () => {
-        expect(capitalize('Thor Token')).toEqual('Thor Token');
+    it('should capitalize "XPow Token"', () => {
+        expect(capitalize('XPow Token')).toEqual('XPow Token');
     });
 });
 describe('capitalize w/length=2', () => {
-    it('should capitalize "thor token"', () => {
-        expect(capitalize('thor token', 2)).toEqual('THor token');
+    it('should capitalize "xpow token"', () => {
+        expect(capitalize('xpow token', 2)).toEqual('XPow token');
     });
-    it('should capitalize "THOR TOKEN"', () => {
-        expect(capitalize('THOR TOKEN', 2)).toEqual('THOR TOKEN');
+    it('should capitalize "XPOW TOKEN"', () => {
+        expect(capitalize('XPOW TOKEN', 2)).toEqual('XPOW TOKEN');
     });
-    it('should capitalize "Thor Token"', () => {
-        expect(capitalize('Thor Token', 2)).toEqual('THor Token');
+    it('should capitalize "XPow Token"', () => {
+        expect(capitalize('XPow Token', 2)).toEqual('XPow Token');
     });
 });
 describe('capitalize-all w/length=1', () => {
-    it('should capitalize-all "thor token"', () => {
-        expect(capitalizeAll('thor token')).toEqual('Thor Token');
+    it('should capitalize-all "xpow token"', () => {
+        expect(capitalizeAll('xpow token')).toEqual('Xpow Token');
     });
-    it('should capitalize "THOR TOKEN"', () => {
-        expect(capitalizeAll('THOR TOKEN')).toEqual('THOR TOKEN');
+    it('should capitalize "XPOW TOKEN"', () => {
+        expect(capitalizeAll('XPOW TOKEN')).toEqual('XPOW TOKEN');
     });
-    it('should capitalize "Thor Token"', () => {
-        expect(capitalizeAll('Thor Token')).toEqual('Thor Token');
+    it('should capitalize "XPow Token"', () => {
+        expect(capitalizeAll('XPow Token')).toEqual('XPow Token');
     });
 });
 describe('capitalize-all w/length=2', () => {
-    it('should capitalize-all "thor token"', () => {
-        expect(capitalizeAll('thor token', 2)).toEqual('THor TOken');
+    it('should capitalize-all "xpow token"', () => {
+        expect(capitalizeAll('xpow token', 2)).toEqual('XPow TOken');
     });
-    it('should capitalize "THOR TOKEN"', () => {
-        expect(capitalizeAll('THOR TOKEN', 2)).toEqual('THOR TOKEN');
+    it('should capitalize "XPOW TOKEN"', () => {
+        expect(capitalizeAll('XPOW TOKEN', 2)).toEqual('XPOW TOKEN');
     });
-    it('should capitalize "Thor Token"', () => {
-        expect(capitalizeAll('Thor Token', 2)).toEqual('THor TOken');
+    it('should capitalize "XPow Token"', () => {
+        expect(capitalizeAll('XPow Token', 2)).toEqual('XPow TOken');
     });
 });

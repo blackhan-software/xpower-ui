@@ -3,7 +3,7 @@ import { Token } from '../types';
 import { versionBy } from './version-by';
 
 describe('version-by', () => {
-    const token = Token.THOR;
+    const token = Token.XPOW;
     it('should return []', () => {
         const versions = versionBy({
             history: {
@@ -17,12 +17,7 @@ describe('version-by', () => {
             history: {
                 items: {
                     [Version.v2a]: {
-                        [Token.THOR]: {
-                            moe: { balance: 1n }
-                        }
-                    },
-                    [Version.v6b]: {
-                        [Token.LOKI]: {
+                        [Token.XPOW]: {
                             moe: { balance: 1n }
                         }
                     },
@@ -38,22 +33,12 @@ describe('version-by', () => {
             history: {
                 items: {
                     [Version.v2a]: {
-                        [Token.THOR]: {
-                            moe: { balance: 1n }
-                        }
-                    },
-                    [Version.v6b]: {
-                        [Token.LOKI]: {
+                        [Token.XPOW]: {
                             moe: { balance: 1n }
                         }
                     },
                     [Version.v3a]: {
-                        [Token.THOR]: {
-                            sov: { balance: 1n }
-                        }
-                    },
-                    [Version.v6b]: {
-                        [Token.LOKI]: {
+                        [Token.XPOW]: {
                             sov: { balance: 1n }
                         }
                     },
@@ -69,33 +54,18 @@ describe('version-by', () => {
             history: {
                 items: {
                     [Version.v2a]: {
-                        [Token.THOR]: {
-                            moe: { balance: 1n }
-                        }
-                    },
-                    [Version.v6b]: {
-                        [Token.LOKI]: {
+                        [Token.XPOW]: {
                             moe: { balance: 1n }
                         }
                     },
                     [Version.v3a]: {
-                        [Token.THOR]: {
-                            sov: { balance: 1n }
-                        }
-                    },
-                    [Version.v6b]: {
-                        [Token.LOKI]: {
+                        [Token.XPOW]: {
                             sov: { balance: 1n }
                         }
                     },
                     [Version.v4a]: {
-                        [Token.THOR]: {
-                            nft: { [1202100]: { balance: 1n} }
-                        }
-                    },
-                    [Version.v6b]: {
-                        [Token.LOKI]: {
-                            nft: { [1202100]: { balance: 1n} }
+                        [Token.XPOW]: {
+                            nft: { [2202100]: { balance: 1n} }
                         }
                     },
                 }
@@ -110,43 +80,23 @@ describe('version-by', () => {
             history: {
                 items: {
                     [Version.v2a]: {
-                        [Token.THOR]: {
-                            moe: { balance: 1n }
-                        }
-                    },
-                    [Version.v6b]: {
-                        [Token.LOKI]: {
+                        [Token.XPOW]: {
                             moe: { balance: 1n }
                         }
                     },
                     [Version.v3a]: {
-                        [Token.THOR]: {
-                            sov: { balance: 1n }
-                        }
-                    },
-                    [Version.v6b]: {
-                        [Token.LOKI]: {
+                        [Token.XPOW]: {
                             sov: { balance: 1n }
                         }
                     },
                     [Version.v4a]: {
-                        [Token.THOR]: {
-                            nft: { [1202100]: { balance: 1n} }
-                        }
-                    },
-                    [Version.v6b]: {
-                        [Token.LOKI]: {
-                            nft: { [1202100]: { balance: 1n} }
+                        [Token.XPOW]: {
+                            nft: { [2202100]: { balance: 1n} }
                         }
                     },
                     [Version.v5a]: {
-                        [Token.THOR]: {
-                            ppt: { [1202100]: { balance: 1n} }
-                        }
-                    },
-                    [Version.v6b]: {
-                        [Token.LOKI]: {
-                            ppt: { [1202100]: { balance: 1n} }
+                        [Token.XPOW]: {
+                            ppt: { [2202100]: { balance: 1n} }
                         }
                     },
                 }

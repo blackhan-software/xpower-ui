@@ -9,7 +9,7 @@ import { Nonces, Empty, Token } from '../types';
 describe('Store w/nonces-reducer', () => {
     const account = BigInt('0xabcd');
     const block_hash = BigInt('0xb10c');
-    const token = Token.THOR;
+    const token = Token.XPOW;
     it('should add a nonce', () => {
         const state_0 = Empty<Nonces>();
         const state_1 = noncesReducer(state_0, addNonce('0xffff', {

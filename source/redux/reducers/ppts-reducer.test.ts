@@ -7,7 +7,7 @@ import { removePpt } from '../actions';
 import { Nfts, Empty } from '../types';
 
 describe('Store w/ppts-reducer (set)', () => {
-    const id = '1202103';
+    const id = '2202103';
     it('should set 1 ppt', () => {
         const state_0 = Empty<Nfts>();
         const state_1 = pptsReducer(state_0, setPpt(id, {
@@ -145,7 +145,7 @@ describe('Store w/ppts-reducer (add)', () => {
     });
 });
 describe('Store w/ppts-reducer (remove)', () => {
-    const id = '3202109';
+    const id = '2202109';
     it('should remove 1 ppt (w/rel. supply)', () => {
         const state_0 = Empty<Nfts>();
         const state_1 = pptsReducer(state_0, addPpt(id, {

@@ -8,7 +8,7 @@ import { AppState } from '../store';
 import { Token } from '../types';
 
 describe('onAftWalletIncreased', () => {
-    const token = Token.THOR;
+    const token = Token.XPOW;
     it('should invoke handler (for increaseAftWallet)', () => {
         const reducer = combineReducers({
             aft_wallet: aftWalletReducer
@@ -19,7 +19,7 @@ describe('onAftWalletIncreased', () => {
             })
         });
         onAftWalletIncreased(store as Store<AppState, AnyAction>, (t, i) => {
-            expect(t).toEqual(Token.THOR);
+            expect(t).toEqual(Token.XPOW);
             expect(i.amount).toEqual(1n);
             expect(i.supply).toEqual(2n);
         });
@@ -29,7 +29,7 @@ describe('onAftWalletIncreased', () => {
     });
 });
 describe('onAftWalletDecreased', () => {
-    const token = Token.LOKI;
+    const token = Token.XPOW;
     it('should invoke handler (for decreaseAftWallet)', () => {
         const reducer = combineReducers({
             aft_wallet: aftWalletReducer
@@ -40,7 +40,7 @@ describe('onAftWalletDecreased', () => {
             })
         });
         onAftWalletDecreased(store as Store<AppState, AnyAction>, (t, i) => {
-            expect(t).toEqual(Token.LOKI);
+            expect(t).toEqual(Token.XPOW);
             expect(i.amount).toEqual(1n);
             expect(i.supply).toEqual(3n);
         });

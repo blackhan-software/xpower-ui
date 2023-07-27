@@ -5,14 +5,8 @@ import { Blockchain, ChainId } from '../../source/blockchain';
 import { Alert, alert, Alerts } from '../../source/functions';
 import { Token, TokenInfo } from '../../source/redux/types';
 
-$('button.add-moe.thor').on('click', (e) => addToken(e, {
-    token: Token.THOR
-}));
-$('button.add-moe.loki').on('click', (e) => addToken(e, {
-    token: Token.LOKI
-}));
-$('button.add-moe.odin').on('click', (e) => addToken(e, {
-    token: Token.ODIN
+$('button.add-moe.xpow').on('click', (e) => addToken(e, {
+    token: Token.XPOW
 }));
 async function addToken(
     ev: JQuery.TriggeredEvent, { token }: { token: Token }

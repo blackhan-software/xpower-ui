@@ -4,16 +4,10 @@ import { Version } from '../../types';
 import { Account } from './base';
 
 export enum Token {
-    THOR = 'THOR',
-    LOKI = 'LOKI',
-    ODIN = 'ODIN',
-    HELA = 'HELA',
+    XPOW = 'XPOW',
 }
 export enum Token {
-    aTHOR = 'aTHOR',
-    aLOKI = 'aLOKI',
-    aODIN = 'aODIN',
-    aHELA = 'aHELA',
+    APOW = 'APOW',
 }
 export function XTokens(): Set<Token> {
     const ref = Token as typeof Token & {
@@ -21,7 +15,7 @@ export function XTokens(): Set<Token> {
     };
     if (ref._xxx === undefined) {
         ref._xxx = new Set(Object.values(Token).filter((t) => {
-            return !t.startsWith('a');
+            return !t.startsWith('A');
         }));
     }
     return ref._xxx;
@@ -32,7 +26,7 @@ export function ATokens(): Set<Token> {
     };
     if (ref._aaa === undefined) {
         ref._aaa = new Set(Object.values(Token).filter((t) => {
-            return t.startsWith('a');
+            return t.startsWith('A');
         }));
     }
     return ref._aaa;

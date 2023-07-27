@@ -20,42 +20,16 @@ $('button.approve-sov-allowance').on(
     'click', async function approveTokens(e) {
         const $approve = $(e.currentTarget);
         const $migrate = $approve.parents('form.sov-migrate');
-        if ($approve.hasClass('thor')) {
-            await moeApproveOld(Token.THOR, {
+        if ($approve.hasClass('xpow')) {
+            await moeApproveOld(Token.XPOW, {
                 $approve
             });
-            await moeApproveNew(Token.THOR, {
+            await moeApproveNew(Token.XPOW, {
                 $approve
             });
-            await sovApproveOld(Token.THOR, {
+            await sovApproveOld(Token.XPOW, {
                 $approve, $migrate: $migrate.find(
-                    '.sov-migrate.thor'
-                )
-            });
-        }
-        if ($approve.hasClass('loki')) {
-            await moeApproveOld(Token.LOKI, {
-                $approve
-            });
-            await moeApproveNew(Token.LOKI, {
-                $approve
-            });
-            await sovApproveOld(Token.LOKI, {
-                $approve, $migrate: $migrate.find(
-                    '.sov-migrate.loki'
-                )
-            });
-        }
-        if ($approve.hasClass('odin')) {
-            await moeApproveNew(Token.ODIN, {
-                $approve
-            });
-            await moeApproveOld(Token.ODIN, {
-                $approve
-            });
-            await sovApproveOld(Token.ODIN, {
-                $approve, $migrate: $migrate.find(
-                    '.sov-migrate.odin'
+                    '.sov-migrate.xpow'
                 )
             });
         }
@@ -257,14 +231,8 @@ async function sovApproveOld(token: Token, { $approve, $migrate }: {
 $('button.sov-migrate').on(
     'click', async function migrateTokens(e) {
         const $migrate = $(e.currentTarget);
-        if ($migrate.hasClass('thor')) {
-            await sovMigrateOld(Token.THOR, { $migrate });
-        }
-        if ($migrate.hasClass('loki')) {
-            await sovMigrateOld(Token.LOKI, { $migrate });
-        }
-        if ($migrate.hasClass('odin')) {
-            await sovMigrateOld(Token.ODIN, { $migrate });
+        if ($migrate.hasClass('xpow')) {
+            await sovMigrateOld(Token.XPOW, { $migrate });
         }
     }
 );

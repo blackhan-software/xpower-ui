@@ -10,7 +10,7 @@ import { Token } from '../types';
 describe('onNonceAdded', () => {
     const account = BigInt('0xabcd');
     const block_hash = BigInt('0xb10c');
-    const token = Token.THOR;
+    const token = Token.XPOW;
     it('should invoke handler (for addNonce)', () => {
         const reducer = combineReducers({
             nonces: noncesReducer
@@ -27,7 +27,7 @@ describe('onNonceAdded', () => {
             expect(i.account).toEqual(account);
             expect(i.amount).toEqual(1n);
             expect(i.block_hash).toEqual(block_hash);
-            expect(i.token).toEqual(Token.THOR);
+            expect(i.token).toEqual(Token.XPOW);
             expect(t_by).toEqual(1n);
             expect(t).toEqual(1n);
         });
@@ -39,7 +39,7 @@ describe('onNonceAdded', () => {
 describe('onNonceRemoved', () => {
     const account = BigInt('0xabcd');
     const block_hash = BigInt('0xb10c');
-    const token = Token.THOR;
+    const token = Token.XPOW;
     it('should invoke handler (for removeNonce)', () => {
         const reducer = combineReducers({
             nonces: noncesReducer
@@ -56,7 +56,7 @@ describe('onNonceRemoved', () => {
             expect(i.account).toEqual(account);
             expect(i.amount).toEqual(1n);
             expect(i.block_hash).toEqual(block_hash);
-            expect(i.token).toEqual(Token.THOR);
+            expect(i.token).toEqual(Token.XPOW);
             expect(t_by).toEqual(0n);
             expect(t).toEqual(0n);
         });
@@ -83,7 +83,7 @@ describe('onNonceRemoved', () => {
             expect(i.account).toEqual(account);
             expect(i.amount).toEqual(1n);
             expect(i.block_hash).toEqual(block_hash);
-            expect(i.token).toEqual(Token.THOR);
+            expect(i.token).toEqual(Token.XPOW);
             expect(t_by).toEqual(0n);
             expect(t).toEqual(0n);
         });

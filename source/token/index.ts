@@ -1,16 +1,10 @@
 import { Amount, Level, Token } from '../redux/types';
 
 enum TokenLower {
-    THOR = 'thor',
-    LOKI = 'loki',
-    ODIN = 'odin',
-    HELA = 'hela',
+    XPOW = 'xpow',
 }
 enum TokenLower {
-    aTHOR = 'athor',
-    aLOKI = 'aloki',
-    aODIN = 'aodin',
-    aHELA = 'ahela',
+    APOW = 'apow',
 }
 export class Tokenizer {
     public static token(value: string | bigint | number | null): Token {
@@ -18,141 +12,76 @@ export class Tokenizer {
             const suffix = value.match(/^xpow[._]/i)
                 ? value.replace('.', '_').split('_')[1] : value;
             switch (suffix.toLowerCase()) {
-                case 'thor':
-                    return Token.THOR;
-                case 'loki':
-                    return Token.LOKI;
-                case 'odin':
-                    return Token.ODIN;
-                case 'hela':
-                    return Token.HELA;
-                case 'athor':
-                    return Token.aTHOR;
-                case 'aloki':
-                    return Token.aLOKI;
-                case 'aodin':
-                    return Token.aODIN;
-                case 'ahela':
-                    return Token.aHELA;
+                case 'xpow':
+                    return Token.XPOW;
+                case 'apow':
+                    return Token.APOW;
             }
         }
         if (typeof value === 'number' || typeof value === 'bigint') {
             switch (Number(value)) {
-                case 1: return Token.THOR;
-                case 2: return Token.LOKI;
-                case 3: return Token.ODIN;
-                case 4: return Token.HELA;
+                case 2: return Token.XPOW;
             }
         }
-        return Token.THOR;
+        return Token.XPOW;
     }
     public static lower(token: Token): TokenLower {
         switch (token) {
-            case Token.THOR:
-                return TokenLower.THOR;
-            case Token.LOKI:
-                return TokenLower.LOKI;
-            case Token.ODIN:
-                return TokenLower.ODIN;
-            case Token.HELA:
-                return TokenLower.HELA;
-            case Token.aTHOR:
-                return TokenLower.aTHOR;
-            case Token.aLOKI:
-                return TokenLower.aLOKI;
-            case Token.aODIN:
-                return TokenLower.aODIN;
-            case Token.aHELA:
-                return TokenLower.aHELA;
+            case Token.XPOW:
+                return TokenLower.XPOW;
+            case Token.APOW:
+                return TokenLower.APOW;
         }
     }
     public static amount(token: Token, level: Level): Amount {
         switch (this.xify(token)) {
-            case Token.THOR:
-                return BigInt(level);
-            case Token.LOKI:
+            case Token.XPOW:
                 return 2n ** BigInt(level) - 1n;
-            case Token.ODIN:
-                return 16n ** BigInt(level) - 1n;
-            case Token.HELA:
+            default:
                 throw new Error('not applicable');
         }
     }
     public static level(token: Token, amount: Amount): Level {
         switch (this.xify(token)) {
-            case Token.THOR:
-                return Number(amount);
-            case Token.LOKI:
+            case Token.XPOW:
                 return (amount + 1n).toString(2).length - 1;
-            case Token.ODIN:
-                return (amount + 1n).toString(16).length - 1;
-            case Token.HELA:
+            default:
                 throw new Error('not applicable');
         }
     }
     public static xify(token: Token) {
         switch (token) {
-            case Token.THOR:
-            case Token.aTHOR:
-                return Token.THOR;
-            case Token.LOKI:
-            case Token.aLOKI:
-                return Token.LOKI;
-            case Token.ODIN:
-            case Token.aODIN:
-                return Token.ODIN;
-            case Token.HELA:
-            case Token.aHELA:
-                return Token.HELA;
+            case Token.XPOW:
+            case Token.APOW:
+                return Token.XPOW;
         }
     }
     public static xified(token: Token) {
         switch (token) {
-            case Token.THOR:
-            case Token.LOKI:
-            case Token.ODIN:
-            case Token.HELA:
+            case Token.XPOW:
                 return true;
         }
         return false;
     }
     public static aify(token: Token) {
         switch (token) {
-            case Token.THOR:
-            case Token.aTHOR:
-                return Token.aTHOR;
-            case Token.LOKI:
-            case Token.aLOKI:
-                return Token.aLOKI;
-            case Token.ODIN:
-            case Token.aODIN:
-                return Token.aODIN;
-            case Token.HELA:
-            case Token.aHELA:
-                return Token.aHELA;
+            case Token.XPOW:
+            case Token.APOW:
+                return Token.APOW;
         }
     }
     public static aified(token: Token) {
         switch (token) {
-            case Token.aTHOR:
-            case Token.aLOKI:
-            case Token.aODIN:
-            case Token.aHELA:
+            case Token.APOW:
                 return true;
         }
         return false;
     }
     public static slug(token: Token) {
         switch (token) {
-            case Token.THOR:
-            case Token.LOKI:
-            case Token.ODIN:
-            case Token.HELA:
+            case Token.XPOW:
                 return 'MOE';
-            case Token.aTHOR:
-            case Token.aLOKI:
-            case Token.aODIN:
-            case Token.aHELA:
+            case Token.APOW:
                 return 'SOV';
         }
     }

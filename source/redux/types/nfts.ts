@@ -19,28 +19,13 @@ export class Nft {
             return memo;
         }
         switch (id.toUpperCase()) {
-            case Token.THOR:
-            case Token.aTHOR.toUpperCase():
-                return this._token[id] = NftToken.THOR;
-            case Token.LOKI:
-            case Token.aLOKI.toUpperCase():
-                return this._token[id] = NftToken.LOKI;
-            case Token.ODIN:
-            case Token.aODIN.toUpperCase():
-                return this._token[id] = NftToken.ODIN;
-            case Token.HELA:
-            case Token.aHELA.toUpperCase():
-                return this._token[id] = NftToken.HELA;
+            case Token.XPOW:
+            case Token.APOW.toUpperCase():
+                return this._token[id] = NftToken.XPOW;
         }
         switch (parseInt(id[0])) {
-            case NftToken.THOR:
-                return this._token[id] = NftToken.THOR;
-            case NftToken.LOKI:
-                return this._token[id] = NftToken.LOKI;
-            case NftToken.ODIN:
-                return this._token[id] = NftToken.ODIN;
-            case NftToken.HELA:
-                return this._token[id] = NftToken.HELA;
+            case NftToken.XPOW:
+                return this._token[id] = NftToken.XPOW;
         }
         throw new Error(`unknown token for "${id}"`);
     }
@@ -139,17 +124,11 @@ export type NftCoreId = `${NftIssue}${NftLevel}`;
 export type NftRealId = NftFullId | NftCoreId;
 export type NftIssue = Year;
 export enum NftToken {
-    THOR = 1,
-    LOKI = 2,
-    ODIN = 3,
-    HELA = 4,
+    XPOW = 2,
 }
 export type NftTokens = keyof typeof NftToken;
 export function* NftTokens() {
-    yield NftToken.THOR;
-    yield NftToken.LOKI;
-    yield NftToken.ODIN;
-    yield NftToken.HELA;
+    yield NftToken.XPOW;
 }
 export enum NftLevel {
     UNIT = 0,

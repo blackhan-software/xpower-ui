@@ -4,7 +4,7 @@ import { Rates } from '../types/rates';
 import { ratesReducer } from './rates-reducer';
 
 describe('Store w/rates-reducer (set)', () => {
-    const t = Token.THOR;
+    const t = Token.XPOW;
     const l = NftLevel.KILO;
     it('should set-apr', () => {
         const state_0 = Empty<Rates>();

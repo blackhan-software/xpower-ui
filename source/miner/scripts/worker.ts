@@ -283,27 +283,11 @@ function amount(
     token: Token, level: Level
 ) {
     switch (token) {
-        case Token.THOR:
-            return (hash: Uint8Array) => {
-                const lhs_zeros = zeros(hash);
-                if (lhs_zeros >= level) {
-                    return BigInt(lhs_zeros);
-                }
-                return 0n;
-            };
-        case Token.LOKI:
+        case Token.XPOW:
             return (hash: Uint8Array) => {
                 const lhs_zeros = zeros(hash);
                 if (lhs_zeros >= level) {
                     return 2n ** BigInt(lhs_zeros) - 1n;
-                }
-                return 0n;
-            };
-        case Token.ODIN:
-            return (hash: Uint8Array) => {
-                const lhs_zeros = zeros(hash);
-                if (lhs_zeros >= level) {
-                    return 16n ** BigInt(lhs_zeros) - 1n;
                 }
                 return 0n;
             };
@@ -505,15 +489,11 @@ function abi_encoder(
             return encoder_v7c;
     }
     function symbol_v2c(token: Token) {
-        if (token === Token.THOR) return 'XPOW.CPU';
-        if (token === Token.LOKI) return 'XPOW.GPU';
-        if (token === Token.ODIN) return 'XPOW.ASIC';
+        if (token === Token.XPOW) return 'XPOW.GPU';
         return 'XPOW';
     }
     function symbol_v3b(token: Token) {
-        if (token === Token.THOR) return 'PARA';
-        if (token === Token.LOKI) return 'AQCH';
-        if (token === Token.ODIN) return 'QRSH';
+        if (token === Token.XPOW) return 'AQCH';
         return 'XPOW';
     }
 }
