@@ -93,13 +93,20 @@ export class Nft {
         return `${token}${issue}${level}`;
     }
     static realIds(
-        ids: NftFullId[] | NftRealId[], { version } = { version: ROParams.version }
+        ids: NftFullId[] | NftRealId[], { version }: { version?: Version } = {
+            version: undefined
+        }
     ): NftRealId[] {
         return ids.map((id) => this.realId(id, { version }));
     }
     static realId(
-        id: NftFullId | NftRealId, { version } = { version: ROParams.version }
+        id: NftFullId | NftRealId, { version }: { version?: Version } = {
+            version: undefined
+        }
     ): NftRealId {
+        if (version === undefined) {
+            version = ROParams.version;
+        }
         return version < Version.v6a && !ROParams.versionFaked
             ? id.slice(-6) as NftCoreId : id;
     }

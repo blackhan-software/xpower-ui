@@ -65,7 +65,7 @@ export function TokenInfo(
             `g-${xtoken}_MOE_IMAGE`
         );
         return {
-            address: BigInt($moe?.dataset.value as string),
+            address: BigInt($moe?.dataset.value ?? '0x0'),
             decimals: version < Version.v5a ? 0 : 18,
             image: String($image?.dataset.value),
             symbol: Tokenizer.xify(token),
@@ -79,7 +79,7 @@ export function TokenInfo(
             `g-${xtoken}_SOV_IMAGE`
         );
         return {
-            address: BigInt($sov?.dataset.value as string),
+            address: BigInt($sov?.dataset.value ?? '0x0'),
             decimals: 18,
             image: String($image?.dataset.value),
             symbol: Tokenizer.aify(token),
@@ -98,7 +98,7 @@ export function NFTokenInfo(
         `g-${slug}_NFT_${version}`
     );
     return {
-        address: BigInt($nft?.dataset.value as string),
+        address: BigInt($nft?.dataset.value ?? '0x0'),
     };
 }
 export function PPTokenInfo(
@@ -113,6 +113,6 @@ export function PPTokenInfo(
         `g-${slug}_PPT_${version}`
     );
     return {
-        address: BigInt($sov?.dataset.value as string),
+        address: BigInt($sov?.dataset.value ?? '0x0'),
     };
 }
