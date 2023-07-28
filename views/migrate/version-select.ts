@@ -3,7 +3,7 @@ import './version-select.scss';
 import { Blockchain } from '../../source/blockchain';
 import { nice_si, x40, zip } from '../../source/functions';
 import { ROParams, RWParams } from '../../source/params';
-import { Account, Balance, Nft, NftLevels, Token } from '../../source/redux/types';
+import { Account, Balance, Nft, NftLevels, Token, TokenInfo } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { Version, Versions } from '../../source/types';
 import { MoeWallet, NftWallet, PptWallet, SovWallet } from '../../source/wallet';
@@ -81,12 +81,16 @@ function set_balances(
         `#version-select>option[value=${version}]`
     );
     const xtoken = Tokenizer.xify(token);
-    const moe_text
-        = `${xtoken}=${nice_si(balance.moe, { base: 1e18 })}`;
     const atoken = Tokenizer.aify(token);
-    const sov_text
-        = `${atoken}=${nice_si(balance.sov, { base: 1e18 })}`;
     const ntoken = 'NFTs';
+    const { decimals: moe_decimals } = TokenInfo(xtoken, version);
+    const { decimals: sov_decimals } = TokenInfo(atoken, version);
+    const moe_base = 10 ** moe_decimals;
+    const sov_base = 10 ** sov_decimals;
+    const moe_text
+        = `${xtoken}=${nice_si(balance.moe, { base: moe_base })}`;
+    const sov_text
+        = `${atoken}=${nice_si(balance.sov, { base: sov_base })}`;
     const nft_text
         = `${ntoken}=${nice_si(balance.nft)}`;
     const opt_text = $option.text()
