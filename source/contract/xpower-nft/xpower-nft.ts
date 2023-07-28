@@ -2,7 +2,7 @@ import { InterfaceAbi, Transaction } from 'ethers';
 import { x40 } from '../../functions';
 import { ROParams } from '../../params';
 import { Account, Address, Amount, Index, NftIssue, NftLevel, NftRealId } from '../../redux/types';
-import { Version } from '../../types';
+import { Version, VersionAt } from '../../types';
 import { OtfManager } from '../../wallet';
 import { Base } from '../base';
 
@@ -12,6 +12,9 @@ export class XPowerNft extends Base {
     public constructor(
         address: Address, abi: InterfaceAbi = ABI
     ) {
+        if (ROParams.version < VersionAt(-1) && !ROParams.versionFaked) {
+            abi = require(`./xpower-nft.abi.${ROParams.version}.json`);
+        }
         super(address, abi);
     }
     async mint(
