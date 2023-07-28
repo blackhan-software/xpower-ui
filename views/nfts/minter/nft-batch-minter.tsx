@@ -1,5 +1,6 @@
+import { ROParams } from '../../../source/params';
 import { AppState } from '../../../source/redux/store';
-import { NftMinterList, NftMinterStatus, Token } from '../../../source/redux/types';
+import { NftMinterList, NftMinterStatus, Token, TokenInfo } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
 
 import React, { useContext } from 'react';
@@ -80,9 +81,13 @@ function inRange(
     return true;
 }
 function exRange(
-    list: NftMinterList, state: AppState | null, base = 10n ** 18n
+    list: NftMinterList, state: AppState | null
 ) {
     if (state) {
+        const { decimals } = TokenInfo(
+            state.token, ROParams.version
+        );
+        const base = 10n ** BigInt(decimals);
         const xtoken = Tokenizer.xify(state.token);
         const wallet = state.aft_wallet.items[xtoken];
         if (wallet) {

@@ -1,6 +1,7 @@
 import { mobile } from '../../../source/functions';
+import { ROParams } from '../../../source/params';
 import { AppState } from '../../../source/redux/store';
-import { Amount, Nft, NftLevel } from '../../../source/redux/types';
+import { Amount, Nft, NftLevel, TokenInfo } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
 
 import React, { KeyboardEvent, MouseEvent, TouchEvent, useContext, useEffect, useRef } from 'react';
@@ -156,9 +157,13 @@ function inRange(
     return min1 <= amount1;
 }
 function exRange(
-    { amount1 }: Props, state: AppState | null, base = 10n ** 18n
+    { amount1 }: Props, state: AppState | null
 ) {
     if (amount1 && state) {
+        const { decimals } = TokenInfo(
+            state.token, ROParams.version
+        );
+        const base = 10n ** BigInt(decimals);
         const xtoken = Tokenizer.xify(state.token);
         const wallet = state.aft_wallet.items[xtoken];
         if (wallet && wallet.amount > base) {
