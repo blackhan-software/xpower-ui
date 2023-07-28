@@ -1,13 +1,14 @@
 import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
 import { buffered, x40 } from '../functions';
+import { ROParams } from '../params';
 import { setAftWallet, setOtfWalletAccount, setOtfWalletAmount } from '../redux/actions';
 import { atokenOf, otfWalletOf, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { Tokenizer } from '../token';
 import { MoeWallet, OnTransfer, OtfManager, SovWallet } from '../wallet';
 
-export const WalletService = (
+const MoeWalletService = (
     store: Store<AppState>
 ) => {
     Blockchain.onceConnect(async function initMoeWallet({
@@ -20,20 +21,6 @@ export const WalletService = (
         ]);
         store.dispatch(setAftWallet(
             xtoken, { amount: a, supply: s, collat: c }
-        ));
-    }, {
-        per: () => xtokenOf(store.getState())
-    });
-    Blockchain.onceConnect(async function initSovWallet({
-        account, token
-    }) {
-        const atoken = Tokenizer.aify(token);
-        const sov_wallet = new SovWallet(account, atoken);
-        const [a, s, c] = await Promise.all([
-            sov_wallet.balance, sov_wallet.supply, sov_wallet.collat
-        ]);
-        store.dispatch(setAftWallet(
-            atoken, { amount: a, supply: s, collat: c }
         ));
     }, {
         per: () => xtokenOf(store.getState())
@@ -65,6 +52,24 @@ export const WalletService = (
     }, {
         per: () => xtokenOf(store.getState())
     });
+}
+const SovWalletService = (
+    store: Store<AppState>
+) => {
+    Blockchain.onceConnect(async function initSovWallet({
+        account, token
+    }) {
+        const atoken = Tokenizer.aify(token);
+        const sov_wallet = new SovWallet(account, atoken);
+        const [a, s, c] = await Promise.all([
+            sov_wallet.balance, sov_wallet.supply, sov_wallet.collat
+        ]);
+        store.dispatch(setAftWallet(
+            atoken, { amount: a, supply: s, collat: c }
+        ));
+    }, {
+        per: () => xtokenOf(store.getState())
+    });
     Blockchain.onceConnect(function syncSovWallet({
         account, token
     }) {
@@ -92,6 +97,10 @@ export const WalletService = (
     }, {
         per: () => xtokenOf(store.getState())
     });
+}
+const OtfWalletService = (
+    store: Store<AppState>
+) => {
     Blockchain.onceConnect(async function initOtfWallet() {
         const otf_wallet = await OtfManager.init();
         const [otf_address, otf_balance] = await Promise.all([
@@ -119,5 +128,18 @@ export const WalletService = (
             }
         }
     });
+}
+export const WalletService = (
+    store: Store<AppState>
+) => {
+    if (ROParams.service('moe-wallet')) {
+        MoeWalletService(store);
+    }
+    if (ROParams.service('sov-wallet')) {
+        SovWalletService(store);
+    }
+    if (ROParams.service('otf-wallet')) {
+        OtfWalletService(store);
+    }
 }
 export default WalletService;
