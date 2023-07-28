@@ -1,7 +1,7 @@
 import { Contract, Transaction } from 'ethers';
 import { x40 } from '../functions';
 import { Account, Address, Amount, Balance, Nft, NftFullId, NftIssue, NftLevel, NftRealId, NftToken, Supply, Token } from '../redux/types';
-import { TxEvent } from '../types';
+import { TxEvent, Version } from '../types';
 
 export type OnTransferBatch = (
     operator: Account,
@@ -33,7 +33,7 @@ export type Meta = {
 };
 export abstract class ERC1155Wallet {
     constructor(
-        account: Account | Address, token: Token
+        account: Account | Address, token: Token, version: Version
     ) {
         if (typeof account === 'bigint') {
             this._account = x40(account);
@@ -48,21 +48,30 @@ export abstract class ERC1155Wallet {
         }
         this._nftToken = Nft.token(token);
         this._token = token;
+        this._version = version;
     }
     async balance(
-        id: NftFullId
+        full_id: NftFullId
     ): Promise<Balance> {
+        const real_id = Nft.realId(full_id, {
+            version: this._version
+        });
         return this.get.then(
-            (c) => c.balanceOf(this._account, Nft.realId(id))
+            (c) => c.balanceOf(this._account, real_id)
         );
     }
     async balances({ issues, levels, token }: {
         issues: NftIssue[], levels: NftLevel[], token: NftToken
     }): Promise<Balance[]> {
-        const ids = Nft.fullIds({ issues, levels, token });
-        const addresses = ids.map(() => this._account);
+        const full_ids = Nft.fullIds({
+            issues, levels, token
+        });
+        const real_ids = Nft.realIds(full_ids, {
+            version: this._version
+        });
+        const addresses = full_ids.map(() => this._account);
         const balances: Balance[] = await this.get.then(
-            (c) => c.balanceOfBatch(addresses, Nft.realIds(ids))
+            (c) => c.balanceOfBatch(addresses, real_ids)
         );
         return balances;
     }
@@ -106,13 +115,16 @@ export abstract class ERC1155Wallet {
         }
     }
     async safeTransfer(
-        to: Account | Address, id: NftFullId, amount: Amount
+        to: Account | Address, full_id: NftFullId, amount: Amount
     ): Promise<Transaction> {
         if (typeof to === 'bigint') {
             to = x40(to);
         }
+        const real_id = Nft.realId(full_id, {
+            version: this._version
+        });
         return this.put.then((c) => c.safeTransferFrom(
-            this._account, to, Nft.realId(id), amount, []
+            this._account, to, real_id, amount, []
         ));
     }
     onTransferSingle(
@@ -146,13 +158,16 @@ export abstract class ERC1155Wallet {
         }
     }
     async safeBatchTransfer(
-        to: Account | Address, ids: NftFullId[], amounts: Amount[]
+        to: Account | Address, full_ids: NftFullId[], amounts: Amount[]
     ): Promise<Transaction> {
         if (typeof to === 'bigint') {
             to = x40(to);
         }
+        const real_ids = Nft.realIds(full_ids, {
+            version: this._version
+        });
         return this.put.then((c) => c.safeBatchTransferFrom(
-            this._account, to, Nft.realIds(ids), amounts, []
+            this._account, to, real_ids, amounts, []
         ));
     }
     onTransferBatch(
@@ -187,29 +202,38 @@ export abstract class ERC1155Wallet {
         }
     }
     async uri(
-        id: NftFullId | Promise<NftFullId>
+        full_id: NftFullId | Promise<NftFullId>
     ): Promise<string> {
+        const real_id = Nft.realId(await full_id, {
+            version: this._version
+        });
         return this.get.then(
-            async (c) => c.uri(Nft.realId(await id))
+            async (c) => c.uri(real_id)
         );
     }
     async meta(
-        id: NftFullId | Promise<NftFullId>
+        full_id: NftFullId | Promise<NftFullId>
     ): Promise<Meta> {
-        let meta = this._meta[id.toString()];
+        let meta = this._meta[full_id.toString()];
         if (typeof meta === 'undefined') {
-            const nft_uri = await this.uri(id);
-            const uri = nft_uri.replace(/{id}/g, Nft.realId(await id));
+            const real_id = Nft.realId(await full_id, {
+                version: this._version
+            });
+            const nft_uri = await this.uri(full_id);
+            const uri = nft_uri.replace(/{id}/g, real_id);
             meta = await fetch(uri).then((res) => res.json());
-            this._meta[id.toString()] = meta;
+            this._meta[full_id.toString()] = meta;
         }
         return meta;
     }
     async totalSupply(
-        id: NftFullId | Promise<NftFullId>
+        full_id: NftFullId | Promise<NftFullId>
     ): Promise<Supply> {
+        const real_id = Nft.realId(await full_id, {
+            version: this._version
+        });
         const supply: Supply = await this.get.then(
-            async (c) => c.totalSupply(Nft.realId(await id))
+            async (c) => c.totalSupply(real_id)
         );
         return supply;
     }
@@ -217,14 +241,16 @@ export abstract class ERC1155Wallet {
         issues: NftIssue[], levels: NftLevel[], token: NftToken
     }): Promise<Supply[]> {
         return Promise.all(Array.from(totalSupplies(
-            this.get, { issues, levels, token }
+            this.get, { issues, levels, token }, this._version
         )));
     }
     get account(): Account {
         return BigInt(this._account);
     }
     get address(): Promise<Address> {
-        return this.get.then((c) => c.getAddress() as Promise<Address>);
+        return this.get.then(
+            (c) => c.getAddress() as Promise<Address>
+        );
     }
     get nftToken(): NftToken {
         return this._nftToken;
@@ -238,17 +264,24 @@ export abstract class ERC1155Wallet {
     private readonly _meta: Record<string, Meta> = {};
     private readonly _nftToken: NftToken;
     private readonly _token: Token;
+    private readonly _version: Version;
 }
 function* totalSupplies(
-    nft: Promise<Contract>, { issues, levels, token }: {
-        issues: NftIssue[], levels: NftLevel[], token: NftToken
-    }
+    nft: Promise<Contract>, {
+        issues, levels, token
+    }: {
+        issues: NftIssue[],
+        levels: NftLevel[],
+        token: NftToken
+    },
+    version: Version
 ): Generator<Promise<Supply>> {
     const full_ids = Nft.fullIds({
         issues, levels, token
     });
-    for (const id of full_ids) {
-        yield nft.then((c) => c.totalSupply(Nft.realId(id)));
+    for (const full_id of full_ids) {
+        const real_id = Nft.realId(full_id, { version });
+        yield nft.then((c) => c.totalSupply(real_id));
     }
 }
 export default ERC1155Wallet;

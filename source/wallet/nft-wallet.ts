@@ -11,7 +11,7 @@ export class NftWallet extends ERC1155Wallet {
     constructor(
         account: Account | Address, token: Token, version?: Version
     ) {
-        super(account, token);
+        super(account, token, version ?? ROParams.version);
         this._nft = XPowerNftFactory({ token, version });
     }
     mint(

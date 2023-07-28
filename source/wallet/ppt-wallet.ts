@@ -1,5 +1,6 @@
 import { MYProvider } from '../blockchain';
 import { XPowerPpt, XPowerPptFactory, XPowerPptMockFactory } from '../contract';
+import { ROParams } from '../params';
 import { Account, Address, Nft, NftFullId, NftLevel, NftRealId, Token, Year } from '../redux/types';
 import { Version } from '../types';
 import { ERC1155Wallet } from './erc1155-wallet';
@@ -8,7 +9,7 @@ export class PptWallet extends ERC1155Wallet {
     constructor(
         account: Account | Address, token: Token, version?: Version
     ) {
-        super(account, token);
+        super(account, token, version ?? ROParams.version);
         this._ppt = XPowerPptFactory({ token, version });
     }
     async idBy(
