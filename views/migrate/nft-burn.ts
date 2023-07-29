@@ -74,7 +74,7 @@ async function burn(token: Token, { $burn }: {
             );
             reset();
         });
-        tx = await nft_source.get.then((c) => c.burnBatch(
+        tx = await nft_source.put.then((c) => c.burnBatch(
             x40(account), Nft.realIds(zz.ids, { version: src_version }), zz.balances
         ));
     } catch (ex: any) {
