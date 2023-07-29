@@ -10,11 +10,6 @@
                 "internalType": "address",
                 "name": "pptLink",
                 "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "mtyLink",
-                "type": "address"
             }
         ],
         "stateMutability": "nonpayable",

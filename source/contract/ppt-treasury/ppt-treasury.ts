@@ -1,8 +1,9 @@
 import { InterfaceAbi, Transaction } from 'ethers';
 import { MYProvider } from '../../blockchain';
 import { x40 } from '../../functions';
+import { ROParams } from '../../params';
 import { Account, Address, Amount, Balance, Nft, NftRealId } from '../../redux/types';
-import { TxEvent } from '../../types';
+import { TxEvent, VersionAt } from '../../types';
 import { OtfManager } from '../../wallet';
 import { Base } from '../base';
 
@@ -37,6 +38,9 @@ export class PptTreasury extends Base {
     public constructor(
         address: Address, abi: InterfaceAbi = ABI
     ) {
+        if (ROParams.version < VersionAt(-1) && !ROParams.versionFaked) {
+            abi = require(`./ppt-treasury.abi.${ROParams.version}.json`);
+        }
         super(address, abi);
     }
     public async stake(
