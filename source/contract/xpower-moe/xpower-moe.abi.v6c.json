@@ -563,40 +563,6 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "blockHash",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
-            }
-        ],
-        "name": "hashOf",
-        "outputs": [
-            {
-                "internalType": "bytes32",
-                "name": "",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "",
-                "type": "bytes32"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
                 "name": "spender",
                 "type": "address"
             },
@@ -628,7 +594,7 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "amount",
+                "name": "oldAmount",
                 "type": "uint256"
             },
             {
@@ -657,7 +623,7 @@
             },
             {
                 "internalType": "uint256",
-                "name": "amount",
+                "name": "oldAmount",
                 "type": "uint256"
             },
             {
@@ -703,9 +669,9 @@
                 "type": "bytes32"
             },
             {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
+                "internalType": "uint256",
+                "name": "nonce",
+                "type": "uint256"
             }
         ],
         "name": "mint",
@@ -817,25 +783,6 @@
             }
         ],
         "stateMutability": "pure",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "blockHash",
-                "type": "bytes32"
-            }
-        ],
-        "name": "recent",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -1103,44 +1050,6 @@
         "name": "transferOwnership",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "pairIndex",
-                "type": "bytes32"
-            }
-        ],
-        "name": "unique",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "nonceHash",
-                "type": "bytes32"
-            }
-        ],
-        "name": "zerosOf",
-        "outputs": [
-            {
-                "internalType": "uint8",
-                "name": "",
-                "type": "uint8"
-            }
-        ],
-        "stateMutability": "pure",
         "type": "function"
     }
 ]

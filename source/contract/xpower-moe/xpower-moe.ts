@@ -2,7 +2,7 @@ import { InterfaceAbi, Transaction } from 'ethers';
 import { x40, x64 } from '../../functions';
 import { ROParams } from '../../params';
 import { Account, Address, BlockHash, Nonce } from '../../redux/types';
-import { Version } from '../../types';
+import { Version, VersionAt } from '../../types';
 import { OtfManager } from '../../wallet';
 import { Base } from '../base';
 
@@ -12,8 +12,8 @@ export class XPowerMoe extends Base {
     public constructor(
         address: Address, abi: InterfaceAbi = ABI
     ) {
-        if (ROParams.version < Version.v7c && !ROParams.versionFaked) {
-            abi = require('./xpower-moe.abi.v7b.json');
+        if (ROParams.version < VersionAt(-1) && !ROParams.versionFaked) {
+            abi = require(`./xpower-moe.abi.${ROParams.version}.json`);
         }
         super(address, abi);
     }
