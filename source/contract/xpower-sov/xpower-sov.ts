@@ -2,7 +2,7 @@ import { InterfaceAbi } from 'ethers';
 import { MYProvider } from '../../blockchain';
 import { ROParams } from '../../params';
 import { Address, Collat } from '../../redux/types';
-import { Version } from '../../types';
+import { Version, VersionAt } from '../../types';
 import { Base } from '../base';
 
 import ABI from './xpower-sov.abi.json';
@@ -11,6 +11,9 @@ export class XPowerSov extends Base {
     public constructor(
         address: Address, abi: InterfaceAbi = ABI
     ) {
+        if (ROParams.version < VersionAt(-1) && !ROParams.versionFaked) {
+            abi = require(`./xpower-sov.abi.${ROParams.version}.json`);
+        }
         super(address, abi);
     }
     public async collat(): Promise<Collat> {

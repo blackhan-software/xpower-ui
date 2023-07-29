@@ -303,19 +303,6 @@
     },
     {
         "inputs": [],
-        "name": "collateralization",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
         "name": "decimals",
         "outputs": [
             {
@@ -482,8 +469,27 @@
     {
         "inputs": [
             {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            }
+        ],
+        "name": "indexOf",
+        "outputs": [
+            {
                 "internalType": "uint256",
-                "name": "amount",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "oldAmount",
                 "type": "uint256"
             },
             {
@@ -512,7 +518,7 @@
             },
             {
                 "internalType": "uint256",
-                "name": "amount",
+                "name": "oldAmount",
                 "type": "uint256"
             },
             {
@@ -622,25 +628,6 @@
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "base",
-                "type": "address"
-            }
-        ],
-        "name": "oldIndexOf",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
                 "internalType": "uint256",
                 "name": "newAmount",
                 "type": "uint256"
@@ -670,19 +657,6 @@
                 "internalType": "address",
                 "name": "",
                 "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "prefix",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -746,14 +720,7 @@
     },
     {
         "inputs": [],
-        "name": "sealAll",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "seals",
+        "name": "sealedAll",
         "outputs": [
             {
                 "internalType": "bool[]",
