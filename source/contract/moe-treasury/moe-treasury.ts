@@ -3,7 +3,7 @@ import { MYProvider } from '../../blockchain';
 import { x40 } from '../../functions';
 import { ROParams } from '../../params';
 import { Account, Address, Amount, Balance, Index, Nft, NftFullId, NftRealId, NftToken, Rate } from '../../redux/types';
-import { TxEvent, Version } from '../../types';
+import { TxEvent, Version, VersionAt } from '../../types';
 import { OtfManager } from '../../wallet';
 import { Base } from '../base';
 
@@ -42,6 +42,9 @@ export class MoeTreasury extends Base {
     public constructor(
         address: Address, abi: InterfaceAbi = ABI
     ) {
+        if (ROParams.version < VersionAt(-1) && !ROParams.versionFaked) {
+            abi = require(`./moe-treasury.abi.${ROParams.version}.json`);
+        }
         super(address, abi);
     }
     public async aprs(
@@ -129,15 +132,14 @@ export class MoeTreasury extends Base {
     public async rateOf(
         ppt_id: NftRealId
     ): Promise<Rate> {
-        if (ROParams.version < Version.v6c) {
+        if (ROParams.version < Version.v6c && !ROParams.versionFaked) {
             const [apr, apr_bonus] = await Promise.all([
                 this.aprOf(ppt_id), this.aprBonusOf(ppt_id)
             ]);
             return apr + apr_bonus;
         }
         const contract = await this.get;
-        return contract
-            .rateOf(Nft.realId(ppt_id));
+        return contract.rateOf(Nft.realId(ppt_id));
     }
     public async aprOf(
         ppt_id: NftRealId
@@ -166,6 +168,9 @@ export class MoeTreasury extends Base {
     public async aprTargetOf(
         ppt_id: NftRealId
     ): Promise<Rate> {
+        if (ROParams.version < Version.v6b && !ROParams.versionFaked) {
+            return 0n;
+        }
         const contract = await this.get;
         return contract.aprTargetOf(
             Nft.realId(ppt_id)
@@ -174,6 +179,9 @@ export class MoeTreasury extends Base {
     public async aprBonusTargetOf(
         ppt_id: NftRealId
     ): Promise<Rate> {
+        if (ROParams.version < Version.v6b && !ROParams.versionFaked) {
+            return 0n;
+        }
         const contract = await this.get;
         return contract.aprBonusTargetOf(
             Nft.realId(ppt_id)
@@ -226,6 +234,9 @@ export class MoeTreasury extends Base {
     public async onRefreshRates(
         listener: OnRefresh
     ): Promise<void> {
+        if (ROParams.version < Version.v7c && !ROParams.versionFaked) {
+            return;
+        }
         const contract = await this.get;
         contract.on('RefreshRates', (
             nft_prefix: bigint, all_levels: boolean, ev: TxEvent
@@ -237,7 +248,7 @@ export class MoeTreasury extends Base {
         index: Index | Promise<Index>
     ): Promise<Balance> {
         const contract = await this.get;
-        if (ROParams.version < Version.v6b) {
+        if (ROParams.version < Version.v6b && !ROParams.versionFaked) {
             return contract.balance();
         }
         return contract.moeBalanceOf(await index);
