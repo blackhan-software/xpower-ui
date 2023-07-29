@@ -24,5 +24,11 @@ export function Versions(): Set<Version> {
     }
     return ref._set;
 }
-
+export function VersionAt(index: number): Version {
+    const versions = Array.from(Versions());
+    if (index < 0) {
+        index += versions.length;
+    }
+    return versions[index];
+}
 export default Version;
