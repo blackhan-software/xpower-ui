@@ -357,7 +357,7 @@ function abi_encoder(
             value = arrayify(template.slice(2));
             abi_encoded[interval] = value;
         }
-        value.set(nonce, 128 - nonce.length);
+        value.set(nonce, 160 - nonce.length);
         return value;
     };
     const encoder_v5b = (nonce: Uint8Array, {
@@ -369,7 +369,7 @@ function abi_encoder(
             const template = abi.encode([
                 'string', 'address', 'uint256', 'bytes32', 'uint256'
             ], [
-                token,
+                symbol_v5b(token),
                 x40(account),
                 interval,
                 x64(block_hash),
@@ -378,7 +378,7 @@ function abi_encoder(
             value = arrayify(template.slice(2));
             abi_encoded[interval] = value;
         }
-        value.set(nonce, 128 - nonce.length);
+        value.set(nonce, 160 - nonce.length);
         return value;
     };
     const encoder_v6a = (nonce: Uint8Array, {
@@ -399,10 +399,10 @@ function abi_encoder(
             value = arrayify(template.slice(2));
             abi_encoded[interval] = value;
         }
-        value.set(nonce, 128 - nonce.length);
+        value.set(nonce, 160 - nonce.length);
         return value;
     };
-    const encoder_v6b = (nonce: Uint8Array, {
+    const encoder_v7a = (nonce: Uint8Array, {
         account, block_hash, contract, interval
     }: Context) => {
         let value = abi_encoded[interval];
@@ -419,7 +419,7 @@ function abi_encoder(
             value = arrayify(template.slice(2));
             abi_encoded[interval] = value;
         }
-        value.set(nonce, 96 - nonce.length);
+        value.set(nonce, 128 - nonce.length);
         return value;
     };
     const encoder_v7b = (nonce: Uint8Array, {
@@ -482,19 +482,20 @@ function abi_encoder(
         case Version.v6b:
         case Version.v6c:
         case Version.v7a:
-            return encoder_v6b;
+            return encoder_v7a;
         case Version.v7b:
             return encoder_v7b;
         default:
             return encoder_v7c;
     }
-    function symbol_v2c(token: Token) {
-        if (token === Token.XPOW) return 'XPOW.GPU';
-        return 'XPOW';
+    function symbol_v2c(_token: Token) {
+        return 'XPOW.GPU';
     }
-    function symbol_v3b(token: Token) {
-        if (token === Token.XPOW) return 'AQCH';
-        return 'XPOW';
+    function symbol_v3b(_token: Token) {
+        return 'AQCH';
+    }
+    function symbol_v5b(_token: Token) {
+        return 'LOKI';
     }
 }
 function arrayify(
