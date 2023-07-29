@@ -14,6 +14,7 @@ import { RatesService } from './rates-service';
 import { ThemeService } from './theme-service';
 import { TooltipService } from './tooltip-service';
 import { WalletService } from './wallet-service';
+import { Version } from '../types';
 
 export default <
     S extends AppState,
@@ -40,13 +41,13 @@ export default <
     if (ROParams.service('nfts-ui')) {
         NftsUiService(store);
     }
-    if (ROParams.service('ppts')) {
+    if (ROParams.service('ppts') && ROParams.version > Version.v3b) {
         PptsService(store);
     }
-    if (ROParams.service('ppts-ui')) {
+    if (ROParams.service('ppts-ui') && ROParams.version > Version.v3b) {
         PptsUiService(store);
     }
-    if (ROParams.service('rates')) {
+    if (ROParams.service('rates') && ROParams.version > Version.v3b) {
         RatesService(store);
     }
     if (ROParams.service('theme')) {
