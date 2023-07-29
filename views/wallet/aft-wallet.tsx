@@ -74,33 +74,27 @@ function $account(
 function $sovBurner(
     { token, wallet, onBurn }: Props
 ) {
-    const amount = wallet.items[token]?.amount ?? 0n;
-    const burning = is_burning(wallet) ? 'burning' : '';
-    const disabled = amount == 0n ? 'disabled' : '';
     const outer_classes = [
-        'form-control input-group-text', disabled, burning
+        'form-control input-group-text',
+        disabled() ? 'disabled' : '',
+        burning() ? 'burning' : ''
     ];
     const inner_classes = [
         'spinner spinner-border spinner-border-sm', 'float-start'
     ];
-    return <button
+    return <button aria-label={title()}
         className={outer_classes.join(' ')}
         data-bs-toggle='tooltip' data-bs-placement='top'
+        data-bs-original-title={title()} title={title()}
         id='aft-wallet-burner' onClick={on_click} role='tooltip'
-        title={title(token)}
     >
         <span
             className={inner_classes.join(' ')} role='status'
         />
         <Fire />
     </button>;
-    function is_burning(
-        wallet: Props['wallet']
-    ) {
-        return wallet.burner === AftWalletBurner.burning;
-    }
     function on_click(e: React.MouseEvent) {
-        if (disabled) {
+        if (disabled()) {
             e.defaultPrevented = true;
             e.stopPropagation();
             return;
@@ -109,7 +103,7 @@ function $sovBurner(
             const { decimals } = TokenInfo(token);
             const text = prompt(
                 `Really? Confirm the amount of ${token} tokens to burn:`,
-                nice(amount, { base: 10 ** decimals, maxPrecision: 18 })
+                nice(amount(), { base: 10 ** decimals, maxPrecision: 18 })
             );
             if (typeof text !== 'string') {
                 return;
@@ -119,19 +113,28 @@ function $sovBurner(
                 return;
             }
             const value = BigInt(input * 10 ** decimals);
-            if (value < amount) {
+            if (value < amount()) {
                 onBurn(token, value);
             } else {
-                onBurn(token, amount);
+                onBurn(token, amount());
             }
         }
     }
-    function title(token: Token) {
-        const atoken = Tokenizer.aify(token);
-        const xtoken = Tokenizer.xify(token);
-        return Tokenizer.aified(token)
-            ? `Burn your ${atoken} to *unwrap* ${xtoken} tokens`
-            : `Burn your ${xtoken}`;
+    function amount() {
+        return wallet.items[token]?.amount ?? 0n;
+    }
+    function disabled() {
+        return amount() == 0n || Tokenizer.xified(token);
+    }
+    function burning() {
+        return wallet.burner === AftWalletBurner.burning;
+    }
+    function title() {
+        if (Tokenizer.aified(token)) {
+            const atoken = Tokenizer.aify(token);
+            const xtoken = Tokenizer.xify(token);
+            return `Burn your ${atoken} to *unwrap* ${xtoken} tokens`;
+        }
     }
 }
 function $balance(
