@@ -6,6 +6,7 @@ import { setAftWallet, setOtfWalletAccount, setOtfWalletAmount } from '../redux/
 import { atokenOf, otfWalletOf, xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { Tokenizer } from '../token';
+import { Version } from '../types';
 import { MoeWallet, OnTransfer, OtfManager, SovWallet } from '../wallet';
 
 const MoeWalletService = (
@@ -135,7 +136,7 @@ export const WalletService = (
     if (ROParams.service('moe-wallet')) {
         MoeWalletService(store);
     }
-    if (ROParams.service('sov-wallet')) {
+    if (ROParams.service('sov-wallet') && ROParams.version > Version.v4a) {
         SovWalletService(store);
     }
     if (ROParams.service('otf-wallet')) {
