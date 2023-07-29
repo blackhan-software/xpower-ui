@@ -16,7 +16,7 @@ $(window).on('load', function setVersion() {
 });
 Blockchain.onConnect(async function setBalances() {
     const versions = Array.from(Versions())
-        .filter((v) => v < ROParams.versionTarget).reverse();
+        .filter((v) => ROParams.lt2(v, ROParams.versionTarget)).reverse();
     const balances = versions.map(
         (version) => get_balances(RWParams.token, version)
     );

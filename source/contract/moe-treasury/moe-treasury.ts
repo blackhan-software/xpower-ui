@@ -42,7 +42,7 @@ export class MoeTreasury extends Base {
     public constructor(
         address: Address, abi: InterfaceAbi = ABI
     ) {
-        if (ROParams.version < VersionAt(-1) && !ROParams.versionFaked) {
+        if (ROParams.lt(VersionAt(-1))) {
             abi = require(`./moe-treasury.abi.${ROParams.version}.json`);
         }
         super(address, abi);
@@ -58,7 +58,7 @@ export class MoeTreasury extends Base {
     public async aprsLength(
         ppt_id: NftFullId | NftToken
     ): Promise<number | undefined> {
-        if (ROParams.version < Version.v7b) {
+        if (ROParams.lt(Version.v7b)) {
             return undefined;
         }
         const contract = await this.get;
@@ -75,7 +75,7 @@ export class MoeTreasury extends Base {
     public async bonusesLength(
         ppt_id: NftFullId | NftToken
     ): Promise<number | undefined> {
-        if (ROParams.version < Version.v7b) {
+        if (ROParams.lt(Version.v7b)) {
             return undefined;
         }
         const contract = await this.get;
@@ -132,7 +132,7 @@ export class MoeTreasury extends Base {
     public async rateOf(
         ppt_id: NftRealId
     ): Promise<Rate> {
-        if (ROParams.version < Version.v6c && !ROParams.versionFaked) {
+        if (ROParams.lt(Version.v6c)) {
             const [apr, apr_bonus] = await Promise.all([
                 this.aprOf(ppt_id), this.aprBonusOf(ppt_id)
             ]);
@@ -168,7 +168,7 @@ export class MoeTreasury extends Base {
     public async aprTargetOf(
         ppt_id: NftRealId
     ): Promise<Rate> {
-        if (ROParams.version < Version.v6b && !ROParams.versionFaked) {
+        if (ROParams.lt(Version.v6b)) {
             return 0n;
         }
         const contract = await this.get;
@@ -179,7 +179,7 @@ export class MoeTreasury extends Base {
     public async aprBonusTargetOf(
         ppt_id: NftRealId
     ): Promise<Rate> {
-        if (ROParams.version < Version.v6b && !ROParams.versionFaked) {
+        if (ROParams.lt(Version.v6b)) {
             return 0n;
         }
         const contract = await this.get;
@@ -234,7 +234,7 @@ export class MoeTreasury extends Base {
     public async onRefreshRates(
         listener: OnRefresh
     ): Promise<void> {
-        if (ROParams.version < Version.v7c && !ROParams.versionFaked) {
+        if (ROParams.lt(Version.v7c)) {
             return;
         }
         const contract = await this.get;
@@ -248,7 +248,7 @@ export class MoeTreasury extends Base {
         index: Index | Promise<Index>
     ): Promise<Balance> {
         const contract = await this.get;
-        if (ROParams.version < Version.v6b && !ROParams.versionFaked) {
+        if (ROParams.lt(Version.v6b)) {
             return contract.balance();
         }
         return contract.moeBalanceOf(await index);

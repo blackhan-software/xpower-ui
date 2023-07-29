@@ -41,13 +41,13 @@ export default <
     if (ROParams.service('nfts-ui')) {
         NftsUiService(store);
     }
-    if (ROParams.service('ppts') && ROParams.version > Version.v3b) {
+    if (ROParams.service('ppts') && ROParams.gt(Version.v3b)) {
         PptsService(store);
     }
-    if (ROParams.service('ppts-ui') && ROParams.version > Version.v3b) {
+    if (ROParams.service('ppts-ui') && ROParams.gt(Version.v3b)) {
         PptsUiService(store);
     }
-    if (ROParams.service('rates') && ROParams.version > Version.v3b) {
+    if (ROParams.service('rates') && ROParams.gt(Version.v3b)) {
         RatesService(store);
     }
     if (ROParams.service('theme')) {

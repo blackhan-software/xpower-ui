@@ -9,7 +9,7 @@ export class XPowerPpt extends Base {
     public constructor(
         address: Address, abi = ABI
     ) {
-        if (ROParams.version < VersionAt(-1) && !ROParams.versionFaked) {
+        if (ROParams.lt(VersionAt(-1))) {
             abi = require(`./xpower-ppt.abi.${ROParams.version}.json`);
         }
         super(address, abi);

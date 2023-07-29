@@ -136,7 +136,7 @@ export const WalletService = (
     if (ROParams.service('moe-wallet')) {
         MoeWalletService(store);
     }
-    if (ROParams.service('sov-wallet') && ROParams.version > Version.v4a) {
+    if (ROParams.service('sov-wallet') && ROParams.gt(Version.v4a)) {
         SovWalletService(store);
     }
     if (ROParams.service('otf-wallet')) {

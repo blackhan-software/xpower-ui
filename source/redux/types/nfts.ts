@@ -107,7 +107,7 @@ export class Nft {
         if (version === undefined) {
             version = ROParams.version;
         }
-        return version < Version.v6a && !ROParams.versionFaked
+        return ROParams.lt2(version, Version.v6a)
             ? id.slice(-6) as NftCoreId : id;
     }
     static fullIdsOf(

@@ -11,14 +11,14 @@ export class XPowerSov extends Base {
     public constructor(
         address: Address, abi: InterfaceAbi = ABI
     ) {
-        if (ROParams.version < VersionAt(-1) && !ROParams.versionFaked) {
+        if (ROParams.lt(VersionAt(-1))) {
             abi = require(`./xpower-sov.abi.${ROParams.version}.json`);
         }
         super(address, abi);
     }
     public async collat(): Promise<Collat> {
         const contract = await this.get;
-        if (ROParams.version < Version.v7b) {
+        if (ROParams.lt(Version.v7b)) {
             return 1_000_000n; // 100%
         }
         return contract.collateralization();

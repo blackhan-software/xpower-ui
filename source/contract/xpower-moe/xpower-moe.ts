@@ -12,7 +12,7 @@ export class XPowerMoe extends Base {
     public constructor(
         address: Address, abi: InterfaceAbi = ABI
     ) {
-        if (ROParams.version < VersionAt(-1) && !ROParams.versionFaked) {
+        if (ROParams.lt(VersionAt(-1))) {
             abi = require(`./xpower-moe.abi.${ROParams.version}.json`);
         }
         super(address, abi);
@@ -25,12 +25,12 @@ export class XPowerMoe extends Base {
         to: Account, block_hash: BlockHash, nonce: Nonce
     ): Promise<Transaction> {
         const contract = await this.otf;
-        if (ROParams.version < Version.v3a && !ROParams.versionFaked) {
+        if (ROParams.lt(Version.v3a)) {
             return contract['mint(uint256,bytes32)'](
                 x64(BigInt(nonce)), x64(block_hash), this.options
             );
         }
-        if (ROParams.version < Version.v7c && !ROParams.versionFaked) {
+        if (ROParams.lt(Version.v7c)) {
             return contract['mint(address,bytes32,uint256)'](
                 x40(to), x64(block_hash), x64(BigInt(nonce)), this.options
             );

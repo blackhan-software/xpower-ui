@@ -12,7 +12,7 @@ export class XPowerNft extends Base {
     public constructor(
         address: Address, abi: InterfaceAbi = ABI
     ) {
-        if (ROParams.version < VersionAt(-1) && !ROParams.versionFaked) {
+        if (ROParams.lt(VersionAt(-1))) {
             abi = require(`./xpower-nft.abi.${ROParams.version}.json`);
         }
         super(address, abi);
@@ -24,12 +24,12 @@ export class XPowerNft extends Base {
         moe_index: Index | Promise<Index>
     ): Promise<Transaction> {
         const contract = await this.otf;
-        if (ROParams.version < Version.v2b && !ROParams.versionFaked) {
+        if (ROParams.lt(Version.v2b)) {
             return contract['mint(uint256,uint256)'](
                 level, amount
             );
         }
-        if (ROParams.version < Version.v6a && !ROParams.versionFaked) {
+        if (ROParams.lt(Version.v6a)) {
             return contract['mint(address,uint256,uint256)'](
                 x40(await to), level, amount
             );
@@ -45,12 +45,12 @@ export class XPowerNft extends Base {
         moe_index: Index | Promise<Index>,
     ): Promise<Transaction> {
         const contract = await this.otf;
-        if (ROParams.version < Version.v2b && !ROParams.versionFaked) {
+        if (ROParams.lt(Version.v2b)) {
             return contract['mintBatch(uint256[],uint256[])'](
                 levels, amounts
             );
         }
-        if (ROParams.version < Version.v6a && !ROParams.versionFaked) {
+        if (ROParams.lt(Version.v6a)) {
             return contract['mintBatch(address,uint256[],uint256[])'](
                 x40(await to), levels, amounts
             );
@@ -108,7 +108,7 @@ export class XPowerNft extends Base {
     async moeIndexOf(
         moe: Account | Promise<Account>
     ): Promise<Index> {
-        if (ROParams.version < Version.v6a && !ROParams.versionFaked) {
+        if (ROParams.lt(Version.v6a)) {
             return Promise.resolve(-1); // invalid moe-index!
         }
         const contract = await this.connect();

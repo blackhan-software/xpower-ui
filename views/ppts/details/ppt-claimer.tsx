@@ -110,7 +110,7 @@ function $info(
 function rateOf(
     { rate }: Props
 ) {
-    if (ROParams.version < Version.v7b) {
+    if (ROParams.lt(Version.v7b)) {
         return Number(rate) / 1e3;
     }
     return Number(rate) / 1e6;

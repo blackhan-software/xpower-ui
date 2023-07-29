@@ -1,4 +1,5 @@
 import * as parsers from './parsers';
+import { Version } from '../types';
 
 export class ROParams {
     public static get autoMint() {
@@ -39,6 +40,18 @@ export class ROParams {
     }
     public static get versionFaked() {
         return parsers.versionFaked(this._search);
+    }
+    public static lt(version: Version): boolean {
+        return this.version < version && !this.versionFaked;
+    }
+    public static lt2(lhs: Version, rhs: Version): boolean {
+        return lhs < rhs && !this.versionFaked;
+    }
+    public static gt(version: Version): boolean {
+        return this.version > version && !this.versionFaked;
+    }
+    public static gt2(lhs: Version, rhs: Version): boolean {
+        return lhs > rhs && !this.versionFaked;
     }
     /**
      * @info initial location.search (of first load):

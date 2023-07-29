@@ -38,7 +38,7 @@ export class PptTreasury extends Base {
     public constructor(
         address: Address, abi: InterfaceAbi = ABI
     ) {
-        if (ROParams.version < VersionAt(-1) && !ROParams.versionFaked) {
+        if (ROParams.lt(VersionAt(-1))) {
             abi = require(`./ppt-treasury.abi.${ROParams.version}.json`);
         }
         super(address, abi);
