@@ -1,5 +1,5 @@
-import * as parsers from './parsers';
 import { Version } from '../types';
+import * as parsers from './parsers';
 
 export class ROParams {
     public static get autoMint() {
@@ -10,6 +10,9 @@ export class ROParams {
     }
     public static get clearAll() {
         return parsers.clearAll(this._search);
+    }
+    public static get color() {
+        return parsers.color(this._search);
     }
     public static get debug() {
         return parsers.debug(this._search);

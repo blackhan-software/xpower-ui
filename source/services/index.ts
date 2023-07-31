@@ -11,7 +11,6 @@ import { NftsUiService } from './nfts-ui-service';
 import { PptsService } from './ppts-service';
 import { PptsUiService } from './ppts-ui-service';
 import { RatesService } from './rates-service';
-import { ThemeService } from './theme-service';
 import { TooltipService } from './tooltip-service';
 import { WalletService } from './wallet-service';
 import { Version } from '../types';
@@ -49,9 +48,6 @@ export default <
     }
     if (ROParams.service('rates') && ROParams.gt(Version.v3b)) {
         RatesService(store);
-    }
-    if (ROParams.service('theme')) {
-        ThemeService(store);
     }
     if (ROParams.service('tooltip')) {
         TooltipService(store);

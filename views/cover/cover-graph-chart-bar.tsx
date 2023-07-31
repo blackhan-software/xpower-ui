@@ -55,7 +55,7 @@ function chart(
     const actuals = evaluators
         .map((re) => middle(re.actuals) ?? [0n, 0n])
         .map(([apr, apb]) => normalize(apr + apb));
-    const xp_color = style(theme(token).XP_POWERED);
+    const xp_color = style(theme(ROParams.color).XP_POWERED);
     const xp_alpha = xp_color.replace(/1\)$/, '0.125)');
     const data = {
         labels,

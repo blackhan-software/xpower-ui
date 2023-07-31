@@ -1,5 +1,6 @@
 import { Parser } from '../parser';
 import { Level, NftLevel, NftLevels, Page, Token } from '../redux/types';
+import { ThemeColor, ThemeColors } from '../theme';
 import { Tokenizer } from '../token';
 import { Version, Versions } from '../types';
 import { RWParams } from './rw-params';
@@ -18,6 +19,15 @@ export function clearAll(
     params: URLSearchParams
 ): boolean {
     return Parser.boolean(params.get('clear-all'), false);
+}
+export function color(
+    params: URLSearchParams, fallback = ThemeColor.lime
+): ThemeColor {
+    const key = params.get('color');
+    if (typeof key === 'string') {
+        return ThemeColor[key as ThemeColors] ?? fallback;
+    }
+    return fallback;
 }
 export function debug(
     params: URLSearchParams

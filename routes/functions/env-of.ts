@@ -1,6 +1,6 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import { Request } from 'express';
-import { nftLevels } from '../../source/params/parsers';
+import { color, nftLevels } from '../../source/params/parsers';
 import { Nft, NftLevels, Page, Pager, Token } from '../../source/redux/types';
 import { theme } from '../../source/theme';
 import { Tokenizer } from '../../source/token';
@@ -30,7 +30,7 @@ export const env_of = (req: Request): Record<string, string> => {
       atoken: atoken_lc,
       aToken: 'A' + capitalize(atoken_lc.slice(1)),
     }, ...{
-      ...theme(xtoken),
+      ...theme(color(params)),
       ...header_page(req),
       ...cover_image(req),
       ...otf_wallet(params),
