@@ -1,4 +1,5 @@
 import { delayed, nice, nice_si, nomobi, x40 } from '../../source/functions';
+import { ROParams } from '../../source/params';
 import { switchToken } from '../../source/redux/actions';
 import { AppDispatch } from '../../source/redux/store';
 import { Account, AftWallet, AftWalletBurner, Amount, Token, TokenInfo } from '../../source/redux/types';
@@ -36,9 +37,9 @@ export function UiAftWallet(
         <div className='input-group wallet-address'>
             {$otfToggle(props)}
             {$account(props)}
-            {$sovBurner(props)}
+            {$aftBurner(props)}
             {$balance(props)}
-            {$sovToggle({
+            {$aftToggle({
                 ...props, aged, set_aged
             })}
         </div>
@@ -71,7 +72,7 @@ function $account(
         value={x40(account ?? 0n)}
     />;
 }
-function $sovBurner(
+function $aftBurner(
     { token, wallet, onBurn }: Props
 ) {
     const outer_classes = [
@@ -124,7 +125,7 @@ function $sovBurner(
         return wallet.items[token]?.amount ?? 0n;
     }
     function disabled() {
-        return amount() == 0n || Tokenizer.xified(token);
+        return amount() === 0n || Tokenizer.xified(token) && !ROParams.debug;
     }
     function burning() {
         return wallet.burner === AftWalletBurner.burning;
@@ -159,7 +160,7 @@ function $balance(
         onTouchStart={on_click}
     />;
 }
-function $sovToggle(
+function $aftToggle(
     { wallet, token, aged, set_aged }: Props & {
         aged: boolean, set_aged: (aged: boolean) => void
     }
