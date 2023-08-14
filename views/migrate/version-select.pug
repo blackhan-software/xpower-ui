@@ -2,6 +2,8 @@ label.mb-2(for="version-select")
     | Version to migrate from
 div.btn-group#version-select-wrap(role="group")
     select.form-select#version-select(disabled)
+        option(value="v1a")
+            | v1a: {{xTOKEN}}=0, {{aTOKEN}}=0 &amp; NFTs=0
         option(value="v2a")
             | v2a: {{xTOKEN}}=0, {{aTOKEN}}=0 &amp; NFTs=0
         option(value="v2b")
@@ -30,6 +32,8 @@ div.btn-group#version-select-wrap(role="group")
             | v7a: {{xTOKEN}}=0, {{aTOKEN}}=0 &amp; NFTs=0
         option(value="v7b")
             | v7b: {{xTOKEN}}=0, {{aTOKEN}}=0 &amp; NFTs=0
+        option(value="v7c")
+            | v7c: {{xTOKEN}}=0, {{aTOKEN}}=0 &amp; NFTs=0
         option(value="v00" selected)
             | &middot;&middot;&middot;
     button.btn.btn-outline-warning.info.loading(

@@ -87,8 +87,7 @@ export class NftWallet extends ERC1155Wallet {
     ): Promise<NftFullId> {
         const [y, l] = await Promise.all([year, level]);
         return Nft.fullIdOf({
-            real_id: `${100 * y + l}` as NftRealId,
-            token: this.nftToken
+            real_id: `${100 * y + l}` as NftRealId
         });
     }
     async year(

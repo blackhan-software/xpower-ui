@@ -15,11 +15,9 @@ export function PptTreasuryFactory({
     if (version === undefined) {
         version = ROParams.version;
     }
-    const xtoken = version < Version.v6a
-        ? Tokenizer.xify(token) : 'XPOW';
-    const pty = new PptTreasury(address({
-        infix: 'PTY', token: xtoken, version
-    }));
-    return global.PTY = pty;
+    const pty_address = address({
+        infix: 'PTY', token: Tokenizer.xify(token), version
+    });
+    return global.PTY = new PptTreasury(pty_address, version);
 }
 export default PptTreasuryFactory;

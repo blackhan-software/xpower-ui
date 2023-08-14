@@ -60,11 +60,11 @@ export abstract class ERC1155Wallet {
             (c) => c.balanceOf(this._account, real_id)
         );
     }
-    async balances({ issues, levels, token }: {
-        issues: NftIssue[], levels: NftLevel[], token: NftToken
+    async balances({ issues, levels }: {
+        issues: NftIssue[], levels: NftLevel[]
     }): Promise<Balance[]> {
         const full_ids = Nft.fullIds({
-            issues, levels, token
+            issues, levels
         });
         const real_ids = Nft.realIds(full_ids, {
             version: this._version
@@ -142,8 +142,7 @@ export abstract class ERC1155Wallet {
                 this._account.match(new RegExp(to, 'i'))
             ) {
                 const full_id = Nft.fullIdOf({
-                    real_id: id.toString() as NftRealId,
-                    token: this._nftToken
+                    real_id: id.toString() as NftRealId
                 });
                 listener(
                     BigInt(operator), BigInt(from), BigInt(to),
@@ -186,9 +185,7 @@ export abstract class ERC1155Wallet {
             ) {
                 const full_ids = ids
                     .map((id) => id.toString() as NftRealId)
-                    .map((id) => Nft.fullIdOf({
-                        real_id: id, token: this._nftToken
-                    }));
+                    .map((id) => Nft.fullIdOf({ real_id: id }));
                 listener(
                     BigInt(operator), BigInt(from), BigInt(to), full_ids,
                     values.map((value) => value), ev
@@ -237,11 +234,11 @@ export abstract class ERC1155Wallet {
         );
         return supply;
     }
-    async totalSupplies({ issues, levels, token }: {
-        issues: NftIssue[], levels: NftLevel[], token: NftToken
+    async totalSupplies({ issues, levels }: {
+        issues: NftIssue[], levels: NftLevel[]
     }): Promise<Supply[]> {
         return Promise.all(Array.from(totalSupplies(
-            this.get, { issues, levels, token }, this._version
+            this.get, { issues, levels }, this._version
         )));
     }
     get account(): Account {
@@ -268,16 +265,15 @@ export abstract class ERC1155Wallet {
 }
 function* totalSupplies(
     nft: Promise<Contract>, {
-        issues, levels, token
+        issues, levels
     }: {
         issues: NftIssue[],
-        levels: NftLevel[],
-        token: NftToken
+        levels: NftLevel[]
     },
     version: Version
 ): Generator<Promise<Supply>> {
     const full_ids = Nft.fullIds({
-        issues, levels, token
+        issues, levels
     });
     for (const full_id of full_ids) {
         const real_id = Nft.realId(full_id, { version });

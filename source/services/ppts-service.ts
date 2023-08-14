@@ -22,10 +22,10 @@ export const PptsService = (
         const issues = Array.from(Years({ reverse: true }));
         const wallet = new PptWallet(account, token);
         const balances = await wallet.balances({
-            issues, levels, token: ppt_token
+            issues, levels
         });
         const supplies = await wallet.totalSupplies({
-            issues, levels, token: ppt_token
+            issues, levels
         });
         for (const issue of issues) {
             for (const level of levels) {
@@ -67,8 +67,7 @@ export const PptsService = (
             );
             const nft_id = Nft.fullId({
                 issue: Nft.issue(id),
-                level: Nft.level(id),
-                token: Nft.token(id)
+                level: Nft.level(id)
             });
             if (account === from) {
                 store.dispatch(removePpt(nft_id, {
@@ -103,8 +102,7 @@ export const PptsService = (
             for (let i = 0; i < ids.length; i++) {
                 const ppt_id = Nft.fullId({
                     issue: Nft.issue(ids[i]),
-                    level: Nft.level(ids[i]),
-                    token: Nft.token(ids[i])
+                    level: Nft.level(ids[i])
                 });
                 if (account === from) {
                     store.dispatch(removePpt(ppt_id, {
@@ -141,8 +139,7 @@ export const PptsService = (
                     if (fixed || toggled) {
                         const full_id = Nft.fullId({
                             level: Number(nft_level),
-                            issue: Number(nft_issue),
-                            token: nft_token
+                            issue: Number(nft_issue)
                         });
                         const $ref = globalRef<HTMLElement>(
                             `:ppt.row[full-id="${full_id}"]`

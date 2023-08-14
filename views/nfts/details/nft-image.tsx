@@ -48,12 +48,12 @@ function onLoaded(
     }
 }
 function title(
-    { level, issue, token }: Props
+    { level, issue }: Props
 ) {
     const rank = Nft.rankOf(level);
     const name = Nft.nameOf(level);
     const full_id = Nft.fullId({
-        level, issue, token: Nft.token(token)
+        level, issue
     });
     return `Trade staked ${name} NFTs (level ${rank}/9 & ID #${Nft.realId(full_id)})`;
 }

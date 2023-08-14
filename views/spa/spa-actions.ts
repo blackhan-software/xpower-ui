@@ -2,7 +2,7 @@
 import { removeNonce, removeNonceByAmount, setAftWalletBurner, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter, setRatesUiRefresher, switchToken } from '../../source/redux/actions';
 import { mintingRowBy, nftTotalBy, nftsBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
 import { AppThunk } from '../../source/redux/store';
-import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterStatus, NftMinterList, NftSenderStatus, NftUpgraderStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, RefresherStatus, Token, NftBurnerStatus } from '../../source/redux/types';
+import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftBurnerStatus, NftFullId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, NftSenderStatus, NftUpgraderStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, RefresherStatus, Token } from '../../source/redux/types';
 
 import { MMProvider } from '../../source/blockchain';
 import { MoeTreasuryFactory, OnClaim, OnClaimBatch, OnRefresh, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
@@ -159,7 +159,7 @@ export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
         token
     );
     const full_id = Nft.fullId({
-        issue, level, token: nft_token
+        issue, level
     });
     const { nfts_ui: { details } } = api.getState();
     const by_token = details[nft_token];
@@ -323,7 +323,7 @@ export const nftsBatchBurn = AppThunk('nfts/batch-burn', async (args: {
                     continue; // irredeemable
                 }
                 const nft_id = Nft.fullId({
-                    level, issue, token: nft_token
+                    level, issue
                 });
                 if (burn_amount >= nft_total.amount) {
                     nft_burns.push({
@@ -519,7 +519,7 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
                     continue;
                 }
                 const ppt_id = Nft.fullId({
-                    level, issue, token: ppt_token
+                    level, issue
                 });
                 if (mint_amount >= nft_total.amount) {
                     ppt_mints.push({
@@ -595,7 +595,7 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
                     continue;
                 }
                 const ppt_id = Nft.fullId({
-                    level, issue, token: ppt_token
+                    level, issue
                 });
                 if (burn_amount >= ppt_total.amount) {
                     ppt_burns.push({
@@ -655,7 +655,7 @@ export const pptsClaim = AppThunk('ppts/claim', async (args: {
         throw new Error('missing account');
     }
     const ppt_id = Nft.fullId({
-        issue, level, token: Nft.token(token)
+        issue, level
     });
     const moe_treasury = MoeTreasuryFactory({
         token
@@ -675,7 +675,7 @@ export const pptsClaim = AppThunk('ppts/claim', async (args: {
     try {
         set_status(PptClaimerStatus.claiming);
         moe_treasury.onClaim(on_claim_tx);
-        tx = await moe_treasury.claimFor(
+        tx = await moe_treasury.claim(
             account, ppt_id
         );
     } catch (ex: any) {
@@ -703,14 +703,13 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
     set_status(PptClaimerStatus.claiming);
     const ppt_ids = Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: ppt_token
+        levels: Array.from(NftLevels())
     });
     const moe_treasury = MoeTreasuryFactory({
         token
     });
     const claimables = await moe_treasury
-        .claimableForBatch(account, ppt_ids);
+        .claimableBatch(account, ppt_ids);
     const claimable = claimables
         .reduce((acc, c) => acc + c, 0n);
     if (claimable === 0n) {
@@ -731,7 +730,7 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
     let tx: Transaction | undefined;
     try {
         moe_treasury.onClaimBatch(on_claim_batch);
-        tx = await moe_treasury.claimForBatch(
+        tx = await moe_treasury.claimBatch(
             account, ppt_ids.filter((_, i) => claimables[i])
         );
     } catch (ex: any) {

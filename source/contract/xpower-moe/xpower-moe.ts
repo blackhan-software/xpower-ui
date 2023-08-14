@@ -1,7 +1,8 @@
 import { InterfaceAbi, Transaction } from 'ethers';
 import { x40, x64 } from '../../functions';
+import { HashManager } from '../../managers';
 import { ROParams } from '../../params';
-import { Account, Address, BlockHash, Nonce } from '../../redux/types';
+import { Account, Address, BlockHash, Nonce, Token } from '../../redux/types';
 import { Version, VersionAt } from '../../types';
 import { OtfManager } from '../../wallet';
 import { Base } from '../base';
@@ -17,25 +18,36 @@ export class XPowerMoe extends Base {
         }
         super(address, abi);
     }
-    async init(): Promise<Transaction> {
+    async init(): Promise<Transaction | void> {
         const contract = await this.otf;
+        if (ROParams.lt(Version.v2a)) {
+            const [bh, ts] = [1n, BigInt(new Date().getTime())];
+            return HashManager.set(bh, ts, {
+                token: Token.XPOW, version: ROParams.version
+            });
+        }
         return contract.init();
     }
     async mint(
         to: Account, block_hash: BlockHash, nonce: Nonce
     ): Promise<Transaction> {
         const contract = await this.otf;
+        if (ROParams.lt(Version.v2a)) {
+            return contract.mint(
+                x64(BigInt(nonce)), this.options
+            );
+        }
         if (ROParams.lt(Version.v3a)) {
-            return contract['mint(uint256,bytes32)'](
+            return contract.mint(
                 x64(BigInt(nonce)), x64(block_hash), this.options
             );
         }
         if (ROParams.lt(Version.v7c)) {
-            return contract['mint(address,bytes32,uint256)'](
+            return contract.mint(
                 x40(to), x64(block_hash), x64(BigInt(nonce)), this.options
             );
         }
-        return contract['mint(address,bytes32,bytes)'](
+        return contract.mint(
             x40(to), x64(block_hash), nonce, this.options
         );
     }

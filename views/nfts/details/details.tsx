@@ -59,13 +59,9 @@ function $row(
     const by_level = props.details[nft_level];
     const by_issue = by_level[nft_issue];
     const { fixed, toggled } = by_issue;
-    const nft_token = Nft.token(
-        props.token
-    );
     const full_id = Nft.fullId({
         issue: nft_issue,
-        level: nft_level,
-        token: nft_token
+        level: nft_level
     });
     const nft = props.nfts.items[full_id] ?? {
         amount: 0n, supply: 0n

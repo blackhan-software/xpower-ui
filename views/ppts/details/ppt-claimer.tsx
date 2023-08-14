@@ -1,9 +1,7 @@
 import { Bus } from '../../../source/bus';
 import { nice } from '../../../source/functions';
-import { ROParams } from '../../../source/params';
 import { Amount, Nft, NftIssue, NftLevel, PptClaimerStatus, Rate, Token } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
-import { Version } from '../../../source/types';
 
 import React, { useEffect } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
@@ -34,8 +32,7 @@ export function UiPptClaimer(
 ) {
     const full_id = Nft.fullId({
         issue: props.issue,
-        level: props.level,
-        token: Nft.token(props.token)
+        level: props.level
     });
     return <div role='group'
         ref={globalRef(`.ppt-claimer[full-id="${full_id}"]`)}
@@ -110,9 +107,6 @@ function $info(
 function rateOf(
     { rate }: Props
 ) {
-    if (ROParams.lt(Version.v7b)) {
-        return Number(rate) / 1e3;
-    }
     return Number(rate) / 1e6;
 }
 function Spinner(

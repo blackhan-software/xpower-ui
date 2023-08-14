@@ -38,8 +38,7 @@ async function burn(token: Token, { $burn }: {
     //
     const ids = Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
     const accounts = ids.map(() => {
         return x40(account);

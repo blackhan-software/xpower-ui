@@ -35,14 +35,13 @@ const claimable = buffered(async (
     }
     const ppt_ids = Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
     const moe_treasury = MoeTreasuryFactory({
         token
     });
     const claimables = await moe_treasury
-        .claimableForBatch(account, ppt_ids);
+        .claimableBatch(account, ppt_ids);
     const claimable = claimables
         .reduce((acc, c) => acc + c, 0n);
     return nice_si(claimable, {

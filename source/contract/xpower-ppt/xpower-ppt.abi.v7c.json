@@ -2,8 +2,13 @@
     {
         "inputs": [
             {
+                "internalType": "string",
+                "name": "pptUri",
+                "type": "string"
+            },
+            {
                 "internalType": "address[]",
-                "name": "moeBase",
+                "name": "pptBase",
                 "type": "address[]"
             },
             {
@@ -21,23 +26,23 @@
             {
                 "indexed": true,
                 "internalType": "address",
-                "name": "owner",
+                "name": "account",
                 "type": "address"
             },
             {
                 "indexed": true,
                 "internalType": "address",
-                "name": "spender",
+                "name": "operator",
                 "type": "address"
             },
             {
                 "indexed": false,
-                "internalType": "uint256",
-                "name": "value",
-                "type": "uint256"
+                "internalType": "bool",
+                "name": "approved",
+                "type": "bool"
             }
         ],
-        "name": "Approval",
+        "name": "ApprovalForAll",
         "type": "event"
     },
     {
@@ -45,18 +50,12 @@
         "inputs": [
             {
                 "indexed": false,
-                "internalType": "bytes32",
-                "name": "blockHash",
-                "type": "bytes32"
-            },
-            {
-                "indexed": false,
                 "internalType": "uint256",
                 "name": "timestamp",
                 "type": "uint256"
             }
         ],
-        "name": "Init",
+        "name": "Migratable",
         "type": "event"
     },
     {
@@ -159,6 +158,49 @@
             {
                 "indexed": true,
                 "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256[]",
+                "name": "ids",
+                "type": "uint256[]"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256[]",
+                "name": "values",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "TransferBatch",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
                 "name": "from",
                 "type": "address"
             },
@@ -171,11 +213,36 @@
             {
                 "indexed": false,
                 "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
                 "name": "value",
                 "type": "uint256"
             }
         ],
-        "name": "Transfer",
+        "name": "TransferSingle",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "value",
+                "type": "string"
+            },
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            }
+        ],
+        "name": "URI",
         "type": "event"
     },
     {
@@ -193,7 +260,7 @@
     },
     {
         "inputs": [],
-        "name": "MOE_SEAL_ADMIN_ROLE",
+        "name": "NFT_OPEN_ADMIN_ROLE",
         "outputs": [
             {
                 "internalType": "bytes32",
@@ -206,7 +273,7 @@
     },
     {
         "inputs": [],
-        "name": "MOE_SEAL_ROLE",
+        "name": "NFT_OPEN_ROLE",
         "outputs": [
             {
                 "internalType": "bytes32",
@@ -219,7 +286,7 @@
     },
     {
         "inputs": [],
-        "name": "SHARE_ADMIN_ROLE",
+        "name": "NFT_ROYALTY_ADMIN_ROLE",
         "outputs": [
             {
                 "internalType": "bytes32",
@@ -232,7 +299,7 @@
     },
     {
         "inputs": [],
-        "name": "SHARE_ROLE",
+        "name": "NFT_ROYALTY_ROLE",
         "outputs": [
             {
                 "internalType": "bytes32",
@@ -244,70 +311,81 @@
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "spender",
-                "type": "address"
-            }
-        ],
-        "name": "allowance",
+        "inputs": [],
+        "name": "NFT_ROYAL_ADMIN_ROLE",
         "outputs": [
             {
-                "internalType": "uint256",
+                "internalType": "bytes32",
                 "name": "",
-                "type": "uint256"
+                "type": "bytes32"
             }
         ],
         "stateMutability": "view",
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "level",
-                "type": "uint256"
-            }
-        ],
-        "name": "amountOf",
+        "inputs": [],
+        "name": "NFT_ROYAL_ROLE",
         "outputs": [
             {
-                "internalType": "uint256",
+                "internalType": "bytes32",
                 "name": "",
-                "type": "uint256"
+                "type": "bytes32"
             }
         ],
         "stateMutability": "view",
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "spender",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "approve",
+        "inputs": [],
+        "name": "NFT_SEAL_ADMIN_ROLE",
         "outputs": [
             {
-                "internalType": "bool",
+                "internalType": "bytes32",
                 "name": "",
-                "type": "bool"
+                "type": "bytes32"
             }
         ],
-        "stateMutability": "nonpayable",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "NFT_SEAL_ROLE",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "URI_DATA_ADMIN_ROLE",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "URI_DATA_ROLE",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -316,6 +394,35 @@
                 "internalType": "address",
                 "name": "account",
                 "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            }
+        ],
+        "name": "ageOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
             }
         ],
         "name": "balanceOf",
@@ -332,17 +439,22 @@
     {
         "inputs": [
             {
-                "internalType": "uint256",
-                "name": "interval",
-                "type": "uint256"
+                "internalType": "address[]",
+                "name": "accounts",
+                "type": "address[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "ids",
+                "type": "uint256[]"
             }
         ],
-        "name": "blockHashOf",
+        "name": "balanceOfBatch",
         "outputs": [
             {
-                "internalType": "bytes32",
+                "internalType": "uint256[]",
                 "name": "",
-                "type": "bytes32"
+                "type": "uint256[]"
             }
         ],
         "stateMutability": "view",
@@ -350,6 +462,16 @@
     },
     {
         "inputs": [
+            {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            },
             {
                 "internalType": "uint256",
                 "name": "amount",
@@ -365,41 +487,33 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "account",
+                "name": "from",
                 "type": "address"
             },
             {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
+                "internalType": "uint256[]",
+                "name": "nftIds",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "amounts",
+                "type": "uint256[]"
             }
         ],
-        "name": "burnFrom",
+        "name": "burnBatch",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
         "inputs": [],
-        "name": "currentInterval",
+        "name": "contractURI",
         "outputs": [
             {
-                "internalType": "uint256",
+                "internalType": "string",
                 "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "decimals",
-        "outputs": [
-            {
-                "internalType": "uint8",
-                "name": "",
-                "type": "uint8"
+                "type": "string"
             }
         ],
         "stateMutability": "view",
@@ -408,35 +522,36 @@
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "spender",
-                "type": "address"
-            },
-            {
                 "internalType": "uint256",
-                "name": "subtractedValue",
+                "name": "level",
                 "type": "uint256"
             }
         ],
-        "name": "decreaseAllowance",
+        "name": "denominationOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "pure",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            }
+        ],
+        "name": "exists",
         "outputs": [
             {
                 "internalType": "bool",
                 "name": "",
                 "type": "bool"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "fees",
-        "outputs": [
-            {
-                "internalType": "uint256[]",
-                "name": "",
-                "type": "uint256[]"
             }
         ],
         "stateMutability": "view",
@@ -505,8 +620,33 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "getShare",
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftPrefix",
+                "type": "uint256"
+            }
+        ],
+        "name": "getRoyal",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftPrefix",
+                "type": "uint256"
+            }
+        ],
+        "name": "getRoyalty",
         "outputs": [
             {
                 "internalType": "uint256[]",
@@ -562,32 +702,80 @@
     {
         "inputs": [
             {
+                "internalType": "uint256",
+                "name": "anno",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "level",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "prefix",
+                "type": "uint256"
+            }
+        ],
+        "name": "idBy",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "pure",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "anno",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "levels",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256",
+                "name": "prefix",
+                "type": "uint256"
+            }
+        ],
+        "name": "idsBy",
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "",
+                "type": "uint256[]"
+            }
+        ],
+        "stateMutability": "pure",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "address",
-                "name": "to",
+                "name": "account",
                 "type": "address"
             },
             {
-                "internalType": "bytes32",
-                "name": "blockHash",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
             }
         ],
-        "name": "hashOf",
+        "name": "isApprovedForAll",
         "outputs": [
             {
-                "internalType": "bytes32",
+                "internalType": "bool",
                 "name": "",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "",
-                "type": "bytes32"
+                "type": "bool"
             }
         ],
         "stateMutability": "view",
@@ -596,17 +784,25 @@
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "spender",
-                "type": "address"
-            },
-            {
                 "internalType": "uint256",
-                "name": "addedValue",
+                "name": "nftId",
                 "type": "uint256"
             }
         ],
-        "name": "increaseAllowance",
+        "name": "levelOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "pure",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "migratable",
         "outputs": [
             {
                 "internalType": "bool",
@@ -614,18 +810,29 @@
                 "type": "bool"
             }
         ],
-        "stateMutability": "nonpayable",
+        "stateMutability": "view",
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "init",
+        "inputs": [
+            {
+                "internalType": "bool",
+                "name": "flag",
+                "type": "bool"
+            }
+        ],
+        "name": "migratable",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
         "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            },
             {
                 "internalType": "uint256",
                 "name": "amount",
@@ -638,13 +845,30 @@
             }
         ],
         "name": "migrate",
-        "outputs": [
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
             {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
+                "internalType": "uint256[]",
+                "name": "nftIds",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "amounts",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "index",
+                "type": "uint256[]"
             }
         ],
+        "name": "migrateBatch",
+        "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
@@ -654,6 +878,11 @@
                 "internalType": "address",
                 "name": "account",
                 "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
             },
             {
                 "internalType": "uint256",
@@ -667,27 +896,36 @@
             }
         ],
         "name": "migrateFrom",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
+        "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "migrated",
-        "outputs": [
+        "inputs": [
             {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "nftIds",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "amounts",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "index",
+                "type": "uint256[]"
             }
         ],
-        "stateMutability": "view",
+        "name": "migrateFromBatch",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -698,17 +936,40 @@
                 "type": "address"
             },
             {
-                "internalType": "bytes32",
-                "name": "blockHash",
-                "type": "bytes32"
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
             },
             {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
             }
         ],
         "name": "mint",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "nftIds",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "amounts",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "mintBatch",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -729,60 +990,12 @@
     {
         "inputs": [
             {
-                "internalType": "uint256",
-                "name": "oldAmount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "index",
-                "type": "uint256"
-            }
-        ],
-        "name": "newUnits",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
                 "internalType": "address",
                 "name": "base",
                 "type": "address"
             }
         ],
         "name": "oldIndexOf",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "newAmount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "index",
-                "type": "uint256"
-            }
-        ],
-        "name": "oldUnits",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -809,20 +1022,20 @@
     {
         "inputs": [
             {
-                "internalType": "bytes32",
-                "name": "blockHash",
-                "type": "bytes32"
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
             }
         ],
-        "name": "recent",
+        "name": "prefixOf",
         "outputs": [
             {
-                "internalType": "bool",
+                "internalType": "uint256",
                 "name": "",
-                "type": "bool"
+                "type": "uint256"
             }
         ],
-        "stateMutability": "view",
+        "stateMutability": "pure",
         "type": "function"
     },
     {
@@ -872,6 +1085,173 @@
         "inputs": [
             {
                 "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "royalties",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "stamp",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "area",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "price",
+                "type": "uint256"
+            }
+        ],
+        "name": "royaltyInfo",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            }
+        ],
+        "name": "royaltyOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            }
+        ],
+        "name": "royaltyTargetOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "nftIds",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "amounts",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "bytes",
+                "name": "data",
+                "type": "bytes"
+            }
+        ],
+        "name": "safeBatchTransferFrom",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes",
+                "name": "data",
+                "type": "bytes"
+            }
+        ],
+        "name": "safeTransferFrom",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
                 "name": "index",
                 "type": "uint256"
             }
@@ -904,12 +1284,30 @@
     {
         "inputs": [
             {
-                "internalType": "uint256[]",
-                "name": "array",
-                "type": "uint256[]"
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "approved",
+                "type": "bool"
             }
         ],
-        "name": "setShare",
+        "name": "setApprovalForAll",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "uri",
+                "type": "string"
+            }
+        ],
+        "name": "setContractURI",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -918,64 +1316,101 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "amount",
+                "name": "nftPrefix",
                 "type": "uint256"
-            }
-        ],
-        "name": "shareOf",
-        "outputs": [
+            },
             {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
+                "internalType": "address",
+                "name": "beneficiary",
+                "type": "address"
             }
         ],
-        "stateMutability": "view",
+        "name": "setRoyal",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "nftPrefixes",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "address",
+                "name": "beneficiary",
+                "type": "address"
+            }
+        ],
+        "name": "setRoyalBatch",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "amount",
+                "name": "nftPrefix",
                 "type": "uint256"
-            }
-        ],
-        "name": "shareTargetOf",
-        "outputs": [
+            },
             {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
+                "internalType": "uint256[]",
+                "name": "array",
+                "type": "uint256[]"
             }
         ],
-        "stateMutability": "view",
+        "name": "setRoyalty",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "nftPrefixes",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "array",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "setRoyaltyBatch",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "uri",
+                "type": "string"
+            }
+        ],
+        "name": "setURI",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "",
+                "name": "nftPrefix",
                 "type": "uint256"
             }
         ],
-        "name": "shares",
+        "name": "sharesBy",
         "outputs": [
             {
-                "internalType": "uint256",
-                "name": "stamp",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "value",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "area",
-                "type": "uint256"
+                "internalType": "int256[34]",
+                "name": "",
+                "type": "int256[34]"
             }
         ],
         "stateMutability": "view",
@@ -1014,7 +1449,13 @@
         "type": "function"
     },
     {
-        "inputs": [],
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            }
+        ],
         "name": "totalSupply",
         "outputs": [
             {
@@ -1024,59 +1465,6 @@
             }
         ],
         "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "transfer",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "transferFrom",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -1095,17 +1483,30 @@
     {
         "inputs": [
             {
-                "internalType": "bytes32",
-                "name": "pairIndex",
-                "type": "bytes32"
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
             }
         ],
-        "name": "unique",
+        "name": "uri",
         "outputs": [
             {
-                "internalType": "bool",
+                "internalType": "string",
                 "name": "",
-                "type": "bool"
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "year",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -1114,17 +1515,17 @@
     {
         "inputs": [
             {
-                "internalType": "bytes32",
-                "name": "nonceHash",
-                "type": "bytes32"
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
             }
         ],
-        "name": "zerosOf",
+        "name": "yearOf",
         "outputs": [
             {
-                "internalType": "uint8",
+                "internalType": "uint256",
                 "name": "",
-                "type": "uint8"
+                "type": "uint256"
             }
         ],
         "stateMutability": "pure",

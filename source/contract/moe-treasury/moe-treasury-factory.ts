@@ -15,11 +15,9 @@ export function MoeTreasuryFactory({
     if (version === undefined) {
         version = ROParams.version;
     }
-    const xtoken = version < Version.v6b
-        ? Tokenizer.xify(token) : 'XPOW';
-    const mty = new MoeTreasury(address({
-        infix: 'MTY', token: xtoken, version
-    }));
-    return global.MTY = mty;
+    const mty_address = address({
+        infix: 'MTY', token: Tokenizer.xify(token), version
+    });
+    return global.MTY = new MoeTreasury(mty_address, version);
 }
 export default MoeTreasuryFactory;

@@ -1,4 +1,4 @@
-import { APR, APRBonus } from '../../../source/contract';
+import { APR, APB } from '../../../source/contract';
 import { range as arange, zip } from '../../../source/functions';
 import { NftIssue, NftLevel, Rates, Token } from '../../../source/redux/types';
 import { SVA, SVAIntegrator } from './sva-integrator';
@@ -25,7 +25,7 @@ export const RateEvaluator = (
 };
 function evaluate(
     aprs: APR[],
-    apbs: APRBonus[],
+    apbs: APB[],
     issue: NftIssue,
     delta: bigint,
     range: bigint,

@@ -318,6 +318,25 @@ function miner(
 function abi_encoder(
     version: Version, versionFaked: boolean
 ) {
+    const encoder_v1a = (nonce: Uint8Array, {
+        account, interval,
+    }: Context) => {
+        let value = abi_encoded[interval];
+        if (value === undefined) {
+            const abi = AbiCoder.defaultAbiCoder();
+            const template = abi.encode([
+                'uint256', 'address', 'uint256'
+            ], [
+                0,
+                x40(account),
+                interval
+            ]);
+            value = arrayify(template.slice(2));
+            abi_encoded[interval] = value;
+        }
+        value.set(nonce, 32 - nonce.length);
+        return value;
+    };
     const encoder_v2c = (nonce: Uint8Array, {
         account, block_hash, interval, token
     }: Context) => {
@@ -465,6 +484,8 @@ function abi_encoder(
         return encoder_v7c;
     }
     switch (version) {
+        case Version.v1a:
+            return encoder_v1a;
         case Version.v2a:
         case Version.v2b:
         case Version.v2c:

@@ -5,7 +5,7 @@ import { ROParams } from '../../../source/params';
 import { AccountContext, globalRef } from '../../../source/react';
 import { onPptChanged } from '../../../source/redux/observers';
 import { AppState } from '../../../source/redux/store';
-import { Account, Amount, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftToken, NftTokens, Nfts, PptDetails, Supply, Token } from '../../../source/redux/types';
+import { Account, Amount, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftToken, NftTokens, Nfts, PptDetails, Rate, Supply, Token } from '../../../source/redux/types';
 import { MAX_YEAR, MIN_YEAR, Years } from '../../../source/years';
 
 import React, { useContext, useEffect, useState } from 'react';
@@ -53,12 +53,12 @@ type Props = {
     ) => void;
 }
 type State = Record<NftLevel, Record<NftIssue, {
-    rate: Record<NftToken, Amount>;
+    rate: Record<NftToken, Rate>;
     claimable: Record<NftToken, Amount>;
     claimed: Record<NftToken, Amount>;
 }>>
 function initialState(
-    rate = 0n, claimable = 0n, claimed = 0n
+    rate = [0n, 1_000_000n], claimable = 0n, claimed = 0n
 ) {
     const ppt_tokens = Array.from(NftTokens());
     const ppt_issues = Array.from(Years({ reverse: true }));
@@ -105,7 +105,7 @@ export function UiPptDetails(
             ppt_issue: NftIssue
         ) => {
             const full_id = Nft.fullId({
-                level: ppt_level, issue: ppt_issue, token: ppt_token
+                level: ppt_level, issue: ppt_issue
             });
             const ref = globalRef<HTMLElement>(
                 `:ppt.row[full-id="${full_id}"]`
@@ -168,21 +168,22 @@ function claims(
         ppt_issue: NftIssue
     ) => {
         const full_id = Nft.fullId({
-            level: ppt_level, issue: ppt_issue, token: ppt_token
+            level: ppt_level, issue: ppt_issue
         });
         const moe_treasury = MoeTreasuryFactory({
             token
         });
-        const [claimable, claimed, rate] = await Promise.all([
-            account ? moe_treasury.claimableFor(account, full_id) : 0n,
-            account ? moe_treasury.claimedFor(account, full_id) : 0n,
-            moe_treasury.rateOf(full_id),
+        const [claimable, claimed, apr, apb] = await Promise.all([
+            account ? moe_treasury.claimable(account, full_id) : 0n,
+            account ? moe_treasury.claimed(account, full_id) : 0n,
+            moe_treasury.aprOf(full_id),
+            moe_treasury.apbOf(full_id),
         ]);
         return {
             [ppt_level]: {
                 [ppt_issue]: {
                     rate: {
-                        [ppt_token]: rate
+                        [ppt_token]: apr + apb
                     },
                     claimable: {
                         [ppt_token]: claimable
@@ -199,15 +200,13 @@ function $row(
     props: Props, ppt_issue: NftIssue,
     { state }: { state: State }
 ) {
-    const { details, level: ppt_level, ppts, token } = props;
+    const { details, level: ppt_level, ppts } = props;
     const by_level = details[ppt_level];
     const by_issue = by_level[ppt_issue];
     const { fixed, toggled } = by_issue;
-    const ppt_token = Nft.token(token);
     const full_id = Nft.fullId({
         issue: ppt_issue,
-        level: ppt_level,
-        token: ppt_token
+        level: ppt_level
     });
     const ppt = ppts.items[full_id] ?? {
         amount: 0n, supply: 0n

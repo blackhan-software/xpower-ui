@@ -225,7 +225,7 @@ export const NftsUiService = (
             ? new NftWallet(address, token)
             : new NftWalletMock(0n, token);
         const nft_id = Nft.fullId({
-            level, issue, token: Nft.token(token)
+            level, issue
         });
         const supply = await nft_wallet.totalSupply(nft_id);
         if (supply > 0) {

@@ -2,8 +2,8 @@ import { InterfaceAbi, Transaction } from 'ethers';
 import { MYProvider } from '../../blockchain';
 import { x40 } from '../../functions';
 import { ROParams } from '../../params';
-import { Account, Address, Amount, Balance, Nft, NftRealId } from '../../redux/types';
-import { TxEvent, VersionAt } from '../../types';
+import { Account, Address, Amount, Balance, Nft, NftFullId, NftRealId } from '../../redux/types';
+import { TxEvent, Version, VersionAt } from '../../types';
 import { OtfManager } from '../../wallet';
 import { Base } from '../base';
 
@@ -11,68 +11,82 @@ import ABI from './ppt-treasury.abi.json';
 
 export type OnStake = (
     account: Account,
-    nftId: NftRealId,
+    nftId: NftFullId,
     amount: Amount,
     ev: TxEvent
 ) => void;
 export type OnUnstake = (
     account: Account,
-    nftId: NftRealId,
+    nftId: NftFullId,
     amount: Amount,
     ev: TxEvent
 ) => void;
 export type OnStakeBatch = (
     account: Account,
-    nftIds: NftRealId[],
+    nftIds: NftFullId[],
     amounts: Amount[],
     ev: TxEvent
 ) => void;
 export type OnUnstakeBatch = (
     account: Account,
-    nftIds: NftRealId[],
+    nftIds: NftFullId[],
     amounts: Amount[],
     ev: TxEvent
 ) => void;
 
 export class PptTreasury extends Base {
     public constructor(
-        address: Address, abi: InterfaceAbi = ABI
+        address: Address, version = ROParams.version,
+        abi: InterfaceAbi = ABI
     ) {
-        if (ROParams.lt(VersionAt(-1))) {
-            abi = require(`./ppt-treasury.abi.${ROParams.version}.json`);
+        if (ROParams.lt2(version, VersionAt(-1))) {
+            abi = require(`./ppt-treasury.abi.${version}.json`);
         }
         super(address, abi);
+        this.version = version;
     }
     public async stake(
-        account: Account, nft_id: NftRealId, balance: Balance
+        account: Account, nft_id: NftFullId, balance: Balance
     ): Promise<Transaction> {
         const contract = await this.otf;
+        const id = Nft.realId(nft_id, {
+            version: this.version
+        });
         return contract.stake(
-            x40(account), Nft.realId(nft_id), balance
+            x40(account), id, balance
         );
     }
     public async unstake(
-        account: Account, nft_id: NftRealId, balance: Balance
+        account: Account, nft_id: NftFullId, balance: Balance
     ): Promise<Transaction> {
         const contract = await this.otf;
+        const id = Nft.realId(nft_id, {
+            version: this.version
+        });
         return contract.unstake(
-            x40(account), Nft.realId(nft_id), balance
+            x40(account), id, balance
         );
     }
     public async stakeBatch(
-        account: Account, nft_ids: NftRealId[], balances: Balance[]
+        account: Account, nft_ids: NftFullId[], balances: Balance[]
     ): Promise<Transaction> {
         const contract = await this.otf;
+        const ids = Nft.realIds(nft_ids, {
+            version: this.version
+        });
         return contract.stakeBatch(
-            x40(account), Nft.realIds(nft_ids), balances
+            x40(account), ids, balances
         );
     }
     public async unstakeBatch(
-        account: Account, nft_ids: NftRealId[], balances: Balance[]
+        account: Account, nft_ids: NftFullId[], balances: Balance[]
     ): Promise<Transaction> {
         const contract = await this.otf;
+        const ids = Nft.realIds(nft_ids, {
+            version: this.version
+        });
         return contract.unstakeBatch(
-            x40(account), Nft.realIds(nft_ids), balances
+            x40(account), ids, balances
         );
     }
     public async onStake(
@@ -83,7 +97,7 @@ export class PptTreasury extends Base {
             account: string, id: bigint, amount: Amount, ev: TxEvent
         ) => {
             const address = BigInt(account);
-            const nft_id = id.toString() as NftRealId;
+            const nft_id = id.toString() as NftFullId;
             listener(address, nft_id, amount, ev);
         });
     }
@@ -95,7 +109,7 @@ export class PptTreasury extends Base {
             account: string, id: bigint, amount: Amount, ev: TxEvent
         ) => {
             const address = BigInt(account);
-            const nft_id = id.toString() as NftRealId;
+            const nft_id = id.toString() as NftFullId;
             listener(address, nft_id, amount, ev);
         });
     }
@@ -106,9 +120,10 @@ export class PptTreasury extends Base {
         contract.on('StakeBatch', (
             account: string, ids: bigint[], amounts: Amount[], ev: TxEvent
         ) => {
-            const address = BigInt(account);
-            const nft_ids = ids.map((id) => id.toString() as NftRealId);
-            listener(address, nft_ids, amounts, ev);
+            const nft_ids = Nft.fullIdsOf({
+                real_ids: ids.map((id) => id.toString() as NftRealId)
+            });
+            listener(BigInt(account), nft_ids, amounts, ev);
         });
     }
     public async onUnstakeBatch(
@@ -118,9 +133,10 @@ export class PptTreasury extends Base {
         contract.on('UnstakeBatch', (
             account: string, ids: bigint[], amounts: Amount[], ev: TxEvent
         ) => {
-            const address = BigInt(account);
-            const nft_ids = ids.map((id) => id.toString() as NftRealId);
-            listener(address, nft_ids, amounts, ev);
+            const nft_ids = Nft.fullIdsOf({
+                real_ids: ids.map((id) => id.toString() as NftRealId)
+            });
+            listener(BigInt(account), nft_ids, amounts, ev);
         });
     }
     private get otf() {
@@ -129,5 +145,6 @@ export class PptTreasury extends Base {
     private get get() {
         return MYProvider().then((p) => this.connect(p));
     }
+    private version: Version;
 }
 export default PptTreasury;

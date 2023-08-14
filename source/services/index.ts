@@ -34,10 +34,10 @@ export default <
     if (ROParams.service('minting')) {
         MintingService(store);
     }
-    if (ROParams.service('nfts')) {
+    if (ROParams.service('nfts') && ROParams.gt(Version.v1a)) {
         NftsService(store);
     }
-    if (ROParams.service('nfts-ui')) {
+    if (ROParams.service('nfts-ui') && ROParams.gt(Version.v1a)) {
         NftsUiService(store);
     }
     if (ROParams.service('ppts') && ROParams.gt(Version.v3b)) {

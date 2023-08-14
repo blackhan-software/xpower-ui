@@ -2,14 +2,14 @@
     {
         "inputs": [
             {
-                "internalType": "address",
+                "internalType": "address[]",
                 "name": "moeLink",
-                "type": "address"
+                "type": "address[]"
             },
             {
-                "internalType": "address",
+                "internalType": "address[]",
                 "name": "sovLink",
-                "type": "address"
+                "type": "address[]"
             },
             {
                 "internalType": "address",
@@ -73,6 +73,12 @@
     {
         "anonymous": false,
         "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "nftPrefix",
+                "type": "uint256"
+            },
             {
                 "indexed": false,
                 "internalType": "bool",
@@ -160,33 +166,33 @@
     },
     {
         "inputs": [],
-        "name": "APB_ADMIN_ROLE",
-        "outputs": [
-            {
-                "internalType": "bytes32",
-                "name": "",
-                "type": "bytes32"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "APB_ROLE",
-        "outputs": [
-            {
-                "internalType": "bytes32",
-                "name": "",
-                "type": "bytes32"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
         "name": "APR_ADMIN_ROLE",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "APR_BONUS_ADMIN_ROLE",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "APR_BONUS_ROLE",
         "outputs": [
             {
                 "internalType": "bytes32",
@@ -231,7 +237,7 @@
                 "type": "uint256"
             }
         ],
-        "name": "apbOf",
+        "name": "aprBonusOf",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -250,60 +256,7 @@
                 "type": "uint256"
             }
         ],
-        "name": "apbTargetOf",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "apbs",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "stamp",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "value",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "area",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "nftId",
-                "type": "uint256"
-            }
-        ],
-        "name": "apbsLength",
+        "name": "aprBonusTargetOf",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -408,6 +361,59 @@
     {
         "inputs": [
             {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "bonuses",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "stamp",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "area",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            }
+        ],
+        "name": "bonusesLength",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "address",
                 "name": "account",
                 "type": "address"
@@ -418,7 +424,7 @@
                 "type": "uint256"
             }
         ],
-        "name": "claim",
+        "name": "claimFor",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -436,7 +442,7 @@
                 "type": "uint256[]"
             }
         ],
-        "name": "claimBatch",
+        "name": "claimForBatch",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -454,7 +460,7 @@
                 "type": "uint256"
             }
         ],
-        "name": "claimable",
+        "name": "claimableFor",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -478,7 +484,7 @@
                 "type": "uint256[]"
             }
         ],
-        "name": "claimableBatch",
+        "name": "claimableForBatch",
         "outputs": [
             {
                 "internalType": "uint256[]",
@@ -502,7 +508,7 @@
                 "type": "uint256"
             }
         ],
-        "name": "claimed",
+        "name": "claimedFor",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -526,26 +532,7 @@
                 "type": "uint256[]"
             }
         ],
-        "name": "claimedBatch",
-        "outputs": [
-            {
-                "internalType": "uint256[]",
-                "name": "",
-                "type": "uint256[]"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "nftId",
-                "type": "uint256"
-            }
-        ],
-        "name": "getAPB",
+        "name": "claimedForBatch",
         "outputs": [
             {
                 "internalType": "uint256[]",
@@ -565,6 +552,25 @@
             }
         ],
         "name": "getAPR",
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "",
+                "type": "uint256[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            }
+        ],
+        "name": "getAPRBonus",
         "outputs": [
             {
                 "internalType": "uint256[]",
@@ -682,6 +688,87 @@
     {
         "inputs": [
             {
+                "internalType": "uint256",
+                "name": "index",
+                "type": "uint256"
+            }
+        ],
+        "name": "moeBalanceOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "moe",
+                "type": "address"
+            }
+        ],
+        "name": "moeIndexOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            }
+        ],
+        "name": "rateOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            }
+        ],
+        "name": "rateTargetOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftPrefix",
+                "type": "uint256"
+            },
+            {
                 "internalType": "bool",
                 "name": "allLevels",
                 "type": "bool"
@@ -693,7 +780,13 @@
         "type": "function"
     },
     {
-        "inputs": [],
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftPrefix",
+                "type": "uint256"
+            }
+        ],
         "name": "refreshable",
         "outputs": [
             {
@@ -802,42 +895,6 @@
                 "type": "uint256[]"
             }
         ],
-        "name": "setAPB",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256[]",
-                "name": "nftIds",
-                "type": "uint256[]"
-            },
-            {
-                "internalType": "uint256[]",
-                "name": "array",
-                "type": "uint256[]"
-            }
-        ],
-        "name": "setAPBBatch",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "nftId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256[]",
-                "name": "array",
-                "type": "uint256[]"
-            }
-        ],
         "name": "setAPR",
         "outputs": [],
         "stateMutability": "nonpayable",
@@ -857,6 +914,42 @@
             }
         ],
         "name": "setAPRBatch",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "array",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "setAPRBonus",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "nftIds",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "array",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "setAPRBonusBatch",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

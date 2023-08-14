@@ -27,8 +27,7 @@ export function UiNftSender(
 ) {
     const full_id = Nft.fullId({
         issue: props.issue,
-        level: props.level,
-        token: Nft.token(props.token)
+        level: props.level
     });
     return <div
         className='btn-group nft-sender d-none d-sm-flex'

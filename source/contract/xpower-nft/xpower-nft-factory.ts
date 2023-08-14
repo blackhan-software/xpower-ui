@@ -17,10 +17,8 @@ export function XPowerNftFactory({
     if (version === undefined) {
         version = ROParams.version;
     }
-    const xtoken = version < Version.v6a
-        ? Tokenizer.xify(token) : 'XPOW';
     const nft = new XPowerNft(address({
-        infix: 'NFT', token: xtoken, version
+        infix: 'NFT', token: Tokenizer.xify(token), version
     }));
     return global.XPOWER_NFT = nft;
 }
@@ -44,8 +42,7 @@ export function XPowerNftMockFactory(
                 id = BigInt(id);
             }
             const full_id = Nft.fullIdOf({
-                real_id: id.toString() as NftRealId,
-                token: Nft.token(token)
+                real_id: id.toString() as NftRealId
             });
             return `/ipfs/QmcmK4qk2vCCzVTnggzZeJes3Leontx3ZH1tNNQ2QZK3F3/320x427/${full_id}.json`;
         },

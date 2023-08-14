@@ -2,14 +2,14 @@
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "moeLink",
-                "type": "address"
-            },
-            {
                 "internalType": "string",
                 "name": "nftUri",
                 "type": "string"
+            },
+            {
+                "internalType": "address[]",
+                "name": "moeLink",
+                "type": "address[]"
             },
             {
                 "internalType": "address[]",
@@ -279,6 +279,32 @@
     {
         "inputs": [],
         "name": "NFT_OPEN_ROLE",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "NFT_ROYALTY_ADMIN_ROLE",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "NFT_ROYALTY_ROLE",
         "outputs": [
             {
                 "internalType": "bytes32",
@@ -575,13 +601,38 @@
         "type": "function"
     },
     {
-        "inputs": [],
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftPrefix",
+                "type": "uint256"
+            }
+        ],
         "name": "getRoyal",
         "outputs": [
             {
                 "internalType": "address",
                 "name": "",
                 "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftPrefix",
+                "type": "uint256"
+            }
+        ],
+        "name": "getRoyalty",
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "",
+                "type": "uint256[]"
             }
         ],
         "stateMutability": "view",
@@ -640,6 +691,11 @@
                 "internalType": "uint256",
                 "name": "level",
                 "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "prefix",
+                "type": "uint256"
             }
         ],
         "name": "idBy",
@@ -664,6 +720,11 @@
                 "internalType": "uint256[]",
                 "name": "levels",
                 "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256",
+                "name": "prefix",
+                "type": "uint256"
             }
         ],
         "name": "idsBy",
@@ -864,6 +925,11 @@
                 "internalType": "uint256",
                 "name": "amount",
                 "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "index",
+                "type": "uint256"
             }
         ],
         "name": "mint",
@@ -887,11 +953,35 @@
                 "internalType": "uint256[]",
                 "name": "amounts",
                 "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256",
+                "name": "index",
+                "type": "uint256"
             }
         ],
         "name": "mintBatch",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "moe",
+                "type": "address"
+            }
+        ],
+        "name": "moeIndexOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -937,6 +1027,25 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            }
+        ],
+        "name": "prefixOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "pure",
         "type": "function"
     },
     {
@@ -991,6 +1100,40 @@
             },
             {
                 "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "royalties",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "stamp",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "area",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
                 "name": "price",
                 "type": "uint256"
             }
@@ -1002,6 +1145,44 @@
                 "name": "",
                 "type": "address"
             },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            }
+        ],
+        "name": "royaltyOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftId",
+                "type": "uint256"
+            }
+        ],
+        "name": "royaltyTargetOf",
+        "outputs": [
             {
                 "internalType": "uint256",
                 "name": "",
@@ -1144,12 +1325,71 @@
     {
         "inputs": [
             {
+                "internalType": "uint256",
+                "name": "nftPrefix",
+                "type": "uint256"
+            },
+            {
                 "internalType": "address",
                 "name": "beneficiary",
                 "type": "address"
             }
         ],
         "name": "setRoyal",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "nftPrefixes",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "address",
+                "name": "beneficiary",
+                "type": "address"
+            }
+        ],
+        "name": "setRoyalBatch",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "nftPrefix",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "array",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "setRoyalty",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "nftPrefixes",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "array",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "setRoyaltyBatch",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -1252,6 +1492,11 @@
                 "internalType": "uint256",
                 "name": "amount",
                 "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "index",
+                "type": "uint256"
             }
         ],
         "name": "upgrade",
@@ -1280,6 +1525,11 @@
                 "internalType": "uint256[][]",
                 "name": "amounts",
                 "type": "uint256[][]"
+            },
+            {
+                "internalType": "uint256",
+                "name": "index",
+                "type": "uint256"
             }
         ],
         "name": "upgradeBatch",

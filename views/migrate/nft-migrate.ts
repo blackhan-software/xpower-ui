@@ -14,14 +14,14 @@ import { Years } from '../../source/years';
 Blockchain.onConnect(function enableUnstake() {
     const $unstake_ppt = $('.unstake-old').filter((i, el) => {
         const source = new RegExp($(el).data('source'));
-        return 'v2a|v2b|v2c|v3a|v3b'.match(source) === null;
+        return 'v1a|v2a|v2b|v2c|v3a|v3b'.match(source) === null;
     });
     $unstake_ppt.prop('disabled', false);
 });
 Blockchain.onConnect(function enableAllowance() {
     const $approve_old = $('.approve-old').filter((i, el) => {
         const source = new RegExp($(el).data('source'));
-        return 'v2a|v2b|v2c|v3a|v3b'.match(source) !== null;
+        return 'v1a|v2a|v2b|v2c|v3a|v3b'.match(source) !== null;
     });
     $approve_old.prop('disabled', false);
 });
@@ -57,13 +57,11 @@ async function nftUnstakeOld(token: Token, { $unstake, $approve }: {
     //
     const ids = Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
     const src_balances: Balance[] = await ppt_source.balances({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
     console.debug(
         `[${src_version}:balances]`, src_balances.map((b) => b.toString())
@@ -101,8 +99,7 @@ async function nftUnstakeOld(token: Token, { $unstake, $approve }: {
             zero: false
         });
         tx = await nty_source.unstakeBatch(
-            account, Nft.realIds(nz.ids, { version: src_version }),
-            nz.balances
+            account, nz.ids, nz.balances
         );
     } catch (ex: any) {
         if (ex.message) {
@@ -160,8 +157,7 @@ async function moeApproveOld(token: Token, { $approve }: {
     //
     const src_balances: Balance[] = await nft_source.balances({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
     console.debug(
         `[${src_version}:balances]`, src_balances.map((b) => b.toString())
@@ -241,8 +237,7 @@ async function moeApproveNew(token: Token, { $approve }: {
     //
     const src_balances: Balance[] = await nft_source.balances({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
     console.debug(
         `[${src_version}:balances]`, src_balances.map((b) => b.toString())
@@ -322,8 +317,7 @@ async function nftApproveOld(token: Token, { $approve, $migrate }: {
     );
     const src_balances: Balance[] = await nft_source.balances({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
     console.debug(
         `[${src_version}:balances]`, src_balances.map((b) => b.toString())
@@ -416,13 +410,11 @@ async function nftMigrateOld(token: Token, { $migrate, $approve }: {
     //
     const ids = Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
     const src_balances: Balance[] = await nft_source.balances({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
     console.debug(
         `[${src_version}:balances]`, src_balances.map((b) => b.toString())
@@ -533,8 +525,7 @@ async function nftApproveNew(token: Token, { $approve, $restake }: {
     );
     const tgt_balances: Balance[] = await nft_target.balances({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
     console.debug(
         `[${tgt_version}:balances]`, tgt_balances.map((b) => b.toString())
@@ -612,13 +603,11 @@ async function nftRestakeNew(token: Token, { $restake }: {
     //
     const ids = Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
     const tgt_balances: Balance[] = await nft_target.balances({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
     console.debug(
         `[${tgt_version}:balances]`, tgt_balances.map((b) => b.toString())
@@ -656,8 +645,7 @@ async function nftRestakeNew(token: Token, { $restake }: {
             zero: false
         });
         tx = await nty_target.stakeBatch(
-            account, Nft.realIds(nz.ids, { version: src_version }),
-            nz.balances
+            account, nz.ids, nz.balances
         );
     } catch (ex: any) {
         if (ex.message) {

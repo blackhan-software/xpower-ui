@@ -20,8 +20,7 @@ export function UiPptExpander(
         if (props.expanded) {
             const full_id = Nft.fullId({
                 issue: props.issue,
-                level: props.level,
-                token: Nft.token(props.token)
+                level: props.level
             });
             const $row = globalRef<HTMLElement>(
                 `:ppt.row[full-id="${full_id}"]`

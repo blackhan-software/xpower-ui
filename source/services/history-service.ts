@@ -42,8 +42,7 @@ async function get_balances(
     }
     const ids = Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
     const accounts = ids.map(() => {
         return x40(account);
@@ -65,7 +64,7 @@ async function get_balances(
         );
         for (let i = 0; i < ids.length; i++) {
             const full_id = Nft.fullIdOf({
-                real_id: ids[i], token: Nft.token(token)
+                real_id: ids[i]
             });
             nft[full_id] = { balance: balances[i] };
         }
@@ -77,7 +76,7 @@ async function get_balances(
         );
         for (let i = 0; i < ids.length; i++) {
             const full_id = Nft.fullIdOf({
-                real_id: ids[i], token: Nft.token(token)
+                real_id: ids[i]
             });
             ppt[full_id] = { balance: balances[i] };
         }

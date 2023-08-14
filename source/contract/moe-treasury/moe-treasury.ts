@@ -2,7 +2,7 @@ import { InterfaceAbi, Listener, Transaction } from 'ethers';
 import { MYProvider } from '../../blockchain';
 import { x40 } from '../../functions';
 import { ROParams } from '../../params';
-import { Account, Address, Amount, Balance, Index, Nft, NftFullId, NftRealId, NftToken, Rate } from '../../redux/types';
+import { Account, Address, Amount, Index, Nft, NftFullId, NftRealId, NftToken, Rate } from '../../redux/types';
 import { TxEvent, Version, VersionAt } from '../../types';
 import { OtfManager } from '../../wallet';
 import { Base } from '../base';
@@ -11,13 +11,13 @@ import ABI from './moe-treasury.abi.json';
 
 export type OnClaim = (
     account: Account,
-    nftId: NftRealId,
+    nftId: NftFullId,
     amount: Amount,
     ev: TxEvent
 ) => void;
 export type OnClaimBatch = (
     account: Account,
-    nftIds: NftRealId[],
+    nftIds: NftFullId[],
     amounts: Amount[],
     ev: TxEvent
 ) => void;
@@ -32,7 +32,7 @@ export type APR = {
     value: bigint;
     area: bigint;
 };
-export type APRBonus = {
+export type APB = {
     stamp: bigint;
     value: bigint;
     area: bigint;
@@ -40,152 +40,188 @@ export type APRBonus = {
 
 export class MoeTreasury extends Base {
     public constructor(
-        address: Address, abi: InterfaceAbi = ABI
+        address: Address, version = ROParams.version,
+        abi: InterfaceAbi = ABI
     ) {
-        if (ROParams.lt(VersionAt(-1))) {
-            abi = require(`./moe-treasury.abi.${ROParams.version}.json`);
+        if (ROParams.lt2(version, VersionAt(-1))) {
+            abi = require(`./moe-treasury.abi.${version}.json`);
         }
         super(address, abi);
+        this.version = version;
     }
     public async aprs(
-        ppt_id: NftFullId | NftToken, index: Index
+        ppt_id: NftFullId, index: Index
     ): Promise<APR> {
         const contract = await this.get;
-        return contract.aprs(ppt_id, index).then(
+        const id = Nft.realId(ppt_id, {
+            version: this.version
+        });
+        return contract.aprs(id, index).then(
             ([stamp, value, area]: Rate[]) => ({ stamp, value, area })
         );
     }
     public async aprsLength(
-        ppt_id: NftFullId | NftToken
+        ppt_id: NftFullId
     ): Promise<number | undefined> {
-        if (ROParams.lt(Version.v7b)) {
+        const contract = await this.get;
+        const id = Nft.realId(ppt_id, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v7b)) {
             return undefined;
         }
-        const contract = await this.get;
-        return contract.aprsLength(ppt_id);
+        return contract.aprsLength(id);
     }
-    public async bonuses(
-        ppt_id: NftFullId | NftToken, index: Index
-    ): Promise<APRBonus> {
+    public async apbs(
+        ppt_id: NftFullId, index: Index
+    ): Promise<APB> {
         const contract = await this.get;
-        return contract.bonuses(ppt_id, index).then(
+        const id = Nft.realId(ppt_id, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v8a)) {
+            return contract.bonuses(id, index).then(
+                ([stamp, value, area]: Rate[]) => ({ stamp, value, area })
+            );
+        }
+        return contract.apbs(id, index).then(
             ([stamp, value, area]: Rate[]) => ({ stamp, value, area })
         );
     }
-    public async bonusesLength(
-        ppt_id: NftFullId | NftToken
+    public async apbsLength(
+        ppt_id: NftFullId
     ): Promise<number | undefined> {
-        if (ROParams.lt(Version.v7b)) {
+        if (ROParams.lt2(this.version, Version.v7b)) {
             return undefined;
         }
         const contract = await this.get;
-        return contract.bonusesLength(ppt_id);
-    }
-    public async claimFor(
-        address: Account, ppt_id: NftRealId
-    ): Promise<Transaction> {
-        const contract = await this.otf;
-        return contract.claimFor(
-            x40(address), Nft.realId(ppt_id)
-        );
-    }
-    public async claimForBatch(
-        address: Account, ppt_ids: NftRealId[]
-    ): Promise<Transaction> {
-        const contract = await this.otf;
-        return contract.claimForBatch(
-            x40(address), Nft.realIds(ppt_ids)
-        );
-    }
-    public async claimedFor(
-        address: Account, ppt_id: NftRealId
-    ): Promise<Amount> {
-        const contract = await this.get;
-        return contract.claimedFor(
-            x40(address), Nft.realId(ppt_id)
-        );
-    }
-    public async claimedForBatch(
-        address: Account, ppt_ids: NftRealId[]
-    ): Promise<Amount[]> {
-        const contract = await this.get;
-        return contract.claimedForBatch(
-            x40(address), Nft.realIds(ppt_ids)
-        );
-    }
-    public async claimableFor(
-        address: Account, ppt_id: NftRealId
-    ): Promise<Amount> {
-        const contract = await this.get;
-        return contract.claimableFor(
-            x40(address), Nft.realId(ppt_id)
-        );
-    }
-    public async claimableForBatch(
-        address: Account, ppt_ids: NftRealId[]
-    ): Promise<Amount[]> {
-        const contract = await this.get;
-        return contract.claimableForBatch(
-            x40(address), Nft.realIds(ppt_ids)
-        );
-    }
-    public async rateOf(
-        ppt_id: NftRealId
-    ): Promise<Rate> {
-        if (ROParams.lt(Version.v6c)) {
-            const [apr, apr_bonus] = await Promise.all([
-                this.aprOf(ppt_id), this.aprBonusOf(ppt_id)
-            ]);
-            return apr + apr_bonus;
+        const id = Nft.realId(ppt_id, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v8a)) {
+            return contract.bonusesLength(id);
         }
+        return contract.apbsLength(id);
+    }
+    public async claim(
+        address: Account, ppt_id: NftFullId
+    ): Promise<Transaction> {
+        const contract = await this.otf;
+        const id = Nft.realId(ppt_id, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v8a)) {
+            return contract.claimFor(x40(address), id);
+        }
+        return contract.claim(x40(address), id);
+    }
+    public async claimBatch(
+        address: Account, ppt_ids: NftFullId[]
+    ): Promise<Transaction> {
+        const contract = await this.otf;
+        const ids = Nft.realIds(ppt_ids, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v8a)) {
+            return contract.claimForBatch(x40(address), ids);
+        }
+        return contract.claimBatch(x40(address), ids);
+    }
+    public async claimed(
+        address: Account, ppt_id: NftFullId
+    ): Promise<Amount> {
         const contract = await this.get;
-        return contract.rateOf(Nft.realId(ppt_id));
+        const id = Nft.realId(ppt_id, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v8a)) {
+            return contract.claimedFor(x40(address), id);
+        }
+        return contract.claimed(x40(address), id);
+    }
+    public async claimedBatch(
+        address: Account, ppt_ids: NftFullId[]
+    ): Promise<Amount[]> {
+        const contract = await this.get;
+        const ids = Nft.realIds(ppt_ids, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v8a)) {
+            return contract.claimedForBatch(x40(address), ids);
+        }
+        return contract.claimedBatch(x40(address), ids);
+    }
+    public async claimable(
+        address: Account, ppt_id: NftFullId
+    ): Promise<Amount> {
+        const contract = await this.get;
+        const id = Nft.realId(ppt_id, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v8a)) {
+            return contract.claimableFor(x40(address), id);
+        }
+        return contract.claimable(x40(address), id);
+    }
+    public async claimableBatch(
+        address: Account, ppt_ids: NftFullId[]
+    ): Promise<Amount[]> {
+        const contract = await this.get;
+        const ids = Nft.realIds(ppt_ids, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v8a)) {
+            return contract.claimableForBatch(x40(address), ids);
+        }
+        return contract.claimableBatch(x40(address), ids);
     }
     public async aprOf(
-        ppt_id: NftRealId
+        ppt_id: NftFullId
     ): Promise<Rate> {
         const contract = await this.get;
-        return contract.aprOf(
-            Nft.realId(ppt_id)
-        );
+        const id = Nft.realId(ppt_id, {
+            version: this.version
+        });
+        return contract.aprOf(id);
     }
-    public async aprBonusOf(
-        ppt_id: NftRealId
+    public async apbOf(
+        ppt_id: NftFullId
     ): Promise<Rate> {
         const contract = await this.get;
-        return contract.aprBonusOf(
-            Nft.realId(ppt_id)
-        );
-    }
-    public async rateTargetOf(
-        ppt_id: NftRealId
-    ): Promise<Rate> {
-        const [apr, apr_bonus] = await Promise.all([
-            this.aprTargetOf(ppt_id), this.aprBonusTargetOf(ppt_id)
-        ]);
-        return apr + apr_bonus;
+        const id = Nft.realId(ppt_id, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v8a)) {
+            return contract.aprBonusOf(id);
+        }
+        return contract.apbOf(id);
     }
     public async aprTargetOf(
-        ppt_id: NftRealId
+        ppt_id: NftFullId
     ): Promise<Rate> {
-        if (ROParams.lt(Version.v6b)) {
+        const contract = await this.get;
+        const id = Nft.realId(ppt_id, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v6b)) {
             return 0n;
         }
-        const contract = await this.get;
-        return contract.aprTargetOf(
-            Nft.realId(ppt_id)
-        );
+        return contract.aprTargetOf(id);
     }
-    public async aprBonusTargetOf(
-        ppt_id: NftRealId
+    public async apbTargetOf(
+        ppt_id: NftFullId
     ): Promise<Rate> {
-        if (ROParams.lt(Version.v6b)) {
+        const contract = await this.get;
+        const id = Nft.realId(ppt_id, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v6b)) {
             return 0n;
         }
-        const contract = await this.get;
-        return contract.aprBonusTargetOf(
-            Nft.realId(ppt_id)
-        );
+        if (ROParams.lt2(this.version, Version.v8a)) {
+            return contract.aprBonusTargetOf(id);
+        }
+        return contract.apbTargetOf(id);
     }
     public async onBlock(
         listener: Listener
@@ -200,9 +236,10 @@ export class MoeTreasury extends Base {
         contract.on('Claim', (
             account: string, id: bigint, amount: Amount, ev: TxEvent
         ) => {
-            const address = BigInt(account);
-            const nft_id = id.toString() as NftRealId;
-            listener(address, nft_id, amount, ev);
+            const nft_id = Nft.fullIdOf({
+                real_id: id.toString() as NftRealId
+            });
+            listener(BigInt(account), nft_id, amount, ev);
         });
     }
     public async onClaimBatch(
@@ -212,54 +249,46 @@ export class MoeTreasury extends Base {
         contract.on('ClaimBatch', (
             account: string, ids: bigint[], amounts: Amount[], ev: TxEvent
         ) => {
-            const address = BigInt(account);
-            const nft_ids = ids.map((id) => id.toString() as NftRealId);
-            listener(address, nft_ids, amounts, ev);
+            const nft_ids = Nft.fullIdsOf({
+                real_ids: ids.map((id) => id.toString() as NftRealId)
+            });
+            listener(BigInt(account), nft_ids, amounts, ev);
         });
     }
     public async refreshRates(
         prefix: NftToken, all_levels: boolean
     ): Promise<Transaction> {
         const contract = await this.otf;
-        return contract.refreshRates(
-            prefix, all_levels
-        );
+        if (ROParams.lt2(this.version, Version.v8a)) {
+            return contract.refreshRates(prefix, all_levels);
+        }
+        return contract.refreshRates(all_levels);
     }
     public async refreshable(
         prefix: NftToken
     ): Promise<boolean> {
         const contract = await this.get;
-        return contract.refreshable(prefix);
+        if (ROParams.lt2(this.version, Version.v8a)) {
+            return contract.refreshable(prefix);
+        }
+        return contract.refreshable();
     }
     public async onRefreshRates(
         listener: OnRefresh
     ): Promise<void> {
-        if (ROParams.lt(Version.v7c)) {
+        const contract = await this.get;
+        if (ROParams.lt2(this.version, Version.v7c)) {
             return;
         }
-        const contract = await this.get;
-        contract.on('RefreshRates', (
-            nft_prefix: bigint, all_levels: boolean, ev: TxEvent
-        ) => {
-            listener(nft_prefix, all_levels, ev);
-        });
-    }
-    public async moeBalanceOf(
-        index: Index | Promise<Index>
-    ): Promise<Balance> {
-        const contract = await this.get;
-        if (ROParams.lt(Version.v6b)) {
-            return contract.balance();
+        if (ROParams.lt2(this.version, Version.v8a)) {
+            contract.on('RefreshRates', listener);
+            return;
         }
-        return contract.moeBalanceOf(await index);
-    }
-    public async moeIndexOf(
-        address: Account
-    ): Promise<Index> {
-        const contract = await this.get;
-        return contract.moeIndexOf(x40(address)).then(
-            (index: bigint) => Number(index)
-        );
+        contract.on('RefreshRates', (
+            all_levels: boolean, ev: TxEvent
+        ) => {
+            listener(2n, all_levels, ev);
+        });
     }
     private get otf() {
         return OtfManager.connect(this.connect());
@@ -267,5 +296,6 @@ export class MoeTreasury extends Base {
     private get get() {
         return MYProvider().then((p) => this.connect(p));
     }
+    private version: Version;
 }
 export default MoeTreasury;

@@ -13,7 +13,7 @@ import { Years } from '../../source/years';
 Blockchain.onConnect(function enableAllowanceButton() {
     const $claim_any = $('.claim-any').filter((i, el) => {
         const source = new RegExp($(el).data('source'));
-        return 'v2a|v2b|v2c|v3a|v3b'.match(source) === null;
+        return 'v1a|v2a|v2b|v2c|v3a|v3b'.match(source) === null;
     });
     $claim_any.prop('disabled', false);
 });
@@ -43,11 +43,10 @@ async function claim(token: Token, { $claim }: {
     //
     const ids = Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
-    const src_claimables = await mty_source.claimableForBatch(
-        account, Nft.realIds(ids, { version: src_version })
+    const src_claimables = await mty_source.claimableBatch(
+        account, ids
     );
     console.debug(
         `[${src_version}:claimables]`, src_claimables
@@ -81,8 +80,8 @@ async function claim(token: Token, { $claim }: {
             );
             reset();
         });
-        const tx: Transaction = await mty_source.claimForBatch(
-            account, Nft.realIds(nz.ids, { version: src_version })
+        const tx: Transaction = await mty_source.claimBatch(
+            account, nz.ids
         );
     } catch (ex: any) {
         if (ex.message) {

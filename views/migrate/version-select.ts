@@ -36,8 +36,7 @@ async function get_balances(
     }
     const ids = Nft.fullIds({
         issues: Array.from(Years()),
-        levels: Array.from(NftLevels()),
-        token: Nft.token(token)
+        levels: Array.from(NftLevels())
     });
     const accounts = ids.map(() => {
         return x40(account);
@@ -61,14 +60,14 @@ async function get_balances(
         const nfts: Balance[] = await nft_contract.get.then(
             (c) => c.balanceOfBatch(accounts, Nft.realIds(ids, { version }))
         );
-        nft = nfts.reduce((a, n) => a + n, 0n);
+        nft = nfts.reduce((a, n, i) => a + n * 10n ** BigInt(Nft.level(ids[i])), 0n);
     }
     let ppt = 0n;
     if (ppt_contract) {
         const ppts: Balance[] = await ppt_contract.get.then(
             (c) => c.balanceOfBatch(accounts, Nft.realIds(ids, { version }))
         );
-        ppt = ppts.reduce((a, p) => a + p, 0n);
+        ppt = ppts.reduce((a, p, i) => a + p * 10n ** BigInt(Nft.level(ids[i])), 0n);
     }
     return { moe, sov, nft: nft + ppt };
 }

@@ -1,7 +1,7 @@
 import { Store } from '@reduxjs/toolkit';
 
 import { Blockchain } from '../blockchain';
-import { APR, APRBonus, MoeTreasury, MoeTreasuryFactory } from '../contract';
+import { APB, APR, MoeTreasury, MoeTreasuryFactory } from '../contract';
 import { buffered, range } from '../functions';
 import { onRatesUiRefresher } from '../redux/observers';
 import { xtokenOf } from '../redux/selectors';
@@ -99,7 +99,7 @@ class APRs {
         level: NftLevel
     ): Promise<APR[]> {
         const ppt_id = Nft.fullId({
-            issue: 2021, level, token: this.nftToken
+            issue: 2021, level
         });
         const length = await this.mty.aprsLength(ppt_id);
         if (length !== undefined) {
@@ -155,9 +155,9 @@ class APBs {
         level: NftLevel
     ): Promise<APR[]> {
         const ppt_id = Nft.fullId({
-            issue: 2021, level, token: this.nftToken
+            issue: 2021, level
         });
-        const length = await this.mty.bonusesLength(ppt_id);
+        const length = await this.mty.apbsLength(ppt_id);
         if (length !== undefined) {
             return this.list(ppt_id, Array.from(range(length)))
         }
@@ -165,23 +165,23 @@ class APBs {
     }
     async list(
         ppt_id: NftFullId, indices: Index[]
-    ): Promise<APRBonus[]> {
+    ): Promise<APB[]> {
         return this.tail(ppt_id, await Promise.all(indices.map((i) =>
-            this.mty.bonuses(ppt_id, i)
+            this.mty.apbs(ppt_id, i)
         )));
     }
     async next(
-        ppt_id: NftFullId, index: Index = 0, list = [] as APRBonus[]
-    ): Promise<APRBonus[]> {
+        ppt_id: NftFullId, index: Index = 0, list = [] as APB[]
+    ): Promise<APB[]> {
         try {
-            list.push(await this.mty.bonuses(this.nftToken, index));
+            list.push(await this.mty.apbs(ppt_id, index));
         } catch (ex) {
             return this.tail(ppt_id, list);
         }
         return this.next(ppt_id, index + 1, list);
     }
     async tail(
-        ppt_id: NftFullId, list: APRBonus[]
+        ppt_id: NftFullId, list: APB[]
     ) {
         const target = await this.fake(ppt_id);
         list.push(aprify(target, list));
@@ -191,7 +191,7 @@ class APBs {
         ppt_id: NftFullId
     ) {
         try {
-            return this.mty.aprBonusTargetOf(ppt_id);
+            return this.mty.apbTargetOf(ppt_id);
         } catch (ex) {
             console.error(ex);
             return 0n;
@@ -202,7 +202,7 @@ class APBs {
 }
 function aprify(
     value: Rate, list: APR[]
-): APR | APRBonus {
+): APR | APB {
     const stamp = BigInt(new Date().getTime()) / 1000n;
     if (list.length > 0) {
         const last = list[list.length - 1];

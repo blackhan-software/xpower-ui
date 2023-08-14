@@ -1,5 +1,5 @@
 import { Action } from '@reduxjs/toolkit';
-import { APR, APRBonus } from '../../contract';
+import { APR, APB } from '../../contract';
 import { Tokenizer } from '../../token';
 import { Empty, Index, Rates } from '../types';
 
@@ -13,7 +13,7 @@ export function ratesReducer(
         const xtoken = Tokenizer.xify(token);
         const by_token = rates.items[xtoken]?.[level] ?? {
             apr: {} as Record<Index, APR>,
-            bonus: {} as Record<Index, APRBonus>,
+            bonus: {} as Record<Index, APB>,
         };
         const items = {
             ...rates.items, [xtoken]: {
@@ -33,7 +33,7 @@ export function ratesReducer(
         const xtoken = Tokenizer.xify(token);
         const by_token = rates.items[xtoken]?.[level] ?? {
             apr: {} as Record<Index, APR>,
-            bonus: {} as Record<Index, APRBonus>,
+            bonus: {} as Record<Index, APB>,
         };
         const items = {
             ...rates.items, [xtoken]: {

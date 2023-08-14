@@ -17,10 +17,8 @@ export function XPowerPptFactory({
     if (version === undefined) {
         version = ROParams.version;
     }
-    const xtoken = version < Version.v6a
-        ? Tokenizer.xify(token) : 'XPOW';
     const ppt = new XPowerPpt(address({
-        infix: 'PPT', token: xtoken, version
+        infix: 'PPT', token: Tokenizer.xify(token), version
     }));
     return global.XPOWER_PPT = ppt;
 }
@@ -42,8 +40,7 @@ export function XPowerPptMockFactory(
                 id = BigInt(id);
             }
             const full_id = Nft.fullIdOf({
-                real_id: id.toString() as NftRealId,
-                token: Nft.token(token)
+                real_id: id.toString() as NftRealId
             });
             return `/ipfs/QmYfHKkkm26y8Xd7Aur8uvaXmca82s3Nrve74RY8BrhckS/320x427/${full_id}.json`;
         },

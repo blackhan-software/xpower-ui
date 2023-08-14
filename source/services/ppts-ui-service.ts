@@ -162,7 +162,7 @@ export const PptsUiService = (
             ? new PptWallet(account, token)
             : new PptWalletMock(0n, token);
         const ppt_id = Nft.fullId({
-            level, issue, token: Nft.token(token)
+            level, issue
         });
         const supply = await ppt_wallet.totalSupply(ppt_id);
         if (supply > 0) {

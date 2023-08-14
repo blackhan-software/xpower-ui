@@ -31,10 +31,7 @@ export class HashManager extends EventEmitter {
         const current_time = this.get(hash, slot);
         if (current_time === null || current_time < time) {
             localStorage.setItem(`block-hash[${key(hash, slot)}]`, `${time}`);
-            this.emit('block-hash', {
-                block_hash: BigInt(hash),
-                slot
-            });
+            this.emit('block-hash', { block_hash: BigInt(hash), slot });
         }
     }
     public static set(hash: Hash, time: Timestamp, slot: Slot): void {
