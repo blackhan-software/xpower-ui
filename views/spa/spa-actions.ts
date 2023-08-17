@@ -919,7 +919,7 @@ export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
             gasLimit: gas_limit, gasPrice: gas_price,
             to: otf_address, value
         });
-        tx.wait(1).then(() => {
+        tx.wait(1, 5000).finally(() => {
             api.dispatch(setOtfWalletProcessing({
                 processing: false
             }));
@@ -971,7 +971,7 @@ export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
             gasLimit: gas_limit, gasPrice: gas_price,
             to: x40(account), value
         });
-        tx.wait(1).then(() => {
+        tx.wait(1, 5000).finally(() => {
             api.dispatch(setOtfWalletProcessing({
                 processing: false
             }));
