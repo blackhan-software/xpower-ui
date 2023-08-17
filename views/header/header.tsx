@@ -71,7 +71,7 @@ function $icon(
 function $label(
     my_page: Page,
 ) {
-    return <span className='d-none d-sm-inline'>
+    return <span className='d-none d-sm-inline text'>
         {labels[my_page]}
     </span>;
 }

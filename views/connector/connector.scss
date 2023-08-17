@@ -4,11 +4,11 @@ form#connector {
 form#connector {
   div.connect-wallet {
     a#connect-wallet {
-      span.spinner {
+      .spinner {
         height: 1em;
         width: 1em;
       }
-      span.spinner {
+      .spinner {
         margin-top: 0.25em;
       }
       border-right: none;
