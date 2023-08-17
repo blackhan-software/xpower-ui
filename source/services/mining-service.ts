@@ -1,3 +1,6 @@
+import { Global } from '../types';
+declare const global: Global;
+
 import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
 import { x32 } from '../functions';
@@ -99,7 +102,9 @@ export const MiningService = (
     Blockchain.onceConnect(function restartMining({
         account
     }) {
-        const im = new IntervalManager({ start: true });
+        const im = global.IM = new IntervalManager({
+            start: true
+        });
         im.on('tick', async () => {
             const token = xtokenOf(store.getState());
             const miner = MM(store).miner({
@@ -109,9 +114,9 @@ export const MiningService = (
             if (running) {
                 await miner.stop();
             }
-            if (running) {
+            if (running) setTimeout(() => {
                 MM(store).toggle({ account, token });
-            }
+            }, 600);
         });
     });
     Blockchain.onceConnect(function benchmarkMining({
