@@ -24,12 +24,12 @@ export class HashManager extends EventEmitter {
     }
     public set(hash: Hash, time: Timestamp, slot: Slot): void {
         const latest_time = this.latestTime(slot);
-        if (latest_time === null || latest_time < time) {
+        if (latest_time === null || latest_time <= time) {
             localStorage.setItem(`latest[${key('time', slot)}]`, `${time}`);
             localStorage.setItem(`latest[${key('hash', slot)}]`, `${hash}`);
         }
         const current_time = this.get(hash, slot);
-        if (current_time === null || current_time < time) {
+        if (current_time === null || current_time <= time) {
             localStorage.setItem(`block-hash[${key(hash, slot)}]`, `${time}`);
             this.emit('block-hash', { block_hash: BigInt(hash), slot });
         }
