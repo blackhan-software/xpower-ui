@@ -28,30 +28,4 @@ export function XPower({
         width={width}
     />;
 }
-export function XPowerBlack({
-    token, height, width, source, style
-}: {
-    token: Token,
-    height?: number,
-    width?: number,
-    source?: string,
-    style?: CSSProperties
-}) {
-    if (source === undefined) {
-        source = `/images/svg/${Tokenizer.lower(token)}-black.svg`;
-    }
-    if (height === undefined) {
-        height = 16;
-    }
-    if (width === undefined) {
-        width = 16;
-    }
-    return <img
-        alt={token}
-        height={height}
-        src={source}
-        style={style}
-        width={width}
-    />;
-}
 export default XPower;
