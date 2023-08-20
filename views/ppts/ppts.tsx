@@ -102,7 +102,7 @@ export function UiPpts(
     const { amounts, minter } = props;
     return <React.Fragment>
         <label className='form-label'>
-            Stake & Manage {token} NFTs
+            Stake NFTs and Claim Rewards
         </label>
         <div id='ppt-batch-minting'>
             <UiPptMinter

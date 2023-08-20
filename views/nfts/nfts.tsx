@@ -102,7 +102,7 @@ export function UiNfts(
     const { amounts, minter } = props;
     return <React.Fragment>
         <label className='form-label'>
-            Mint & Manage {token} NFTs
+            Mint and Manage NFTs
         </label>
         <div id='nft-batch-minting'>
             <UiNftMinter

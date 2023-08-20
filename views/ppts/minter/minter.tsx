@@ -114,7 +114,7 @@ function $info(
     return <button type='button'
         className='btn btn-outline-warning info'
         data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`Batch (un)stake NFTs or claim ${Tokenizer.aify(token)} rewards`}
+        title={`(Un)stake ${token} NFTs and claim ${Tokenizer.aify(token)} rewards`}
     >
         <InfoCircle fill={true} />
     </button>;
