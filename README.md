@@ -62,7 +62,7 @@ auto-mint | number | 3000 | auto-mint interval in milliseconds
 clear | boolean | false | flag to clear current persistence slot (as defined by persist flag)
 clear-all | boolean | false | flag to clear all persistence slots
 logger | boolean | false | flag to log nonces to console
-min-level | number | 5 | threshold of nonces with lower corresponding amounts to be ignored
+min-level | number | 6 | threshold of nonces with lower corresponding amounts to be ignored
 max-level | number | 64 | threshold of nonces with higher corresponding amounts to be ignored
 min-nft-level | number | 0 | threshold of NFT levels to display from (UNIT)
 max-nft-level | number | 24 | threshold of NFT levels to display upto (YOTTA)

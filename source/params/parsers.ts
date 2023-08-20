@@ -40,7 +40,7 @@ export function level(
 ): {
     min: Level, max: Level
 } {
-    const min = Parser.number(params.get('min-level'), 5);
+    const min = Parser.number(params.get('min-level'), 6);
     const max = Parser.number(params.get('max-level'), 64);
     return { min, max };
 }
