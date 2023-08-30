@@ -4,7 +4,7 @@ export interface OnDoubleTap {
     (e: MouseEvent | TouchEvent): void
 }
 export function useDoubleTap<T extends HTMLElement>(
-    $ref: React.RefObject<T>, handler: OnDoubleTap, ms = 300
+    $ref: React.RefObject<T>, handler: OnDoubleTap, ms = 200
 ): [
     React.RefObject<T>
 ] {
