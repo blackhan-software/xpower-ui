@@ -2,7 +2,7 @@ import { Action } from '@reduxjs/toolkit';
 import { RWParams } from '../../params';
 import { Years } from '../../years';
 import * as actions from '../actions';
-import { NftLevels, NftToken, NftTokens, PptAmounts, PptDetails, PptFlags, PptMinter, PptsUi } from '../types';
+import { NftLevels, PptAmounts, PptDetails, PptFlags, PptMinter, PptsUi } from '../types';
 
 export function pptsUiReducer(
     ppts_ui: PptsUi = pptsUiState(), action: Action
@@ -56,14 +56,6 @@ export function pptsUiState() {
         toggled: false
     };
 }
-export function pptWrap<WR extends Record<string, unknown>>(
-    wrapped_record: WR
-) {
-    const entries = Object.fromEntries(
-        Array.from(NftTokens()).map((t) => [t, wrapped_record])
-    );
-    return entries as Record<NftToken, WR>;
-}
 export function pptAmounts(
     amount = 0n, max = 0n, min = 0n
 ) {
@@ -74,7 +66,7 @@ export function pptAmounts(
             }]
         )
     );
-    return pptWrap(amounts as PptAmounts);
+    return amounts as PptAmounts;
 }
 export function pptDetails(
     image = {
@@ -105,7 +97,7 @@ export function pptDetails(
             }])
         )])
     );
-    return pptWrap(details as PptDetails);
+    return details as PptDetails;
 }
 export function pptMinter() {
     const minter = {
@@ -114,7 +106,7 @@ export function pptMinter() {
         burner_status: null,
         claimer_status: null,
     };
-    return pptWrap(minter as PptMinter);
+    return minter as PptMinter;
 }
 export function pptFlags(
     display = true

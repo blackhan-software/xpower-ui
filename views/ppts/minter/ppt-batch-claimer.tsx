@@ -1,5 +1,5 @@
 import { pptTotalBy } from '../../../source/redux/selectors';
-import { Nft, Nfts, PptClaimerStatus, Token } from '../../../source/redux/types';
+import { Nfts, PptClaimerStatus } from '../../../source/redux/types';
 
 import React from 'react';
 import { UiPptBatchClaimerTitle } from './ppt-batch-claimer-title';
@@ -7,21 +7,20 @@ import { Spinner } from './spinner';
 
 type Props = {
     approved: boolean | null;
-    onBatchClaim?: (token: Token) => void;
+    onBatchClaim?: () => void;
     status: PptClaimerStatus | null;
-    token: Token;
 } & {
     ppts: Nfts;
 }
 export function UiPptBatchClaimer(
-    { approved, onBatchClaim, ppts, status, token }: Props
+    { approved, onBatchClaim, ppts, status }: Props
 ) {
     const classes = [
         'btn btn-outline-warning',
         approved ? 'show' : ''
     ];
     const title = UiPptBatchClaimerTitle({
-        status, token
+        status
     });
     const text = claiming(status)
         ? <>Claiming<span className="d-none d-sm-inline">&nbsp;Rewards…</span></>
@@ -30,8 +29,8 @@ export function UiPptBatchClaimer(
         type='button' id='ppt-batch-claimer'
         className={classes.join(' ')}
         data-bs-placement='top' data-bs-toggle='tooltip'
-        disabled={disabled({ ppts, status, token, title })}
-        onClick={onBatchClaim?.bind(null, token)} title={title}
+        disabled={disabled({ ppts, status, title })}
+        onClick={onBatchClaim?.bind(null)} title={title}
     >
         {Spinner({
             show: claiming(status), grow: true
@@ -40,7 +39,7 @@ export function UiPptBatchClaimer(
     </button>;
 }
 function disabled(
-    { ppts, status, token, title }: Omit<Props, 'approved'> & {
+    { ppts, status, title }: Omit<Props, 'approved'> & {
         title: string | undefined
     }
 ) {
@@ -50,7 +49,7 @@ function disabled(
     if (claiming(status)) {
         return true;
     }
-    if (!claimable(ppts, token)) {
+    if (!claimable(ppts)) {
         return true;
     }
     return false;
@@ -61,11 +60,9 @@ function claiming(
     return status === PptClaimerStatus.claiming;
 }
 function claimable(
-    ppts: Props['ppts'], token: Props['token']
+    ppts: Props['ppts']
 ) {
-    const { amount } = pptTotalBy({ ppts }, {
-        token: Nft.token(token)
-    });
+    const { amount } = pptTotalBy({ ppts });
     return amount > 0n;
 }
 export default UiPptBatchClaimer;

@@ -1,10 +1,9 @@
-import { NftLevel, NftToken } from '../types';
+import { NftLevel } from '../types';
 import { nftTotalBy } from './nft-total-by';
 
 describe('nft-total-by', () => {
     const issue = 2021;
     const level = NftLevel.UNIT;
-    const token = NftToken.XPOW;
     it('should return total = { amount: 0n, supply: 0n }', () => {
         const total = nftTotalBy({ nfts: { items: {} } });
         expect(total).toEqual({
@@ -21,7 +20,7 @@ describe('nft-total-by', () => {
                 }
             }
         }, {
-            issue, level, token
+            issue, level
         });
         expect(total).toEqual({
             amount: 1n, supply: 2n
@@ -40,7 +39,7 @@ describe('nft-total-by', () => {
                 }
             }
         }, {
-            issue, token
+            issue
         });
         expect(total).toEqual({
             amount: 3n, supply: 6n

@@ -5,7 +5,6 @@ import { Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
 import { Alert, Alerts, alert, x40 } from '../../source/functions';
 import { Account, MAX_UINT256, Token } from '../../source/redux/types';
-import { Tokenizer } from '../../source/token';
 import { Version } from '../../source/types';
 import { MoeWallet } from '../../source/wallet';
 
@@ -18,7 +17,7 @@ $('button.approve-moe-allowance').on(
         const $approve = $(e.currentTarget);
         const $migrate = $approve.parents('form.moe-migrate');
         if ($approve.hasClass('xpow')) {
-            await moeApproveOld(Token.XPOW, {
+            await moeApproveOld({
                 $approve, $migrate: $migrate.find(
                     '.moe-migrate.xpow'
                 )
@@ -26,14 +25,14 @@ $('button.approve-moe-allowance').on(
         }
     }
 );
-async function moeApproveOld(token: Token, { $approve, $migrate }: {
+async function moeApproveOld({ $approve, $migrate }: {
     $approve: JQuery<HTMLElement>, $migrate: JQuery<HTMLElement>
 }) {
     const { account, src_version, tgt_version } = await context({
         $el: $approve
     });
     const { src_xpower, tgt_xpower } = await contracts({
-        account, token, src_version, tgt_version
+        account, src_version, tgt_version
     });
     if (!src_xpower) {
         throw new Error('undefined src_xpower');
@@ -99,18 +98,18 @@ $('button.moe-migrate').on(
     'click', async function migrateTokens(e) {
         const $migrate = $(e.currentTarget);
         if ($migrate.hasClass('xpow')) {
-            await moeMigrateOld(Token.XPOW, { $migrate });
+            await moeMigrateOld({ $migrate });
         }
     }
 );
-async function moeMigrateOld(token: Token, { $migrate }: {
+async function moeMigrateOld({ $migrate }: {
     $migrate: JQuery<HTMLElement>
 }) {
     const { account, src_version, tgt_version } = await context({
         $el: $migrate
     });
     const { src_xpower, tgt_xpower } = await contracts({
-        account, src_version, tgt_version, token
+        account, src_version, tgt_version
     });
     if (!src_xpower) {
         throw new Error('undefined src_xpower');
@@ -159,7 +158,7 @@ async function moeMigrateOld(token: Token, { $migrate }: {
                 return;
             }
             alert(
-                `Old ${Tokenizer.xify(token)} balance has been migrated! ;)`,
+                `Old ${Token.XPOW} balance has been migrated! ;)`,
                 Alert.success, { after: $migrate.parent('div')[0], id: 'success' }
             );
             reset();
@@ -201,14 +200,14 @@ async function context({ $el: $approve }: {
     return { account, src_version, tgt_version };
 }
 async function contracts({
-    account, token, src_version, tgt_version
+    account, src_version, tgt_version
 }: {
-    account: Account, token: Token, src_version: Version, tgt_version: Version
+    account: Account, src_version: Version, tgt_version: Version
 }) {
     let src_xpower: MoeWallet | undefined;
     try {
         src_xpower = new MoeWallet(
-            account, token, src_version
+            account, src_version
         );
         console.debug(
             `[${src_version}:src_xpower]`, await src_xpower.address
@@ -219,7 +218,7 @@ async function contracts({
     let tgt_xpower: MoeWallet | undefined;
     try {
         tgt_xpower = new MoeWallet(
-            account, token, tgt_version
+            account, tgt_version
         );
         console.debug(
             `[${tgt_version}:tgt_xpower]`, await tgt_xpower.address

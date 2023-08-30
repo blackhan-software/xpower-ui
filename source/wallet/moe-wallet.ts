@@ -1,6 +1,6 @@
 import { MYProvider } from '../blockchain';
 import { XPowerMoe, XPowerMoeFactory } from '../contract';
-import { Account, Address, BlockHash, Nonce, Timestamp, Token } from '../redux/types';
+import { Account, Address, BlockHash, Nonce, Timestamp } from '../redux/types';
 import { TxEvent, Version } from '../types';
 import { ERC20Wallet, OnApproval, OnTransfer } from './erc20-wallet';
 
@@ -11,10 +11,14 @@ export type OnInit = (
 
 export class MoeWallet extends ERC20Wallet {
     constructor(
-        account: Account | Address, token: Token, version?: Version
+        account: Account | Address, version?: Version
     ) {
         super(account);
-        this._moe = XPowerMoeFactory({ token, version });
+        if (version) {
+            this._moe = XPowerMoeFactory({ version });
+        } else {
+            this._moe = XPowerMoeFactory();
+        }
     }
     init() {
         return this._moe.init();

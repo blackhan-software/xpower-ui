@@ -1,7 +1,6 @@
 import { Bus } from '../../../source/bus';
 import { nice } from '../../../source/functions';
 import { Amount, Nft, NftIssue, NftLevel, PptClaimerStatus, Rate, Token } from '../../../source/redux/types';
-import { Tokenizer } from '../../../source/token';
 
 import React, { useEffect } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
@@ -9,7 +8,6 @@ import { globalRef } from '../../../source/react';
 import { UiPptToggle } from './ui-toggle';
 
 type Props = {
-    token: Token;
     issue: NftIssue;
     level: NftLevel;
 } & {
@@ -92,12 +90,11 @@ function $info(
     useEffect(
         () => Bus.emit('refresh-tips'), [rate]
     );
-    const { level, token } = props;
-    const atoken = Tokenizer.aify(token);
+    const { level } = props;
     return <button type='button'
         className='btn btn-outline-warning info'
         data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`Claim ${atoken}s for staked ${Nft.nameOf(level)} NFTs at ${nice(rate, {
+        title={`Claim ${Token.APOW}s for staked ${Nft.nameOf(level)} NFTs at ${nice(rate, {
             maxPrecision: 2, minPrecision: 2
         })}%`}
     >

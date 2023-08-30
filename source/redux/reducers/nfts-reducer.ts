@@ -1,9 +1,9 @@
 import { Action } from '@reduxjs/toolkit';
 import * as actions from '../actions';
-import { Amount, Empty, Nft, NftFullId, NftIssue, NftLevel, Nfts, NftToken, Supply } from '../types';
+import { Amount, Empty, Nft, NftFullId, NftIssue, NftLevel, Nfts, Supply } from '../types';
 
 const fullId = (nft: NftFullId | {
-    token: NftToken, issue: NftIssue, level: NftLevel
+    issue: NftIssue, level: NftLevel
 }) => {
     return typeof nft !== 'string' ? Nft.fullId(nft) : nft;
 };

@@ -1,37 +1,34 @@
 import { Version } from '../../types';
 import { Balance } from './base';
 import { NftFullId } from './nfts';
-import { Token } from './token';
 
 export type History = {
     /**
      * version => token => moe|sov|nft|ppt => { balance }
      */
     items: {
-        [version in Version]?: {
-            [token in Token]?: Partial<{
-                moe: {
+        [version in Version]?: Partial<{
+            moe: {
+                balance: Balance;
+            };
+            sov: {
+                balance: Balance;
+            };
+            nft: {
+                [id in NftFullId]?: {
                     balance: Balance;
-                };
-                sov: {
+                }
+            };
+            ppt: {
+                [id in NftFullId]?: {
                     balance: Balance;
-                };
-                nft: {
-                    [id in NftFullId]?: {
-                        balance: Balance;
-                    }
-                };
-                ppt: {
-                    [id in NftFullId]?: {
-                        balance: Balance;
-                    }
-                };
-            }>;
-        };
+                }
+            };
+        }>;
     };
-    /** set of more [version, token] */
-    more?: [Version, Token];
-    /** set of less [version, token] */
-    less?: [Version, Token];
+    /** set of more [version] */
+    more?: [Version];
+    /** set of less [version] */
+    less?: [Version];
 }
 export default History;

@@ -4,14 +4,14 @@ import { capitalize } from '../../routes/functions';
 import { Bus } from '../../source/bus';
 import { mobile } from '../../source/functions';
 import { useLongTap } from '../../source/react';
-import { NftIssue, RefresherStatus, Token } from '../../source/redux/types';
+import { NftIssue, RefresherStatus } from '../../source/redux/types';
 import { MAX_YEAR, MIN_YEAR } from '../../source/years';
 import { Scale } from './cover-graph-chart-scale';
 
 type Props = {
     controls: {
         refresher: {
-            onRefresh?: (token: Token, all_levels: boolean) => void;
+            onRefresh?: (all_levels: boolean) => void;
             status: RefresherStatus | null;
         };
         issues: {
@@ -23,10 +23,9 @@ type Props = {
             scale: Scale;
         };
     };
-    token: Token;
 }
 export function UiCoverGraphControlIssue(
-    { controls, token }: Props
+    { controls }: Props
 ) {
     const { issues: { issue, setIssue } } = controls;
     const { toggle: { scale, setScale } } = controls;
@@ -39,7 +38,7 @@ export function UiCoverGraphControlIssue(
     return <div className='control-issue cover-layer'>
         <div className='btn-group-vertical' role='group'>
             {$next({ issue, setIssue })}
-            {$refresh(refresher, token)}
+            {$refresh(refresher)}
             {$prev({ issue, setIssue })}
             {$toggle({ scale, setScale })}
         </div>
@@ -59,15 +58,14 @@ function $next(
     </button>;
 }
 function $refresh(
-    refresher: Props['controls']['refresher'],
-    token: Props['token']
+    refresher: Props['controls']['refresher']
 ) {
     const $ref = useRef<HTMLButtonElement>(null);
     const [tapped] = useLongTap($ref, () => {
-        refresher.onRefresh?.(token, true);
+        refresher.onRefresh?.(true);
     });
     const refresh = (all: boolean) => {
-        if (!tapped) refresher.onRefresh?.(token, all);
+        if (!tapped) refresher.onRefresh?.(all);
     };
     return <button ref={$ref}
         data-bs-toggle='tooltip' data-bs-placement='left'

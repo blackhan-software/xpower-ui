@@ -1,11 +1,12 @@
 import { Account, Amount } from './base';
-import { NftIssue, NftLevel, NftToken } from './nfts';
+import { NftIssue, NftLevel } from './nfts';
 
 export type NftsUi = {
-    amounts: Record<NftToken, NftAmounts>;
-    details: Record<NftToken, NftDetails>;
-    minter: Record<NftToken, NftMinter>;
-    flags: NftFlags; toggled: boolean;
+    amounts: NftAmounts;
+    details: NftDetails;
+    minter: NftMinter;
+    flags: NftFlags;
+    toggled: boolean;
 };
 export type NftDetails = Record<NftLevel, Record<NftIssue, {
     image: {

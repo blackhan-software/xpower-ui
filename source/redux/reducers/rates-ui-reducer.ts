@@ -1,6 +1,4 @@
-import { NftToken, NftTokens, RatesUi } from '../types';
-import { Refresher } from '../types/rates-ui';
-
+import { RatesUi, Refresher } from '../types';
 import { Action } from '@reduxjs/toolkit';
 import * as actions from '../actions';
 
@@ -25,14 +23,6 @@ export function ratesUiState() {
     };
 }
 function refresher() {
-    return wrap({ status: null } as Refresher);
-}
-function wrap<WR extends Record<string, unknown>>(
-    wrapped_record: WR
-) {
-    const entries = Object.fromEntries(
-        Array.from(NftTokens()).map((t) => [t, wrapped_record])
-    );
-    return entries as Record<NftToken, WR>;
+    return { status: null } as Refresher;
 }
 export default ratesUiReducer;

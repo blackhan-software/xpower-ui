@@ -20,11 +20,10 @@ type markdownItAnchor = {
     permalink: { linkInsideHeader: Function; };
 }
 type Props = {
-    token: Token;
     url?: URL;
 }
 export function UiAbout(
-    { token, url }: Props
+    { url }: Props
 ) {
     const $md_content = document.querySelector<HTMLElement>(
         '#md-content'
@@ -45,19 +44,19 @@ export function UiAbout(
         const md = !debug
             ? sessionStorage.getItem(md_url) ?? '' : '';
         if (md.length) {
-            renderMarkdown(md, token).then(
+            renderMarkdown(md).then(
                 (html) => setHtml(html)
             );
         } else {
             fetchMarkdown(md_url).then((md) => {
                 sessionStorage.setItem(md_url, md);
-                return renderMarkdown(md, token);
+                return renderMarkdown(md);
             }).then(
                 (html) => setHtml(html)
             );
         }
     }, [
-        debug, html, token, url
+        debug, html, url
     ]);
     useEffect(/*render-katex*/() => {
         const $md_content = document.querySelector<HTMLElement>(
@@ -103,7 +102,7 @@ async function fetchMarkdown(
     return await fetched.text();
 }
 async function renderMarkdown(
-    content: string, token: Token
+    content: string
 ) {
     await Promise.all([
         script(SCRIPTS.markdownIt),
@@ -132,7 +131,9 @@ async function renderMarkdown(
             .replace(/\\%/g, '\\\\%')
             .replace(/\\#/g, '\\\\#');
     }
-    function add_token(content: string) {
+    function add_token(
+        content: string, token = Token.XPOW
+    ) {
         const token_lc = Tokenizer.lower(token);
         const atoken = Tokenizer.aify(token);
         const atoken_lc = Tokenizer.lower(atoken);

@@ -5,13 +5,13 @@ import { Bus } from '../../source/bus';
 import { mobile } from '../../source/functions';
 import { ROParams } from '../../source/params';
 import { useLongTap } from '../../source/react';
-import { Nft, NftLevel, RefresherStatus, Token } from '../../source/redux/types';
+import { Nft, NftLevel, RefresherStatus } from '../../source/redux/types';
 import { Scale } from './cover-graph-chart-scale';
 
 type Props = {
     controls: {
         refresher: {
-            onRefresh?: (token: Token, all_levels: boolean) => void;
+            onRefresh?: (all_levels: boolean) => void;
             status: RefresherStatus | null;
         };
         levels: {
@@ -23,10 +23,9 @@ type Props = {
             scale: Scale;
         };
     };
-    token: Token;
 }
 export function UiCoverGraphControlLevel(
-    { controls, token }: Props
+    { controls }: Props
 ) {
     const { levels: { level, setLevel } } = controls;
     const { toggle: { scale, setScale } } = controls;
@@ -39,7 +38,7 @@ export function UiCoverGraphControlLevel(
     return <div className='control-level cover-layer'>
         <div className='btn-group-vertical' role='group'>
             {$next({ level, setLevel })}
-            {$refresh(refresher, token)}
+            {$refresh(refresher)}
             {$prev({ level, setLevel })}
             {$toggle({ scale, setScale })}
         </div>
@@ -59,15 +58,14 @@ function $next(
     </button>;
 }
 function $refresh(
-    refresher: Props['controls']['refresher'],
-    token: Props['token']
+    refresher: Props['controls']['refresher']
 ) {
     const $ref = useRef<HTMLButtonElement>(null);
     const [tapped] = useLongTap($ref, () => {
-        refresher.onRefresh?.(token, true);
+        refresher.onRefresh?.(true);
     });
     const refresh = (all: boolean) => {
-        if (!tapped) refresher.onRefresh?.(token, all);
+        if (!tapped) refresher.onRefresh?.(all);
     };
     return <button ref={$ref}
         data-bs-toggle='tooltip' data-bs-placement='left'

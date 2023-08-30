@@ -8,20 +8,18 @@ import { HashManager, IntervalManager, MiningManager as MM } from '../managers';
 import { ROParams } from '../params';
 import { setMiningSpeed, setMiningStatus } from '../redux/actions';
 import { onPageSwitch, onTokenSwitch } from '../redux/observers';
-import { xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { MinerStatus } from '../redux/types';
-import { Tokenizer } from '../token';
 import { MoeWallet, OnInit, OtfManager } from '../wallet';
 
 export const MiningService = (
     store: Store<AppState>
 ) => {
     Blockchain.onceConnect(function setupMining({
-        account, token
+        account
     }) {
         const miner = MM(store).miner({
-            account, token
+            account
         });
         miner.on('initializing', () => store.dispatch(
             setMiningStatus({ status: MinerStatus.initializing })));
@@ -44,60 +42,43 @@ export const MiningService = (
         miner.on('resumed', () => store.dispatch(
             setMiningStatus({ status: MinerStatus.resumed })));
         miner.on('increased', (e) => store.dispatch(
-            setMiningSpeed({ speed: { [miner.token]: e.speed } })));
+            setMiningSpeed({ speed: e.speed })));
         miner.on('decreased', (e) => store.dispatch(
-            setMiningSpeed({ speed: { [miner.token]: e.speed } })));
+            setMiningSpeed({ speed: e.speed })));
         store.dispatch(
             setMiningStatus({ status: MinerStatus.stopped })
         );
-    }, {
-        per: () => xtokenOf(store.getState())
     });
     onPageSwitch(store, async function stopMining() {
         const account = await Blockchain.account;
         if (account) {
             const miner = MM(store).miner({
-                account, token: xtokenOf(store.getState())
+                account
             });
             const running = miner.running;
             if (running) miner.stop();
         }
     });
-    onTokenSwitch(store, async function stopMining(token, oldToken) {
-        if (Tokenizer.similar(token, oldToken)) {
-            return;
-        }
+    onTokenSwitch(store, async function resetSpeed() {
         const account = await Blockchain.account;
         if (account) {
-            const miner = MM(store).miner({
-                account, token: oldToken
-            });
-            const running = miner.running;
-            if (running) miner.stop();
-        }
-    });
-    onTokenSwitch(store, async function resetSpeed(token) {
-        const account = await Blockchain.account;
-        if (account) {
-            const miner = MM(store).miner({ account, token });
+            const miner = MM(store).miner({ account });
             store.dispatch(
-                setMiningSpeed({ speed: { [token]: miner.speed } })
+                setMiningSpeed({ speed: miner.speed })
             );
         }
     });
     Blockchain.onceConnect(function refreshBlockHash({
-        account, token
+        account
     }) {
         const on_init: OnInit = async (block_hash, timestamp, ev) => {
             console.debug('[on:init]', x32(block_hash), timestamp, ev);
             HashManager.set(block_hash, timestamp, {
-                token: Tokenizer.xify(token), version: ROParams.version
+                version: ROParams.version
             });
         };
-        const moe_wallet = new MoeWallet(account, token);
+        const moe_wallet = new MoeWallet(account);
         moe_wallet.onInit(on_init);
-    }, {
-        per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(function restartMining({
         account
@@ -106,23 +87,22 @@ export const MiningService = (
             start: true
         });
         im.on('tick', async () => {
-            const token = xtokenOf(store.getState());
             const miner = MM(store).miner({
-                account, token
+                account
             });
             const running = miner.running;
             if (running) {
                 await miner.stop();
             }
             if (running) setTimeout(() => {
-                MM(store).toggle({ account, token });
+                MM(store).toggle({ account });
             }, 600);
         });
     });
     Blockchain.onceConnect(function benchmarkMining({
-        account, token
+        account
     }) {
-        const miner = MM(store).miner({ account, token });
+        const miner = MM(store).miner({ account });
         miner.on('started', function (
             { now: beg_ms }: { now: number; }
         ) {
@@ -133,8 +113,6 @@ export const MiningService = (
                 console.debug('[mining.duration]', ms, '[ms]');
             });
         });
-    }, {
-        per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(async function resumeMiningIf({
         account
@@ -144,7 +122,7 @@ export const MiningService = (
                 const otf_balance = await OtfManager.getBalance();
                 if (otf_balance > OtfManager.threshold) {
                     const miner = MM(store).miner({
-                        account, token: xtokenOf(store.getState())
+                        account
                     });
                     if (miner.running) {
                         miner.resume();

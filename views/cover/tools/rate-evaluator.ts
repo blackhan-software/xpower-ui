@@ -1,11 +1,10 @@
-import { APR, APB } from '../../../source/contract';
+import { APB, APR } from '../../../source/contract';
 import { range as arange, zip } from '../../../source/functions';
-import { NftIssue, NftLevel, Rates, Token } from '../../../source/redux/types';
+import { NftIssue, NftLevel, Rates } from '../../../source/redux/types';
 import { SVA, SVAIntegrator } from './sva-integrator';
 
 export const RateEvaluator = (
     rates: Rates,
-    token: Token,
     level: NftLevel,
     issue: NftIssue,
     delta = 0n,
@@ -16,10 +15,10 @@ export const RateEvaluator = (
     stamps: Date[];
 } => {
     const aprs = Object.values(
-        rates.items[token]?.[level]?.apr ?? {}
+        rates.items[level]?.apr ?? {}
     );
     const apbs = Object.values(
-        rates.items[token]?.[level]?.bonus ?? {}
+        rates.items[level]?.bonus ?? {}
     );
     return evaluate(aprs, apbs, issue, delta, range);
 };

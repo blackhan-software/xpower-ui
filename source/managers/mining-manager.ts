@@ -8,40 +8,37 @@ import { ROParams } from '../params';
 import { addNonce } from '../redux/actions';
 import { miningSpeedBy } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Account, Amount, BlockHash, Token } from '../redux/types';
+import { Account, Amount, BlockHash } from '../redux/types';
 import { Tokenizer } from '../token';
 import { MoeWallet } from '../wallet';
 
-MiningManager._miner = {} as Record<Token, Miner | undefined>;
+MiningManager._miner = undefined as Miner | undefined;
 
 export function MiningManager(
     api: MiddlewareAPI<Dispatch, AppState>
 ): {
     miner: (
-        args: { account: Account; token: Token; }) => Miner;
+        args: { account: Account }) => Miner;
     toggle: (
-        args: { account: Account; token: Token; }) => Promise<void>;
+        args: { account: Account }) => Promise<void>;
 } {
-    function my_miner({ account, token }: {
-        account: Account, token: Token
+    function my_miner({ account, }: {
+        account: Account
     }): Miner {
-        const xtoken = Tokenizer.xify(token);
-        let miner = MiningManager._miner[xtoken];
+        let miner = MiningManager._miner;
         if (miner === undefined) {
-            const contract = addressOf({
-                infix: 'MOE', token
-            });
-            const speed = miningSpeedBy(api.getState(), token);
-            miner = MiningManager._miner[xtoken] = new Miner(
-                token, contract, account, speed, ROParams.level.min
+            const contract = addressOf({ infix: 'MOE' });
+            const speed = miningSpeedBy(api.getState());
+            miner = MiningManager._miner = new Miner(
+                contract, account, speed ?? undefined, ROParams.level.min
             );
         }
         return miner;
     }
-    async function my_toggle({ account, token }: {
-        account: Account, token: Token
+    async function my_toggle({ account }: {
+        account: Account
     }): Promise<void> {
-        const miner = my_miner({ account, token });
+        const miner = my_miner({ account });
         if (miner.running) {
             return await miner.stop();
         }
@@ -52,11 +49,11 @@ export function MiningManager(
         // if: recent(block-hash?) => mine
         //
         const block_hash = HashManager.latestHash({
-            token, version: ROParams.version
+            version: ROParams.version
         });
         if (block_hash !== null) {
             const timestamp = HashManager.get(block_hash, {
-                token, version: ROParams.version
+                version: ROParams.version
             });
             if (timestamp !== null) {
                 const interval = IntervalManager.intervalFrom(
@@ -77,7 +74,7 @@ export function MiningManager(
         }) => {
             mine(account, block_hash);
         });
-        const moe_wallet = new MoeWallet(account, token);
+        const moe_wallet = new MoeWallet(account);
         try {
             const init = await moe_wallet.init();
             console.debug('[init]', init);
@@ -90,7 +87,7 @@ export function MiningManager(
             account: Account, block_hash: BlockHash
         ) {
             miner.emit('initialized', { block_hash });
-            const { min, max } = range(token);
+            const { min, max } = range();
             if (miner.running) {
                 await miner.stop();
             }
@@ -102,7 +99,6 @@ export function MiningManager(
                         account,
                         amount,
                         block_hash,
-                        token: Tokenizer.xify(token),
                         worker,
                     }));
                 }
@@ -111,9 +107,9 @@ export function MiningManager(
     }
     return { miner: my_miner, toggle: my_toggle };
 }
-function range(token: Token): { min: Amount, max: Amount } {
-    const min = Tokenizer.amount(token, ROParams.level.min);
-    const max = Tokenizer.amount(token, ROParams.level.max);
+function range(): { min: Amount, max: Amount } {
+    const min = Tokenizer.amount(ROParams.level.min);
+    const max = Tokenizer.amount(ROParams.level.max);
     return { min, max };
 }
 export default MiningManager;

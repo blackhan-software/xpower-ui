@@ -1,20 +1,19 @@
 import { Alert, Alerts } from '../../source/functions';
 import { versionBy } from '../../source/redux/selectors';
-import { History, Token } from '../../source/redux/types';
-import { Tokenizer } from '../../source/token';
+import { History } from '../../source/redux/types';
 import { Version } from '../../source/types';
 
 import React from 'react';
 
 export function $notify(
-    history: History, token: Token
+    history: History
 ) {
     const versions = versionBy(
-        { history }, Tokenizer.xify(token)
+        { history }
     );
     if (versions.length) {
         const $alert = Alerts.show(
-            $message(versions[0], token), Alert.primary, {
+            $message(versions[0]), Alert.primary, {
                 html: true, id: String.random(8)
             }
         );
@@ -24,9 +23,9 @@ export function $notify(
     }
 }
 function $message(
-    version: Version, token: Token
+    version: Version
 ) {
-    const href = `/migrate?token=${token}&version-source=${version}`;
+    const href = `/migrate?version-source=${version}`;
     const $Migrate = <a href={href} style={{color:'inherit'}}>Migrate</a>;
     const $migrate = <a href={href} style={{color:'inherit'}}>migrate</a>;
     const $version = <strong>{version}</strong>;

@@ -1,12 +1,11 @@
 /* eslint @typescript-eslint/no-unused-vars: [off] */
 import { AppState } from '../store';
-import { Amount, Nft, NftFullId, NftIssue, NftLevel, NftToken, Supply } from '../types';
+import { Amount, Nft, NftFullId, NftIssue, NftLevel, Supply } from '../types';
 
 export function pptTotalBy(
     { ppts }: Pick<AppState, 'ppts'>, ppt?: NftFullId | {
         issue?: NftIssue,
         level?: NftLevel,
-        token?: NftToken,
     }
 ): {
     amount: Amount, supply: Supply
@@ -15,16 +14,11 @@ export function pptTotalBy(
         ? Nft.issue(ppt) : ppt?.issue;
     const level = typeof ppt === 'string'
         ? Nft.level(ppt) : ppt?.level;
-    const token = typeof ppt === 'string'
-        ? Nft.token(ppt) : ppt?.token;
     const filtered = Object.entries(ppts.items).filter(([id]) => {
         if (issue !== undefined && issue !== Nft.issue(id as NftFullId)) {
             return false;
         }
         if (level !== undefined && level !== Nft.level(id as NftFullId)) {
-            return false;
-        }
-        if (token !== undefined && token !== Nft.token(id as NftFullId)) {
             return false;
         }
         return true;

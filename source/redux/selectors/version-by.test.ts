@@ -1,15 +1,13 @@
 import { Version } from '../../types';
-import { Token } from '../types';
 import { versionBy } from './version-by';
 
 describe('version-by', () => {
-    const token = Token.XPOW;
     it('should return []', () => {
         const versions = versionBy({
             history: {
                 items: {}
             }
-        }, token);
+        });
         expect(versions).toEqual([]);
     });
     it('should return ["v2a"]', () => {
@@ -17,13 +15,11 @@ describe('version-by', () => {
             history: {
                 items: {
                     [Version.v2a]: {
-                        [Token.XPOW]: {
-                            moe: { balance: 1n }
-                        }
+                        moe: { balance: 1n }
                     },
                 }
             }
-        }, token);
+        });
         expect(versions).toEqual([
             Version.v2a
         ]);
@@ -33,18 +29,14 @@ describe('version-by', () => {
             history: {
                 items: {
                     [Version.v2a]: {
-                        [Token.XPOW]: {
-                            moe: { balance: 1n }
-                        }
+                        moe: { balance: 1n }
                     },
                     [Version.v3a]: {
-                        [Token.XPOW]: {
-                            sov: { balance: 1n }
-                        }
+                        sov: { balance: 1n }
                     },
                 }
             }
-        }, token);
+        });
         expect(versions).toEqual([
             Version.v3a, Version.v2a
         ]);
@@ -54,23 +46,17 @@ describe('version-by', () => {
             history: {
                 items: {
                     [Version.v2a]: {
-                        [Token.XPOW]: {
-                            moe: { balance: 1n }
-                        }
+                        moe: { balance: 1n }
                     },
                     [Version.v3a]: {
-                        [Token.XPOW]: {
-                            sov: { balance: 1n }
-                        }
+                        sov: { balance: 1n }
                     },
                     [Version.v4a]: {
-                        [Token.XPOW]: {
-                            nft: { [2202100]: { balance: 1n} }
-                        }
+                        nft: { [2202100]: { balance: 1n} }
                     },
                 }
             }
-        }, token);
+        });
         expect(versions).toEqual([
             Version.v4a, Version.v3a, Version.v2a
         ]);
@@ -80,28 +66,20 @@ describe('version-by', () => {
             history: {
                 items: {
                     [Version.v2a]: {
-                        [Token.XPOW]: {
-                            moe: { balance: 1n }
-                        }
+                        moe: { balance: 1n }
                     },
                     [Version.v3a]: {
-                        [Token.XPOW]: {
-                            sov: { balance: 1n }
-                        }
+                        sov: { balance: 1n }
                     },
                     [Version.v4a]: {
-                        [Token.XPOW]: {
-                            nft: { [2202100]: { balance: 1n} }
-                        }
+                        nft: { [2202100]: { balance: 1n} }
                     },
                     [Version.v5a]: {
-                        [Token.XPOW]: {
-                            ppt: { [2202100]: { balance: 1n} }
-                        }
+                        ppt: { [2202100]: { balance: 1n} }
                     },
                 }
             }
-        }, token);
+        });
         expect(versions).toEqual([
             Version.v5a, Version.v4a, Version.v3a, Version.v2a
         ]);

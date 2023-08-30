@@ -1,4 +1,4 @@
-import { PptBurnerStatus, PptMinterList, Token } from '../../../source/redux/types';
+import { PptBurnerStatus, PptMinterList } from '../../../source/redux/types';
 
 import React from 'react';
 import { Spinner } from './spinner';
@@ -6,12 +6,11 @@ import { Spinner } from './spinner';
 type Props = {
     approved: boolean | null;
     list: PptMinterList;
-    onBatchBurn?: (token: Token, list: PptMinterList) => void;
+    onBatchBurn?: (list: PptMinterList) => void;
     status: PptBurnerStatus | null;
-    token: Token;
 }
 export function UiPptBatchBurner(
-    { approved, list, status, token, onBatchBurn }: Props
+    { approved, list, status, onBatchBurn }: Props
 ) {
     const classes = [
         'btn btn-outline-warning',
@@ -24,7 +23,7 @@ export function UiPptBatchBurner(
         type='button' id='ppt-batch-burner'
         className={classes.join(' ')}
         disabled={disabled({ list, status })}
-        onClick={onBatchBurn?.bind(null, token, list)}
+        onClick={onBatchBurn?.bind(null, list)}
     >
         {Spinner({
             show: burning(status), grow: true

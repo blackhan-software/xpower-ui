@@ -42,7 +42,6 @@ type Props = {
         level: NftLevel
     ) => void;
     toggled: boolean;
-    token: Token;
 }
 export type NftList = Record<NftLevel, {
     amount1: Amount; max1: Amount; min1: Amount;
@@ -68,11 +67,11 @@ function $nftMinter(
     props: Props, nft_level: NftLevel,
     { display, toggled, amount1, max1, min1 }: NftList[NftLevel]
 ) {
-    const { nfts, token } = props;
+    const { nfts } = props;
     const total_by = useMemo(() => nftTotalBy({ nfts }, {
-        level: nft_level, token: Nft.token(token)
+        level: nft_level
     }), [
-        nfts, nft_level, token
+        nfts, nft_level
     ]);
     if (display) {
         return <div
@@ -86,7 +85,7 @@ function $nftMinter(
                     });
                 }
             })}
-            {$minter(nft_level, props.token)}
+            {$minter(nft_level)}
             {$balance(nft_level, total_by)}
             <UiNftAmount
                 amount1={amount1}
@@ -134,9 +133,6 @@ function $nftDetails(
                 onNftTransfer={
                     props.onNftTransfer
                 }
-                token={
-                    props.token
-                }
             />
         </div>;
     }
@@ -164,26 +160,26 @@ function $toggle(
     </div>;
 }
 function $minter(
-    nft_level: NftLevel, token: Token
+    nft_level: NftLevel
 ) {
     const head = (nft_level: NftLevel) => {
         const nft_name = Nft.nameOf(nft_level);
         if (nft_name) return nft_name.slice(0, 1);
     };
     const title = (
-        nft_level: NftLevel, token: Token
+        nft_level: NftLevel
     ) => {
         const nft_name = Nft.nameOf(nft_level);
         const lhs_head = head(nft_level);
         const lhs = lhs_head ? `1${lhs_head}` : '';
         const rhs_head = head(nft_level + 3);
         const rhs = rhs_head ? `1${rhs_head}` : `K${lhs_head}`;
-        return `Mint ${nft_name} NFTs (for [${lhs}...${rhs}] ${token} tokens)`;
+        return `Mint ${nft_name} NFTs (for [${lhs}...${rhs}] ${Token.XPOW} tokens)`;
     };
     return <button type='button'
         className='btn btn-outline-warning minter'
         data-bs-placement='top' data-bs-toggle='tooltip'
-        title={title(nft_level, token)}
+        title={title(nft_level)}
     >
         {Nft.nameOf(nft_level)}<span className='d-none d-sm-inline'> NFTs</span>
     </button>;

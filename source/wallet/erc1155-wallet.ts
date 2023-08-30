@@ -1,6 +1,6 @@
 import { Contract, Transaction } from 'ethers';
 import { x40 } from '../functions';
-import { Account, Address, Amount, Balance, Nft, NftFullId, NftIssue, NftLevel, NftRealId, NftToken, Supply, Token } from '../redux/types';
+import { Account, Address, Amount, Balance, Nft, NftFullId, NftIssue, NftLevel, NftRealId, Supply } from '../redux/types';
 import { TxEvent, Version } from '../types';
 
 export type OnTransferBatch = (
@@ -33,7 +33,7 @@ export type Meta = {
 };
 export abstract class ERC1155Wallet {
     constructor(
-        account: Account | Address, token: Token, version: Version
+        account: Account | Address, version: Version
     ) {
         if (typeof account === 'bigint') {
             this._account = x40(account);
@@ -46,8 +46,6 @@ export abstract class ERC1155Wallet {
         if (this._account.length !== 42) {
             throw new Error('address length is not 42')
         }
-        this._nftToken = Nft.token(token);
-        this._token = token;
         this._version = version;
     }
     async balance(
@@ -249,18 +247,10 @@ export abstract class ERC1155Wallet {
             (c) => c.getAddress() as Promise<Address>
         );
     }
-    get nftToken(): NftToken {
-        return this._nftToken;
-    }
-    get token(): Token {
-        return this._token;
-    }
     abstract get put(): Promise<Contract>;
     abstract get get(): Promise<Contract>;
     private readonly _account: Address;
     private readonly _meta: Record<string, Meta> = {};
-    private readonly _nftToken: NftToken;
-    private readonly _token: Token;
     private readonly _version: Version;
 }
 function* totalSupplies(

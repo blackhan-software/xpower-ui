@@ -3,7 +3,7 @@ import './list.scss';
 
 import { mobile, nice_si } from '../../../source/functions';
 import { pptTotalBy } from '../../../source/redux/selectors';
-import { Amount, Nft, NftIssue, NftLevel, NftLevels, Nfts, PptDetails, Supply, Token } from '../../../source/redux/types';
+import { Amount, Nft, NftIssue, NftLevel, NftLevels, Nfts, PptDetails, Supply } from '../../../source/redux/types';
 
 import React, { useMemo } from 'react';
 import { UiPptDetails } from '../details/details';
@@ -46,7 +46,6 @@ type Props = {
         level: NftLevel
     ) => void;
     toggled: boolean;
-    token: Token;
 }
 type PptList = Record<NftLevel, {
     amount: Amount; max: Amount; min: Amount;
@@ -71,11 +70,11 @@ function $pptMinter(
     props: Props, ppt_level: NftLevel,
     { display, toggled, amount, max, min }: PptList[NftLevel]
 ) {
-    const { ppts, token } = props;
+    const { ppts } = props;
     const total_by = useMemo(() => pptTotalBy({ ppts }, {
-        level: ppt_level, token: Nft.token(token)
+        level: ppt_level
     }), [
-        ppts, ppt_level, token
+        ppts, ppt_level
     ]);
     if (display) {
         return <div
@@ -139,9 +138,6 @@ function $pptDetails(
                 }
                 onPptClaim={
                     props.onPptClaim
-                }
-                token={
-                    props.token
                 }
             />
         </div>;

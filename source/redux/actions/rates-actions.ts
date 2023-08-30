@@ -1,17 +1,17 @@
 import { createAction } from '@reduxjs/toolkit';
-import { Area, Index, NftLevel, Rate, Timestamp, Token } from '../types';
+import { Area, Index, NftLevel, Rate, Timestamp } from '../types';
 
 export const setAPR = createAction('rates/set-apr', (
-    token: Token, level: NftLevel, index: Index, item: {
+    level: NftLevel, index: Index, item: {
         stamp: Timestamp, value: Rate, area: Area
     }
 ) => ({
-    payload: { token, level, index, item }
+    payload: { level, index, item }
 }));
-export const setAPRBonus = createAction('rates/set-apr-bonus', (
-    token: Token, level: NftLevel, index: Index, item: {
+export const setAPB = createAction('rates/set-apb', (
+    level: NftLevel, index: Index, item: {
         stamp: Timestamp, value: Rate, area: Area
     }
 ) => ({
-    payload: { token, level, index, item }
+    payload: { level, index, item }
 }));

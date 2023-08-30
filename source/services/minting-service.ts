@@ -5,11 +5,10 @@ import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
 import { IntervalManager, MiningManager as MM } from '../managers';
 import { ROParams } from '../params';
-import { clearMintingRows, removeNonces, setMintingRow } from '../redux/actions';
-import { onNonceChanged, onTokenSwitch } from '../redux/observers';
-import { mintingRowBy, pageOf, xtokenOf } from '../redux/selectors';
+import { removeNonces, setMintingRow } from '../redux/actions';
+import { onNonceChanged } from '../redux/observers';
+import { mintingRowBy } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Page } from '../redux/types';
 import { Tokenizer } from '../token';
 import { OtfManager } from '../wallet';
 
@@ -17,19 +16,14 @@ export const MintingService = (
     store: Store<AppState>
 ) => {
     onNonceChanged(store, async function updateMinters(
-        nonce, { account, amount, token }, total
+        nonce, { account, amount }, total
     ) {
         if (account !== await Blockchain.account) {
             return;
         }
-        if (token !== xtokenOf(store.getState())) {
-            return;
-        }
-        const level = Tokenizer.level(token, amount);
+        const level = Tokenizer.level(amount);
         const { tx_counter } = mintingRowBy(store.getState(), level);
-        const min_amount = Tokenizer.amount(
-            token, ROParams.level.min
-        );
+        const min_amount = Tokenizer.amount(ROParams.level.min);
         const display =
             amount === min_amount ||
             total > 0n || tx_counter > 0n;
@@ -40,32 +34,14 @@ export const MintingService = (
             }
         }));
     });
-    onTokenSwitch(store, function forgetNonces(token, oldToken) {
-        if (Page.Home !== pageOf(store.getState())) {
-            return;
-        }
-        if (Tokenizer.similar(token, oldToken)) {
-            return;
-        }
-        store.dispatch(removeNonces());
-    });
-    onTokenSwitch(store, function resetMinters(token, oldToken) {
-        if (Page.Home !== pageOf(store.getState())) {
-            return;
-        }
-        if (Tokenizer.similar(token, oldToken)) {
-            return;
-        }
-        store.dispatch(clearMintingRows());
-    });
     Blockchain.onceConnect(function forgetNonces() {
         const im = new IntervalManager({ start: true });
         im.on('tick', () => store.dispatch(removeNonces()));
     });
     Blockchain.onceConnect(function autoMint({
-        account, token
+        account
     }) {
-        const miner = MM(store).miner({ account, token });
+        const miner = MM(store).miner({ account });
         miner.on('stopping', () => {
             if (global.MINTER_IID) {
                 clearInterval(global.MINTER_IID);
@@ -96,8 +72,6 @@ export const MintingService = (
                 }
             }
         }
-    }, {
-        per: () => xtokenOf(store.getState())
     });
 }
 export default MintingService;

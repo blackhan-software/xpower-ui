@@ -1,16 +1,20 @@
 import { MYProvider } from '../blockchain';
 import { XPowerPpt, XPowerPptFactory, XPowerPptMockFactory } from '../contract';
 import { ROParams } from '../params';
-import { Account, Address, Nft, NftFullId, NftLevel, NftRealId, Token, Year } from '../redux/types';
+import { Account, Address, Nft, NftFullId, NftLevel, NftRealId, Year } from '../redux/types';
 import { Version } from '../types';
 import { ERC1155Wallet } from './erc1155-wallet';
 
 export class PptWallet extends ERC1155Wallet {
     constructor(
-        account: Account | Address, token: Token, version?: Version
+        account: Account | Address, version?: Version
     ) {
-        super(account, token, version ?? ROParams.version);
-        this._ppt = XPowerPptFactory({ token, version });
+        super(account, version ?? ROParams.version);
+        if (version) {
+            this._ppt = XPowerPptFactory({ version });
+        } else {
+            this._ppt = XPowerPptFactory();
+        }
     }
     async idBy(
         year: Year | Promise<Year>,
@@ -36,10 +40,10 @@ export class PptWallet extends ERC1155Wallet {
 }
 export class PptWalletMock extends PptWallet {
     constructor(
-        address: Account | Address = 0n, token: Token, version?: Version
+        address: Account | Address = 0n, version?: Version
     ) {
-        super(address, token, version);
-        this._ppt = XPowerPptMockFactory({ token });
+        super(address, version);
+        this._ppt = XPowerPptMockFactory();
     }
 }
 export default PptWallet;

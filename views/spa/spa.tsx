@@ -2,11 +2,11 @@ import './spa.scss';
 
 import { Bus } from '../../source/bus';
 import { leafKeys } from '../../source/functions';
-import { AccountContext, AccountProvider, DebugContext, DebugProvider, StateProvider } from '../../source/react';
+import { AccountContext, AccountProvider, DebugContext, DebugProvider, StateProvider, TokenProvider } from '../../source/react';
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiToggled, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
 import { AppDispatch, AppState, Store } from '../../source/redux/store';
-import { AftWallet, History, MinerStatus, Mining, Minting, Nft, NftLevels, NftTokens, Nfts, NftsUi, OtfWallet, Page, PptsUi, Rates, RatesUi, Token } from '../../source/redux/types';
+import { AftWallet, History, MinerStatus, Mining, Minting, NftLevels, Nfts, NftsUi, OtfWallet, Page, PptsUi, Rates, RatesUi } from '../../source/redux/types';
 
 import React, { createElement, useContext, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -21,14 +21,12 @@ import { UiNfts } from '../nfts/nfts';
 import { UiPpts } from '../ppts/ppts';
 import { UiWallet } from '../wallet/wallet';
 
-import Tokenizer from '../../source/token';
 import Years from '../../source/years';
 import * as actions from './spa-actions';
 import { $notify } from './spa-notify';
 
 type Props = {
     page: Page;
-    token: Token;
     history: History;
     mining: Mining;
     minting: Minting;
@@ -56,18 +54,17 @@ export function SPA(
     const { rates, rates_ui } = props;
     const { nfts, nfts_ui } = props;
     const { ppts, ppts_ui } = props;
-    const { page, token } = props;
-    const { history } = props;
+    const { page, history } = props;
     return <React.StrictMode>
-        {$notify(history, token)}
+        {$notify(history)}
         {$h1(page)}
         {$connector(page)}
-        {$cover(page, token, mining, rates, rates_ui)}
-        {$wallet(page, token, aft_wallet, otf_wallet)}
-        {$home(page, token, mining, minting)}
-        {$nfts(page, token, nfts, nfts_ui)}
-        {$ppts(page, token, ppts, ppts_ui)}
-        {$about(page, token)}
+        {$cover(page, mining, rates, rates_ui)}
+        {$wallet(page, aft_wallet, otf_wallet)}
+        {$home(page, mining, minting)}
+        {$nfts(page, nfts, nfts_ui)}
+        {$ppts(page, ppts, ppts_ui)}
+        {$about(page)}
     </React.StrictMode>;
 }
 function $h1(
@@ -96,10 +93,10 @@ function $connector(
     </form>;
 }
 function $cover(
-    page: Page, token: Token, mining: Mining, rates: Rates, rates_ui: RatesUi
+    page: Page, mining: Mining, rates: Rates, rates_ui: RatesUi
 ) {
     const refresher_status = () => {
-        const { status } = rates_ui.refresher[Nft.token(token)];
+        const { status } = rates_ui.refresher;
         return status;
     };
     const pulsate = () => {
@@ -115,8 +112,8 @@ function $cover(
     return <UiCover
         controls={{
             refresher: {
-                onRefresh: (token, all_levels) =>
-                    dispatch(actions.ratesRefresh({ token, all_levels })),
+                onRefresh: (all_levels) =>
+                    dispatch(actions.ratesRefresh({ all_levels })),
                 status: refresher_status()
             }
         }}
@@ -126,11 +123,11 @@ function $cover(
         data={{
             rates
         }}
-        page={page} token={token}
+        page={page}
     />;
 }
 function $wallet(
-    page: Page, token: Token,
+    page: Page,
     aft_wallet: AftWallet,
     otf_wallet: OtfWallet
 ) {
@@ -155,15 +152,12 @@ function $wallet(
                     dispatch(actions.otfWithdraw({ account, processing })),
                 ...otf_wallet
             }}
-            token={token}
         />
     </form>;
 }
 function $home(
-    page: Page, token: Token,
-    mining: Mining, minting: Minting
+    page: Page, mining: Mining, minting: Minting
 ) {
-    const xtoken = Tokenizer.xify(token);
     const [account] = useContext(AccountContext);
     const dispatch = useDispatch<AppDispatch>();
     if (page !== Page.Home) {
@@ -174,37 +168,33 @@ function $home(
     >
         <UiHome
             mining={{
-                onToggle: (token) =>
-                    dispatch(actions.miningToggle({ account, token })),
-                togglable: miningTogglable(mining, xtoken),
-                onSpeed: (token, by) =>
-                    dispatch(actions.miningSpeed({ account, token, by })),
+                onToggle: () =>
+                    dispatch(actions.miningToggle({ account })),
+                togglable: miningTogglable(mining),
+                onSpeed: (by) =>
+                    dispatch(actions.miningSpeed({ account, by })),
                 speedable: miningSpeedable(mining),
                 ...mining
             }}
             minting={{
-                onForget: (token, level) =>
-                    dispatch(actions.mintingForget({ account, token, level })),
-                onMint: (token, level) =>
-                    dispatch(actions.mintingMint({ account, token, level })),
+                onForget: (level) =>
+                    dispatch(actions.mintingForget({ account, level })),
+                onMint: (level) =>
+                    dispatch(actions.mintingMint({ account, level })),
                 ...minting
             }}
-            speed={mining.speed[xtoken]}
-            token={xtoken}
+            speed={mining.speed}
         />
     </form>;
 }
 function $nfts(
-    page: Page, token: Token,
-    nfts: Nfts, nfts_ui: NftsUi
+    page: Page, nfts: Nfts, nfts_ui: NftsUi
 ) {
     const [account] = useContext(AccountContext);
     const dispatch = useDispatch<AppDispatch>();
     if (page !== Page.Nfts) {
         return null;
     }
-    const xtoken = Tokenizer.xify(token);
-    const nft_token = Nft.token(xtoken);
     return <form
         id='nfts' onSubmit={(e) => e.preventDefault()}
     >
@@ -224,7 +214,7 @@ function $nfts(
                 const rhs_keys = leafKeys(rhs);
                 if (rhs_keys.length) {
                     dispatch(setNftsUiAmounts({
-                        amounts: { [nft_token]: rhs }
+                        amounts: rhs
                     }));
                 }
             }}
@@ -232,11 +222,9 @@ function $nfts(
                 nft_issue, nft_level
             ) => {
                 const details = {
-                    [nft_token]: {
-                        [nft_level]: {
-                            [nft_issue]: {
-                                image: { loading: false }
-                            }
+                    [nft_level]: {
+                        [nft_issue]: {
+                            image: { loading: false }
                         }
                     }
                 };
@@ -251,21 +239,16 @@ function $nfts(
                 const by_levels = Object.fromEntries(
                     Array.from(NftLevels()).map((l) => [l, by_issues])
                 );
-                const by_tokens = Object.fromEntries(
-                    Array.from(NftTokens()).map((t) => [t, by_levels])
-                );
-                dispatch(setNftsUiDetails({ details: by_tokens }));
-                dispatch(setPptsUiDetails({ details: by_tokens }));
+                dispatch(setNftsUiDetails({ details: by_levels }));
+                dispatch(setPptsUiDetails({ details: by_levels }));
             }}
             onNftAmountChanged={(
                 nft_issue, nft_level, value, valid
             ) => {
                 const details = {
-                    [nft_token]: {
-                        [nft_level]: {
-                            [nft_issue]: {
-                                amount: { valid, value }
-                            }
+                    [nft_level]: {
+                        [nft_issue]: {
+                            amount: { valid, value }
                         }
                     }
                 };
@@ -275,11 +258,9 @@ function $nfts(
                 nft_issue, nft_level, value, valid
             ) => {
                 const details = {
-                    [nft_token]: {
-                        [nft_level]: {
-                            [nft_issue]: {
-                                target: { valid, value }
-                            }
+                    [nft_level]: {
+                        [nft_issue]: {
+                            target: { valid, value }
                         }
                     }
                 };
@@ -287,27 +268,27 @@ function $nfts(
             }}
             onNftTransfer={(issue, level) =>
                 dispatch(actions.nftsTransfer({
-                    account, token: xtoken, issue, level
+                    account, issue, level
                 }))
             }
-            onNftMinterApproval={(token) =>
+            onNftMinterApproval={() =>
                 dispatch(actions.nftsApprove({
-                    account, token
+                    account
                 }))
             }
-            onNftMinterBatchMint={(token, list) =>
+            onNftMinterBatchMint={(list) =>
                 dispatch(actions.nftsBatchMint({
-                    account, token, list
+                    account, list
                 }))
             }
-            onNftMinterBatchBurn={(token, list) =>
+            onNftMinterBatchBurn={(list) =>
                 dispatch(actions.nftsBatchBurn({
-                    account, token, list
+                    account, list
                 }))
             }
-            onNftMinterBatchUpgrade={(token, list) =>
+            onNftMinterBatchUpgrade={(list) =>
                 dispatch(actions.nftsBatchUpgrade({
-                    account, token, list
+                    account, list
                 }))
             }
             onNftMinterToggled={(toggled) => {
@@ -323,21 +304,17 @@ function $nfts(
                 dispatch(setPptsUiToggled({ toggled }));
                 dispatch(setPptsUiFlags({ flags }));
             }}
-            token={xtoken}
         />
     </form>;
 }
 function $ppts(
-    page: Page, token: Token,
-    ppts: Nfts, ppts_ui: PptsUi
+    page: Page, ppts: Nfts, ppts_ui: PptsUi
 ) {
     const [account] = useContext(AccountContext);
     const dispatch = useDispatch<AppDispatch>();
     if (page !== Page.Ppts) {
         return null;
     }
-    const xtoken = Tokenizer.xify(token);
-    const ppt_token = Nft.token(xtoken);
     return <form
         id='ppts' onSubmit={(e) => e.preventDefault()}
     >
@@ -357,7 +334,7 @@ function $ppts(
                 const rhs_keys = leafKeys(rhs);
                 if (rhs_keys.length) {
                     dispatch(setPptsUiAmounts({
-                        amounts: { [ppt_token]: rhs }
+                        amounts: rhs
                     }));
                 }
             }}
@@ -365,11 +342,9 @@ function $ppts(
                 ppt_issue, ppt_level
             ) => {
                 const details = {
-                    [ppt_token]: {
-                        [ppt_level]: {
-                            [ppt_issue]: {
-                                image: { loading: false }
-                            }
+                    [ppt_level]: {
+                        [ppt_issue]: {
+                            image: { loading: false }
                         }
                     }
                 };
@@ -384,21 +359,16 @@ function $ppts(
                 const by_levels = Object.fromEntries(
                     Array.from(NftLevels()).map((l) => [l, by_issues])
                 );
-                const by_tokens = Object.fromEntries(
-                    Array.from(NftTokens()).map((t) => [t, by_levels])
-                );
-                dispatch(setNftsUiDetails({ details: by_tokens }));
-                dispatch(setPptsUiDetails({ details: by_tokens }));
+                dispatch(setNftsUiDetails({ details: by_levels }));
+                dispatch(setPptsUiDetails({ details: by_levels }));
             }}
             onPptAmountChanged={(
                 ppt_issue, ppt_level, value, valid
             ) => {
                 const details = {
-                    [ppt_token]: {
-                        [ppt_level]: {
-                            [ppt_issue]: {
-                                amount: { valid, value }
-                            }
+                    [ppt_level]: {
+                        [ppt_issue]: {
+                            amount: { valid, value }
                         }
                     }
                 };
@@ -408,11 +378,9 @@ function $ppts(
                 ppt_issue, ppt_level, value, valid
             ) => {
                 const details = {
-                    [ppt_token]: {
-                        [ppt_level]: {
-                            [ppt_issue]: {
-                                target: { valid, value }
-                            }
+                    [ppt_level]: {
+                        [ppt_issue]: {
+                            target: { valid, value }
                         }
                     }
                 };
@@ -420,27 +388,27 @@ function $ppts(
             }}
             onPptClaim={(issue, level) =>
                 dispatch(actions.pptsClaim({
-                    account, token: xtoken, issue, level
+                    account, issue, level
                 }))
             }
-            onPptMinterApproval={(t) =>
+            onPptMinterApproval={() =>
                 dispatch(actions.pptsApprove({
-                    account, token: t
+                    account
                 }))
             }
-            onPptMinterBatchMint={(token, list) =>
+            onPptMinterBatchMint={(list) =>
                 dispatch(actions.pptsBatchMint({
-                    account, token, list
+                    account, list
                 }))
             }
-            onPptMinterBatchBurn={(token, list) =>
+            onPptMinterBatchBurn={(list) =>
                 dispatch(actions.pptsBatchBurn({
-                    account, token, list
+                    account, list
                 }))
             }
-            onPptMinterBatchClaim={(token) => {
+            onPptMinterBatchClaim={() => {
                 dispatch(actions.pptsBatchClaim({
-                    account, token
+                    account
                 }));
             }}
             onPptMinterToggled={(toggled) => {
@@ -456,21 +424,19 @@ function $ppts(
                 dispatch(setNftsUiToggled({ toggled }));
                 dispatch(setNftsUiFlags({ flags }));
             }}
-            token={xtoken}
         />
     </form>;
 }
 function $about(
-    page: Page, token: Token
+    page: Page
 ) {
     if (page !== Page.About) {
         return null;
     }
-    const xtoken = Tokenizer.xify(token);
     return <form
         id='about' onSubmit={(e) => e.preventDefault()}
     >
-        <UiAbout token={xtoken} />
+        <UiAbout />
     </form>;
 }
 if (require.main === module) {
@@ -480,7 +446,9 @@ if (require.main === module) {
         <Provider store={Store()}>
             <DebugProvider>
                 <AccountProvider>
-                    <StateProvider>{$spa}</StateProvider>
+                    <TokenProvider>
+                        <StateProvider>{$spa}</StateProvider>
+                    </TokenProvider>
                 </AccountProvider>
             </DebugProvider>
         </Provider>

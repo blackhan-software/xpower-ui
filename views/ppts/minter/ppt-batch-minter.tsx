@@ -1,4 +1,4 @@
-import { PptMinterList, PptMinterStatus, Token } from '../../../source/redux/types';
+import { PptMinterList, PptMinterStatus } from '../../../source/redux/types';
 
 import React from 'react';
 import { Spinner } from './spinner';
@@ -6,12 +6,11 @@ import { Spinner } from './spinner';
 type Props = {
     approved: boolean | null;
     list: PptMinterList;
-    onBatchMint?: (token: Token, list: PptMinterList) => void;
+    onBatchMint?: (list: PptMinterList) => void;
     status: PptMinterStatus | null;
-    token: Token;
 }
 export function UiPptBatchMinter(
-    { approved, list, onBatchMint, status, token }: Props
+    { approved, list, onBatchMint, status }: Props
 ) {
     const classes = [
         'btn btn-outline-warning',
@@ -24,7 +23,7 @@ export function UiPptBatchMinter(
         type='button' id='ppt-batch-minter'
         className={classes.join(' ')}
         disabled={disabled({ list, status })}
-        onClick={onBatchMint?.bind(null, token, list)}
+        onClick={onBatchMint?.bind(null, list)}
     >
         {Spinner({
             show: minting(status), grow: true

@@ -1,7 +1,8 @@
 import './nfts.scss';
 
 import {
-    Amount, Nft, NftAmounts, NftDetails, NftFlags, NftIssue, NftLevel, NftMinter, NftMinterList, Nfts, NftToken, Token
+    Amount,
+    NftAmounts, NftDetails, NftFlags, NftIssue, NftLevel, NftMinter, NftMinterList, Nfts
 } from '../../source/redux/types';
 
 import React from 'react';
@@ -9,10 +10,11 @@ import { UiNftList } from './list/list';
 import { UiNftMinter } from './minter/minter';
 
 type Props = {
-    token: Token; nfts: Nfts; flags: NftFlags;
-    amounts: Record<NftToken, NftAmounts>;
-    details: Record<NftToken, NftDetails>;
-    minter: Record<NftToken, NftMinter>;
+    nfts: Nfts;
+    flags: NftFlags;
+    amounts: NftAmounts;
+    details: NftDetails;
+    minter: NftMinter;
     onNftList?: (
         flags: NftFlags,
         amounts: NftAmounts
@@ -48,21 +50,11 @@ type Props = {
     /**
      * nft-minter:
      */
-    onNftMinterApproval?: (
-        token: Token
-    ) => void
-    onNftMinterBatchMint?: (
-        token: Token, list: NftMinterList
-    ) => void;
-    onNftMinterBatchBurn?: (
-        token: Token, list: NftMinterList
-    ) => void;
-    onNftMinterBatchUpgrade?: (
-        token: Token, list: NftMinterList
-    ) => void;
-    onNftMinterToggled?: (
-        toggled: boolean
-    ) => void;
+    onNftMinterApproval?: () => void
+    onNftMinterBatchMint?: (list: NftMinterList) => void;
+    onNftMinterBatchBurn?: (list: NftMinterList) => void;
+    onNftMinterBatchUpgrade?: (list: NftMinterList) => void;
+    onNftMinterToggled?: (toggled: boolean) => void;
     toggled: boolean;
 }
 function join(
@@ -96,8 +88,7 @@ function split(
 export function UiNfts(
     props: Props
 ) {
-    const { nfts, token } = props;
-    const nft_token = Nft.token(token);
+    const { nfts } = props;
     const { flags, toggled } = props;
     const { amounts, minter } = props;
     return <React.Fragment>
@@ -107,28 +98,28 @@ export function UiNfts(
         <div id='nft-batch-minting'>
             <UiNftMinter
                 approval={
-                    minter[nft_token].approval
+                    minter.approval
                 }
                 onApproval={
                     props.onNftMinterApproval
                 }
                 minter_list={
-                    join(flags, amounts[nft_token])
+                    join(flags, amounts)
                 }
                 minter_status={
-                    minter[nft_token].minter_status
+                    minter.minter_status
                 }
                 onBatchMint={
                     props.onNftMinterBatchMint
                 }
                 burner_status={
-                    minter[nft_token].burner_status
+                    minter.burner_status
                 }
                 onBatchBurn={
                     props.onNftMinterBatchBurn
                 }
                 upgrader_status={
-                    minter[nft_token].upgrader_status
+                    minter.upgrader_status
                 }
                 onBatchUpgrade={
                     props.onNftMinterBatchUpgrade
@@ -137,14 +128,13 @@ export function UiNfts(
                     props.onNftMinterToggled
                 }
                 toggled={toggled}
-                token={token}
             />
         </div>
         <div id='nft-single-minting'>
             <UiNftList
                 nfts={nfts}
                 list={
-                    join(flags, amounts[nft_token])
+                    join(flags, amounts)
                 }
                 onNftList={(
                     list
@@ -154,7 +144,7 @@ export function UiNfts(
                     if (onNftList) onNftList(lhs, rhs);
                 }}
                 details={
-                    props.details[nft_token]
+                    props.details
                 }
                 onNftImageLoaded={
                     props.onNftImageLoaded
@@ -172,7 +162,6 @@ export function UiNfts(
                     props.onNftTransfer
                 }
                 toggled={toggled}
-                token={token}
             />
         </div>
     </React.Fragment>;

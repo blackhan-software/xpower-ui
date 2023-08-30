@@ -2,7 +2,7 @@ import { InterfaceAbi, Listener, Transaction } from 'ethers';
 import { MYProvider } from '../../blockchain';
 import { x40 } from '../../functions';
 import { ROParams } from '../../params';
-import { Account, Address, Amount, Index, Nft, NftFullId, NftRealId, NftToken, Rate } from '../../redux/types';
+import { Account, Address, Amount, Index, Nft, NftFullId, NftRealId, Rate } from '../../redux/types';
 import { TxEvent, Version, VersionAt } from '../../types';
 import { OtfManager } from '../../wallet';
 import { Base } from '../base';
@@ -22,7 +22,6 @@ export type OnClaimBatch = (
     ev: TxEvent
 ) => void;
 export type OnRefresh = (
-    nftPrefix: bigint,
     allLevels: boolean,
     ev: TxEvent
 ) => void;
@@ -256,20 +255,18 @@ export class MoeTreasury extends Base {
         });
     }
     public async refreshRates(
-        prefix: NftToken, all_levels: boolean
+        all_levels: boolean
     ): Promise<Transaction> {
         const contract = await this.otf;
         if (ROParams.lt2(this.version, Version.v8a)) {
-            return contract.refreshRates(prefix, all_levels);
+            return contract.refreshRates(2, all_levels);
         }
         return contract.refreshRates(all_levels);
     }
-    public async refreshable(
-        prefix: NftToken
-    ): Promise<boolean> {
+    public async refreshable(): Promise<boolean> {
         const contract = await this.get;
         if (ROParams.lt2(this.version, Version.v8a)) {
-            return contract.refreshable(prefix);
+            return contract.refreshable(2);
         }
         return contract.refreshable();
     }
@@ -287,7 +284,7 @@ export class MoeTreasury extends Base {
         contract.on('RefreshRates', (
             all_levels: boolean, ev: TxEvent
         ) => {
-            listener(2n, all_levels, ev);
+            listener(all_levels, ev);
         });
     }
     private get otf() {

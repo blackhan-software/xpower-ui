@@ -6,7 +6,7 @@ if (typeof importScripts === 'function') importScripts(
 );
 
 import { hex_bytes, x40, x64 } from '../../functions';
-import { Account, Address, Amount, BlockHash, Interval, Level, Nonce, Token } from '../../redux/types';
+import { Account, Address, Amount, BlockHash, Interval, Level, Nonce } from '../../redux/types';
 import { Version } from '../../types';
 
 import { AbiCoder, randomBytes, solidityPacked } from 'ethers';
@@ -23,7 +23,6 @@ export interface Miner extends Function {
     (nonce: Uint8Array, context: Context): Uint8Array
 }
 export type Context = {
-    token: Token,
     account: Account,
     block_hash: BlockHash,
     contract: Address,
@@ -53,7 +52,6 @@ expose({
         contract,
         level,
         meta,
-        token,
         version,
         versionFaked,
     }: {
@@ -61,7 +59,6 @@ expose({
         contract: Address,
         level: Level,
         meta: { id: number, idLength: number },
-        token: Token,
         version: Version,
         versionFaked: boolean,
     }) {
@@ -76,7 +73,6 @@ expose({
             contract,
             level,
             meta,
-            token,
             version,
             versionFaked,
         });
@@ -125,7 +121,6 @@ class Worker {
         contract,
         level,
         meta,
-        token,
         version,
         versionFaked,
     }: {
@@ -133,17 +128,15 @@ class Worker {
         contract: Address,
         level: Level,
         meta: { id: number, idLength: number },
-        token: Token,
         version: Version,
         versionFaked: boolean,
     }) {
-        this._amount = amount(token, level);
+        this._amount = amount(level);
         this._context = {
             account,
             block_hash: 0n,
             contract: normalize(contract),
             interval: interval(),
-            token,
         };
         this._miner = miner(version, versionFaked);
         this._nonce = nonce(meta.id, meta.idLength);
@@ -280,20 +273,15 @@ function increment(
     );
 }
 function amount(
-    token: Token, level: Level
+    level: Level
 ) {
-    switch (token) {
-        case Token.XPOW:
-            return (hash: Uint8Array) => {
-                const lhs_zeros = zeros(hash);
-                if (lhs_zeros >= level) {
-                    return 2n ** BigInt(lhs_zeros) - 1n;
-                }
-                return 0n;
-            };
-        default:
-            return (_hash: Uint8Array) => 0n;
-    }
+    return (hash: Uint8Array) => {
+        const lhs_zeros = zeros(hash);
+        if (lhs_zeros >= level) {
+            return 2n ** BigInt(lhs_zeros) - 1n;
+        }
+        return 0n;
+    };
 }
 function zeros(
     hash: Uint8Array, counter = 0
@@ -338,7 +326,7 @@ function abi_encoder(
         return value;
     };
     const encoder_v2c = (nonce: Uint8Array, {
-        account, block_hash, interval, token
+        account, block_hash, interval
     }: Context) => {
         let value = abi_encoded[interval];
         if (value === undefined) {
@@ -346,7 +334,7 @@ function abi_encoder(
             const template = abi.encode([
                 'string', 'uint256', 'address', 'uint256', 'bytes32'
             ], [
-                symbol_v2c(token),
+                'XPOW.GPU',
                 0,
                 x40(account),
                 interval,
@@ -359,7 +347,7 @@ function abi_encoder(
         return value;
     };
     const encoder_v3b = (nonce: Uint8Array, {
-        account, block_hash, interval, token
+        account, block_hash, interval
     }: Context) => {
         let value = abi_encoded[interval];
         if (value === undefined) {
@@ -367,7 +355,7 @@ function abi_encoder(
             const template = abi.encode([
                 'string', 'address', 'uint256', 'bytes32', 'uint256'
             ], [
-                symbol_v3b(token),
+                'AQCH',
                 x40(account),
                 interval,
                 x64(block_hash),
@@ -380,7 +368,7 @@ function abi_encoder(
         return value;
     };
     const encoder_v5b = (nonce: Uint8Array, {
-        account, block_hash, interval, token
+        account, block_hash, interval
     }: Context) => {
         let value = abi_encoded[interval];
         if (value === undefined) {
@@ -388,7 +376,7 @@ function abi_encoder(
             const template = abi.encode([
                 'string', 'address', 'uint256', 'bytes32', 'uint256'
             ], [
-                symbol_v5b(token),
+                'LOKI',
                 x40(account),
                 interval,
                 x64(block_hash),
@@ -508,15 +496,6 @@ function abi_encoder(
             return encoder_v7b;
         default:
             return encoder_v7c;
-    }
-    function symbol_v2c(_token: Token) {
-        return 'XPOW.GPU';
-    }
-    function symbol_v3b(_token: Token) {
-        return 'AQCH';
-    }
-    function symbol_v5b(_token: Token) {
-        return 'LOKI';
     }
 }
 function arrayify(

@@ -6,12 +6,12 @@ import { Tokenizer } from '../../../source/token';
 import React, { useEffect, useState } from 'react';
 
 type Props = {
-    level: Level; rows: Minting['rows']; token: Token;
-    onMint?: (token: Token, level: Level) => void;
-    onForget?: (token: Token, level: Level) => void;
+    level: Level; rows: Minting['rows'];
+    onMint?: (level: Level) => void;
+    onForget?: (level: Level) => void;
 }
 export function UiMinting(
-    { token, rows, onMint, onForget }: Props
+    { rows, onMint, onForget }: Props
 ) {
     const [focus, setFocus] = useState<Record<Level, boolean>>({});
     const status = Object.values(rows).map(({ status }) => status);
@@ -33,13 +33,13 @@ export function UiMinting(
             Mined Amounts Mintable
         </label>
         {Object.values(rows).map((row, i) => $mint(
-            { token, level: i + 1, row, onMint, onForget },
+            { level: i + 1, row, onMint, onForget },
             (level, flag) => setFocus({ [level]: flag })
         )).filter((row) => row)}
     </React.Fragment>;
 }
 function $mint(
-    { token, level, row, onMint, onForget }: Omit<Props, 'rows'> & {
+    { level, row, onMint, onForget }: Omit<Props, 'rows'> & {
         row: MintingRow
     },
     onFocus: (level: Level, flag: boolean) => void
@@ -52,24 +52,24 @@ function $mint(
             role='group'
             style={{ display: row.display ? 'block' : 'none' }}
         >
-            {$minter({ token, level, row, onMint }, onFocus)}
-            {$nn_counter({ token, level, row })}
-            {$tx_counter({ token, level, row })}
-            {$forget({ token, level, row, onForget })}
+            {$minter({ level, row, onMint }, onFocus)}
+            {$nn_counter({ level, row })}
+            {$tx_counter({ level, row })}
+            {$forget({ level, row, onForget })}
         </div>;
     }
     return null;
 }
 function $minter(
-    { token, level, row, onMint }: Omit<Props, 'rows'> & {
+    { level, row, onMint }: Omit<Props, 'rows'> & {
         row: MintingRow
     },
     onFocus: (level: Level, flag: boolean) => void
 ) {
-    const amount = nice(Tokenizer.amount(token, level));
+    const amount = nice(Tokenizer.amount(level));
     const minting = row.status === MinterStatus.minting;
     const $token = <span className='d-none d-sm-inline'>
-        {token}
+        {Token.XPOW}
     </span>;
     const text = minting
         ? <span className="text">Minting {amount} {$token}…</span>
@@ -77,7 +77,7 @@ function $minter(
     return <button
         className='btn btn-outline-warning minter'
         disabled={row.disabled || minting}
-        onClick={() => { if (onMint) onMint(token, level); }}
+        onClick={() => { if (onMint) onMint(level); }}
         onBlur={() => onFocus(level, false)}
         onFocus={() => onFocus(level, true)}
         ref={globalRef(`.minter[level="${level}"]`)}
@@ -87,14 +87,14 @@ function $minter(
     </button>;
 }
 function $nn_counter(
-    { token, level, row }: Omit<Props, 'rows'> & {
+    { level, row }: Omit<Props, 'rows'> & {
         row: MintingRow
     }
 ) {
     return <span
         className='d-inline-block'
         data-bs-toggle='tooltip' data-bs-placement='left'
-        title={`Number of level ${level} ${token} tokens mined`}
+        title={`Number of level ${level} ${Token.XPOW} tokens mined`}
     >
         <button
             className='btn btn-outline-warning nn-counter'
@@ -103,14 +103,14 @@ function $nn_counter(
     </span>;
 }
 function $tx_counter(
-    { token, level, row }: Omit<Props, 'rows'> & {
+    { level, row }: Omit<Props, 'rows'> & {
         row: MintingRow
     }
 ) {
     return <span
         className='d-inline-block'
         data-bs-toggle='tooltip' data-bs-placement='left'
-        title={`Number of level ${level} ${token} tokens minted`}
+        title={`Number of level ${level} ${Token.XPOW} tokens minted`}
     >
         <button
             className='btn btn-outline-warning tx-counter'
@@ -119,7 +119,7 @@ function $tx_counter(
     </span>;
 }
 function $forget(
-    { token, level, row, onForget }: Omit<Props, 'rows'> & {
+    { level, row, onForget }: Omit<Props, 'rows'> & {
         row: MintingRow
     }
 ) {
@@ -130,7 +130,7 @@ function $forget(
     >
         <button
             onClick={() => {
-                if (onForget) onForget(token, level);
+                if (onForget) onForget(level);
             }}
             className='btn btn-outline-warning forget'
             type='button' disabled={row.disabled}

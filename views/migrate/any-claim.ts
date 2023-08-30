@@ -5,7 +5,7 @@ import { Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
 import { MoeTreasury, MoeTreasuryFactory } from '../../source/contract';
 import { Alert, Alerts, alert } from '../../source/functions';
-import { Account, Balance, Nft, NftLevels, Token } from '../../source/redux/types';
+import { Account, Balance, Nft, NftLevels } from '../../source/redux/types';
 import { Version } from '../../source/types';
 import { MoeWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
@@ -20,17 +20,17 @@ Blockchain.onConnect(function enableAllowanceButton() {
 $('button.claim-any').on('click', async function claimTokens(e) {
     const $claim = $(e.currentTarget);
     if ($claim.hasClass('xpow')) {
-        await claim(Token.XPOW, { $claim });
+        await claim({ $claim });
     }
 });
-async function claim(token: Token, { $claim }: {
+async function claim({ $claim }: {
     $claim: JQuery<HTMLElement>
 }) {
     const { account, src_version } = await context({
         $el: $claim
     });
     const { src_xpower, mty_source } = await contracts({
-        account, token, src_version
+        account, src_version
     });
     if (!src_xpower) {
         throw new Error('undefined src_xpower');
@@ -128,14 +128,14 @@ async function context({ $el: $approve }: {
     return { account, src_version, tgt_version };
 }
 async function contracts({
-    account, token, src_version
+    account, src_version
 }: {
-    account: Account, token: Token, src_version: Version
+    account: Account, src_version: Version
 }) {
     let src_xpower: MoeWallet | undefined;
     try {
         src_xpower = new MoeWallet(
-            account, token, src_version
+            account, src_version
         );
         console.debug(
             `[${src_version}:src_xpower]`, await src_xpower.address
@@ -146,7 +146,7 @@ async function contracts({
     let mty_source: MoeTreasury | undefined;
     try {
         mty_source = MoeTreasuryFactory({
-            token, version: src_version
+            version: src_version
         });
         console.debug(
             `[${src_version}:mty_source]`, mty_source.address

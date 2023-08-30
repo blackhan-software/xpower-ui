@@ -4,95 +4,68 @@ import { Blockchain } from '../blockchain';
 import { APB, APR, MoeTreasury, MoeTreasuryFactory } from '../contract';
 import { buffered, range } from '../functions';
 import { onRatesUiRefresher } from '../redux/observers';
-import { xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Index, Nft, NftFullId, NftLevel, NftLevels, NftToken, Rate, RefresherStatus, Token } from '../redux/types';
-import { Tokenizer } from '../token';
+import { Index, Nft, NftFullId, NftLevel, NftLevels, Rate, RefresherStatus } from '../redux/types';
 
 import * as actions from '../redux/actions';
 
 export const RatesService = (
     store: Store<AppState>
 ) => {
-    Blockchain.onceConnect(function initRates({
-        token
-    }) {
-        const mty = MoeTreasuryFactory({
-            token
+    Blockchain.onceConnect(function initRates() {
+        const mty = MoeTreasuryFactory();
+        fetch(mty).then((rates) => {
+            update(store, rates)
         });
-        fetch(token, mty).then((rates) => {
-            update(store, token, rates)
-        });
-    }, {
-        per: () => xtokenOf(store.getState())
-    });
-    Blockchain.onceConnect(function syncRates({
-        token
-    }) {
-        const mty = MoeTreasuryFactory({
-            token
-        });
-        mty.onRefreshRates(buffered((
-            nft_prefix: bigint
-        ) => {
-            if (token !== Tokenizer.token(nft_prefix)) {
-                return; // avoid multi-fetches!
-            }
-            fetch(token, mty).then(
-                (rates) => update(store, token, rates)
-            );
-        }));
-    }, {
-        per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(function syncRates() {
-        onRatesUiRefresher(store, (next) => {
-            const token = xtokenOf(store.getState());
-            const { status } = next[Nft.token(token)];
+        const mty = MoeTreasuryFactory();
+        mty.onRefreshRates(buffered(() => {
+            fetch(mty).then((rates) => update(store, rates));
+        }));
+    });
+    Blockchain.onceConnect(function syncRates() {
+        onRatesUiRefresher(store, ({ status }) => {
             if (status !== RefresherStatus.refetch) {
                 return;
             }
-            const mty = MoeTreasuryFactory({
-                token
-            });
-            fetch(token, mty).then(
-                (rates) => update(store, token, rates)
+            const mty = MoeTreasuryFactory();
+            fetch(mty).then(
+                (rates) => update(store, rates)
             );
         });
     });
 }
 function fetch(
-    token: Token, mty: MoeTreasury
+    mty: MoeTreasury
 ) {
-    const nft_token = Nft.token(token);
     return Promise.all(
         Array.from(NftLevels()).map((l) => Promise.all([
-            new APRs(nft_token, mty).fetch(l),
-            new APBs(nft_token, mty).fetch(l),
+            new APRs(mty).fetch(l),
+            new APBs(mty).fetch(l),
         ]))
     );
 }
 function update(
-    store: Store<AppState>, token: Token, rates: Array<[APR[], APR[]]>
+    store: Store<AppState>, rates: Array<[APR[], APR[]]>
 ) {
     for (const [l, [aprs, apbs]] of Object.entries(rates)) {
         for (const [i, apr] of Object.entries(aprs)) {
             store.dispatch(actions.setAPR(
-                token, 3 * Number(l), Number(i), apr)
+                3 * Number(l), Number(i), apr)
             );
         }
         for (const [i, apb] of Object.entries(apbs)) {
-            store.dispatch(actions.setAPRBonus(
-                token, 3 * Number(l), Number(i), apb)
+            store.dispatch(actions.setAPB(
+                3 * Number(l), Number(i), apb)
             );
         }
     }
 }
 class APRs {
     constructor(
-        nft_token: NftToken, mty: MoeTreasury
+         mty: MoeTreasury
     ) {
-        this.nftToken = nft_token;
         this.mty = mty;
     }
     async fetch(
@@ -141,14 +114,12 @@ class APRs {
             return 0n;
         }
     }
-    nftToken: NftToken;
     mty: MoeTreasury;
 }
 class APBs {
     constructor(
-        nft_token: NftToken, mty: MoeTreasury
+        mty: MoeTreasury
     ) {
-        this.nftToken = nft_token;
         this.mty = mty;
     }
     async fetch(
@@ -197,7 +168,6 @@ class APBs {
             return 0n;
         }
     }
-    nftToken: NftToken;
     mty: MoeTreasury;
 }
 function aprify(

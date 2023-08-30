@@ -2,7 +2,7 @@ import { InterfaceAbi, Transaction } from 'ethers';
 import { x40, x64 } from '../../functions';
 import { HashManager } from '../../managers';
 import { ROParams } from '../../params';
-import { Account, Address, BlockHash, Nonce, Token } from '../../redux/types';
+import { Account, Address, BlockHash, Nonce } from '../../redux/types';
 import { Version, VersionAt } from '../../types';
 import { OtfManager } from '../../wallet';
 import { Base } from '../base';
@@ -23,7 +23,7 @@ export class XPowerMoe extends Base {
         if (ROParams.lt(Version.v2a)) {
             const [bh, ts] = [1n, BigInt(new Date().getTime())];
             return HashManager.set(bh, ts, {
-                token: Token.XPOW, version: ROParams.version
+                version: ROParams.version
             });
         }
         return contract.init();

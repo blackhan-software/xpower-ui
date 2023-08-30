@@ -1,33 +1,13 @@
 import { ROParams } from '../../params';
 import { Version } from '../../types';
 import { Amount, Supply, Year } from './base';
-import { Token } from './token';
 
 export class Nft {
-    static oldIndexOf(token: NftToken) {
-        return token - 1;
-    }
     static nameOf(level: NftLevel) {
         return NftLevel[level] as NftName;
     }
     static rankOf(level: NftLevel) {
         return level / 3 + 1;
-    }
-    static token(id: NftFullId | Token): NftToken {
-        const memo = this._token[id];
-        if (memo) {
-            return memo;
-        }
-        switch (id.toUpperCase()) {
-            case Token.XPOW:
-            case Token.APOW:
-                return this._token[id] = NftToken.XPOW;
-        }
-        switch (parseInt(id[0])) {
-            case NftToken.XPOW:
-                return this._token[id] = NftToken.XPOW;
-        }
-        throw new Error(`unknown token for "${id}"`);
     }
     static issue(id: NftFullId): NftIssue {
         const memo = this._issue[id];
@@ -119,23 +99,18 @@ export class Nft {
     ): NftFullId {
         return real_id.length > 6
             ? real_id as NftFullId
-            : NftToken.XPOW + real_id as NftFullId;
+            : `${NftToken.XPOW}${real_id}` as NftFullId;
     }
-    private static _token = {} as Record<NftFullId | Token, NftToken>;
     private static _issue = {} as Record<NftFullId, NftIssue>;
     private static _level = {} as Record<NftFullId, NftLevel>;
+}
+enum NftToken {
+    XPOW = 2
 }
 export type NftFullId = `${NftToken}${NftIssue}${NftLevel}`;
 export type NftCoreId = `${NftIssue}${NftLevel}`;
 export type NftRealId = NftFullId | NftCoreId;
 export type NftIssue = Year;
-export enum NftToken {
-    XPOW = 2,
-}
-export type NftTokens = keyof typeof NftToken;
-export function* NftTokens() {
-    yield NftToken.XPOW;
-}
 export enum NftLevel {
     UNIT = 0,
     KILO = 3,

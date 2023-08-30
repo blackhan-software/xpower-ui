@@ -1,4 +1,4 @@
-import { NftBurnerStatus, NftMinterList, Token } from '../../../source/redux/types';
+import { NftBurnerStatus, NftMinterList } from '../../../source/redux/types';
 
 import React from 'react';
 import { Spinner } from './spinner';
@@ -6,12 +6,11 @@ import { Spinner } from './spinner';
 type Props = {
     approved: boolean | null;
     list: NftMinterList;
-    onBatchBurn?: (token: Token, list: NftMinterList) => void;
+    onBatchBurn?: (list: NftMinterList) => void;
     status: NftBurnerStatus | null;
-    token: Token;
 }
 export function UiNftBatchBurner(
-    { approved, list, status, token, onBatchBurn }: Props
+    { approved, list, status, onBatchBurn }: Props
 ) {
     const classes = [
         'btn btn-outline-warning',
@@ -24,7 +23,7 @@ export function UiNftBatchBurner(
         type='button' id='nft-batch-burner'
         className={classes.join(' ')}
         disabled={disabled({ list, status })}
-        onClick={onBatchBurn?.bind(null, token, list)}
+        onClick={onBatchBurn?.bind(null, list)}
     >
         {Spinner({
             show: burning(status), grow: true

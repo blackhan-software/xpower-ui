@@ -4,7 +4,6 @@ import { delayed } from '../functions';
 import { MiningManager as MM } from '../managers';
 import { RWParams } from '../params';
 import { onNftsUiFlags, onPageSwitch, onTokenSwitch } from '../redux/observers';
-import { xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { NftLevel, Page } from '../redux/types';
 
@@ -48,21 +47,21 @@ export const LocationService = (
     onTokenSwitch(store, function syncLocationToken(token) {
         RWParams.token = token;
     });
-    onTokenSwitch(store, async function syncLocationSpeed(token) {
+    onTokenSwitch(store, async function syncLocationSpeed() {
         const account = await Blockchain.account;
         if (!account) {
             throw new Error('missing account')
         }
         const miner = MM(store).miner({
-            account, token
+            account
         });
         RWParams.speed = miner.speed;
     });
     Blockchain.onceConnect(function syncLocationSpeed({
-        account, token
+        account
     }) {
         const miner = MM(store).miner({
-            account, token
+            account
         });
         miner.on('increased', (e) => {
             RWParams.speed = e.speed;
@@ -70,8 +69,6 @@ export const LocationService = (
         miner.on('decreased', (e) => {
             RWParams.speed = e.speed;
         });
-    }, {
-        per: () => xtokenOf(store.getState())
     });
     onNftsUiFlags(store, function syncLocationNftLevels(flags) {
         RWParams.nftLevels = Object.entries(flags)

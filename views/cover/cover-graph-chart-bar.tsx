@@ -6,7 +6,7 @@ import { useIsFirstRender } from 'usehooks-ts';
 
 import { mobile, nice, nice_si, range } from '../../source/functions';
 import { ROParams } from '../../source/params';
-import { Nft, NftIssue, NftLevel, Rates, Token } from '../../source/redux/types';
+import { Nft, NftIssue, NftLevel, Rates } from '../../source/redux/types';
 import { theme } from '../../source/theme';
 import { normalize } from './tools/apr-normalize';
 import { RateEvaluator } from './tools/rate-evaluator';
@@ -18,17 +18,16 @@ type Props = {
     issue: NftIssue;
     rates: Rates;
     scale: Scale;
-    token: Token;
 }
 export function UiCoverGraphChartBar(
-    { issue, rates, scale, token }: Props
+    { issue, rates, scale }: Props
 ) {
     const $ref = useRef<HTMLCanvasElement>(null);
     const animate = useIsFirstRender();
     useEffect(() => chart($ref, {
-        animate, issue, rates, scale, token
+        animate, issue, rates, scale
     }), [
-        animate, issue, rates, scale, token
+        animate, issue, rates, scale
     ]);
     return <div className='chart chart-bar cover-layer'>
         <canvas ref={$ref} />
@@ -36,7 +35,7 @@ export function UiCoverGraphChartBar(
 }
 function chart(
     $ref: React.RefObject<HTMLCanvasElement>, {
-        animate, issue, rates, scale, token
+        animate, issue, rates, scale
     }: Props & {
         animate: boolean
     }
@@ -48,7 +47,7 @@ function chart(
     const levels = Array.from<NftLevel>(range(min, max + 3, 3));
     const labels = levels.map((l) => Nft.nameOf(l))
     const evaluators = levels
-        .map(level => RateEvaluator(rates, token, level, issue));
+        .map(level => RateEvaluator(rates, level, issue));
     const targets = evaluators
         .map((re) => middle(re.targets) ?? [0n, 0n])
         .map(([apr, apb]) => normalize(apr + apb));

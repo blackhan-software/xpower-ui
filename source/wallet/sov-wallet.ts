@@ -1,15 +1,19 @@
 import { MYProvider } from '../blockchain';
 import { XPowerSov, XPowerSovFactory } from '../contract';
-import { Account, Address, Collat, Token } from '../redux/types';
+import { Account, Address, Collat } from '../redux/types';
 import { Version } from '../types';
 import { ERC20Wallet } from './erc20-wallet';
 
 export class SovWallet extends ERC20Wallet {
     constructor(
-        account: Account | Address, token: Token, version?: Version
+        account: Account | Address, version?: Version
     ) {
         super(account);
-        this._sov = XPowerSovFactory({ token, version });
+        if (version) {
+            this._sov = XPowerSovFactory({ version });
+        } else {
+            this._sov = XPowerSovFactory();
+        }
     }
     get collat(): Promise<Collat> {
         return this._sov.collat();

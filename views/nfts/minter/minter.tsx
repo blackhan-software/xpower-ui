@@ -10,16 +10,15 @@ import { UiNftBurnApproval, approved } from './nft-burn-approval';
 type Props = {
     minter_list: NftMinterList;
     approval: NftMinterApproval | null;
-    onApproval?: (token: Token) => void;
+    onApproval?: () => void;
     minter_status: NftMinterStatus | null;
-    onBatchMint?: (token: Token, list: NftMinterList) => void;
+    onBatchMint?: (list: NftMinterList) => void;
     burner_status: NftBurnerStatus | null;
-    onBatchBurn?: (token: Token, list: NftMinterList) => void;
+    onBatchBurn?: (list: NftMinterList) => void;
     upgrader_status: NftUpgraderStatus | null;
-    onBatchUpgrade?: (token: Token, list: NftMinterList) => void;
+    onBatchUpgrade?: (list: NftMinterList) => void;
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
-    token: Token;
 }
 export function UiNftMinter(
     props: Props
@@ -31,7 +30,7 @@ export function UiNftMinter(
         {$burnApproval(props)}
         {$batchReminter(props)}
         {$batchUpgrader(props)}
-        {$info(props)}
+        {$info()}
     </div>;
 }
 function $toggleAll(
@@ -54,12 +53,11 @@ function $toggleAll(
     </button>;
 }
 function $burnApproval(
-    { approval, onApproval, token }: Props
+    { approval, onApproval }: Props
 ) {
     return <UiNftBurnApproval
         approval={approval}
         onApproval={onApproval}
-        token={token}
     />;
 }
 function $batchReminter(
@@ -74,45 +72,40 @@ function $batchReminter(
     }
 }
 function $batchMinter(
-    { approval, minter_list, minter_status, onBatchMint, token }: Props
+    { approval, minter_list, minter_status, onBatchMint }: Props
 ) {
     return <UiNftBatchMinter
         approved={approved(approval)}
         list={minter_list}
         onBatchMint={onBatchMint}
         status={minter_status}
-        token={token}
     />;
 }
 function $batchBurner(
-    { approval, minter_list, burner_status, token, onBatchBurn }: Props
+    { approval, minter_list, burner_status, onBatchBurn }: Props
 ) {
     return <UiNftBatchBurner
         approved={approved(approval)}
         list={minter_list}
         onBatchBurn={onBatchBurn}
         status={burner_status}
-        token={token}
     />;
 }
 function $batchUpgrader(
-    { approval, minter_list, onBatchUpgrade, token, upgrader_status }: Props
+    { approval, minter_list, onBatchUpgrade, upgrader_status }: Props
 ) {
     return <UiNftBatchUpgrader
         approved={approved(approval)}
         list={minter_list}
         onBatchUpgrade={onBatchUpgrade}
         status={upgrader_status}
-        token={token}
     />;
 }
-function $info(
-    { token }: Props
-) {
+function $info() {
     return <button type='button'
         className='btn btn-outline-warning info'
         data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`Mint, burn or upgrade ${token} NFTs`}
+        title={`Mint, burn or upgrade ${Token.XPOW} NFTs`}
     >
         <InfoCircle fill={true} />
     </button>;

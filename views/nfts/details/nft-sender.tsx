@@ -1,12 +1,11 @@
 import { globalRef } from '../../../source/react';
-import { Account, Amount, Nft, NftIssue, NftLevel, NftSenderStatus, Token } from '../../../source/redux/types';
+import { Account, Amount, Nft, NftIssue, NftLevel, NftSenderStatus } from '../../../source/redux/types';
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 import { UiNftToggle } from './ui-toggle';
 
 type Props = {
-    token: Token;
     issue: NftIssue;
     level: NftLevel;
     amount: {

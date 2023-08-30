@@ -5,7 +5,7 @@ import { ROParams } from '../../../source/params';
 import { AccountContext, globalRef } from '../../../source/react';
 import { onPptChanged } from '../../../source/redux/observers';
 import { AppState } from '../../../source/redux/store';
-import { Account, Amount, Nft, NftFullId, NftIssue, NftLevel, NftLevels, NftToken, NftTokens, Nfts, PptDetails, Rate, Supply, Token } from '../../../source/redux/types';
+import { Account, Amount, Nft, NftFullId, NftIssue, NftLevel, NftLevels, Nfts, PptDetails, Rate, Supply } from '../../../source/redux/types';
 import { MAX_YEAR, MIN_YEAR, Years } from '../../../source/years';
 
 import React, { useContext, useEffect, useState } from 'react';
@@ -19,7 +19,6 @@ import { UiPptImage } from './ppt-image';
 
 type Props = {
     ppts: Nfts;
-    token: Token;
     level: NftLevel;
     details: PptDetails;
     onPptImageLoaded?: (
@@ -53,28 +52,19 @@ type Props = {
     ) => void;
 }
 type State = Record<NftLevel, Record<NftIssue, {
-    rate: Record<NftToken, Rate>;
-    claimable: Record<NftToken, Amount>;
-    claimed: Record<NftToken, Amount>;
+    rate: Rate;
+    claimable: Amount;
+    claimed: Amount;
 }>>
 function initialState(
-    rate = [0n, 1_000_000n], claimable = 0n, claimed = 0n
+    rate = 1_000_000n, claimable = 0n, claimed = 0n
 ) {
-    const ppt_tokens = Array.from(NftTokens());
     const ppt_issues = Array.from(Years({ reverse: true }));
     const ppt_levels = Array.from(NftLevels());
     const state = Object.fromEntries(
         ppt_levels.map((level) => [level, Object.fromEntries(
             ppt_issues.map((issue) => [issue, {
-                rate: Object.assign({}, ...ppt_tokens.map((t) => ({
-                    [t]: rate
-                }))),
-                claimable: Object.assign({}, ...ppt_tokens.map((t) => ({
-                    [t]: claimable
-                }))),
-                claimed: Object.assign({}, ...ppt_tokens.map((t) => ({
-                    [t]: claimed
-                }))),
+                rate, claimable, claimed
             }])
         )])
     );
@@ -85,22 +75,20 @@ export function UiPptDetails(
 ) {
     const [state, set_state] = useState(initialState());
     const [account] = useContext(AccountContext);
-    const { token, level: ppt_level } = props;
+    const { level: ppt_level } = props;
     useEffect(/*init*/() => {
-        const ppt_token = Nft.token(token);
         Array.from(Years()).forEach(async (
             ppt_issue: NftIssue
         ) => {
-            const patch = await claims(account, token)(
-                ppt_token, ppt_level, ppt_issue
+            const patch = await claims(account)(
+                ppt_level, ppt_issue
             );
             set_state((s) => $.extend(true, {}, s, patch));
         });
     }, [
-        account, token, ppt_level
+        account, ppt_level
     ]);
     useEffect(/*sync[on:refresh-claims]*/() => {
-        const ppt_token = Nft.token(token);
         Array.from(Years()).forEach(async (
             ppt_issue: NftIssue
         ) => {
@@ -112,8 +100,8 @@ export function UiPptDetails(
             );
             if (ref.current) {
                 on_refresh(ref.current, async () => {
-                    const patch = await claims(account, token)(
-                        ppt_token, ppt_level, ppt_issue
+                    const patch = await claims(account)(
+                        ppt_level, ppt_issue
                     );
                     set_state((s) => $.extend(true, {}, s, patch));
                 });
@@ -132,27 +120,23 @@ export function UiPptDetails(
             $el.onrefresh = listener;
         }
     }, [
-        account, token, ppt_level
+        account, ppt_level
     ]);
     const store = useStore<AppState>();
     useEffect(/*sync[on:ppt-changed]*/() => {
-        const ppt_token = Nft.token(token);
         return onPptChanged(store, async (
             full_id: NftFullId
         ) => {
-            if (Nft.token(full_id) !== ppt_token) {
-                return;
-            }
             if (Nft.level(full_id) !== ppt_level) {
                 return;
             }
-            const patch = await claims(account, token)(
-                ppt_token, ppt_level, Nft.issue(full_id)
+            const patch = await claims(account)(
+                ppt_level, Nft.issue(full_id)
             );
             set_state((s) => $.extend(true, {}, s, patch));
         });
     }, [
-        account, token, ppt_level, store
+        account, ppt_level, store
     ]);
     const issues = Array.from(Years({ reverse: true }));
     return <React.Fragment>{
@@ -160,19 +144,16 @@ export function UiPptDetails(
     }</React.Fragment>;
 }
 function claims(
-    account: Account | null, token: Token
+    account: Account | null
 ) {
     return async (
-        ppt_token: NftToken,
         ppt_level: NftLevel,
         ppt_issue: NftIssue
     ) => {
         const full_id = Nft.fullId({
             level: ppt_level, issue: ppt_issue
         });
-        const moe_treasury = MoeTreasuryFactory({
-            token
-        });
+        const moe_treasury = MoeTreasuryFactory();
         const [claimable, claimed, apr, apb] = await Promise.all([
             account ? moe_treasury.claimable(account, full_id) : 0n,
             account ? moe_treasury.claimed(account, full_id) : 0n,
@@ -182,15 +163,9 @@ function claims(
         return {
             [ppt_level]: {
                 [ppt_issue]: {
-                    rate: {
-                        [ppt_token]: apr + apb
-                    },
-                    claimable: {
-                        [ppt_token]: claimable
-                    },
-                    claimed: {
-                        [ppt_token]: claimed
-                    }
+                    rate: apr + apb,
+                    claimable,
+                    claimed
                 }
             }
         };
@@ -242,7 +217,6 @@ function $image(
     const by_level = details[ppt_level];
     const by_issue = by_level[ppt_issue];
     const { image, fixed, toggled } = by_issue;
-    const { token } = props;
     return <UiPptImage
         issue={ppt_issue}
         level={ppt_level}
@@ -255,7 +229,6 @@ function $image(
             }
         }}
         toggled={fixed || toggled}
-        token={token}
         url_content={image.url_content}
         url_market={image.url_market}
     />;
@@ -328,7 +301,7 @@ function $supply(
 function $expander(
     props: Props, ppt_issue: NftIssue
 ) {
-    const { details, level: ppt_level, token } = props;
+    const { details, level: ppt_level } = props;
     const by_level = details[ppt_level];
     const by_issue = by_level[ppt_issue];
     const { expanded, toggled } = by_issue;
@@ -347,58 +320,54 @@ function $expander(
         }}
         expanded={expanded}
         toggled={toggled}
-        token={token}
     />;
 }
 function $claimed(
     props: Props, ppt_issue: NftIssue,
     { state }: { state: State }
 ) {
-    const { level: ppt_level, token } = props;
+    const { level: ppt_level } = props;
     const by_level = state[ppt_level];
     const by_issue = by_level[ppt_issue];
     const { claimed } = by_issue;
     return <UiPptClaimed
         issue={ppt_issue}
-        token={token}
-        value={claimed[Nft.token(token)]}
+        value={claimed}
     />;
 }
 function $claimable(
     props: Props, ppt_issue: NftIssue,
     { state }: { state: State }
 ) {
-    const { level: ppt_level, token } = props;
+    const { level: ppt_level } = props;
     const by_level = state[ppt_level];
     const by_issue = by_level[ppt_issue];
     const { claimable } = by_issue;
     return <UiPptClaimable
         issue={ppt_issue}
-        token={token}
-        value={claimable[Nft.token(token)]}
+        value={claimable}
     />;
 }
 function $claimer(
     props: Props, ppt_issue: NftIssue,
     { state }: { state: State }
 ) {
-    const { details, level: ppt_level, token } = props;
+    const { details, level: ppt_level } = props;
     const { rate } = state[ppt_level][ppt_issue];
     const { claimer, toggled } = details[ppt_level][ppt_issue];
     const { claimable, claimed } = state[ppt_level][ppt_issue];
     return <UiPptClaimer
         issue={ppt_issue}
         level={ppt_level}
-        rate={rate[Nft.token(token)]}
-        claimable={claimable[Nft.token(token)]}
-        claimed={claimed[Nft.token(token)]}
+        rate={rate}
+        claimable={claimable}
+        claimed={claimed}
         onClaim={props.onPptClaim}
         onToggled={(flag) => {
             Bus.emit('toggle-issue', { flag });
         }}
         status={claimer.status}
         toggled={toggled}
-        token={token}
     />;
 }
 function lastHR(

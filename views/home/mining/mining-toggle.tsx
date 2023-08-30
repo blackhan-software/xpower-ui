@@ -2,22 +2,20 @@ import { MinerStatus, Token } from '../../../source/redux/types';
 
 import React, { useEffect, useState } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
-import Tokenizer from '../../../source/token';
 
 type Props = {
     disabled: boolean;
     status: MinerStatus | null;
-    token: Token
     onToggle?: () => void;
 }
 export function UiMiningToggle(
-    { disabled, status, token, onToggle }: Props
+    { disabled, status, onToggle }: Props
 ) {
     return <div
         className='btn-group toggle-mining' role='group'
     >
         {$toggle({ status, disabled, onToggle })}
-        {$info({ token })}
+        {$info()}
     </div>;
 }
 function $toggle(
@@ -92,13 +90,11 @@ function textFor(
     }
     return 'Start Mining';
 }
-function $info(
-    { token }: Pick<Props, 'token'>
-) {
+function $info() {
     return <button type='button'
         className='btn btn-outline-warning info'
         data-bs-toggle='tooltip' data-bs-placement='top'
-        title={`Toggle mining for the XPower ${Tokenizer.xify(token)} tokens`}
+        title={`Toggle mining for the XPower ${Token.XPOW} tokens`}
     >
         <InfoCircle fill={true} />
     </button>;

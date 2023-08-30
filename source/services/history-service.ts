@@ -2,9 +2,8 @@ import { Store } from '@reduxjs/toolkit';
 
 import { Blockchain } from '../blockchain';
 import { x40 } from '../functions';
-import { xtokenOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Account, Balance, Nft, NftLevels, Token } from '../redux/types';
+import { Account, Balance, Nft, NftLevels } from '../redux/types';
 import { Version, Versions } from '../types';
 import { MoeWallet, NftWallet, PptWallet, SovWallet } from '../wallet';
 import { Years } from '../years';
@@ -15,26 +14,24 @@ export const HistoryService = (
     store: Store<AppState>
 ) => {
     Blockchain.onceConnect(async function initBalances({
-        token, version
+        version
     }) {
         const versions = Array.from(Versions())
             .filter((v) => v < version).reverse();
         const balances = versions.map((version) => ({
-            version, balance: get_balances(token, version)
+            version, balance: get_balances(version)
         }));
         for (const { version, balance } of balances) {
             const { moe, sov, nft, ppt } = await balance;
-            store.dispatch(actions.setMoeHistory(version, token, moe));
-            store.dispatch(actions.setSovHistory(version, token, sov));
-            store.dispatch(actions.setNftHistory(version, token, nft));
-            store.dispatch(actions.setPptHistory(version, token, ppt));
+            store.dispatch(actions.setMoeHistory(version, moe));
+            store.dispatch(actions.setSovHistory(version, sov));
+            store.dispatch(actions.setNftHistory(version, nft));
+            store.dispatch(actions.setPptHistory(version, ppt));
         }
-    }, {
-        per: () => xtokenOf(store.getState())
     });
 }
 async function get_balances(
-    token: Token, version: Version
+    version: Version
 ) {
     const account = await Blockchain.account;
     if (!account) {
@@ -51,7 +48,7 @@ async function get_balances(
         moe_contract, sov_contract,
         nft_contract, ppt_contract,
     } = await contracts({
-        account, token, version
+        account, version
     });
     const moe = moe_contract
         ? await moe_contract.balance : 0n;
@@ -87,14 +84,14 @@ async function get_balances(
     };
 }
 async function contracts({
-    account, token, version
+    account, version
 }: {
-    account: Account, token: Token, version: Version
+    account: Account, version: Version
 }) {
     let moe_contract: MoeWallet | undefined;
     try {
         moe_contract = new MoeWallet(
-            account, token, version
+            account, version
         );
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
@@ -104,7 +101,7 @@ async function contracts({
     let sov_contract: SovWallet | undefined;
     try {
         sov_contract = new SovWallet(
-            account, token, version
+            account, version
         );
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
@@ -114,7 +111,7 @@ async function contracts({
     let nft_contract: NftWallet | undefined;
     try {
         nft_contract = new NftWallet(
-            account, token, version
+            account, version
         );
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
@@ -124,7 +121,7 @@ async function contracts({
     let ppt_contract: PptWallet | undefined;
     try {
         ppt_contract = new PptWallet(
-            account, token, version
+            account, version
         );
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {

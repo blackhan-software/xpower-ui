@@ -1,7 +1,7 @@
 import { Action } from '@reduxjs/toolkit';
 import { RWParams } from '../../params';
 import * as actions from '../actions';
-import { Mining, XTokens } from '../types';
+import { Mining } from '../types';
 
 export function miningReducer(
     mining: Mining = miningState(), action: Action
@@ -13,9 +13,7 @@ export function miningReducer(
     }
     if (actions.setMiningSpeed.match(action)) {
         return {
-            ...mining, speed: {
-                ...mining.speed, ...action.payload.speed
-            }
+            ...mining, speed: action.payload.speed
         };
     }
     if (actions.setMining.match(action)) {
@@ -23,11 +21,9 @@ export function miningReducer(
     }
     return mining;
 }
-export function miningState() {
-    const speed = {} as Mining['speed'];
-    for (const token of XTokens()) {
-        speed[token] = RWParams.speed;
-    }
-    return { speed, status: null };
+export function miningState(
+    speed?: number
+) {
+    return { speed: speed ?? RWParams.speed, status: null };
 }
 export default miningReducer;

@@ -2,7 +2,7 @@ import { createAction, DeepPartial } from '@reduxjs/toolkit';
 import { Mining } from '../types/mining';
 
 export const setMiningSpeed = createAction(
-    'mining/set-speed', ({ speed }: DeepPartial<Pick<Mining, 'speed'>>) => ({
+    'mining/set-speed', ({ speed }: Pick<Mining, 'speed'>) => ({
         payload: { speed }
     })
 );

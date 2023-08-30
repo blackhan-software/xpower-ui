@@ -1,20 +1,17 @@
 import { nice } from '../../../source/functions';
 import { Amount, NftIssue, Token, TokenInfo } from '../../../source/redux/types';
-import { Tokenizer } from '../../../source/token';
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 
 type Props = {
     issue: NftIssue;
-    token: Token;
     value: Amount | null;
 }
 export function UiPptClaimable(
-    { issue, token, value }: Props
+    { issue, value }: Props
 ) {
-    const atoken = Tokenizer.aify(token);
-    const { decimals } = TokenInfo(token);
+    const { decimals } = TokenInfo(Token.XPOW);
     const nice_value = typeof value === 'bigint'
         ? nice(value, { base: 10 ** decimals }) : '';
     return <React.Fragment>
@@ -31,7 +28,7 @@ export function UiPptClaimable(
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Min. amount of claimable ${atoken} rewards (for ${issue})`}
+                title={`Min. amount of claimable ${Token.APOW} rewards (for ${issue})`}
             >
                 <InfoCircle fill={true} />
             </span>

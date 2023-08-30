@@ -1,18 +1,15 @@
-import { Global, Version } from '../../types';
+import { Global } from '../../types';
 declare const global: Global;
 
-import { Token } from '../../redux/types';
-import { Tokenizer } from '../../token';
+import { ROParams } from '../../params';
 import { address } from '../address';
 import { XPowerSov } from './xpower-sov';
 
-export function XPowerSovFactory({
-    token, version
-}: {
-    token: Token, version?: Version
-}): XPowerSov {
+export function XPowerSovFactory(
+    { version } = { version: ROParams.version }
+): XPowerSov {
     const sov = new XPowerSov(address({
-        infix: 'SOV', token: Tokenizer.xify(token), version
+        infix: 'SOV', version
     }));
     return global.XPOWER_SOV = sov;
 }

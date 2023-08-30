@@ -19,10 +19,9 @@ type Props = {
         onDeposit?: (processing: OtfWallet['processing']) => void;
         onWithdraw?: (processing: OtfWallet['processing']) => void;
     };
-    token: Token;
 }
 export function UiWallet(
-    { aft, otf, token }: Props
+    { aft, otf }: Props
 ) {
     const toggled = otf.toggled ?? OtfManager.enabled;
     useEffect(() => {
@@ -33,7 +32,6 @@ export function UiWallet(
             account={aft.account}
             onBurn={aft.onBurn}
             toggled={toggled}
-            token={token}
             onToggled={otf.onToggled}
             wallet={aft}
         ></UiAftWallet>

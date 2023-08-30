@@ -18,11 +18,10 @@ export function noncesReducer(
         const delta = [action.payload.nonce] as Nonce[];
         const items = Object.fromEntries(
             Object.entries(nonces.items).filter(([
-                nonce, { account, block_hash, token }
+                nonce, { account, block_hash }
             ]) => {
                 if (action.payload.item.account === account &&
                     action.payload.item.block_hash === block_hash &&
-                    action.payload.item.token === token &&
                     action.payload.nonce === nonce
                 ) {
                     return false;
@@ -36,11 +35,10 @@ export function noncesReducer(
         const delta = [] as Nonce[];
         const items = Object.fromEntries(
             Object.entries(nonces.items).filter(([
-                nonce, { account, amount, token }
+                nonce, { account, amount }
             ]) => {
                 if (action.payload.item.account === account &&
-                    action.payload.item.amount === amount &&
-                    action.payload.item.token === token
+                    action.payload.item.amount === amount
                 ) {
                     delta.push(nonce);
                     return false;
@@ -54,12 +52,10 @@ export function noncesReducer(
         const delta = [] as Nonce[];
         const items = Object.fromEntries(
             Object.entries(nonces.items).filter(([
-                nonce, { account, token }
+                nonce, { account }
             ]) => {
                 if (action.payload.item.account === account ||
-                    action.payload.item.account === null &&
-                    action.payload.item.token === token ||
-                    action.payload.item.token === null
+                    action.payload.item.account === null
                 ) {
                     delta.push(nonce);
                     return false;

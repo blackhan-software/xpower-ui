@@ -5,7 +5,7 @@ import { ratesUiReducer } from '../reducers';
 import { onRatesUi, onRatesUiRefresher } from '.';
 import { setRatesUi, setRatesUiRefresher } from '../actions';
 import { AppState } from '../store';
-import { NftToken, RefresherStatus } from '../types';
+import { RefresherStatus } from '../types';
 
 describe('onRatesUi', () => {
     it('should invoke handler (for setRatesUi)', () => {
@@ -18,13 +18,11 @@ describe('onRatesUi', () => {
             })
         });
         onRatesUi(store as Store<AppState, AnyAction>, ({ refresher }) => {
-            expect(refresher[NftToken.XPOW]).toEqual({
+            expect(refresher).toEqual({
                 status: RefresherStatus.refreshed
             });
         });
-        const refresher = {
-            [NftToken.XPOW]: { status: RefresherStatus.refreshed },
-        };
+        const refresher = { status: RefresherStatus.refreshed };
         store.dispatch(setRatesUi({ refresher }));
     });
     it('should invoke handler (for setRatesUiRefresher)', () => {
@@ -37,13 +35,11 @@ describe('onRatesUi', () => {
             })
         });
         onRatesUi(store as Store<AppState, AnyAction>, ({ refresher }) => {
-            expect(refresher[NftToken.XPOW]).toEqual({
+            expect(refresher).toEqual({
                 status: null
             });
         });
-        const refresher = {
-            [NftToken.XPOW]: { status: null },
-        };
+        const refresher = { status: null };
         store.dispatch(setRatesUiRefresher({ refresher }));
     });
 });
@@ -58,13 +54,11 @@ describe('onRatesUiRefresher', () => {
             })
         });
         onRatesUiRefresher(store as Store<AppState, AnyAction>, (next) => {
-            expect(next[NftToken.XPOW]).toEqual({
+            expect(next).toEqual({
                 status: RefresherStatus.refreshed
             });
         });
-        const refresher = {
-            [NftToken.XPOW]: { status: RefresherStatus.refreshed },
-        };
+        const refresher = { status: RefresherStatus.refreshed };
         store.dispatch(setRatesUi({ refresher }));
     });
     it('should invoke handler (for setRatesUiRefresher)', () => {
@@ -77,13 +71,11 @@ describe('onRatesUiRefresher', () => {
             })
         });
         onRatesUiRefresher(store as Store<AppState, AnyAction>, (next) => {
-            expect(next[NftToken.XPOW]).toEqual({
+            expect(next).toEqual({
                 status: null
             });
         });
-        const refresher = {
-            [NftToken.XPOW]: { status: null },
-        };
+        const refresher = { status: null };
         store.dispatch(setRatesUiRefresher({ refresher }));
     });
 });

@@ -1,7 +1,9 @@
 import './ppts.scss';
 
 import {
-    Amount, Nft, NftIssue, NftLevel, Nfts, NftToken, PptAmounts, PptDetails, PptFlags, PptMinter, PptMinterList, Token
+    Amount,
+    NftIssue, NftLevel, Nfts,
+    PptAmounts, PptDetails, PptFlags, PptMinter, PptMinterList
 } from '../../source/redux/types';
 
 import React from 'react';
@@ -9,10 +11,11 @@ import { UiPptList } from './list/list';
 import { UiPptMinter } from './minter/minter';
 
 type Props = {
-    ppts: Nfts; token: Token; flags: PptFlags;
-    details: Record<NftToken, PptDetails>;
-    minter: Record<NftToken, PptMinter>;
-    amounts: Record<NftToken, PptAmounts>;
+    ppts: Nfts;
+    flags: PptFlags;
+    details: PptDetails;
+    minter: PptMinter;
+    amounts: PptAmounts;
     onPptList?: (
         flags: PptFlags,
         amounts: PptAmounts
@@ -52,21 +55,11 @@ type Props = {
     /**
      * ppt-minter:
      */
-    onPptMinterApproval?: (
-        token: Token
-    ) => void
-    onPptMinterBatchMint?: (
-        token: Token, list: PptMinterList
-    ) => void;
-    onPptMinterBatchBurn?: (
-        token: Token, list: PptMinterList
-    ) => void;
-    onPptMinterBatchClaim?: (
-        token: Token
-    ) => void;
-    onPptMinterToggled?: (
-        toggled: boolean
-    ) => void;
+    onPptMinterApproval?: () => void
+    onPptMinterBatchMint?: (list: PptMinterList) => void;
+    onPptMinterBatchBurn?: (list: PptMinterList) => void;
+    onPptMinterBatchClaim?: () => void;
+    onPptMinterToggled?: (toggled: boolean) => void;
     toggled: boolean;
 }
 function join(
@@ -96,8 +89,7 @@ function split(
 export function UiPpts(
     props: Props
 ) {
-    const { ppts, token } = props;
-    const ppt_token = Nft.token(token);
+    const { ppts } = props;
     const { flags, toggled } = props;
     const { amounts, minter } = props;
     return <React.Fragment>
@@ -107,28 +99,28 @@ export function UiPpts(
         <div id='ppt-batch-minting'>
             <UiPptMinter
                 approval={
-                    minter[ppt_token].approval
+                    minter.approval
                 }
                 onApproval={
                     props.onPptMinterApproval
                 }
                 minter_list={
-                    join(flags, amounts[ppt_token])
+                    join(flags, amounts)
                 }
                 minter_status={
-                    minter[ppt_token].minter_status
+                    minter.minter_status
                 }
                 onBatchMint={
                     props.onPptMinterBatchMint
                 }
                 burner_status={
-                    minter[ppt_token].burner_status
+                    minter.burner_status
                 }
                 onBatchBurn={
                     props.onPptMinterBatchBurn
                 }
                 claimer_status={
-                    minter[ppt_token].claimer_status
+                    minter.claimer_status
                 }
                 onBatchClaim={
                     props.onPptMinterBatchClaim
@@ -137,7 +129,6 @@ export function UiPpts(
                     props.onPptMinterToggled
                 }
                 toggled={toggled}
-                token={token}
                 ppts={ppts}
             />
         </div>
@@ -145,7 +136,7 @@ export function UiPpts(
             <UiPptList
                 ppts={ppts}
                 list={
-                    join(flags, amounts[ppt_token])
+                    join(flags, amounts)
                 }
                 onPptList={(
                     list
@@ -155,7 +146,7 @@ export function UiPpts(
                     if (onPptList) onPptList(lhs, rhs);
                 }}
                 details={
-                    props.details[ppt_token]
+                    props.details
                 }
                 onPptImageLoaded={
                     props.onPptImageLoaded
@@ -176,7 +167,6 @@ export function UiPpts(
                     props.onPptClaim
                 }
                 toggled={toggled}
-                token={token}
             />
         </div>
     </React.Fragment>;

@@ -2,7 +2,7 @@ import { Bus } from '../../../source/bus';
 import { nice } from '../../../source/functions';
 import { ROParams } from '../../../source/params';
 import { globalRef } from '../../../source/react';
-import { Amount, Nft, NftDetails, NftIssue, NftLevel, Nfts, Supply, Token } from '../../../source/redux/types';
+import { Amount, Nft, NftDetails, NftIssue, NftLevel, Nfts, Supply } from '../../../source/redux/types';
 import { MAX_YEAR, MIN_YEAR, Years } from '../../../source/years';
 
 import React from 'react';
@@ -15,7 +15,6 @@ import { UiNftTarget } from './nft-target';
 
 type Props = {
     nfts: Nfts;
-    token: Token;
     level: NftLevel;
     details: NftDetails;
     onNftImageLoaded?: (
@@ -97,9 +96,7 @@ function $image(
     const by_level = details[nft_level];
     const by_issue = by_level[nft_issue];
     const { image, fixed, toggled } = by_issue;
-    const { token } = props;
     return <UiNftImage
-        token={token}
         issue={nft_issue}
         level={nft_level}
         toggled={fixed || toggled}
@@ -183,7 +180,7 @@ function $supply(
 function $expander(
     props: Props, nft_issue: NftIssue
 ) {
-    const { details, level: nft_level, token } = props;
+    const { details, level: nft_level } = props;
     const by_level = details[nft_level];
     const by_issue = by_level[nft_issue];
     const { expanded, toggled } = by_issue;
@@ -202,7 +199,6 @@ function $expander(
         }}
         expanded={expanded}
         toggled={toggled}
-        token={token}
     />;
 }
 function $target(
@@ -254,7 +250,7 @@ function $amount(
 function $sender(
     props: Props, nft_issue: NftIssue
 ) {
-    const { details, level: nft_level, token } = props;
+    const { details, level: nft_level } = props;
     const { amount, target } = details[nft_level][nft_issue];
     const { toggled, sender } = details[nft_level][nft_issue];
     return <UiNftSender
@@ -268,7 +264,6 @@ function $sender(
             Bus.emit('toggle-issue', { flag });
         }}
         toggled={toggled}
-        token={token}
     />;
 }
 function lastHR(

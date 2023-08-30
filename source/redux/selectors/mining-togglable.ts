@@ -1,8 +1,8 @@
-import { Mining, Token } from '../types';
+import { Mining } from '../types';
 
 export function miningTogglable(
-    { speed }: Pick<Mining, 'speed'>, token: Token
+    { speed }: Pick<Mining, 'speed'>
 ) {
-    return speed[token] > 0;
+    return speed !== null && speed > 0;
 }
 export default miningTogglable;

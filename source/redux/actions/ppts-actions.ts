@@ -1,9 +1,8 @@
 import { createAction } from '@reduxjs/toolkit';
-import { Amount, NftFullId, NftIssue, NftLevel, NftToken, Supply } from '../types';
+import { Amount, NftFullId, NftIssue, NftLevel, Supply } from '../types';
 
 export const setPpt = createAction('ppts/set', (
     nft: NftFullId | {
-        token: NftToken;
         issue: NftIssue;
         level: NftLevel;
     },
@@ -16,7 +15,6 @@ export const setPpt = createAction('ppts/set', (
 }));
 export const addPpt = createAction('ppts/add', (
     nft: NftFullId | {
-        token: NftToken;
         issue: NftIssue;
         level: NftLevel;
     },
@@ -29,7 +27,6 @@ export const addPpt = createAction('ppts/add', (
 }));
 export const removePpt = createAction('ppts/remove', (
     nft: NftFullId | {
-        token: NftToken;
         issue: NftIssue;
         level: NftLevel;
     },

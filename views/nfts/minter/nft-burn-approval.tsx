@@ -5,11 +5,10 @@ import { Spinner } from './spinner';
 
 type Props = {
     approval: NftMinterApproval | null;
-    onApproval?: (token: Token) => void;
-    token: Token;
+    onApproval?: () => void;
 }
 export function UiNftBurnApproval(
-    { token, approval, onApproval }: Props
+    { approval, onApproval }: Props
 ) {
     const is_approved = approved(approval);
     const is_approving = approving(approval);
@@ -21,9 +20,9 @@ export function UiNftBurnApproval(
         className='btn btn-outline-warning'
         data-bs-placement='top' data-bs-toggle='tooltip'
         disabled={is_approving || is_approved || is_approved === null}
-        onClick={onApproval?.bind(null, token)}
+        onClick={onApproval?.bind(null)}
         style={{ display: !is_approved ? 'block' : 'none' }}
-        title={`Approve minting of ${token} NFTs`}
+        title={`Approve minting of ${Token.XPOW} NFTs`}
     >
         {Spinner({
             show: !!is_approving, grow: true

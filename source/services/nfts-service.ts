@@ -2,7 +2,7 @@ import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
 import { x40 } from '../functions';
 import { addNft, removeNft, setNft } from '../redux/actions';
-import { nftsBy, xtokenOf } from '../redux/selectors';
+import { nftsBy } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { Nft, NftFullId, NftLevels } from '../redux/types';
 import { NftWallet, OnTransferBatch, OnTransferSingle } from '../wallet';
@@ -12,13 +12,12 @@ export const NftsService = (
     store: Store<AppState>
 ) => {
     Blockchain.onceConnect(async function initNfts({
-        account, token
+        account
     }) {
         let index = 0;
-        const nft_token = Nft.token(token);
         const levels = Array.from(NftLevels());
         const issues = Array.from(Years({ reverse: true }));
-        const wallet = new NftWallet(account, token);
+        const wallet = new NftWallet(account);
         const balances = await wallet.balances({
             issues, levels
         });
@@ -30,35 +29,26 @@ export const NftsService = (
                 const amount = balances[index];
                 const supply = supplies[index];
                 store.dispatch(setNft({
-                    issue, level, token: nft_token
+                    issue, level
                 }, {
                     amount, supply
                 }));
                 index += 1;
             }
         }
-    }, {
-        per: () => xtokenOf(store.getState())
     });
-    Blockchain.onConnect(function syncNfts({
-        token
-    }) {
-        const nfts = nftsBy(store.getState(), {
-            token: Nft.token(token)
-        });
+    Blockchain.onConnect(function syncNfts() {
+        const nfts = nftsBy(store.getState());
         for (const [id, nft] of Object.entries(nfts.items)) {
             store.dispatch(setNft(id as NftFullId, nft));
         }
     });
     Blockchain.onceConnect(async function onNftSingleTransfers({
-        account, token
+        account
     }) {
         const on_transfer: OnTransferSingle = async (
             op, from, to, id, value, ev
         ) => {
-            if (xtokenOf(store.getState()) !== token) {
-                return;
-            }
             console.debug('[on:transfer-single]',
                 x40(op), x40(from), x40(to),
                 id, value, ev
@@ -79,20 +69,15 @@ export const NftsService = (
                 }));
             }
         };
-        const nft_wallet = new NftWallet(account, token);
+        const nft_wallet = new NftWallet(account);
         nft_wallet.onTransferSingle(on_transfer)
-    }, {
-        per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(async function onNftBatchTransfers({
-        account, token
+        account
     }) {
         const on_transfer: OnTransferBatch = async (
             op, from, to, ids, values, ev
         ) => {
-            if (xtokenOf(store.getState()) !== token) {
-                return;
-            }
             console.debug('[on:transfer-batch]',
                 x40(op), x40(from), x40(to),
                 ids, values, ev
@@ -115,10 +100,8 @@ export const NftsService = (
                 }
             }
         };
-        const nft_wallet = new NftWallet(account, token);
+        const nft_wallet = new NftWallet(account);
         nft_wallet.onTransferBatch(on_transfer);
-    }, {
-        per: () => xtokenOf(store.getState())
     });
 }
 export default NftsService;

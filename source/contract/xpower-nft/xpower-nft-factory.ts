@@ -1,31 +1,22 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-import { Global, Version } from '../../../source/types';
+import { Global } from '../../../source/types';
 declare const global: Global;
 
 import { ROParams } from '../../params';
-import { Nft, NftLevel, NftRealId, Token } from '../../redux/types';
-import { Tokenizer } from '../../token';
+import { Nft, NftLevel, NftRealId } from '../../redux/types';
 import { MAX_YEAR } from '../../years';
 import { address } from '../address';
 import { XPowerNft } from './xpower-nft';
 
-export function XPowerNftFactory({
-    token, version
-}: {
-    token: Token, version?: Version
-}): XPowerNft {
-    if (version === undefined) {
-        version = ROParams.version;
-    }
+export function XPowerNftFactory(
+    { version } = { version: ROParams.version }
+): XPowerNft {
     const nft = new XPowerNft(address({
-        infix: 'NFT', token: Tokenizer.xify(token), version
+        infix: 'NFT', version
     }));
     return global.XPOWER_NFT = nft;
 }
-export function XPowerNftMockFactory(
-    { token }: { token: Token }
-): XPowerNft {
-    const nft_token = Nft.token(token);
+export function XPowerNftMockFactory(): XPowerNft {
     const mock = {
         totalSupply: (
             /*id: string*/
@@ -55,7 +46,7 @@ export function XPowerNftMockFactory(
                 year = BigInt(year);
             }
             if (typeof index !== 'bigint') {
-                index = BigInt(index ?? Nft.oldIndexOf(nft_token));
+                index = BigInt(index ?? 1);
             }
             return 1_000_000n * (index + 1n) + 100n * year + BigInt(level);
         },

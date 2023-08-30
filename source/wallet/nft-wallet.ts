@@ -2,24 +2,27 @@ import { MYProvider } from '../blockchain';
 import { XPowerNft, XPowerNftFactory, XPowerNftMockFactory } from '../contract';
 import { address } from '../contract/address';
 import { ROParams } from '../params';
-import { Account, Address, Amount, Index, Nft, NftFullId, NftIssue, NftLevel, NftRealId, Token, Year } from '../redux/types';
-import { Tokenizer } from '../token';
+import { Account, Address, Amount, Index, Nft, NftFullId, NftIssue, NftLevel, NftRealId, Year } from '../redux/types';
 import { Version } from '../types';
 import { ERC1155Wallet } from './erc1155-wallet';
 
 export class NftWallet extends ERC1155Wallet {
     constructor(
-        account: Account | Address, token: Token, version?: Version
+        account: Account | Address, version?: Version
     ) {
-        super(account, token, version ?? ROParams.version);
-        this._nft = XPowerNftFactory({ token, version });
+        super(account, version ?? ROParams.version);
+        if (version) {
+            this._nft = XPowerNftFactory({ version });
+        } else {
+            this._nft = XPowerNftFactory();
+        }
     }
     mint(
         level: NftLevel | Promise<NftLevel>,
         amount: Amount | Promise<Amount>,
     ) {
         const moe_index = this.moeIndexOf(
-            moeAddress(this.token)
+            moeAddress()
         );
         return this._nft.mint(
             this.account, level, amount, moe_index
@@ -30,7 +33,7 @@ export class NftWallet extends ERC1155Wallet {
         amounts: Amount[] | Promise<Amount[]>,
     ) {
         const moe_index = this.moeIndexOf(
-            moeAddress(this.token)
+            moeAddress()
         );
         return this._nft.mintBatch(
             this.account, levels, amounts, moe_index
@@ -58,7 +61,7 @@ export class NftWallet extends ERC1155Wallet {
         amount: Amount | Promise<Amount>,
     ) {
         const moe_index = this.moeIndexOf(
-            moeAddress(this.token)
+            moeAddress()
         );
         return this._nft.upgrade(
             this.account, issue, level, amount, moe_index
@@ -70,7 +73,7 @@ export class NftWallet extends ERC1155Wallet {
         amounts: Amount[][] | Promise<Amount[][]>,
     ) {
         const moe_index = this.moeIndexOf(
-            moeAddress(this.token)
+            moeAddress()
         );
         return this._nft.upgradeBatch(
             this.account, issues, levels, amounts, moe_index
@@ -105,19 +108,13 @@ export class NftWallet extends ERC1155Wallet {
 }
 export class NftWalletMock extends NftWallet {
     constructor(
-        address: Account | Address = 0n, token: Token, version?: Version
+        address: Account | Address = 0n, version?: Version
     ) {
-        super(address, token, version);
-        this._nft = XPowerNftMockFactory({ token });
+        super(address, version);
+        this._nft = XPowerNftMockFactory();
     }
 }
-function moeAddress(
-    token: Token
-): Account {
-    return BigInt(address({
-        token: Tokenizer.xify(token),
-        version: ROParams.version,
-        infix: 'MOE',
-    }));
+function moeAddress(): Account {
+    return BigInt(address({ version: ROParams.version, infix: 'MOE', }));
 }
 export default NftWallet;

@@ -1,7 +1,5 @@
-import { NftToken } from './nfts';
-
 export type RatesUi = {
-    refresher: Record<NftToken, Refresher>;
+    refresher: Refresher;
 };
 export type Refresher = {
     status: RefresherStatus | null;

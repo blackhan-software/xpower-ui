@@ -1,8 +1,7 @@
 import React from 'react';
-import { Nft, NftIssue, NftLevel, Token } from '../../../source/redux/types';
+import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
 
 type Props = {
-    token: Token;
     issue: NftIssue;
     level: NftLevel;
     toggled: boolean;

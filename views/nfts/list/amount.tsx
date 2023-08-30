@@ -168,7 +168,7 @@ function exRange(
         const wallet = state.aft_wallet.items[xtoken];
         if (wallet && wallet.amount > base) {
             const total = Object
-                .entries(state.nfts_ui.amounts[Nft.token(state.token)])
+                .entries(state.nfts_ui.amounts)
                 .map(([l, { amount1: a }]) => 10n ** BigInt(l) * a)
                 .reduce((acc, a) => acc + a * base, 0n);
             if (total > wallet.amount) {
@@ -183,7 +183,7 @@ function readOnly(
 ) {
     if (state) {
         for (const [l, { max1 }] of Object.entries(
-            state.nfts_ui.amounts[Nft.token(state.token)]
+            state.nfts_ui.amounts
         )) {
             if (BigInt(l) > level && max1) {
                 return false; // read-write

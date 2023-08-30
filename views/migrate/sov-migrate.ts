@@ -5,7 +5,6 @@ import { Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
 import { Alert, Alerts, alert, x40 } from '../../source/functions';
 import { Account, MAX_UINT256, Token } from '../../source/redux/types';
-import { Tokenizer } from '../../source/token';
 import { Version } from '../../source/types';
 import { MoeWallet, SovWallet } from '../../source/wallet';
 
@@ -21,13 +20,13 @@ $('button.approve-sov-allowance').on(
         const $approve = $(e.currentTarget);
         const $migrate = $approve.parents('form.sov-migrate');
         if ($approve.hasClass('xpow')) {
-            await moeApproveOld(Token.XPOW, {
+            await moeApproveOld({
                 $approve
             });
-            await moeApproveNew(Token.XPOW, {
+            await moeApproveNew({
                 $approve
             });
-            await sovApproveOld(Token.XPOW, {
+            await sovApproveOld({
                 $approve, $migrate: $migrate.find(
                     '.sov-migrate.xpow'
                 )
@@ -35,14 +34,14 @@ $('button.approve-sov-allowance').on(
         }
     }
 );
-async function moeApproveOld(token: Token, { $approve }: {
+async function moeApproveOld({ $approve }: {
     $approve: JQuery<HTMLElement>
 }) {
     const { account, src_version, tgt_version } = await context({
         $el: $approve
     });
     const { src_xpower, src_apower, tgt_xpower } = await contracts({
-        account, token, src_version, tgt_version
+        account, src_version, tgt_version
     });
     if (!src_xpower) {
         throw new Error('undefined src_xpower');
@@ -97,14 +96,14 @@ async function moeApproveOld(token: Token, { $approve }: {
         reset();
     }
 }
-async function moeApproveNew(token: Token, { $approve }: {
+async function moeApproveNew({ $approve }: {
     $approve: JQuery<HTMLElement>
 }) {
     const { account, src_version, tgt_version } = await context({
         $el: $approve
     });
     const { src_apower, tgt_xpower, tgt_apower } = await contracts({
-        account, token, src_version, tgt_version
+        account, src_version, tgt_version
     });
     if (!src_apower) {
         throw new Error('undefined src_apower');
@@ -159,14 +158,14 @@ async function moeApproveNew(token: Token, { $approve }: {
         reset();
     }
 }
-async function sovApproveOld(token: Token, { $approve, $migrate }: {
+async function sovApproveOld({ $approve, $migrate }: {
     $approve: JQuery<HTMLElement>, $migrate: JQuery<HTMLElement>
 }) {
     const { account, src_version, tgt_version } = await context({
         $el: $approve
     });
     const { src_apower, tgt_apower } = await contracts({
-        account, token, src_version, tgt_version
+        account, src_version, tgt_version
     });
     if (!src_apower) {
         throw new Error('undefined src_apower');
@@ -232,11 +231,11 @@ $('button.sov-migrate').on(
     'click', async function migrateTokens(e) {
         const $migrate = $(e.currentTarget);
         if ($migrate.hasClass('xpow')) {
-            await sovMigrateOld(Token.XPOW, { $migrate });
+            await sovMigrateOld({ $migrate });
         }
     }
 );
-async function sovMigrateOld(token: Token, { $migrate }: {
+async function sovMigrateOld({ $migrate }: {
     $migrate: JQuery<HTMLElement>
 }) {
     const { account, src_version, tgt_version } = await context({
@@ -246,7 +245,7 @@ async function sovMigrateOld(token: Token, { $migrate }: {
         src_apower, tgt_apower,
         src_xpower, tgt_xpower,
     } = await contracts({
-        account, token, src_version, tgt_version
+        account, src_version, tgt_version
     });
     if (!src_apower) {
         throw new Error('undefined src_apower');
@@ -265,11 +264,11 @@ async function sovMigrateOld(token: Token, { $migrate }: {
     //
     const moe_balance = await src_xpower.balance;
     console.debug(
-        `[${src_version}:balance]`, moe_balance.toString(), `[${token}]`
+        `[${src_version}:balance]`, moe_balance.toString()
     );
     if (moe_balance) {
         alert(
-            `Old ${token} balance is non-zero; migrate them first.`,
+            `Old ${Token.XPOW} balance is non-zero; migrate them first.`,
             Alert.warning, { after: $migrate.parent('div')[0] }
         );
         return;
@@ -315,7 +314,7 @@ async function sovMigrateOld(token: Token, { $migrate }: {
                 return;
             }
             alert(
-                `Old ${Tokenizer.aify(token)} balance has been migrated! ;)`,
+                `Old ${Token.APOW} balance has been migrated! ;)`,
                 Alert.success, { after: $migrate.parent('div')[0], id: 'success' }
             );
             reset();
@@ -360,14 +359,14 @@ async function context({ $el: $approve }: {
     return { account, src_version, tgt_version };
 }
 async function contracts({
-    account, token, src_version, tgt_version
+    account, src_version, tgt_version
 }: {
-    account: Account, token: Token, src_version: Version, tgt_version: Version
+    account: Account, src_version: Version, tgt_version: Version
 }) {
     let src_xpower: MoeWallet | undefined;
     try {
         src_xpower = new MoeWallet(
-            account, token, src_version
+            account, src_version
         );
         console.debug(
             `[${src_version}:src_xpower]`, await src_xpower.address
@@ -378,7 +377,7 @@ async function contracts({
     let tgt_xpower: MoeWallet | undefined;
     try {
         tgt_xpower = new MoeWallet(
-            account, token, tgt_version
+            account, tgt_version
         );
         console.debug(
             `[${tgt_version}:tgt_xpower]`, await tgt_xpower.address
@@ -389,7 +388,7 @@ async function contracts({
     let src_apower: SovWallet | undefined;
     try {
         src_apower = new SovWallet(
-            account, token, src_version
+            account, src_version
         );
         console.debug(
             `[${src_version}:src_apower]`, await src_apower.address
@@ -400,7 +399,7 @@ async function contracts({
     let tgt_apower: SovWallet | undefined;
     try {
         tgt_apower = new SovWallet(
-            account, token, tgt_version
+            account, tgt_version
         );
         console.debug(
             `[${tgt_version}:tgt_apower]`, await tgt_apower.address

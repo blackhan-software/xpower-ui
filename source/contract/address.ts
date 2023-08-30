@@ -1,12 +1,11 @@
 import { Version } from '../../source/types';
 import { ROParams } from '../params';
-import { Address, Token } from '../redux/types';
-import { Tokenizer } from '../token';
+import { Address } from '../redux/types';
 
 export function address({
-    infix, token, version
+    infix, version
 }: {
-    infix: string, token: Token | 'XPOW', version?: Version
+    infix: string, version?: Version
 }): Address {
     if (typeof document === 'undefined') {
         return '0x0000000000000000000000000000000000000000'; // test-env
@@ -14,10 +13,7 @@ export function address({
     if (version === undefined) {
         version = ROParams.version;
     }
-    if (token.startsWith('A') && token !== 'XPOW') {
-        token = Tokenizer.xify(token);
-    }
-    const id = `g-${token}_${infix}_${version}`;
+    const id = `g-${'XPOW'}_${infix}_${version}`;
     const $element = document.getElementById(id);
     const address = $element?.dataset.value;
     if (!address) {

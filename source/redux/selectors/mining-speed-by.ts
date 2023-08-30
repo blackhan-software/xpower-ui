@@ -1,9 +1,7 @@
-import { Tokenizer } from '../../token';
 import { AppState } from '../store';
-import { Token } from '../types';
 
 export function miningSpeedBy(
-    { mining }: Pick<AppState, 'mining'>, token: Token
+    { mining }: Pick<AppState, 'mining'>
 ) {
-    return mining.speed[Tokenizer.xify(token)];
+    return mining.speed;
 }

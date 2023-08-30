@@ -1,19 +1,17 @@
 import { AppState } from '../store';
-import { Account, Amount, BlockHash, Nonce, Token } from '../types';
+import { Account, Amount, BlockHash, Nonce } from '../types';
 
 export function noncesBy(
     { nonces }: Pick<AppState, 'nonces'>, item?: {
         account?: Account,
         amount?: Amount,
         block_hash?: BlockHash,
-        token?: Token,
     }
 ): Array<{
     nonce: Nonce, item: {
         account: Account,
         amount: Amount,
         block_hash: BlockHash
-        token: Token,
     }
 }> {
     const filtered = Object.entries(nonces.items).filter(([_, i]) => {
@@ -30,11 +28,6 @@ export function noncesBy(
             }
             if (item.block_hash !== undefined &&
                 item.block_hash !== i.block_hash
-            ) {
-                return false;
-            }
-            if (item.token !== undefined &&
-                item.token !== i.token
             ) {
                 return false;
             }

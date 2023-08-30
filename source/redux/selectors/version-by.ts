@@ -1,12 +1,10 @@
 import { Version } from '../../types';
 import { AppState } from '../store';
-import { Token } from '../types';
 
 export const versionBy = (
-    { history }: Pick<AppState, 'history'>, token: Token
+    { history }: Pick<AppState, 'history'>
 ): Version[] => {
-    const filtered = Object.entries(history.items).filter(([_, entry]) => {
-        const item = entry[token];
+    const filtered = Object.entries(history.items).filter(([_, item]) => {
         if (item?.moe?.balance) {
             return true;
         }

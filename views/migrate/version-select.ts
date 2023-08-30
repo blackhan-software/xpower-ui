@@ -4,7 +4,6 @@ import { Blockchain } from '../../source/blockchain';
 import { nice_si, x40, zip } from '../../source/functions';
 import { ROParams, RWParams } from '../../source/params';
 import { Account, Balance, Nft, NftLevels, Token, TokenInfo } from '../../source/redux/types';
-import { Tokenizer } from '../../source/token';
 import { Version, Versions } from '../../source/types';
 import { MoeWallet, NftWallet, PptWallet, SovWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
@@ -18,17 +17,17 @@ Blockchain.onConnect(async function setBalances() {
     const versions = Array.from(Versions())
         .filter((v) => ROParams.lt2(v, ROParams.versionTarget)).reverse();
     const balances = versions.map(
-        (version) => get_balances(RWParams.token, version)
+        (version) => get_balances(version)
     );
     for (const [version, balance] of zip(versions, balances)) {
-        set_balances(RWParams.token, version, await balance);
+        set_balances(version, await balance);
     }
     const $select = $('#version-select');
     $select.next('.info').removeClass('loading');
     $select.prop('disabled', false);
 });
 async function get_balances(
-    token: Token, version: Version
+    version: Version
 ) {
     const account = await Blockchain.account;
     if (!account) {
@@ -45,7 +44,7 @@ async function get_balances(
         moe_contract, sov_contract,
         nft_contract, ppt_contract,
     } = await contracts({
-        account, token, version
+        account, version
     });
     let moe = 0n;
     if (moe_contract) {
@@ -72,29 +71,27 @@ async function get_balances(
     return { moe, sov, nft: nft + ppt };
 }
 function set_balances(
-    token: Token, version: Version, balance: {
+    version: Version, balance: {
         moe: Balance, sov: Balance, nft: Balance
     }
 ) {
     const $option = $(
         `#version-select>option[value=${version}]`
     );
-    const xtoken = Tokenizer.xify(token);
-    const atoken = Tokenizer.aify(token);
     const ntoken = 'NFTs';
-    const { decimals: moe_decimals } = TokenInfo(xtoken, version);
-    const { decimals: sov_decimals } = TokenInfo(atoken, version);
+    const { decimals: moe_decimals } = TokenInfo(Token.XPOW, version);
+    const { decimals: sov_decimals } = TokenInfo(Token.APOW, version);
     const moe_base = 10 ** moe_decimals;
     const sov_base = 10 ** sov_decimals;
     const moe_text
-        = `${xtoken}=${nice_si(balance.moe, { base: moe_base })}`;
+        = `${Token.XPOW}=${nice_si(balance.moe, { base: moe_base })}`;
     const sov_text
-        = `${atoken}=${nice_si(balance.sov, { base: sov_base })}`;
+        = `${Token.APOW}=${nice_si(balance.sov, { base: sov_base })}`;
     const nft_text
         = `${ntoken}=${nice_si(balance.nft)}`;
     const opt_text = $option.text()
-        .replace(new RegExp(xtoken + '=0'), moe_text)
-        .replace(new RegExp(atoken + '=0'), sov_text)
+        .replace(new RegExp(Token.XPOW + '=0'), moe_text)
+        .replace(new RegExp(Token.APOW + '=0'), sov_text)
         .replace(new RegExp('NFTs' + '=0'), nft_text);
     $option.html(opt_text);
 }
@@ -115,13 +112,13 @@ $('.selectors>a').on('click', function selectToken(e) {
     location.reload();
 });
 async function contracts({
-    account, token, version
+    account, version
 }: {
-    account: Account, token: Token, version: Version
+    account: Account, version: Version
 }) {
     let moe_contract: MoeWallet | undefined;
     try {
-        moe_contract = new MoeWallet(account, token, version);
+        moe_contract = new MoeWallet(account, version);
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
             console.error(ex);
@@ -129,7 +126,7 @@ async function contracts({
     }
     let sov_contract: SovWallet | undefined;
     try {
-        sov_contract = new SovWallet(account, token, version);
+        sov_contract = new SovWallet(account, version);
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
             console.error(ex);
@@ -137,7 +134,7 @@ async function contracts({
     }
     let nft_contract: NftWallet | undefined;
     try {
-        nft_contract = new NftWallet(account, token, version);
+        nft_contract = new NftWallet(account, version);
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
             console.error(ex);
@@ -145,7 +142,7 @@ async function contracts({
     }
     let ppt_contract: PptWallet | undefined;
     try {
-        ppt_contract = new PptWallet(account, token, version);
+        ppt_contract = new PptWallet(account, version);
     } catch (ex) {
         if (`${ex}`.match(/missing\sg/) === null) {
             console.error(ex);

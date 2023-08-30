@@ -7,7 +7,7 @@ import { useIsFirstRender } from 'usehooks-ts';
 import { mobile, nice, nice_si, ordinal } from '../../source/functions';
 import { ROParams } from '../../source/params';
 import { useMouseDragX } from '../../source/react';
-import { Nft, NftIssue, NftLevel, Rates, Token } from '../../source/redux/types';
+import { Nft, NftIssue, NftLevel, Rates } from '../../source/redux/types';
 import { theme } from '../../source/theme';
 import { normalize } from './tools/apr-normalize';
 import { RateEvaluator } from './tools/rate-evaluator';
@@ -20,10 +20,9 @@ type Props = {
     issue: NftIssue;
     rates: Rates;
     scale: Scale;
-    token: Token;
 }
 export function UiCoverGraphChartLine(
-    { level, issue, rates, scale, token }: Props
+    { level, issue, rates, scale }: Props
 ) {
     const $ref = useRef<HTMLCanvasElement>(null);
     const animate = useIsFirstRender();
@@ -31,9 +30,9 @@ export function UiCoverGraphChartLine(
         useMouseDragX($ref)[0]
     ));
     useEffect(() => chart($ref, {
-        animate, delta, level, issue, rates, scale, token,
+        animate, delta, level, issue, rates, scale
     }), [
-        animate, delta, level, issue, rates, scale, token,
+        animate, delta, level, issue, rates, scale
     ]);
     return <div className='chart chart-line cover-layer'>
         <canvas ref={$ref} />
@@ -41,7 +40,7 @@ export function UiCoverGraphChartLine(
 }
 function chart(
     $ref: React.RefObject<HTMLCanvasElement>, {
-        animate, delta, level, issue, rates, scale, token,
+        animate, delta, level, issue, rates, scale
     }: Props & {
         animate: boolean, delta: bigint
     }
@@ -49,7 +48,7 @@ function chart(
     if ($ref.current === null) {
         return;
     }
-    const re = RateEvaluator(rates, token, level, issue, delta, 360n);
+    const re = RateEvaluator(rates, level, issue, delta, 360n);
     const targets = re.targets.map(([apr, apb]) => normalize(apr + apb));
     const actuals = re.actuals.map(([apr, apb]) => normalize(apr + apb));
     const xp_color = style(theme(ROParams.color).XP_POWERED);

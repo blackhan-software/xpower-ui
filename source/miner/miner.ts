@@ -2,8 +2,7 @@ import { EventEmitter } from 'events';
 import { ModuleThread, spawn, Thread, Worker } from 'threads';
 import { logical_cpus } from '../functions';
 import { ROParams } from '../params';
-import { Account, Address, Amount, BlockHash, Level, Nonce, Token } from '../redux/types';
-import { Tokenizer } from '../token';
+import { Account, Address, Amount, BlockHash, Level, Nonce } from '../redux/types';
 import { Version } from '../types';
 import { Item, IWorker } from './scripts/worker';
 
@@ -18,8 +17,6 @@ export class Miner extends EventEmitter {
     public static SPEED_DEFAULT = 0.5; // [0..1]
     public static WORKERS_MAX = logical_cpus();
     public constructor(
-        /** token to mine for */
-        token: Token,
         /** contract to mine on */
         contract: Address,
         /** account to mine for */
@@ -38,7 +35,6 @@ export class Miner extends EventEmitter {
         this._contract = contract;
         this._level = level;
         this._speed = speed;
-        this._token = Tokenizer.xify(token);
         this._version = version;
         this._versionFaked = versionFaked;
         this.setMaxListeners(20);
@@ -167,7 +163,6 @@ export class Miner extends EventEmitter {
             contract: this.contract,
             level: this.level,
             meta: { id, idLength: this.workersLength },
-            token: this.token,
             version: this.version,
             versionFaked: this.versionFaked
         });
@@ -192,9 +187,6 @@ export class Miner extends EventEmitter {
     private set speed(value: number) {
         this._speed = value;
     }
-    public get token(): Token {
-        return this._token;
-    }
     public get version(): Version {
         return this._version;
     }
@@ -212,7 +204,6 @@ export class Miner extends EventEmitter {
     private _level: Level;
     private _paused = false;
     private _speed: number;
-    private _token: Token;
     private _version: Version;
     private _versionFaked: boolean;
     private _workers: ModuleThread<IWorker>[] = [];

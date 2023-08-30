@@ -5,8 +5,7 @@ import { Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
 import { PptTreasury, PptTreasuryFactory } from '../../source/contract';
 import { Alert, Alerts, alert, x40 } from '../../source/functions';
-import { Account, Balance, MAX_UINT256, Nft, NftLevels, Token } from '../../source/redux/types';
-import { Tokenizer } from '../../source/token';
+import { Account, Balance, MAX_UINT256, Nft, NftLevels } from '../../source/redux/types';
 import { Version } from '../../source/types';
 import { MoeWallet, NftWallet, PptWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
@@ -30,21 +29,21 @@ $('button.unstake-old').on('click', async function unstakeOldNfts(e) {
     const $unstake_ppt = $unstake.parents('form.unstake-old');
     const $migrate_nft = $unstake_ppt.next('form.migrate-old');
     if ($unstake.hasClass('xpow')) {
-        await nftUnstakeOld(Token.XPOW, {
+        await nftUnstakeOld({
             $unstake, $approve: $migrate_nft.find(
                 '.approve-old.xpow'
             )
         });
     }
 });
-async function nftUnstakeOld(token: Token, { $unstake, $approve }: {
+async function nftUnstakeOld({ $unstake, $approve }: {
     $unstake: JQuery<HTMLElement>, $approve: JQuery<HTMLElement>
 }) {
     const { account, src_version, tgt_version } = await context({
         $el: $unstake
     });
     const { ppt_source, nty_source } = await contracts({
-        account, token, src_version, tgt_version
+        account, src_version, tgt_version
     });
     if (!ppt_source) {
         throw new Error('undefined ppt_source');
@@ -118,30 +117,30 @@ $('button.approve-old').on('click', async function approveOldNfts(e) {
     const $approve = $(e.currentTarget);
     const $migrate_nft = $approve.parents('form.migrate-old');
     if ($approve.hasClass('xpow')) {
-        await moeApproveOld(Token.XPOW, {
+        await moeApproveOld({
             $approve
         });
-        await moeApproveNew(Token.XPOW, {
+        await moeApproveNew({
             $approve
         });
-        await nftApproveOld(Token.XPOW, {
+        await nftApproveOld({
             $approve, $migrate: $migrate_nft.find(
                 '.migrate-old.xpow'
             )
         });
     }
 });
-async function moeApproveOld(token: Token, { $approve }: {
+async function moeApproveOld({ $approve }: {
     $approve: JQuery<HTMLElement>
 }) {
     const { account, src_version, tgt_version } = await context({
         $el: $approve
     });
     const { src_xpower, tgt_xpower } = await contracts({
-        account, src_version, tgt_version, token
+        account, src_version, tgt_version
     });
     const { nft_source } = await contracts({
-        account, token, src_version, tgt_version
+        account, src_version, tgt_version
     });
     if (!src_xpower) {
         throw new Error('undefined src_xpower');
@@ -211,17 +210,17 @@ async function moeApproveOld(token: Token, { $approve }: {
         reset();
     }
 }
-async function moeApproveNew(token: Token, { $approve }: {
+async function moeApproveNew({ $approve }: {
     $approve: JQuery<HTMLElement>
 }) {
     const { account, src_version, tgt_version } = await context({
         $el: $approve
     });
     const { nft_source, nft_target } = await contracts({
-        account, token, src_version, tgt_version
+        account, src_version, tgt_version
     });
     const { tgt_xpower } = await contracts({
-        account, src_version, tgt_version, token
+        account, src_version, tgt_version
     });
     if (!nft_source) {
         throw new Error('undefined nft_source');
@@ -291,14 +290,14 @@ async function moeApproveNew(token: Token, { $approve }: {
         reset();
     }
 }
-async function nftApproveOld(token: Token, { $approve, $migrate }: {
+async function nftApproveOld({ $approve, $migrate }: {
     $approve: JQuery<HTMLElement>, $migrate: JQuery<HTMLElement>
 }) {
     const { account, src_version, tgt_version } = await context({
         $el: $approve
     });
     const { nft_source, nft_target } = await contracts({
-        account, token, src_version, tgt_version
+        account, src_version, tgt_version
     });
     if (!nft_source) {
         throw new Error('undefined nft_source');
@@ -374,24 +373,24 @@ $('button.migrate-old').on('click', async function migrateOldNfts(e) {
     const $migrate_nft = $migrate.parents('form.migrate-old');
     const $restake_nft = $migrate_nft.next('form.restake-new');
     if ($migrate.hasClass('xpow')) {
-        await nftMigrateOld(Token.XPOW, {
+        await nftMigrateOld({
             $migrate, $approve: $restake_nft.find(
                 '.approve-new.xpow'
             )
         });
     }
 });
-async function nftMigrateOld(token: Token, { $migrate, $approve }: {
+async function nftMigrateOld({ $migrate, $approve }: {
     $migrate: JQuery<HTMLElement>, $approve: JQuery<HTMLElement>
 }) {
     const { account, src_version, tgt_version } = await context({
         $el: $migrate
     });
     const { src_xpower, tgt_xpower } = await contracts({
-        account, src_version, tgt_version, token
+        account, src_version, tgt_version
     });
     const { nft_source, nft_target } = await contracts({
-        account, token, src_version, tgt_version
+        account, src_version, tgt_version
     });
     if (!src_xpower) {
         throw new Error('undefined src_xpower');
@@ -457,7 +456,7 @@ async function nftMigrateOld(token: Token, { $migrate, $approve }: {
                 return;
             }
             alert(
-                `Old ${Tokenizer.xify(token)} NFTs have been migrated! ;)`,
+                `Old NFTs have been migrated! ;)`,
                 Alert.success, { id: 'success', after: $migrate.parent('div')[0] }
             );
             $approve.prop('disabled', false);
@@ -492,21 +491,21 @@ $('button.approve-new').on('click', async function approveNewNfts(e) {
     const $approve = $(e.currentTarget);
     const $restake_nft = $approve.parents('form.restake-new');
     if ($approve.hasClass('xpow')) {
-        await nftApproveNew(Token.XPOW, {
+        await nftApproveNew({
             $approve, $restake: $restake_nft.find(
                 '.restake-new.xpow'
             )
         });
     }
 });
-async function nftApproveNew(token: Token, { $approve, $restake }: {
+async function nftApproveNew({ $approve, $restake }: {
     $approve: JQuery<HTMLElement>, $restake: JQuery<HTMLElement>
 }) {
     const { account, src_version, tgt_version } = await context({
         $el: $approve
     });
     const { nft_target, nty_target } = await contracts({
-        account, token, src_version, tgt_version
+        account, src_version, tgt_version
     });
     if (!nft_target) {
         throw new Error('undefined nft_target');
@@ -580,17 +579,17 @@ async function nftApproveNew(token: Token, { $approve, $restake }: {
 $('button.restake-new').on('click', async function restakeNewNfts(e) {
     const $restake = $(e.currentTarget);
     if ($restake.hasClass('xpow')) {
-        await nftRestakeNew(Token.XPOW, { $restake });
+        await nftRestakeNew({ $restake });
     }
 });
-async function nftRestakeNew(token: Token, { $restake }: {
+async function nftRestakeNew({ $restake }: {
     $restake: JQuery<HTMLElement>
 }) {
     const { account, src_version, tgt_version } = await context({
         $el: $restake
     });
     const { nft_target, nty_target } = await contracts({
-        account, token, src_version, tgt_version
+        account, src_version, tgt_version
     });
     if (!nft_target) {
         throw new Error('undefined nft_target');
@@ -691,14 +690,14 @@ async function context({ $el: $approve }: {
     return { account, src_version, tgt_version };
 }
 async function contracts({
-    account, token, src_version, tgt_version
+    account, src_version, tgt_version
 }: {
-    account: Account, token: Token, src_version: Version, tgt_version: Version
+    account: Account, src_version: Version, tgt_version: Version
 }) {
     let src_xpower: MoeWallet | undefined;
     try {
         src_xpower = new MoeWallet(
-            account, token, src_version
+            account, src_version
         );
         console.debug(
             `[${src_version}:src_xpower]`, await src_xpower.address
@@ -709,7 +708,7 @@ async function contracts({
     let tgt_xpower: MoeWallet | undefined;
     try {
         tgt_xpower = new MoeWallet(
-            account, token, tgt_version
+            account, tgt_version
         );
         console.debug(
             `[${tgt_version}:tgt_xpower]`, await tgt_xpower.address
@@ -720,7 +719,7 @@ async function contracts({
     let nft_source: NftWallet | undefined;
     try {
         nft_source = new NftWallet(
-            account, token, src_version
+            account, src_version
         );
         console.debug(
             `[${src_version}:nft_source]`, await nft_source.address
@@ -731,7 +730,7 @@ async function contracts({
     let nft_target: NftWallet | undefined;
     try {
         nft_target = new NftWallet(
-            account, token, tgt_version
+            account, tgt_version
         );
         console.debug(
             `[${tgt_version}:nft_target]`, await nft_target.address
@@ -742,7 +741,7 @@ async function contracts({
     let ppt_source: PptWallet | undefined;
     try {
         ppt_source = new PptWallet(
-            account, token, src_version
+            account, src_version
         );
         console.debug(
             `[${src_version}:ppt_source]`, await ppt_source.address
@@ -753,7 +752,7 @@ async function contracts({
     let ppt_target: PptWallet | undefined;
     try {
         ppt_target = new PptWallet(
-            account, token, tgt_version
+            account, tgt_version
         );
         console.debug(
             `[${tgt_version}:ppt_target]`, await ppt_target.address
@@ -764,7 +763,7 @@ async function contracts({
     let nty_source: PptTreasury | undefined;
     try {
         nty_source = PptTreasuryFactory({
-            token, version: src_version
+            version: src_version
         });
         console.debug(
             `[${src_version}:nty_source]`, nty_source.address
@@ -775,7 +774,7 @@ async function contracts({
     let nty_target: PptTreasury | undefined;
     try {
         nty_target = PptTreasuryFactory({
-            token, version: tgt_version
+            version: tgt_version
         });
         console.debug(
             `[${tgt_version}:nty_target]`, nty_target.address

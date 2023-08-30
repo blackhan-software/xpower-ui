@@ -5,15 +5,15 @@ import { AppDispatch } from '../../source/redux/store';
 import { Account, AftWallet, AftWalletBurner, Amount, Token, TokenInfo } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { Fire, XPower } from '../../public/images/tsx';
+import { TokenContext } from '../../source/react';
 import { Sector } from './sector';
 
 type Props = {
     account: Account | null;
     onBurn?: (token: Token, amount: Amount) => void;
-    token: Token;
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
     wallet: AftWallet;
@@ -21,26 +21,31 @@ type Props = {
 export function UiAftWallet(
     props: Props
 ) {
+    const [token] = useContext(TokenContext);
+    const aged = Tokenizer.aified(token);
     const dispatch = useDispatch<AppDispatch>();
-    const aged = Tokenizer.aified(props.token);
     const set_aged = (aged: boolean) => {
-        if (aged) {
-            dispatch(switchToken(Tokenizer.aify(props.token)));
-        } else {
-            dispatch(switchToken(Tokenizer.xify(props.token)));
-        }
+        dispatch(switchToken(aged ? Token.APOW : Token.XPOW));
     };
     return <div id='aft-wallet'>
         <label className='form-label'>
-            Wallet Address and {props.token} Balance
+            Wallet Address and {token} Balance
         </label>
         <div className='input-group wallet-address'>
-            {$otfToggle(props)}
-            {$account(props)}
-            {$aftBurner(props)}
-            {$balance(props)}
+            {$otfToggle({
+                ...props
+            })}
+            {$account({
+                ...props
+            })}
+            {$aftBurner({
+                ...props, token
+            })}
+            {$balance({
+                ...props, token
+            })}
             {$aftToggle({
-                ...props, aged, set_aged
+                ...props, aged, set_aged, token
             })}
         </div>
     </div>;
@@ -73,7 +78,7 @@ function $account(
     />;
 }
 function $aftBurner(
-    { token, wallet, onBurn }: Props
+    { token, wallet, onBurn }: Props & { token: Token }
 ) {
     const outer_classes = [
         'form-control input-group-text',
@@ -139,7 +144,7 @@ function $aftBurner(
     }
 }
 function $balance(
-    { token, wallet }: Props
+    { token, wallet }: Props & { token: Token }
 ) {
     const on_click = delayed(() => {
         const $burner = document.getElementById(
@@ -162,7 +167,7 @@ function $balance(
 }
 function $aftToggle(
     { wallet, token, aged, set_aged }: Props & {
-        aged: boolean, set_aged: (aged: boolean) => void
+        aged: boolean, set_aged: (aged: boolean) => void, token: Token
     }
 ) {
     const collat = collat_pct({
@@ -191,7 +196,7 @@ function $sectors(
     />;
 }
 function collat_pct(
-    { wallet, token }: Pick<Props, 'wallet' | 'token'>, denominator = 1e6
+    { wallet, token }: Pick<Props, 'wallet'> & { token: Token }, denominator = 1e6
 ) {
     return 100 * Number(wallet.items[token]?.collat ?? 0n) / denominator;
 }

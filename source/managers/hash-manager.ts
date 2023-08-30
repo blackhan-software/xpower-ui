@@ -1,13 +1,12 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-import { Timestamp, Token } from '../redux/types';
-import { Tokenizer } from '../token';
+import { Timestamp } from '../redux/types';
 import { Version } from '../types';
 
 import { EventEmitter } from 'events';
 
 export type Hash = bigint;
 export type Slot = {
-    token: Token, version: Version
+    version: Version
 }
 export class HashManager extends EventEmitter {
     public get(hash: Hash, slot: Slot): Timestamp | null {
@@ -59,7 +58,7 @@ export class HashManager extends EventEmitter {
     }
     private static _me: HashManager | undefined;
 }
-function key(hash: Hash | string, { token, version }: Slot) {
-    return `${hash}:${Tokenizer.xify(token)}:${version}`;
+function key(hash: Hash | string, { version }: Slot) {
+    return `${hash}:${version}`;
 }
 export default HashManager;

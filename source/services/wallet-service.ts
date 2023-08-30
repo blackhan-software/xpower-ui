@@ -3,9 +3,9 @@ import { Blockchain } from '../blockchain';
 import { buffered, x40 } from '../functions';
 import { ROParams } from '../params';
 import { setAftWallet, setOtfWalletAccount, setOtfWalletAmount } from '../redux/actions';
-import { atokenOf, otfWalletOf, xtokenOf } from '../redux/selectors';
+import { otfWalletOf } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Tokenizer } from '../token';
+import { Token } from '../redux/types';
 import { Version } from '../types';
 import { MoeWallet, OnTransfer, OtfManager, SovWallet } from '../wallet';
 
@@ -13,28 +13,22 @@ const MoeWalletService = (
     store: Store<AppState>
 ) => {
     Blockchain.onceConnect(async function initMoeWallet({
-        account, token
+        account
     }) {
-        const xtoken = Tokenizer.xify(token);
-        const moe_wallet = new MoeWallet(account, xtoken);
+        const moe_wallet = new MoeWallet(account);
         const [a, s, c] = await Promise.all([
             moe_wallet.balance, moe_wallet.supply, 0n
         ]);
         store.dispatch(setAftWallet(
-            xtoken, { amount: a, supply: s, collat: c }
+            Token.XPOW, { amount: a, supply: s, collat: c }
         ));
-    }, {
-        per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(function syncMoeWallet({
-        account, token
+        account
     }) {
         const on_transfer: OnTransfer = async (
             from, to, amount
         ) => {
-            if (xtokenOf(store.getState()) !== xtoken) {
-                return;
-            }
             console.debug(
                 '[on:transfer]', x40(from), x40(to), amount
             );
@@ -43,43 +37,34 @@ const MoeWalletService = (
                     moe_wallet.balance, moe_wallet.supply, 0n
                 ]);
                 store.dispatch(setAftWallet(
-                    xtoken, { amount: a, supply: s, collat: c }
+                    Token.XPOW, { amount: a, supply: s, collat: c }
                 ));
             }
         };
-        const xtoken = Tokenizer.xify(token);
-        const moe_wallet = new MoeWallet(account, xtoken);
+        const moe_wallet = new MoeWallet(account);
         moe_wallet.onTransfer(on_transfer);
-    }, {
-        per: () => xtokenOf(store.getState())
     });
 }
 const SovWalletService = (
     store: Store<AppState>
 ) => {
     Blockchain.onceConnect(async function initSovWallet({
-        account, token
+        account
     }) {
-        const atoken = Tokenizer.aify(token);
-        const sov_wallet = new SovWallet(account, atoken);
+        const sov_wallet = new SovWallet(account);
         const [a, s, c] = await Promise.all([
             sov_wallet.balance, sov_wallet.supply, sov_wallet.collat
         ]);
         store.dispatch(setAftWallet(
-            atoken, { amount: a, supply: s, collat: c }
+            Token.APOW, { amount: a, supply: s, collat: c }
         ));
-    }, {
-        per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(function syncSovWallet({
-        account, token
+        account
     }) {
         const on_transfer: OnTransfer = async (
             from, to, amount
         ) => {
-            if (atokenOf(store.getState()) !== atoken) {
-                return;
-            }
             console.debug(
                 '[on:transfer]', x40(from), x40(to), amount
             );
@@ -88,15 +73,12 @@ const SovWalletService = (
                     sov_wallet.balance, sov_wallet.supply, sov_wallet.collat
                 ]);
                 store.dispatch(setAftWallet(
-                    atoken, { amount: a, supply: s, collat: c }
+                    Token.APOW, { amount: a, supply: s, collat: c }
                 ));
             }
         };
-        const atoken = Tokenizer.aify(token);
-        const sov_wallet = new SovWallet(account, atoken);
+        const sov_wallet = new SovWallet(account);
         sov_wallet.onTransfer(on_transfer);
-    }, {
-        per: () => xtokenOf(store.getState())
     });
 }
 const OtfWalletService = (

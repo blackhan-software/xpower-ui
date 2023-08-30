@@ -1,10 +1,9 @@
-import { NftLevel, NftToken } from '../types';
+import { NftLevel } from '../types';
 import { nftsBy } from './nfts-by';
 
 describe('nfts-by', () => {
     const issue = 2021;
     const level = NftLevel.UNIT;
-    const token = NftToken.XPOW;
     it('should return {}', () => {
         const state = { nfts: { items: {} } };
         const nfts_by = nftsBy(state);
@@ -21,7 +20,7 @@ describe('nfts-by', () => {
             }
         };
         const nfts_by = nftsBy(state, {
-            issue, level, token
+            issue, level
         });
         expect(nfts_by).toEqual(state.nfts);
     });
@@ -39,7 +38,7 @@ describe('nfts-by', () => {
             }
         };
         const nfts_by = nftsBy(state, {
-            issue, token
+            issue
         });
         expect(nfts_by).toEqual(state.nfts);
     });

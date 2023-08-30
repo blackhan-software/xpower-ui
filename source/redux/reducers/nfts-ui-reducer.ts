@@ -2,7 +2,7 @@ import { Action } from '@reduxjs/toolkit';
 import { RWParams } from '../../params';
 import { Years } from '../../years';
 import * as actions from '../actions';
-import { NftAmounts, NftDetails, NftFlags, NftLevels, NftMinter, NftToken, NftTokens, NftsUi } from '../types';
+import { NftAmounts, NftDetails, NftFlags, NftLevels, NftMinter, NftsUi } from '../types';
 
 export function nftsUiReducer(
     nfts_ui: NftsUi = nftsUiState(), action: Action
@@ -56,14 +56,6 @@ export function nftsUiState() {
         toggled: false
     };
 }
-export function nftWrap<WR extends Record<string, unknown>>(
-    wrapped_record: WR
-) {
-    const entries = Object.fromEntries(
-        Array.from(NftTokens()).map((t) => [t, wrapped_record])
-    );
-    return entries as Record<NftToken, WR>;
-}
 export function nftAmounts(
     amount1 = 0n, max1 = 0n, min1 = 0n
 ) {
@@ -74,7 +66,7 @@ export function nftAmounts(
             }]
         )
     );
-    return nftWrap(amounts as NftAmounts);
+    return amounts as NftAmounts;
 }
 export function nftDetails(
     image = {
@@ -105,7 +97,7 @@ export function nftDetails(
             }])
         )])
     );
-    return nftWrap(details as NftDetails);
+    return details as NftDetails;
 }
 export function nftMinter() {
     const minter = {
@@ -114,7 +106,7 @@ export function nftMinter() {
         burner_status: null,
         upgrader_status: null,
     };
-    return nftWrap(minter as NftMinter);
+    return minter as NftMinter;
 }
 export function nftFlags(
     display = true

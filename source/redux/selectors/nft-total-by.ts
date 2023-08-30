@@ -1,12 +1,11 @@
 /* eslint @typescript-eslint/no-unused-vars: [off] */
 import { AppState } from '../store';
-import { Amount, Nft, NftFullId, NftIssue, NftLevel, NftToken, Supply } from '../types';
+import { Amount, Nft, NftFullId, NftIssue, NftLevel, Supply } from '../types';
 
 export function nftTotalBy(
     { nfts }: Pick<AppState, 'nfts'>, nft?: NftFullId | {
         issue?: NftIssue,
         level?: NftLevel,
-        token?: NftToken,
     }
 ): {
     amount: Amount, supply: Supply
@@ -15,16 +14,11 @@ export function nftTotalBy(
         ? Nft.issue(nft) : nft?.issue;
     const level = typeof nft === 'string'
         ? Nft.level(nft) : nft?.level;
-    const token = typeof nft === 'string'
-        ? Nft.token(nft) : nft?.token;
     const filtered = Object.entries(nfts.items).filter(([id]) => {
         if (issue !== undefined && issue !== Nft.issue(id as NftFullId)) {
             return false;
         }
         if (level !== undefined && level !== Nft.level(id as NftFullId)) {
-            return false;
-        }
-        if (token !== undefined && token !== Nft.token(id as NftFullId)) {
             return false;
         }
         return true;

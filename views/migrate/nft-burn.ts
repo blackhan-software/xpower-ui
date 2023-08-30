@@ -4,7 +4,7 @@ import './nft-burn.scss';
 import { Transaction } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
 import { Alert, alert, Alerts, x40 } from '../../source/functions';
-import { Account, Balance, Nft, NftLevels, Token } from '../../source/redux/types';
+import { Account, Balance, Nft, NftLevels } from '../../source/redux/types';
 import { Version } from '../../source/types';
 import { NftWallet } from '../../source/wallet';
 import { Years } from '../../source/years';
@@ -21,17 +21,17 @@ Blockchain.onConnect(function enableBurnButton() {
 $('button.burn-empty-nft').on('click', async function burnEmpty(e) {
     const $burn = $(e.currentTarget);
     if ($burn.hasClass('xpow')) {
-        await burn(Token.XPOW, { $burn });
+        await burn({ $burn });
     }
 });
-async function burn(token: Token, { $burn }: {
+async function burn({ $burn }: {
     $burn: JQuery<HTMLElement>
 }) {
     const { account, src_version } = await context({
         $el: $burn
     });
     const { nft_source } = await contracts({
-        account, token, src_version
+        account, src_version
     });
     //
     // Check balances:
@@ -116,12 +116,12 @@ async function context({ $el: $approve }: {
     return { account, src_version };
 }
 async function contracts({
-    account, token, src_version
+    account, src_version
 }: {
-    account: Account, token: Token, src_version: Version
+    account: Account, src_version: Version
 }) {
     const nft_source = new NftWallet(
-        account, token, src_version
+        account, src_version
     );
     console.debug(
         `[${src_version}:contract]`, await nft_source.address

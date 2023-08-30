@@ -4,7 +4,7 @@ import { MoeTreasuryFactory } from '../contract';
 import { buffered, x40 } from '../functions';
 import { globalRef } from '../react';
 import { addPpt, removePpt, setPpt } from '../redux/actions';
-import { pptsBy, xtokenOf } from '../redux/selectors';
+import { pptsBy } from '../redux/selectors';
 import { AppState } from '../redux/store';
 import { Nft, NftFullId, NftLevels } from '../redux/types';
 import { OnTransferBatch, OnTransferSingle, PptWallet } from '../wallet';
@@ -14,13 +14,12 @@ export const PptsService = (
     store: Store<AppState>
 ) => {
     Blockchain.onceConnect(async function initPpts({
-        account, token
+        account
     }) {
         let index = 0;
-        const ppt_token = Nft.token(token);
         const levels = Array.from(NftLevels());
         const issues = Array.from(Years({ reverse: true }));
-        const wallet = new PptWallet(account, token);
+        const wallet = new PptWallet(account);
         const balances = await wallet.balances({
             issues, levels
         });
@@ -32,35 +31,26 @@ export const PptsService = (
                 const amount = balances[index];
                 const supply = supplies[index];
                 store.dispatch(setPpt({
-                    issue, level, token: ppt_token
+                    issue, level
                 }, {
                     amount, supply
                 }));
                 index += 1;
             }
         }
-    }, {
-        per: () => xtokenOf(store.getState())
     });
-    Blockchain.onConnect(function syncPpts({
-        token
-    }) {
-        const ppts = pptsBy(store.getState(), {
-            token: Nft.token(token)
-        });
+    Blockchain.onConnect(function syncPpts() {
+        const ppts = pptsBy(store.getState());
         for (const [id, ppt] of Object.entries(ppts.items)) {
             store.dispatch(setPpt(id as NftFullId, ppt));
         }
     });
     Blockchain.onceConnect(async function onPptSingleTransfers({
-        account, token
+        account
     }) {
         const on_transfer: OnTransferSingle = async (
             op, from, to, id, value, ev
         ) => {
-            if (xtokenOf(store.getState()) !== token) {
-                return;
-            }
             console.debug('[on:transfer-single]',
                 x40(op), x40(from), x40(to),
                 id, value, ev
@@ -81,20 +71,15 @@ export const PptsService = (
                 }));
             }
         };
-        const ppt_wallet = new PptWallet(account, token);
+        const ppt_wallet = new PptWallet(account);
         ppt_wallet.onTransferSingle(on_transfer)
-    }, {
-        per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(async function onPptBatchTransfers({
-        account, token
+        account
     }) {
         const on_transfer: OnTransferBatch = async (
             op, from, to, ids, values, ev
         ) => {
-            if (xtokenOf(store.getState()) !== token) {
-                return;
-            }
             console.debug('[on:transfer-batch]',
                 x40(op), x40(from), x40(to),
                 ids, values, ev
@@ -117,20 +102,14 @@ export const PptsService = (
                 }
             }
         };
-        const ppt_wallet = new PptWallet(account, token);
+        const ppt_wallet = new PptWallet(account);
         ppt_wallet.onTransferBatch(on_transfer);
-    }, {
-        per: () => xtokenOf(store.getState())
     });
     Blockchain.onceConnect(async function updateClaims() {
-        const moe_treasury = MoeTreasuryFactory({
-            token: xtokenOf(store.getState())
-        });
+        const moe_treasury = MoeTreasuryFactory();
         moe_treasury.onBlock(buffered(() => {
-            const nft_token = Nft.token(xtokenOf(store.getState()));
             const { details } = store.getState().ppts_ui;
-            const by_token = details[nft_token];
-            Object.entries(by_token).forEach(([
+            Object.entries(details).forEach(([
                 nft_level, nft_issues
             ]) => {
                 Object.entries(nft_issues).forEach(([

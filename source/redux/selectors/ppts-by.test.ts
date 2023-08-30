@@ -1,10 +1,9 @@
-import { NftLevel, NftToken } from '../types';
+import { NftLevel } from '../types';
 import { pptsBy } from './ppts-by';
 
 describe('ppts-by', () => {
     const issue = 2021;
     const level = NftLevel.UNIT;
-    const token = NftToken.XPOW;
     it('should return {}', () => {
         const state = { ppts: { items: {} } };
         const ppts_by = pptsBy(state);
@@ -21,7 +20,7 @@ describe('ppts-by', () => {
             }
         };
         const ppts_by = pptsBy(state, {
-            issue, level, token
+            issue, level
         });
         expect(ppts_by).toEqual(state.ppts);
     });
@@ -39,7 +38,7 @@ describe('ppts-by', () => {
             }
         };
         const ppts_by = pptsBy(state, {
-            issue, token
+            issue
         });
         expect(ppts_by).toEqual(state.ppts);
     });

@@ -4,52 +4,46 @@ import { observe } from './observe';
 
 import { hex, max, x40 } from '../../functions';
 import { AppState } from '../store';
-import { Account, Amount, BlockHash, Empty, Nonce, Nonces, Token } from '../types';
+import { Account, Amount, BlockHash, Empty, Nonce, Nonces } from '../types';
 
 enum Sign {
     positive = +1,
     negative = -1
 }
 const TOTAL = {} as {
-    [token: string]: { [address: string]: bigint };
+    [address: string]: bigint
 };
-const inc_total = (sign: Sign, { account, amount, token }: {
-    account: Account, amount: Amount, token: Token
+const inc_total = (sign: Sign, { account, amount }: {
+    account: Account, amount: Amount
 }) => {
-    if (TOTAL[token] === undefined) {
-        TOTAL[token] = {};
-    }
     const x_address = x40(account);
-    if (TOTAL[token][x_address] === undefined) {
-        TOTAL[token][x_address] = 0n;
+    if (TOTAL[x_address] === undefined) {
+        TOTAL[x_address] = 0n;
     }
     if (sign > 0) {
-        return max(0n, TOTAL[token][x_address] += amount);
+        return max(0n, TOTAL[x_address] += amount);
     } else {
-        return max(0n, TOTAL[token][x_address] -= amount);
+        return max(0n, TOTAL[x_address] -= amount);
     }
 };
 const TOTAL_BY = {} as {
-    [token: string]: { [address: string]: { [amount: string]: bigint; } }
+    [address: string]: { [amount: string]: bigint; }
 };
-const inc_total_by = (sign: Sign, { account, amount, token }: {
-    account: Account, amount: Amount, token: Token
+const inc_total_by = (sign: Sign, { account, amount }: {
+    account: Account, amount: Amount
 }) => {
-    if (TOTAL_BY[token] === undefined) {
-        TOTAL_BY[token] = {};
-    }
     const x_address = x40(account);
-    if (TOTAL_BY[token][x_address] === undefined) {
-        TOTAL_BY[token][x_address] = {};
+    if (TOTAL_BY[x_address] === undefined) {
+        TOTAL_BY[x_address] = {};
     }
     const x_amount = hex(amount);
-    if (TOTAL_BY[token][x_address][x_amount] === undefined) {
-        TOTAL_BY[token][x_address][x_amount] = 0n;
+    if (TOTAL_BY[x_address][x_amount] === undefined) {
+        TOTAL_BY[x_address][x_amount] = 0n;
     }
     if (sign > 0) {
-        return max(0n, TOTAL_BY[token][x_address][x_amount] += amount);
+        return max(0n, TOTAL_BY[x_address][x_amount] += amount);
     } else {
-        return max(0n, TOTAL_BY[token][x_address][x_amount] -= amount);
+        return max(0n, TOTAL_BY[x_address][x_amount] -= amount);
     }
 };
 
@@ -58,7 +52,6 @@ export type OnNonceAdded = (
         account: Account,
         amount: Amount,
         block_hash: BlockHash,
-        token: Token,
     },
     total_by: Amount, total: Amount
 ) => void;
@@ -67,7 +60,6 @@ export type OnNonceRemoved = (
         account: Account,
         amount: Amount,
         block_hash: BlockHash,
-        token: Token,
     },
     total_by: Amount, total: Amount
 ) => void;

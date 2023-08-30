@@ -1,32 +1,30 @@
-import { MinerStatus, Token } from '../../../source/redux/types';
+import { MinerStatus } from '../../../source/redux/types';
 
 import React from 'react';
-import { UiMiningToggle } from './mining-toggle';
 import { UiMiningSpeed } from './mining-speed';
+import { UiMiningToggle } from './mining-toggle';
 
 type Props = {
     status: MinerStatus | null;
     togglable: boolean;
-    onToggle?: (token: Token) => void;
+    onToggle?: () => void;
     speed: number;
     speedable: boolean;
-    onSpeed?: (token: Token, by: number) => void;
-    token: Token;
+    onSpeed?: (by: number) => void;
 }
 export function UiMining(
     props: Props
 ) {
     const { speed, speedable, onSpeed } = props;
     const { status, togglable, onToggle } = props;
-    const { token } = props;
     return <React.Fragment>
         <UiMiningToggle
-            disabled={!togglable} status={status} token={token}
-            onToggle={() => onToggle && onToggle(token)}
+            disabled={!togglable} status={status}
+            onToggle={() => onToggle && onToggle()}
         />
         <UiMiningSpeed
             disabled={!speedable} speed={speed}
-            onSpeed={(by) => onSpeed && onSpeed(token, by)}
+            onSpeed={(by) => onSpeed && onSpeed(by)}
         />
     </React.Fragment>;
 }

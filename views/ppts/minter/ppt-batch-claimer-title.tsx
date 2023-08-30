@@ -5,30 +5,28 @@ import { MoeTreasuryFactory } from '../../../source/contract';
 import { buffered, nice_si } from '../../../source/functions';
 import { AccountContext } from '../../../source/react';
 import { Account, Nft, NftLevels, PptClaimerStatus, Token, TokenInfo } from '../../../source/redux/types';
-import { Tokenizer } from '../../../source/token';
 import { Years } from '../../../source/years';
 
 export type Props = {
     status: PptClaimerStatus | null;
-    token: Token;
 }
 export function UiPptBatchClaimerTitle(
-    { status, token }: Props
+    { status }: Props
 ) {
     const [title, set_title] = useState<string | undefined>();
     const [account] = useContext(AccountContext);
     useEffect(() => {
-        claimable(account, token).then((a) => {
-            set_title(`${a} ${Tokenizer.aify(token)}`);
+        claimable(account).then((a) => {
+            set_title(`${a} ${Token.APOW}`);
             Bus.emit('refresh-tips');
         });
     }, [
-        account, status, token
+        account, status
     ]);
     return title;
 }
 const claimable = buffered(async (
-    account: Account | null, token: Props['token']
+    account: Account | null
 ) => {
     if (account === null) {
         return Promise.resolve(undefined);
@@ -37,15 +35,13 @@ const claimable = buffered(async (
         issues: Array.from(Years()),
         levels: Array.from(NftLevels())
     });
-    const moe_treasury = MoeTreasuryFactory({
-        token
-    });
+    const moe_treasury = MoeTreasuryFactory();
     const claimables = await moe_treasury
         .claimableBatch(account, ppt_ids);
     const claimable = claimables
         .reduce((acc, c) => acc + c, 0n);
     return nice_si(claimable, {
-        base: 10 ** TokenInfo(token).decimals
+        base: 10 ** TokenInfo(Token.APOW).decimals
     });
 }, 0);
 export default UiPptBatchClaimerTitle;

@@ -33,21 +33,11 @@ export class Tokenizer {
                 return TokenLower.APOW;
         }
     }
-    public static amount(token: Token, level: Level): Amount {
-        switch (this.xify(token)) {
-            case Token.XPOW:
-                return 2n ** BigInt(level) - 1n;
-            default:
-                throw new Error('not applicable');
-        }
+    public static amount(level: Level): Amount {
+        return 2n ** BigInt(level) - 1n;
     }
-    public static level(token: Token, amount: Amount): Level {
-        switch (this.xify(token)) {
-            case Token.XPOW:
-                return (amount + 1n).toString(2).length - 1;
-            default:
-                throw new Error('not applicable');
-        }
+    public static level(amount: Amount): Level {
+        return (amount + 1n).toString(2).length - 1;
     }
     public static xify(token: Token) {
         switch (token) {

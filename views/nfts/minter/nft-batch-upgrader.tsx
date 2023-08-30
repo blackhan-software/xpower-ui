@@ -1,4 +1,4 @@
-import { NftMinterList, NftUpgraderStatus, Token } from '../../../source/redux/types';
+import { NftMinterList, NftUpgraderStatus } from '../../../source/redux/types';
 
 import React from 'react';
 import { Spinner } from './spinner';
@@ -6,12 +6,11 @@ import { Spinner } from './spinner';
 type Props = {
     approved: boolean | null;
     list: NftMinterList;
-    onBatchUpgrade?: (token: Token, list: NftMinterList) => void;
+    onBatchUpgrade?: (list: NftMinterList) => void;
     status: NftUpgraderStatus | null;
-    token: Token;
 }
 export function UiNftBatchUpgrader(
-    { approved, list, onBatchUpgrade, status, token }: Props
+    { approved, list, onBatchUpgrade, status }: Props
 ) {
     const classes = [
         'btn btn-outline-warning',
@@ -24,7 +23,7 @@ export function UiNftBatchUpgrader(
         type='button' id='nft-batch-upgrader'
         className={classes.join(' ')}
         disabled={disabled({ list, status })}
-        onClick={onBatchUpgrade?.bind(null, token, list)}
+        onClick={onBatchUpgrade?.bind(null, list)}
     >
         {Spinner({
             show: Boolean(upgrading(status)), grow: true

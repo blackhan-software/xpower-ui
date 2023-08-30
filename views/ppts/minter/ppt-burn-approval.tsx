@@ -1,15 +1,14 @@
-import { PptMinterApproval, Token } from '../../../source/redux/types';
+import { PptMinterApproval } from '../../../source/redux/types';
 
 import React from 'react';
 import { Spinner } from './spinner';
 
 type Props = {
     approval: PptMinterApproval | null;
-    onApproval?: (token: Token) => void;
-    token: Token;
+    onApproval?: () => void;
 }
 export function UiPptBurnApproval(
-    { token, approval, onApproval }: Props
+    { approval, onApproval }: Props
 ) {
     const is_approved = approved(approval);
     const is_approving = approving(approval);
@@ -21,7 +20,7 @@ export function UiPptBurnApproval(
         className='btn btn-outline-warning'
         data-bs-placement='top' data-bs-toggle='tooltip'
         disabled={is_approving || is_approved || is_approved === null}
-        onClick={onApproval?.bind(null, token)}
+        onClick={onApproval?.bind(null)}
         style={{ display: !is_approved ? 'block' : 'none' }}
         title={`Approve staking (and unstaking) of NFTs`}
     >

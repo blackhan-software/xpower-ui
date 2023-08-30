@@ -1,6 +1,6 @@
 import { ROParams } from '../../../source/params';
 import { AppState } from '../../../source/redux/store';
-import { NftMinterList, NftMinterStatus, Token, TokenInfo } from '../../../source/redux/types';
+import { NftMinterList, NftMinterStatus, TokenInfo } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
 
 import React, { useContext } from 'react';
@@ -10,12 +10,11 @@ import { Spinner } from './spinner';
 type Props = {
     approved: boolean | null;
     list: NftMinterList;
-    onBatchMint?: (token: Token, list: NftMinterList) => void;
+    onBatchMint?: (list: NftMinterList) => void;
     status: NftMinterStatus | null;
-    token: Token;
 }
 export function UiNftBatchMinter(
-    { approved, list, onBatchMint, status, token }: Props
+    { approved, list, onBatchMint, status }: Props
 ) {
     const [state] = useContext(StateContext);
     const classes = [
@@ -29,7 +28,7 @@ export function UiNftBatchMinter(
         type='button' id='nft-batch-minter'
         className={classes.join(' ')}
         disabled={disabled({ list, status, state })}
-        onClick={onBatchMint?.bind(null, token, list)}
+        onClick={onBatchMint?.bind(null, list)}
     >
         {Spinner({
             show: Boolean(minting(status)), grow: true
