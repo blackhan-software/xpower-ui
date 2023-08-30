@@ -122,7 +122,7 @@ export abstract class ERC1155Wallet {
             version: this._version
         });
         return this.put.then((c) => c.safeTransferFrom(
-            this._account, to, real_id, amount, []
+            this._account, to, real_id, amount, new Uint8Array()
         ));
     }
     onTransferSingle(
@@ -164,7 +164,7 @@ export abstract class ERC1155Wallet {
             version: this._version
         });
         return this.put.then((c) => c.safeBatchTransferFrom(
-            this._account, to, real_ids, amounts, []
+            this._account, to, real_ids, amounts, new Uint8Array()
         ));
     }
     onTransferBatch(
