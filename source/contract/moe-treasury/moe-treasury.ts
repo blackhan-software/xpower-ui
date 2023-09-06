@@ -174,6 +174,54 @@ export class MoeTreasury extends Base {
         }
         return contract.claimableBatch(x40(address), ids);
     }
+    public async minted(
+        address: Account, ppt_id: NftFullId
+    ): Promise<Amount> {
+        const contract = await this.get;
+        const id = Nft.realId(ppt_id, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v8b)) {
+            return this.claimed(address, ppt_id)
+        }
+        return contract.minted(x40(address), id);
+    }
+    public async mintedBatch(
+        address: Account, ppt_ids: NftFullId[]
+    ): Promise<Amount[]> {
+        const contract = await this.get;
+        const ids = Nft.realIds(ppt_ids, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v8b)) {
+            return this.claimedBatch(address, ppt_ids);
+        }
+        return contract.mintedBatch(x40(address), ids);
+    }
+    public async mintable(
+        address: Account, ppt_id: NftFullId
+    ): Promise<Amount> {
+        const contract = await this.get;
+        const id = Nft.realId(ppt_id, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v8b)) {
+            return this.claimable(address, ppt_id);
+        }
+        return contract.mintable(x40(address), id);
+    }
+    public async mintableBatch(
+        address: Account, ppt_ids: NftFullId[]
+    ): Promise<Amount[]> {
+        const contract = await this.get;
+        const ids = Nft.realIds(ppt_ids, {
+            version: this.version
+        });
+        if (ROParams.lt2(this.version, Version.v8b)) {
+            return this.claimableBatch(address, ppt_ids);
+        }
+        return contract.mintableBatch(x40(address), ids);
+    }
     public async aprOf(
         ppt_id: NftFullId
     ): Promise<Rate> {

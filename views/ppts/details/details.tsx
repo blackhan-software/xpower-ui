@@ -55,16 +55,18 @@ type State = Record<NftLevel, Record<NftIssue, {
     rate: Rate;
     claimable: Amount;
     claimed: Amount;
+    mintable: Amount;
+    minted: Amount;
 }>>
 function initialState(
-    rate = 1_000_000n, claimable = 0n, claimed = 0n
+    rate = 1_000_000n, claimable = 0n, claimed = 0n, mintable = 0n, minted = 0n
 ) {
     const ppt_issues = Array.from(Years({ reverse: true }));
     const ppt_levels = Array.from(NftLevels());
     const state = Object.fromEntries(
         ppt_levels.map((level) => [level, Object.fromEntries(
             ppt_issues.map((issue) => [issue, {
-                rate, claimable, claimed
+                rate, claimable, claimed, mintable, minted
             }])
         )])
     );
@@ -154,9 +156,11 @@ function claims(
             level: ppt_level, issue: ppt_issue
         });
         const moe_treasury = MoeTreasuryFactory();
-        const [claimable, claimed, apr, apb] = await Promise.all([
+        const [claimable, claimed, mintable, minted, apr, apb] = await Promise.all([
             account ? moe_treasury.claimable(account, full_id) : 0n,
             account ? moe_treasury.claimed(account, full_id) : 0n,
+            account ? moe_treasury.mintable(account, full_id) : 0n,
+            account ? moe_treasury.minted(account, full_id) : 0n,
             moe_treasury.aprOf(full_id),
             moe_treasury.apbOf(full_id),
         ]);
@@ -165,7 +169,9 @@ function claims(
                 [ppt_issue]: {
                     rate: apr + apb,
                     claimable,
-                    claimed
+                    claimed,
+                    mintable,
+                    minted
                 }
             }
         };
@@ -329,10 +335,11 @@ function $claimed(
     const { level: ppt_level } = props;
     const by_level = state[ppt_level];
     const by_issue = by_level[ppt_issue];
-    const { claimed } = by_issue;
+    const { claimed, minted } = by_issue;
     return <UiPptClaimed
         issue={ppt_issue}
-        value={claimed}
+        claim={claimed}
+        value={minted}
     />;
 }
 function $claimable(
@@ -342,10 +349,11 @@ function $claimable(
     const { level: ppt_level } = props;
     const by_level = state[ppt_level];
     const by_issue = by_level[ppt_issue];
-    const { claimable } = by_issue;
+    const { claimable, mintable } = by_issue;
     return <UiPptClaimable
         issue={ppt_issue}
-        value={claimable}
+        claim={claimable}
+        value={mintable}
     />;
 }
 function $claimer(

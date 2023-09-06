@@ -1,4 +1,4 @@
-import { NftMinterApproval, Token } from '../../../source/redux/types';
+import { NftMinterApproval } from '../../../source/redux/types';
 
 import React from 'react';
 import { Spinner } from './spinner';
@@ -22,7 +22,7 @@ export function UiNftBurnApproval(
         disabled={is_approving || is_approved || is_approved === null}
         onClick={onApproval?.bind(null)}
         style={{ display: !is_approved ? 'block' : 'none' }}
-        title={`Approve minting of ${Token.XPOW} NFTs`}
+        title={`Approve minting of NFTs`}
     >
         {Spinner({
             show: !!is_approving, grow: true

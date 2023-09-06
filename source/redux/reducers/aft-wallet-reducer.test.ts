@@ -9,10 +9,10 @@ describe('Store w/aft-wallet-reducer (set)', () => {
     it('should set-aft-wallet to amount=1', () => {
         const state_0 = Empty<AftWallet>();
         const state_1 = aftWalletReducer(state_0, setAftWallet(t, {
-            amount: 1n, supply: 1n, collat: 0n
+            amount: 1n, supply: 1n, metric: 0n
         }));
         expect(state_1.items[t]).toEqual({
-            amount: 1n, supply: 1n, collat: 0n
+            amount: 1n, supply: 1n, metric: 0n
         });
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
@@ -20,10 +20,10 @@ describe('Store w/aft-wallet-reducer (set)', () => {
     it('should set-aft-wallet to amount=2', () => {
         const state_0 = Empty<AftWallet>();
         const state_1 = aftWalletReducer(state_0, setAftWallet(t, {
-            amount: 2n, supply: 5n, collat: 0n
+            amount: 2n, supply: 5n, metric: 0n
         }));
         expect(state_1.items[t]).toEqual({
-            amount: 2n, supply: 5n, collat: 0n
+            amount: 2n, supply: 5n, metric: 0n
         });
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
@@ -37,7 +37,7 @@ describe('Store w/aft-wallet-reducer (inrease)', () => {
             amount: 1n
         }));
         expect(state_1.items[t]).toEqual({
-            amount: 1n, supply: 1n, collat: 0n
+            amount: 1n, supply: 1n, metric: 0n
         });
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
@@ -48,7 +48,7 @@ describe('Store w/aft-wallet-reducer (inrease)', () => {
             amount: 1n, supply: 10n
         }));
         expect(state_1.items[t]).toEqual({
-            amount: 1n, supply: 10n, collat: 0n
+            amount: 1n, supply: 10n, metric: 0n
         });
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
@@ -71,13 +71,13 @@ describe('Store w/aft-wallet-reducer (inrease)', () => {
             amount: 1n
         }));
         expect(state_1.items[t]).toEqual({
-            amount: 1n, supply: 1n, collat: 0n
+            amount: 1n, supply: 1n, metric: 0n
         });
         const state_2 = aftWalletReducer(state_1, increaseAftWallet(t, {
             amount: 2n
         }));
         expect(state_2.items[t]).toEqual({
-            amount: 3n, supply: 3n, collat: 0n
+            amount: 3n, supply: 3n, metric: 0n
         });
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
@@ -90,13 +90,13 @@ describe('Store w/aft-wallet-reducer (inrease)', () => {
             amount: 1n, supply: 10n
         }));
         expect(state_1.items[t]).toEqual({
-            amount: 1n, supply: 10n, collat: 0n
+            amount: 1n, supply: 10n, metric: 0n
         });
         const state_2 = aftWalletReducer(state_1, increaseAftWallet(t, {
             amount: 2n
         }));
         expect(state_2.items[t]).toEqual({
-            amount: 3n, supply: 12n, collat: 0n
+            amount: 3n, supply: 12n, metric: 0n
         });
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
@@ -109,13 +109,13 @@ describe('Store w/aft-wallet-reducer (inrease)', () => {
             amount: 1n
         }));
         expect(state_1.items[t]).toEqual({
-            amount: 1n, supply: 1n, collat: 0n
+            amount: 1n, supply: 1n, metric: 0n
         });
         const state_2 = aftWalletReducer(state_1, increaseAftWallet(t, {
             amount: 2n, supply: 20n
         }));
         expect(state_2.items[t]).toEqual({
-            amount: 3n, supply: 20n, collat: 0n
+            amount: 3n, supply: 20n, metric: 0n
         });
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
@@ -128,13 +128,13 @@ describe('Store w/aft-wallet-reducer (inrease)', () => {
             amount: 1n, supply: 10n
         }));
         expect(state_1.items[t]).toEqual({
-            amount: 1n, supply: 10n, collat: 0n
+            amount: 1n, supply: 10n, metric: 0n
         });
         const state_2 = aftWalletReducer(state_1, increaseAftWallet(t, {
             amount: 2n, supply: 20n
         }));
         expect(state_2.items[t]).toEqual({
-            amount: 3n, supply: 20n, collat: 0n
+            amount: 3n, supply: 20n, metric: 0n
         });
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
@@ -150,13 +150,13 @@ describe('Store w/aft-wallet-reducer (decrease)', () => {
             amount: 1n
         }));
         expect(state_1.items[t]).toEqual({
-            amount: 1n, supply: 1n, collat: 0n
+            amount: 1n, supply: 1n, metric: 0n
         });
         const state_2 = aftWalletReducer(state_1, decreaseAftWallet(t, {
             amount: 1n
         }));
         expect(state_2.items[t]).toEqual({
-            amount: 0n, supply: 1n, collat: 0n
+            amount: 0n, supply: 1n, metric: 0n
         });
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
@@ -169,13 +169,13 @@ describe('Store w/aft-wallet-reducer (decrease)', () => {
             amount: 1n
         }));
         expect(state_1.items[t]).toEqual({
-            amount: 1n, supply: 1n, collat: 0n
+            amount: 1n, supply: 1n, metric: 0n
         });
         const state_2 = aftWalletReducer(state_1, decreaseAftWallet(t, {
             amount: 1n, supply: 10n
         }));
         expect(state_2.items[t]).toEqual({
-            amount: 0n, supply: 10n, collat: 0n
+            amount: 0n, supply: 10n, metric: 0n
         });
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
@@ -205,19 +205,19 @@ describe('Store w/aft-wallet-reducer (decrease)', () => {
             amount: 5n
         }));
         expect(state_1.items[t]).toEqual({
-            amount: 5n, supply: 5n, collat: 0n
+            amount: 5n, supply: 5n, metric: 0n
         });
         const state_2 = aftWalletReducer(state_1, decreaseAftWallet(t, {
             amount: 2n
         }));
         expect(state_2.items[t]).toEqual({
-            amount: 3n, supply: 5n, collat: 0n
+            amount: 3n, supply: 5n, metric: 0n
         });
         const state_3 = aftWalletReducer(state_2, decreaseAftWallet(t, {
             amount: 1n
         }));
         expect(state_3.items[t]).toEqual({
-            amount: 2n, supply: 5n, collat: 0n
+            amount: 2n, supply: 5n, metric: 0n
         });
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
@@ -232,19 +232,19 @@ describe('Store w/aft-wallet-reducer (decrease)', () => {
             amount: 5n
         }));
         expect(state_1.items[t]).toEqual({
-            amount: 5n, supply: 5n, collat: 0n
+            amount: 5n, supply: 5n, metric: 0n
         });
         const state_2 = aftWalletReducer(state_1, decreaseAftWallet(t, {
             amount: 2n, supply: 4n
         }));
         expect(state_2.items[t]).toEqual({
-            amount: 3n, supply: 4n, collat: 0n
+            amount: 3n, supply: 4n, metric: 0n
         });
         const state_3 = aftWalletReducer(state_2, decreaseAftWallet(t, {
             amount: 1n
         }));
         expect(state_3.items[t]).toEqual({
-            amount: 2n, supply: 4n, collat: 0n
+            amount: 2n, supply: 4n, metric: 0n
         });
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
@@ -259,19 +259,19 @@ describe('Store w/aft-wallet-reducer (decrease)', () => {
             amount: 5n
         }));
         expect(state_1.items[t]).toEqual({
-            amount: 5n, supply: 5n, collat: 0n
+            amount: 5n, supply: 5n, metric: 0n
         });
         const state_2 = aftWalletReducer(state_1, decreaseAftWallet(t, {
             amount: 2n
         }));
         expect(state_2.items[t]).toEqual({
-            amount: 3n, supply: 5n, collat: 0n
+            amount: 3n, supply: 5n, metric: 0n
         });
         const state_3 = aftWalletReducer(state_2, decreaseAftWallet(t, {
             amount: 1n, supply: 4n
         }));
         expect(state_3.items[t]).toEqual({
-            amount: 2n, supply: 4n, collat: 0n
+            amount: 2n, supply: 4n, metric: 0n
         });
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();
@@ -286,19 +286,19 @@ describe('Store w/aft-wallet-reducer (decrease)', () => {
             amount: 5n
         }));
         expect(state_1.items[t]).toEqual({
-            amount: 5n, supply: 5n, collat: 0n
+            amount: 5n, supply: 5n, metric: 0n
         });
         const state_2 = aftWalletReducer(state_1, decreaseAftWallet(t, {
             amount: 2n, supply: 4n
         }));
         expect(state_2.items[t]).toEqual({
-            amount: 3n, supply: 4n, collat: 0n
+            amount: 3n, supply: 4n, metric: 0n
         });
         const state_3 = aftWalletReducer(state_2, decreaseAftWallet(t, {
             amount: 1n, supply: 3n
         }));
         expect(state_3.items[t]).toEqual({
-            amount: 2n, supply: 3n, collat: 0n
+            amount: 2n, supply: 3n, metric: 0n
         });
         expect(state_1.more).toEqual([t]);
         expect(state_1.less).not.toBeDefined();

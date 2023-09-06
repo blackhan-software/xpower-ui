@@ -118,7 +118,7 @@ function $aftBurner(
             if (isNaN(input) || input === 0) {
                 return;
             }
-            const value = BigInt(input * 10 ** decimals);
+            const value = BigInt(Math.ceil(input * 10 ** decimals));
             if (value < amount()) {
                 onBurn(token, value);
             } else {
@@ -170,12 +170,14 @@ function $aftToggle(
         aged: boolean, set_aged: (aged: boolean) => void, token: Token
     }
 ) {
-    const collat = collat_pct({
+    const metric = metric_bps({
         wallet, token
     });
     const title = aged
-        ? `Balance of ${token} tokens collateralized at ${collat.toFixed(2)}%`
-        : `Balance of proof-of-work ${token} tokens`;
+        ? `${token}s with conversion rate of ${nice(metric, {
+            maxPrecision: 0, minPrecision: 0
+        })} ‱`
+        : `Balance of ${token}s`;
     return <button
         className='form-control input-group-text info'
         data-bs-toggle='tooltip' data-bs-placement='top'
@@ -185,7 +187,7 @@ function $aftToggle(
         <XPower token={Tokenizer.xify(token)} style={{
             filter: aged ? 'invert(1)' : undefined
         }} />
-        {aged ? $sectors({ percent: collat / 100 }) : null}
+        {aged ? $sectors({ percent: metric / 1e4 }) : null}
     </button>;
 }
 function $sectors(
@@ -195,9 +197,9 @@ function $sectors(
         length={360 * percent} start={180 * (1 - percent)}
     />;
 }
-function collat_pct(
-    { wallet, token }: Pick<Props, 'wallet'> & { token: Token }, denominator = 1e6
+function metric_bps(
+    { wallet, token }: Pick<Props, 'wallet'> & { token: Token }, denominator = 1e18
 ) {
-    return 100 * Number(wallet.items[token]?.collat ?? 0n) / denominator;
+    return 1e4 * Number(wallet.items[token]?.metric ?? 0n) / denominator;
 }
 export default UiAftWallet;

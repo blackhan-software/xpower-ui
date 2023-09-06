@@ -1,6 +1,6 @@
 import { Action } from '@reduxjs/toolkit';
 import * as actions from '../actions';
-import { AftWallet, Amount, Collat, Supply, Token } from '../types';
+import { AftWallet, Amount, Metric, Supply, Token } from '../types';
 
 export function initialState() {
     return { items: {}, burner: null } as AftWallet;
@@ -9,7 +9,7 @@ export function aftWalletReducer(
     aft_wallet = initialState(), action: Action
 ): AftWallet {
     if (actions.setAftWallet.match(action)) {
-        const { token, item: { amount: a, supply: s, collat: c } } = action.payload;
+        const { token, item: { amount: a, supply: s, metric: c } } = action.payload;
         const items = { ...aft_wallet.items };
         items[token] = pack(a, s, c, token);
         return {
@@ -27,7 +27,7 @@ export function aftWalletReducer(
         if (item_old) {
             const s = item_new.supply ?? item_old.supply + item_new.amount;
             const a = item_old.amount + item_new.amount;
-            const c = item_old.collat;
+            const c = item_old.metric;
             items[token] = pack(a, s, c, token);
         } else {
             const s = item_new.supply ?? item_new.amount;
@@ -49,7 +49,7 @@ export function aftWalletReducer(
         if (item_old) {
             const s = item_new.supply ?? item_old.supply;
             const a = item_old.amount - item_new.amount;
-            const c = item_old.collat;
+            const c = item_old.metric;
             items[token] = pack(a, s, c, token);
         } else {
             const s = item_new.supply ?? 0n;
@@ -69,7 +69,7 @@ export function aftWalletReducer(
     return aft_wallet;
 }
 function pack(
-    a: Amount, s: Supply, c: Collat, t: Token,
+    a: Amount, s: Supply, c: Metric, t: Token,
 ) {
     if (s < a) {
         throw new Error(`${t} supply=${s} < amount=${a}`);
@@ -77,6 +77,6 @@ function pack(
     if (s < 0) {
         throw new Error(`${t} supply=${s} < 0`);
     }
-    return { amount: a, supply: s, collat: c };
+    return { amount: a, supply: s, metric: c };
 }
 export default aftWalletReducer;

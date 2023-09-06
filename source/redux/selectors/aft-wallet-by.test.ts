@@ -10,7 +10,7 @@ describe('aft-wallet-by', () => {
     it('should return wallet full[ish]', () => {
         const aft_wallet = {
             items: {
-                [Token.XPOW]: { amount: 1n, supply: 2n, collat: 0n },
+                [Token.XPOW]: { amount: 1n, supply: 2n, metric: 0n },
             },
             burner: AftWalletBurner.burned
         };
@@ -20,7 +20,7 @@ describe('aft-wallet-by', () => {
     it('should return wallet for XPOW only', () => {
         const aft_wallet = {
             items: {
-                [Token.XPOW]: { amount: 1n, supply: 2n, collat: 0n },
+                [Token.XPOW]: { amount: 1n, supply: 2n, metric: 0n },
             },
             burner: AftWalletBurner.burned
         };
@@ -28,7 +28,7 @@ describe('aft-wallet-by', () => {
             { aft_wallet }, Token.XPOW
         );
         expect(aft_wallet_by.items).toEqual({
-            [Token.XPOW]: { amount: 1n, supply: 2n, collat: 0n },
+            [Token.XPOW]: { amount: 1n, supply: 2n, metric: 0n },
         });
     });
 });

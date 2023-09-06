@@ -1,4 +1,4 @@
-import { nice } from '../../../source/functions';
+import { nice, nice_si } from '../../../source/functions';
 import { Amount, NftIssue, Token, TokenInfo } from '../../../source/redux/types';
 
 import React from 'react';
@@ -7,16 +7,21 @@ import { InfoCircle } from '../../../public/images/tsx';
 type Props = {
     issue: NftIssue;
     value: Amount | null;
+    claim: Amount | null;
 }
 export function UiPptClaimable(
-    { issue, value }: Props
+    { issue, value, claim }: Props
 ) {
     const { decimals } = TokenInfo(Token.XPOW);
     const nice_value = typeof value === 'bigint'
         ? nice(value, { base: 10 ** decimals }) : '';
+    const nice_claim = typeof claim === 'bigint'
+        ? nice_si(claim, {
+            base: 10 ** decimals, minPrecision: 1
+        }) : '';
     return <React.Fragment>
         <label className='form-label nft-claimable-label d-none d-sm-flex'>
-            Claimable Amount
+            Mintable Amount
         </label>
         <div className='input-group nft-claimable d-none d-sm-flex'
             role='group'
@@ -28,7 +33,7 @@ export function UiPptClaimable(
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Min. amount of claimable ${Token.APOW} rewards (for ${issue})`}
+                title={`Mintable ${Token.APOW} due to ${nice_claim} claimables (for ${issue})`}
             >
                 <InfoCircle fill={true} />
             </span>

@@ -1,4 +1,4 @@
-import { Amount, Collat, Supply } from './base';
+import { Amount, Metric, Supply } from './base';
 import { Token } from './token';
 
 export type AftWallet = {
@@ -7,7 +7,7 @@ export type AftWallet = {
         [token in Token]?: {
             amount: Amount;
             supply: Supply;
-            collat: Collat;
+            metric: Metric;
         };
     };
     /** set of more token(s) */

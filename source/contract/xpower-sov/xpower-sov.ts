@@ -1,7 +1,7 @@
 import { InterfaceAbi } from 'ethers';
 import { MYProvider } from '../../blockchain';
 import { ROParams } from '../../params';
-import { Address, Collat } from '../../redux/types';
+import { Address, Metric } from '../../redux/types';
 import { Version, VersionAt } from '../../types';
 import { Base } from '../base';
 
@@ -16,12 +16,17 @@ export class XPowerSov extends Base {
         }
         super(address, abi);
     }
-    public async collat(): Promise<Collat> {
+    public async metric(): Promise<Metric> {
         const contract = await this.get;
         if (ROParams.lt(Version.v7b)) {
-            return 1_000_000n; // 100%
+            return 10n ** 18n; // 100%
         }
-        return contract.collateralization();
+        if (ROParams.lt(Version.v8b)) {
+            return contract.collateralization().then(
+                (c) => c * 10n ** 12n
+            );
+        }
+        return contract.metric();
     }
     private get get() {
         return MYProvider().then((p) => this.connect(p));

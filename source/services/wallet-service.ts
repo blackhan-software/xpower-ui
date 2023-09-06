@@ -20,7 +20,7 @@ const MoeWalletService = (
             moe_wallet.balance, moe_wallet.supply, 0n
         ]);
         store.dispatch(setAftWallet(
-            Token.XPOW, { amount: a, supply: s, collat: c }
+            Token.XPOW, { amount: a, supply: s, metric: c }
         ));
     });
     Blockchain.onceConnect(function syncMoeWallet({
@@ -37,7 +37,7 @@ const MoeWalletService = (
                     moe_wallet.balance, moe_wallet.supply, 0n
                 ]);
                 store.dispatch(setAftWallet(
-                    Token.XPOW, { amount: a, supply: s, collat: c }
+                    Token.XPOW, { amount: a, supply: s, metric: c }
                 ));
             }
         };
@@ -53,10 +53,10 @@ const SovWalletService = (
     }) {
         const sov_wallet = new SovWallet(account);
         const [a, s, c] = await Promise.all([
-            sov_wallet.balance, sov_wallet.supply, sov_wallet.collat
+            sov_wallet.balance, sov_wallet.supply, sov_wallet.metric
         ]);
         store.dispatch(setAftWallet(
-            Token.APOW, { amount: a, supply: s, collat: c }
+            Token.APOW, { amount: a, supply: s, metric: c }
         ));
     });
     Blockchain.onceConnect(function syncSovWallet({
@@ -70,10 +70,10 @@ const SovWalletService = (
             );
             if (account === from || account === to) {
                 const [a, s, c] = await Promise.all([
-                    sov_wallet.balance, sov_wallet.supply, sov_wallet.collat
+                    sov_wallet.balance, sov_wallet.supply, sov_wallet.metric
                 ]);
                 store.dispatch(setAftWallet(
-                    Token.APOW, { amount: a, supply: s, collat: c }
+                    Token.APOW, { amount: a, supply: s, metric: c }
                 ));
             }
         };

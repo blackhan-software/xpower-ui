@@ -16,8 +16,8 @@ export function UiPptBatchClaimerTitle(
     const [title, set_title] = useState<string | undefined>();
     const [account] = useContext(AccountContext);
     useEffect(() => {
-        claimable(account).then((a) => {
-            set_title(`${a} ${Token.APOW}`);
+        mintable(account).then((amount) => {
+            set_title(`${amount} ${Token.APOW}`);
             Bus.emit('refresh-tips');
         });
     }, [
@@ -25,7 +25,7 @@ export function UiPptBatchClaimerTitle(
     ]);
     return title;
 }
-const claimable = buffered(async (
+const mintable = buffered(async (
     account: Account | null
 ) => {
     if (account === null) {
@@ -36,11 +36,11 @@ const claimable = buffered(async (
         levels: Array.from(NftLevels())
     });
     const moe_treasury = MoeTreasuryFactory();
-    const claimables = await moe_treasury
-        .claimableBatch(account, ppt_ids);
-    const claimable = claimables
-        .reduce((acc, c) => acc + c, 0n);
-    return nice_si(claimable, {
+    const mintables = await moe_treasury
+        .mintableBatch(account, ppt_ids);
+    const mintable = mintables
+        .reduce((acc, m) => acc + m, 0n);
+    return nice_si(mintable, {
         base: 10 ** TokenInfo(Token.APOW).decimals
     });
 }, 0);
