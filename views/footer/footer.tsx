@@ -139,7 +139,7 @@ function $discord() {
     return <li className='nav-item pb-1 pt-1 pe-1'>
         <a className='discord nav-link'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            title='Discord' href='https://discord.gg/vzRa4FAZXd'
+            title='Discord' href='https://discord.gg/43ChQHEvzV'
             target='_blank' rel='noreferrer'
         >
             <svg xmlns='http://www.w3.org/2000/svg' className='bi bi-discord' width='16' height='16' viewBox='0 0 16 16' role='img'>
