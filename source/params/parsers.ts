@@ -109,7 +109,7 @@ export function token(
     return Tokenizer.token(params.get('token'));
 }
 export function version(
-    params: URLSearchParams, value?: string | null, fallback = Version.v8b
+    params: URLSearchParams, value?: string | null, fallback = Version.v8c
 ): Version {
     if (value === undefined) {
         value = params.get('version');
@@ -123,7 +123,7 @@ export function version(
 export function versionSource(
     params: URLSearchParams
 ): Version {
-    return version(params, params.get('version-source'), Version.v8a);
+    return version(params, params.get('version-source'), Version.v8b);
 }
 export function versionTarget(
     params: URLSearchParams
