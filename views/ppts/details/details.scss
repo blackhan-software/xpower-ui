@@ -37,11 +37,11 @@ div#ppt-single-minting > .nft-details {
       margin-top: 0.5em;
     }
   }
-  label:not(:first-of-type) {
+  .form-label:not(:first-of-type) {
     margin-top: 1em;
   }
   @media (max-width: 575px) {
-    label:not(:first-of-type) {
+    .form-label:not(:first-of-type) {
       margin-top: 0.5em;
     }
   }

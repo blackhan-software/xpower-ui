@@ -28,9 +28,9 @@ export function UiAftWallet(
         dispatch(switchToken(aged ? Token.APOW : Token.XPOW));
     };
     return <div id='aft-wallet'>
-        <label className='form-label'>
+        <div className='form-label'>
             Wallet Address and {token} Balance
-        </label>
+        </div>
         <div className='input-group wallet-address'>
             {$otfToggle({
                 ...props
@@ -174,9 +174,9 @@ function $aftToggle(
         wallet, token
     });
     const title = aged
-        ? `${token}s with conversion rate of ${nice(metric, {
-            maxPrecision: 0, minPrecision: 0
-        })} ‱`
+        ? `${token}s with a conversion rate of ${nice(metric, {
+            maxPrecision: 2, minPrecision: 2
+        })}‱`
         : `Balance of ${token}s`;
     return <button
         className='form-control input-group-text info'

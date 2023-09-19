@@ -117,12 +117,13 @@ function $issue(
 ) {
     const { level: nft_level } = props;
     return <React.Fragment>
-        <label className='form-label'>
+        <div className='form-label'>
             Year of Issuance
-        </label>
+        </div>
         <div className='input-group nft-issuance-year'>
             <input className='form-control' readOnly
                 type='number' value={nft_issue}
+                name={`nft-issuance-year-${nft_level}-${nft_issue}`}
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
@@ -139,12 +140,13 @@ function $balance(
 ) {
     const { level: nft_level } = props;
     return <React.Fragment>
-        <label className='form-label'>
+        <div className='form-label'>
             Personal Balance
-        </label>
+        </div>
         <div className='input-group nft-balance'>
             <input className='form-control' readOnly
                 type='text' value={nice(balance)}
+                name={`nft-balance-${nft_level}-${nft_issue}`}
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
@@ -161,12 +163,13 @@ function $supply(
 ) {
     const { level: nft_level } = props;
     return <React.Fragment>
-        <label className='form-label'>
+        <div className='form-label'>
             Total Supply
-        </label>
+        </div>
         <div className='input-group nft-total-supply'>
             <input className='form-control' readOnly
                 type='text' value={nice(supply)}
+                name={`nft-total-supply-${nft_level}-${nft_issue}`}
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'

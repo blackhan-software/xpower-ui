@@ -19,11 +19,12 @@ each year in Array.from(YEARS).reverse()
           )
 
     div.col-sm.nft-details-rhs
-      label.form-label
+      div.form-label
         | Year of Issuance
       div.input-group.nft-issuance-year
         input.form-control(
           type="number" value=`${year}` readonly
+          name=`ppt-issuance-year-${levels[index]}-${year}`
         )
         span.input-group-text.info(
           data-bs-toggle="tooltip" data-bs-placement="top"
@@ -31,11 +32,12 @@ each year in Array.from(YEARS).reverse()
         )
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
-      label.form-label
+      div.form-label
         | Personal Balance
       div.input-group.nft-balance
         input.form-control(
           type="text" placeholder="0" readonly
+          name=`ppt-balance-${levels[index]}-${year}`
         )
         span.input-group-text.info(
           data-bs-toggle="tooltip" data-bs-placement="top"
@@ -43,11 +45,12 @@ each year in Array.from(YEARS).reverse()
         )
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
-      label.form-label
+      div.form-label
         | Total Supply
       div.input-group.nft-total-supply
         input.form-control(
           type="text" placeholder="0" readonly
+          name=`ppt-total-supply-${levels[index]}-${year}`
         )
         span.input-group-text.info(
           data-bs-toggle="tooltip" data-bs-placement="top"
@@ -73,13 +76,14 @@ each year in Array.from(YEARS).reverse()
         )
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
-      label.form-label.nft-claimed-label.d-none.d-sm-flex
+      div.form-label.nft-claimed-label.d-none.d-sm-flex
         | Minted Amount
       div.input-group.nft-claimed.d-none.d-sm-flex(
         role="group"
       )
         input.form-control(
           type="number" placeholder="0" readonly
+          name=`ppt-claimed-${levels[index]}-${year}`
         )
         span.input-group-text.info(
           data-bs-toggle="tooltip" data-bs-placement="top"
@@ -87,13 +91,14 @@ each year in Array.from(YEARS).reverse()
         )
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
-      label.form-label.nft-claimable-label.d-none.d-sm-flex
+      div.form-label.nft-claimable-label.d-none.d-sm-flex
         | Mintable Amount
       div.input-group.nft-claimable.d-none.d-sm-flex(
         role="group"
       )
         input.form-control(
           type="number" placeholder="0" readonly
+          name=`ppt-claimable-${levels[index]}-${year}`
         )
         span.input-group-text.info(
           data-bs-toggle="tooltip" data-bs-placement="top"

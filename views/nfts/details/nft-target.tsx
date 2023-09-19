@@ -29,9 +29,9 @@ export function UiNftTarget(
         'form-control', validity(props)
     ];
     return <React.Fragment>
-        <label className='form-label nft-transfer-to-label d-none d-sm-flex'>
+        <div className='form-label nft-transfer-to-label d-none d-sm-flex'>
             Send To
-        </label>
+        </div>
         <div className='input-group nft-transfer-to d-none d-sm-flex'
             role='group'
         >
@@ -41,6 +41,7 @@ export function UiNftTarget(
                 onChange={onChange.bind(null, props)}
                 onInput={onChange.bind(null, props)}
                 style={{ cursor: cursor(props) }}
+                name={`nft-transfer-to-${props.level}-${props.issue}`}
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'

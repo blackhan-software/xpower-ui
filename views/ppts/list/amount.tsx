@@ -128,6 +128,7 @@ function $amount(
         readOnly={readOnly(props)}
         title={title(props)}
         value={props.amount.toString()}
+        name={`ppt-amount-${props.level}`}
     />;
 }
 function parse(value: string) {

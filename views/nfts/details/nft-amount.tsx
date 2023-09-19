@@ -26,9 +26,9 @@ function $amount(
         'form-control', validity(props)
     ];
     return <React.Fragment>
-        <label className='form-label nft-transfer-amount-label d-none d-sm-flex'>
+        <div className='form-label nft-transfer-amount-label d-none d-sm-flex'>
             Send Amount
-        </label>
+        </div>
         <div className='input-group nft-transfer-amount d-none d-sm-flex'
             role='group'
         >
@@ -39,6 +39,7 @@ function $amount(
                 onInput={onChange.bind(null, props)}
                 style={{ cursor: cursor(props) }}
                 value={typeof props.value === 'bigint' ? props.value.toString() : ''}
+                name={`nft-transfer-amount-${props.level}-${props.issue}`}
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'

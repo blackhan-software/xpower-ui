@@ -18,9 +18,9 @@ export function UiOtfWallet(
         return <div
             id='otf-wallet' ref={globalRef('#otf-wallet')}
         >
-            <label className='form-label'>
+            <div className='form-label'>
                 Minter Address and AVAX Balance
-            </label>
+            </div>
             <div className='input-group otf-wallet-address'>
                 {$transmitter(props)}
                 {$account(props)}

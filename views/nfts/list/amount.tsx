@@ -132,6 +132,7 @@ function $amount(
         readOnly={readOnly(props, state)}
         title={title(props)}
         value={props.amount1.toString()}
+        name={`nft-amount-${props.level}`}
     />;
 }
 function parse(value: string) {

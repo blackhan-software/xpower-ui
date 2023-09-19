@@ -244,12 +244,13 @@ function $issue(
 ) {
     const { level: ppt_level } = props;
     return <React.Fragment>
-        <label className='form-label'>
+        <div className='form-label'>
             Year of Issuance
-        </label>
+        </div>
         <div className='input-group nft-issuance-year'>
             <input className='form-control' readOnly
                 type='number' value={ppt_issue}
+                name={`ppt-issuance-year-${ppt_level}-${ppt_issue}`}
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
@@ -266,12 +267,13 @@ function $balance(
 ) {
     const { level: ppt_level } = props;
     return <React.Fragment>
-        <label className='form-label'>
+        <div className='form-label'>
             Personal Balance
-        </label>
+        </div>
         <div className='input-group nft-balance'>
             <input className='form-control' readOnly
                 type='text' value={nice(balance)}
+                name={`ppt-balance-${ppt_level}-${ppt_issue}`}
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
@@ -288,12 +290,13 @@ function $supply(
 ) {
     const { level: ppt_level } = props;
     return <React.Fragment>
-        <label className='form-label'>
+        <div className='form-label'>
             Total Supply
-        </label>
+        </div>
         <div className='input-group nft-total-supply'>
             <input className='form-control' readOnly
                 type='text' value={nice(supply)}
+                name={`ppt-total-supply-${ppt_level}-${ppt_issue}`}
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
@@ -338,6 +341,7 @@ function $claimed(
     const { claimed, minted } = by_issue;
     return <UiPptClaimed
         issue={ppt_issue}
+        level={ppt_level}
         claim={claimed}
         value={minted}
     />;
@@ -352,6 +356,7 @@ function $claimable(
     const { claimable, mintable } = by_issue;
     return <UiPptClaimable
         issue={ppt_issue}
+        level={ppt_level}
         claim={claimable}
         value={mintable}
     />;

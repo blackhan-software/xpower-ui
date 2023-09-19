@@ -29,9 +29,9 @@ export function UiMinting(
         focus, status
     ]);
     return <React.Fragment>
-        <label className='form-label'>
+        <div className='form-label'>
             Mined Amounts Mintable
-        </label>
+        </div>
         {Object.values(rows).map((row, i) => $mint(
             { level: i + 1, row, onMint, onForget },
             (level, flag) => setFocus({ [level]: flag })
