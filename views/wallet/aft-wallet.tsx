@@ -108,7 +108,7 @@ function $aftBurner(
         if (onBurn) {
             const { decimals } = TokenInfo(token);
             const text = prompt(
-                `Really? Confirm the amount of ${token} tokens to burn:`,
+                `Really? Confirm the amount of ${token} tokens to burn: 🔥`,
                 nice(amount(), { base: 10 ** decimals, maxPrecision: 18 })
             );
             if (typeof text !== 'string') {
@@ -170,13 +170,13 @@ function $aftToggle(
         aged: boolean, set_aged: (aged: boolean) => void, token: Token
     }
 ) {
-    const metric = metric_bps({
+    const metric = metric_pct({
         wallet, token
     });
     const title = aged
         ? `${token}s with a conversion rate of ${nice(metric, {
             maxPrecision: 2, minPrecision: 2
-        })}‱`
+        })}%`
         : `Balance of ${token}s`;
     return <button
         className='form-control input-group-text info'
@@ -187,7 +187,7 @@ function $aftToggle(
         <XPower token={Tokenizer.xify(token)} style={{
             filter: aged ? 'invert(1)' : undefined
         }} />
-        {aged ? $sectors({ percent: metric / 1e4 }) : null}
+        {aged ? $sectors({ percent: metric / 1e2 }) : null}
     </button>;
 }
 function $sectors(
@@ -197,9 +197,9 @@ function $sectors(
         length={360 * percent} start={180 * (1 - percent)}
     />;
 }
-function metric_bps(
+function metric_pct(
     { wallet, token }: Pick<Props, 'wallet'> & { token: Token }, denominator = 1e18
 ) {
-    return 1e4 * Number(wallet.items[token]?.metric ?? 0n) / denominator;
+    return 1e2 * Number(wallet.items[token]?.metric ?? 0n) / denominator;
 }
 export default UiAftWallet;
