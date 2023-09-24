@@ -15,9 +15,16 @@ type Props = {
         onBurn?: (token: Token, amount: Amount) => void;
     };
     otf: OtfWallet & {
-        onToggled?: (toggled: OtfWallet['toggled']) => void;
-        onDeposit?: (processing: OtfWallet['processing']) => void;
-        onWithdraw?: (processing: OtfWallet['processing']) => void;
+        onToggled?: (
+            toggled: OtfWallet['toggled']
+        ) => void;
+        onDeposit?: (
+            processing: OtfWallet['processing'],
+            amount: OtfWallet['amount']
+        ) => void;
+        onWithdraw?: (
+            processing: OtfWallet['processing']
+        ) => void;
     };
 }
 export function UiWallet(

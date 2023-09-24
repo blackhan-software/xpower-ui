@@ -146,8 +146,8 @@ function $wallet(
             otf={{
                 onToggled: (toggled) =>
                     dispatch(actions.otfToggle({ toggled })),
-                onDeposit: (processing) =>
-                    dispatch(actions.otfDeposit({ account, processing })),
+                onDeposit: (processing, amount) =>
+                    dispatch(actions.otfDeposit({ account, processing, amount })),
                 onWithdraw: (processing) =>
                     dispatch(actions.otfWithdraw({ account, processing })),
                 ...otf_wallet

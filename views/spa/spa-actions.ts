@@ -827,7 +827,8 @@ export const otfToggle = AppThunk('otf-wallet/toggle', (args: {
     api.dispatch(setOtfWalletToggle(args));
 });
 export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
-    account: OtfWallet['account'], processing: OtfWallet['processing']
+    account: OtfWallet['account'], processing: OtfWallet['processing'],
+    amount: OtfWallet['amount']
 }, api) => {
     const provider = await MMProvider();
     if (provider === undefined) {
@@ -843,7 +844,7 @@ export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
     api.dispatch(setOtfWalletProcessing({
         processing: true
     }));
-    const unit = parseUnits('1.0');
+    const unit = args.amount ?? parseUnits('1.0');
     const mmw_signer = await provider.getSigner(x40(account));
     const mmw_balance = await provider.getBalance(x40(account));
     let gas_limit = parseUnits('0');

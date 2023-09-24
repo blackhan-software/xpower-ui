@@ -1,14 +1,20 @@
 import { nice, nice_si, x40 } from '../../source/functions';
-import { globalRef } from '../../source/react';
-import { Amount, OtfWallet } from '../../source/redux/types';
+import { ROParams } from '../../source/params';
+import { AccountContext, globalRef } from '../../source/react';
+import { Account, Amount, OtfWallet } from '../../source/redux/types';
 import { OtfManager } from '../../source/wallet';
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { Avalanche } from '../../public/images/tsx';
 
 type Props = OtfWallet & {
-    onDeposit?: (processing: OtfWallet['processing']) => void;
-    onWithdraw?: (processing: OtfWallet['processing']) => void;
+    onDeposit?: (
+        processing: OtfWallet['processing'],
+        amount: OtfWallet['amount']
+    ) => void;
+    onWithdraw?: (
+        processing: OtfWallet['processing']
+    ) => void;
 }
 export function UiOtfWallet(
     props: Props
@@ -34,6 +40,7 @@ export function UiOtfWallet(
 function $transmitter(
     props: Props
 ) {
+    const [account] = useContext(AccountContext);
     const { amount, processing } = props;
     const outer_classes = [
         'form-control input-group-text',
@@ -47,7 +54,7 @@ function $transmitter(
         className={outer_classes.join(' ')}
         data-bs-toggle='tooltip' data-bs-placement='top'
         id='otf-wallet-transfer'
-        onClick={transact.bind(null, props)}
+        onClick={transact.bind(null, { ...props, account })}
         title={title({ amount })}
     >
         <span
@@ -88,22 +95,62 @@ function title(
     return 'Deposit AVAX from wallet to minter address';
 }
 function transact(
-    { amount, processing, onDeposit, onWithdraw }: Props
+    { amount, processing, onDeposit, onWithdraw, account }: Props & {
+        account: Account | null
+    }
 ) {
     if (amount !== null) {
         if (threshold_lte(amount)) {
             if (onWithdraw) {
                 onWithdraw(processing);
             }
-        } else {
-            if (onDeposit) {
-                onDeposit(processing);
-            }
+            return;
         }
-    } else {
-        if (onDeposit) {
-            onDeposit(processing);
+    }
+    if (onDeposit) {
+        const info = warning(account);
+        const prefix = info.warn ?
+            "The minter wallet's secret is stored in a cookie. So, you *will* " +
+            "loose your transferred AVAX if you delete your cookies! 💀\n\n" : "";
+        const avax = prompt(
+            prefix + "Really? Confirm the amount of AVAX to transfer: 💸", "1.0"
+        );
+        if (typeof avax !== 'string') {
+            return;
         }
+        const input = Number(avax.replace(/[']/g, ''));
+        if (isNaN(input) || input === 0) {
+            return;
+        }
+        const value = BigInt(Math.ceil(input * 1e18));
+        if (value) {
+            onDeposit(processing, value);
+        }
+        if (info.warn) {
+            persist(info);
+        }
+    }
+    function warning(
+        account: Account | null,
+        max_time = 8.64e7, // daily
+        key = 'oft-wallet:deposit:warn',
+    ) {
+        if (account) {
+            key += ':' + account;
+        }
+        const now_date = new Date();
+        const old_date = new Date(localStorage.getItem(key) ?? 0);
+        const dif_time = now_date.getTime() - old_date.getTime();
+        const warn = !!ROParams.debug || dif_time > max_time;
+        return { warn, key, date: now_date };
+    }
+    function persist(
+        { warn, key, date }: { warn: boolean, key: string, date: Date }
+    ) {
+        if (warn) {
+            localStorage.setItem(key, date.toISOString());
+        }
+        return { warn, key, date };
     }
 }
 function $account(
