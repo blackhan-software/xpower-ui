@@ -39,7 +39,7 @@ describe('env_of', () => {
                 XP_POWEREDi: '--xp-lime-i',
                 XP_POWERED_DARKi: '--xp-lime-dark-i',
             }, ...{
-                COVER_IMAGE: 'cover-apower',
+                COVER_IMAGE: 'cover-none',
             }, ...{
                 NFT_UNIT_DISPLAY: 'none',
                 NFT_KILO_DISPLAY: 'none',

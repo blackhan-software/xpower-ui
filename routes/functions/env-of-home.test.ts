@@ -39,7 +39,7 @@ describe('env_of_home', () => {
                 XP_POWEREDi: '--xp-lime-i',
                 XP_POWERED_DARKi: '--xp-lime-dark-i',
             }, ...{
-                COVER_IMAGE: 'cover-apower',
+                COVER_IMAGE: 'cover-none',
             }, ...{
                 AMOUNT_1: "1",
                 AMOUNT_2: "3",

@@ -60,8 +60,7 @@ const cover_image = (
 ) => {
   const page = Pager.parse(req.path);
   return {
-    COVER_IMAGE:
-      page === Page.Home ? 'cover-xpower' : 'cover-apower',
+    COVER_IMAGE: `cover-${page}`,
   };
 };
 const otf_wallet = (

@@ -13,10 +13,8 @@ export function UiCoverImage(
     const classes = [
         pulsate ? 'pulsate' : '', 'cover-layer'
     ];
-    const power = page === Page.Home
-        ? 'xpower' : 'apower';
     return <img
-        src={`/images/jpg/cover-${power}.jpg`}
+        src={`/images/jpg/cover-${page}.jpg`}
         className={classes.join(' ')}
         width='736' height='246'
         id='cover' alt='cover'
