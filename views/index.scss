@@ -33,15 +33,15 @@ input, .btn, .ellipsis {
   overflow: hidden;
   text-overflow: initial;
 }
-.btn-outline-warning {
+.btn {
   border-color: var(--xp-powered);
   color: var(--xp-powered);
 }
-.btn-outline-warning.disabled,
-.btn-outline-warning:disabled {
+.btn.disabled,
+.btn:disabled {
   color: var(--xp-powered-dark);
 }
-.btn-outline-warning:hover {
+.btn.active, .btn:hover {
   background-color: var(--xp-powered);
   border-color: var(--xp-powered);
 }
