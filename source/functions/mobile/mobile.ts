@@ -1,19 +1,19 @@
 import { Global } from '../../types';
 declare const global: Global;
 /**
- * @returns `true` on mobile and else `false`, but if a text is
- * provided then returns the text on mobile and else `undefined`
+ * @returns `true` on mobile and else `false`; but, if a value is
+ * provided then returns the value on mobile and else `undefined`
  */
-export function mobile(text?: undefined): boolean;
-export function mobile(text?: string): string | undefined;
-export function mobile(text?: string) {
+export function mobile<_>(value?: undefined): boolean;
+export function mobile<T>(value?: T): T | undefined;
+export function mobile<T>(value?: T) {
     if (global.UA_MOBILE === undefined) {
         global.UA_MOBILE = Boolean(
             global?.navigator?.userAgent?.match(/mobi/i)
         );
     }
-    if (typeof text === 'string') {
-        return global.UA_MOBILE ? text : undefined;
+    if (value !== undefined) {
+        return global.UA_MOBILE ? value : undefined;
     }
     return global.UA_MOBILE;
 }
