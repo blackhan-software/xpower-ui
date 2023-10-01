@@ -1,4 +1,22 @@
 div#minting {
+  div.btn-group.mint {
+    button.minter {
+      border-right: 1px solid;
+    }
+    button.nn-counter {
+      border-radius: 0;
+      border-right: 1px solid;
+    }
+    button.tx-counter {
+      border-radius: 0;
+      border-right: 1px solid;
+    }
+    button.forget {
+      border-radius: 0 3px 3px 0;
+    }
+  }
+}
+div#minting {
   div.btn-group.mint:nth-of-type(7) {
     display: block;
   }
@@ -14,23 +32,17 @@ div#minting {
         height: 1em;
         width: 1em;
       }
-      border-right: none;
       width: calc(100% - 150px);
     }
     button.nn-counter {
-      border-radius: 0;
-      border-right: none;
       cursor: default;
       width: 53.75px;
     }
     button.tx-counter {
-      border-radius: 0;
-      border-right: none;
       cursor: default;
       width: 53.75px;
     }
     button.forget {
-      border-radius: 0 4px 4px 0;
       width: 42.5px;
     }
     margin-bottom: 1em;

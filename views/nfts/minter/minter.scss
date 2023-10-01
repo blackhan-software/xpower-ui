@@ -1,8 +1,16 @@
 div#nft-batch-minting {
   .nft-batch-minter {
+    #nft-batch-burner,
+    #nft-batch-minter  {
+      border-right: 1px solid var(--xp-powered);
+    }
+  }
+}
+div#nft-batch-minting {
+  .nft-batch-minter {
     #toggle-all {
-      min-width: 42px;
-      width: 42px;
+      min-width: 42.5px;
+      width: 42.5px;
     }
     #toggle-all > i {
       position: relative;
@@ -16,9 +24,7 @@ div#nft-batch-minting {
         height: 1em;
         width: 1em;
       }
-      border-left: none;
-      border-right: none;
-      width: calc(100% - 84px);
+      width: calc(100% - 83px);
     }
     #nft-batch-minter {
       span.spinner {
@@ -28,10 +34,8 @@ div#nft-batch-minting {
         height: 1em;
         width: 1em;
       }
-      border-left: none;
-      border-right: none;
       display: none;
-      width: calc(50% - 41px);
+      width: calc(50% - 42.5px);
     }
     #nft-batch-minter.show {
       display: inline-block;
@@ -44,9 +48,7 @@ div#nft-batch-minting {
         height: 1em;
         width: 1em;
       }
-      border-left: none;
-      border-right: none;
-      width: calc(50% - 41px);
+      width: calc(50% - 42.5px);
     }
     #nft-batch-burner {
       display: none;
@@ -62,9 +64,8 @@ div#nft-batch-minting {
         height: 1em;
         width: 1em;
       }
-      border-right: none;
       display: none;
-      width: calc(50% - 41px);
+      width: calc(50% - 42.5px);
     }
     #nft-batch-upgrader.show {
       display: inline-block;

@@ -3,7 +3,7 @@ div#mining {
   margin-bottom: 0.5em;
 }
 div#mining {
-  div.toggle-mining {
+  .toggle-mining {
     button#toggle-mining {
       span.spinner {
         margin-top: 0.25em;
@@ -12,39 +12,36 @@ div#mining {
         height: 1em;
         width: 1em;
       }
-      border-right: none;
       width: calc(100% - 42px);
     }
     width: 100%;
   }
-  div.tweak-mining {
-    div.increaser,
-    div.decreaser {
-      button#increase,
-      button#decrease  {
+  .tweak-mining {
+    .increaser,
+    .decreaser {
+      button#decrease,
+      button#increase {
         padding: 0;
         width: 42.5px;
       }
-      button#increase > svg,
-      button#decrease > svg {
+      button#decrease > svg,
+      button#increase > svg {
         position: relative;
         top: -1px;
       }
     }
-    div.progressor {
-      div.progress {
-        div.progress-bar {
+    .progressor {
+      .progress {
+        .progress-bar {
           background-color: var(--xp-powered);
         }
-        div.progress-bar.with-indicator {
+        .progress-bar.with-indicator {
           border-right: 1px dotted var(--xp-gray-dark);
         }
         border: 3px double var(--xp-gray-dark);
         margin: calc(1em - 2px) 1em;
         width: 100%;
       }
-      border-top: 1px solid var(--xp-powered);
-      border-bottom: 1px solid var(--xp-powered);
       width: calc(100% - 82px);
     }
     margin-top: 1em;

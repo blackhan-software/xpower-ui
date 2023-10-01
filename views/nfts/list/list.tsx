@@ -3,7 +3,7 @@ import './list.scss';
 
 import { mobile, nice_si } from '../../../source/functions';
 import { nftTotalBy } from '../../../source/redux/selectors';
-import { Amount, Nft, NftDetails, NftIssue, NftLevel, NftLevels, Nfts, Supply, Token } from '../../../source/redux/types';
+import { Amount, Nft, NftDetails, NftIssue, NftLevel, NftLevels, Nfts, Supply } from '../../../source/redux/types';
 
 import React, { useMemo } from 'react';
 import { UiNftDetails } from '../details/details';
@@ -162,19 +162,10 @@ function $toggle(
 function $minter(
     nft_level: NftLevel
 ) {
-    const head = (nft_level: NftLevel) => {
-        const nft_name = Nft.nameOf(nft_level);
-        if (nft_name) return nft_name.slice(0, 1);
-    };
     const title = (
         nft_level: NftLevel
     ) => {
-        const nft_name = Nft.nameOf(nft_level);
-        const lhs_head = head(nft_level);
-        const lhs = lhs_head ? `1${lhs_head}` : '';
-        const rhs_head = head(nft_level + 3);
-        const rhs = rhs_head ? `1${rhs_head}` : `K${lhs_head}`;
-        return `Mint ${nft_name} NFTs (for [${lhs}...${rhs}] ${Token.XPOW} tokens)`;
+        return `Stakeable ${Nft.nameOf(nft_level)} NFTs (i.e. a deposit of ${nice_si(10 ** nft_level, { maxPrecision: 0 })} XPOW)`;
     };
     return <button type='button'
         className='btn btn-outline-warning minter'
@@ -189,7 +180,7 @@ function $balance(
 ) {
     const title = mobile()
         ? `Overall personal balance`
-        : `Overall personal balance & supply (${Nft.nameOf(nft_level)} NFTs)`;
+        : `Overall personal balance & supply of ${Nft.nameOf(nft_level)} NFTs`;
     return <button type='button' title={title}
         className='btn btn-outline-warning balance'
         data-bs-placement='top' data-bs-toggle='tooltip'

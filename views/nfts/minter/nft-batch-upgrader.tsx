@@ -14,7 +14,8 @@ export function UiNftBatchUpgrader(
 ) {
     const classes = [
         'btn btn-outline-warning',
-        approved ? 'show' : ''
+        approved ? 'show' : '',
+        upgrading(status) ? 'upgrading' : '',
     ];
     const text = upgrading(status)
         ? <>Upgrading<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>

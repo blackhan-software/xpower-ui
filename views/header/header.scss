@@ -1,26 +1,8 @@
 header {
-    nav#menu {
-        a:not(:first-of-type):not(:last-of-type) {
-            border-radius: 0;
-        }
-        a:first-of-type {
-            border-start-end-radius: 0;
-            border-end-end-radius: 0;
-        }
-        a:last-of-type {
-            border-start-start-radius: 0;
-            border-end-start-radius: 0;
-        }
-        a:not(:last-of-type) {
-            border-right: none;
-        }
-        a.active, a:hover {
-            background-color: var(--xp-powered);
-            color: var(--xp-gray-dark);
-        }
-        a {
-            border: 1px solid var(--xp-powered);
-            color: var(--xp-powered);
-        }
+  nav#menu {
+    a.active,
+    a:hover {
+      color: var(--xp-gray-dark);
     }
+  }
 }

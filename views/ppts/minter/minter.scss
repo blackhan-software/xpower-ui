@@ -1,5 +1,12 @@
 div#ppt-batch-minting {
   .ppt-batch-minter {
+    #ppt-batch-claimer  {
+      border-left: 1px solid var(--xp-powered);
+    }
+  }
+}
+div#ppt-batch-minting {
+  .ppt-batch-minter {
     #toggle-all {
       min-width: 42px;
       width: 42px;
@@ -16,9 +23,7 @@ div#ppt-batch-minting {
         height: 1em;
         width: 1em;
       }
-      border-left: none;
-      border-right: none;
-      width: calc(100% - 84px);
+      width: calc(100% - 83px);
     }
     #ppt-batch-minter {
       span.spinner {
@@ -28,9 +33,7 @@ div#ppt-batch-minting {
         height: 1em;
         width: 1em;
       }
-      border-left: none;
-      border-right: none;
-      width: calc(50% - 41px);
+      width: calc(50% - 42.5px);
     }
     #ppt-batch-minter {
       display: none;
@@ -46,9 +49,7 @@ div#ppt-batch-minting {
         height: 1em;
         width: 1em;
       }
-      border-left: none;
-      border-right: none;
-      width: calc(50% - 41px);
+      width: calc(50% - 42.5px);
     }
     #ppt-batch-burner {
       display: none;
@@ -64,8 +65,7 @@ div#ppt-batch-minting {
         height: 1em;
         width: 1em;
       }
-      border-right: none;
-      width: calc(50% - 41px);
+      width: calc(50% - 42.5px);
     }
     #ppt-batch-claimer {
       display: none;

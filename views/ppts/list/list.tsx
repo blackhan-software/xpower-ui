@@ -88,7 +88,7 @@ function $pptMinter(
                     });
                 }
             })}
-            {$minter(ppt_level, amount)}
+            {$minter(ppt_level)}
             {$balance(ppt_level, total_by)}
             <UiPptAmount
                 amount={amount}
@@ -166,21 +166,17 @@ function $toggle(
     </div>;
 }
 function $minter(
-    ppt_level: NftLevel, amount: Amount
+    ppt_level: NftLevel
 ) {
     const title = (
-        ppt_level: NftLevel, amount: Amount
+        ppt_level: NftLevel
     ) => {
-        const nft_name = Nft.nameOf(ppt_level);
-        return amount !== 0n ? amount > 0
-            ? `Stake ${nft_name} NFTs`
-            : `Unstake ${nft_name} NFTs`
-            : `(Un)stake ${nft_name} NFTs`;
+        return `Staked ${Nft.nameOf(ppt_level)} NFTs (with claimable APOW rewards)`;
     };
     return <button type='button'
         className='btn btn-outline-warning minter'
         data-bs-placement='top' data-bs-toggle='tooltip'
-        title={title(ppt_level, amount)}
+        title={title(ppt_level)}
     >
         {Nft.nameOf(ppt_level)}<span className='d-none d-sm-inline'> NFTs</span>
     </button>;
@@ -190,7 +186,7 @@ function $balance(
 ) {
     const title = mobile()
         ? `Overall personal balance`
-        : `Overall personal balance & supply (staked ${Nft.nameOf(ppt_level)})`;
+        : `Overall personal balance & supply of staked ${Nft.nameOf(ppt_level)}`;
     return <button type='button' title={title}
         className='btn btn-outline-warning balance'
         data-bs-placement='top' data-bs-toggle='tooltip'

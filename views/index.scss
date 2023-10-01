@@ -23,6 +23,9 @@ body.container {
   margin-left: auto;
   max-width: 768px;
 }
+//
+// buttons:
+//
 input, .btn, .ellipsis {
   white-space: nowrap;
   overflow: hidden;
@@ -33,18 +36,50 @@ input, .btn, .ellipsis {
   overflow: hidden;
   text-overflow: initial;
 }
+.btn-group,
+.btn-group-vertical {
+  .btn {
+    color: var(--xp-powered);
+  }
+  .btn.disabled,
+  .btn:disabled {
+    color: var(--xp-powered-dark);
+  }
+  .btn.active, .btn:hover {
+    background-color: var(--xp-powered);
+    color: var(--xp-gray-dark);
+  }
+}
+.btn-group {
+  .btn-group, .btn {
+    border: none;
+  }
+  .btn.active, .btn:hover {
+    border-color: var(--xp-powered);
+  }
+  border: 1px solid var(--xp-powered);
+}
+.btn-group {
+  >:not(:first-of-type),
+  >:not(:last-of-type) {
+    border-radius: 0;
+  }
+  >:first-of-type {
+    border-start-start-radius: 3px;
+    border-end-start-radius: 3px;
+  }
+  >:last-of-type {
+    border-start-end-radius: 3px;
+    border-end-end-radius: 3px;
+  }
+  border-radius: 4px;
+}
 .btn {
-  border-color: var(--xp-powered);
-  color: var(--xp-powered);
+  font-weight: bold;
 }
-.btn.disabled,
-.btn:disabled {
-  color: var(--xp-powered-dark);
-}
-.btn.active, .btn:hover {
-  background-color: var(--xp-powered);
-  border-color: var(--xp-powered);
-}
+//
+// headers:
+//
 h1 {
   font-size: 22px;
   font-weight: bold;
@@ -53,9 +88,15 @@ h1 {
 h1:first-of-type {
   margin-bottom: 0.5em;
 }
+//
+// forms:
+//
 .form-label {
   user-select: none;
 }
+//
+// info:
+//
 :not(span).info {
   svg:not(.component) {
     position: relative;
@@ -69,7 +110,4 @@ h1:first-of-type {
   }
   padding: 0;
   width: 42px !important;
-}
-.btn {
-  font-weight: bold;
 }

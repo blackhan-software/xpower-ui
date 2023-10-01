@@ -17,7 +17,8 @@ export function UiPptBatchClaimer(
 ) {
     const classes = [
         'btn btn-outline-warning',
-        approved ? 'show' : ''
+        approved ? 'show' : '',
+        claiming(status) ? 'claiming' : '',
     ];
     const title = UiPptBatchClaimerTitle({
         status

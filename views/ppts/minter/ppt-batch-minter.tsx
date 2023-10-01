@@ -14,7 +14,8 @@ export function UiPptBatchMinter(
 ) {
     const classes = [
         'btn btn-outline-warning',
-        approved ? 'show' : ''
+        approved ? 'show' : '',
+        minting(status) ? 'minting' : '',
     ];
     const text = minting(status)
         ? <>Staking<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
@@ -26,7 +27,7 @@ export function UiPptBatchMinter(
         onClick={onBatchMint?.bind(null, list)}
     >
         {Spinner({
-            show: minting(status), grow: true
+            show: minting(status), grow: true, right: true
         })}
         <span className='text'>{text}</span>
     </button>;

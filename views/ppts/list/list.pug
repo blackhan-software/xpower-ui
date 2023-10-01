@@ -13,12 +13,12 @@ div#ppt-single-minting
           i(class=`bi-chevron-{{NFT_${levels[index]}_CHEVRON}}`)
       button.btn.btn-outline-warning.minter(
         type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-        title=`(Un)stake ${levels[index]} NFTs`
+        title=`Staked ${levels[index]} NFTs`
       )
         | #{levels[index]}<span class="d-none d-sm-inline"> NFTs</span>
       button.btn.btn-outline-warning.balance(
         type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-        title=`Overall personal balance & supply (staked ${levels[index]} NFTs)`
+        title=`Overall personal balance & supply of staked ${levels[index]} NFTs`
       )
         span: | 0
         span.d-none.d-sm-inline: | &nbsp;/&nbsp;

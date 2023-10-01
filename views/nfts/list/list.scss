@@ -2,6 +2,21 @@ div#nft-single-minting {
   margin-bottom: 0;
 }
 div#nft-single-minting {
+  .nft-minter .btn-group {
+    .decrease {
+      border-left: 1px solid var(--xp-powered);
+    }
+  }
+}
+div#nft-single-minting {
+  .nft-minter {
+    .minter {
+      text-align: center;
+    }
+    .balance {
+      text-align: right;
+    }
+  }
   .nft-minter {
     .btn-group {
       .toggle {
@@ -20,36 +35,25 @@ div#nft-single-minting {
         position: relative;
         top: -1px;
       }
-      .increase {
-        border-left: none;
-      }
-      .decrease {
-        border-left: none;
-        border-right: none;
-      }
     }
     .minter {
-      border-left: none;
-      border-right: none;
-    }
-    .minter {
-      width: calc(33.33% - 42.5px + 2px);
+      width: calc(25% - 42.5px);
     }
     .balance {
-      width: calc(33.33% - 42.5px - 4px);
+      width: calc(25% + 3px);
     }
     .amount {
-      width: calc(33.33% - 42.5px + 2px);
+      width: calc(50% - 83px);
     }
     @media (max-width: 575px) {
       .minter {
-        width: calc(33.33% - 42.5px - 1px);
+        width: calc(32% - 42.5px);
       }
       .balance {
-        width: calc(33.33% - 42.5px - 1px);
+        width: calc(18% + 3px);
       }
       .amount {
-        width: calc(33.33% - 42.5px);
+        width: calc(50% - 83px);
       }
     }
     .minter, .balance, .amount {
@@ -58,7 +62,10 @@ div#nft-single-minting {
     @media (max-width: 575px) {
       .amount, .balance {
         font-size: x-small;
-        padding: 0.375rem;
+      }
+      .amount {
+        padding-left: 0.375rem;
+        padding-right: 0.375rem;
       }
     }
     margin-bottom: 1em;
@@ -80,8 +87,8 @@ div#nft-single-minting {
       cursor: auto;
     }
     input[type=number].invalid {
-      border: 2px solid var(--xp-powered-i);
-      color: var(--xp-powered-i);
+      background-color: var(--xp-powered-i);
+      color: var(--xp-gray-dark);
     }
   }
 }

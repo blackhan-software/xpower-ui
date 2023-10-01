@@ -13,12 +13,12 @@ div#nft-single-minting
           i(class=`bi-chevron-{{NFT_${levels[index]}_CHEVRON}}`)
       button.btn.btn-outline-warning.minter(
         type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-        title=`Mint ${levels[index]} NFTs (for [1${levels[index].slice(0,1)}...1${levels[index+1].toUpperCase().slice(0,1)}] {{TOKEN}} tokens)`
+        title=`${levels[index]} NFTs`
       )
         | #{levels[index]}<span class="d-none d-sm-inline"> NFTs</span>
       button.btn.btn-outline-warning.balance(
         type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-        title=`Overall personal balance & supply (${levels[index]} NFTs)`
+        title=`Overall personal balance & supply of ${levels[index]} NFTs`
       )
         span: | 0
         span.d-none.d-sm-inline: | &nbsp;/&nbsp;

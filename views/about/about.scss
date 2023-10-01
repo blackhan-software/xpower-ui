@@ -6,5 +6,8 @@ form#about {
         top: calc(50% - 1rem);
         width: 2rem;
     }
+    a.active, a:hover {
+        color: var(--xp-powered-i);
+    }
     margin-top: 0;
 }

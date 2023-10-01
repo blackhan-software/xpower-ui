@@ -14,7 +14,8 @@ export function UiNftBatchBurner(
 ) {
     const classes = [
         'btn btn-outline-warning',
-        approved ? 'show' : ''
+        approved ? 'show' : '',
+        burning(status) ? 'burning' : '',
     ];
     const text = burning(status)
         ? <>Burning<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
@@ -26,7 +27,7 @@ export function UiNftBatchBurner(
         onClick={onBatchBurn?.bind(null, list)}
     >
         {Spinner({
-            show: burning(status), grow: true
+            show: burning(status), grow: true, right: true
         })}
         <span className='text'>{text}</span>
     </button>;

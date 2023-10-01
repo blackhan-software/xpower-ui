@@ -16,7 +16,7 @@ export function UiHeader(
     props: Props
 ) {
     const classes = [
-        'nav nav-pills nav-justified', 'mb-3'
+        'btn-group nav nav-pills nav-justified', 'mb-3'
     ];
     return <React.StrictMode>
         <nav id='menu' className={

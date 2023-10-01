@@ -1,11 +1,17 @@
 import React from 'react';
 
+type Props = {
+    show: boolean;
+    grow?: boolean;
+    right?: boolean;
+}
 export function Spinner(
-    { show, grow }: { show: boolean; grow?: boolean; }
+    { show, grow, right }: Props
 ) {
     const classes = [
         'spinner spinner-border spinner-border-sm',
-        'float-start', grow ? 'spinner-grow' : ''
+        !right ? 'float-start' : 'float-end',
+        grow ? 'spinner-grow' : ''
     ];
     return <span
         className={classes.join(' ')} role='status'

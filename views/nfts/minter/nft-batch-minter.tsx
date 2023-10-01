@@ -19,7 +19,8 @@ export function UiNftBatchMinter(
     const [state] = useContext(StateContext);
     const classes = [
         'btn btn-outline-warning',
-        approved ? 'show' : ''
+        approved ? 'show' : '',
+        minting(status) ? 'minting' : '',
     ];
     const text = minting(status)
         ? <>Minting<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
@@ -31,7 +32,7 @@ export function UiNftBatchMinter(
         onClick={onBatchMint?.bind(null, list)}
     >
         {Spinner({
-            show: Boolean(minting(status)), grow: true
+            show: Boolean(minting(status)), grow: true, right: true
         })}
         <span className='text'>{text}</span>
     </button>;
