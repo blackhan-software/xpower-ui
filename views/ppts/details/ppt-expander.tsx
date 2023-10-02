@@ -64,7 +64,7 @@ function $expander(
             className='btn btn-outline-warning info'
             data-bs-placement='top' data-bs-toggle='tooltip'
             style={{ width: '43px' }}
-            title='Show claimed & claimable'
+            title='Show minted & mintable'
         >
             <InfoCircle fill={true} />
         </button>
