@@ -1,6 +1,8 @@
-import { MinerStatus, Token } from '../../../source/redux/types';
+import { ROParams } from '../../../source/params';
+import { AccountContext } from '../../../source/react';
+import { Account, MinerStatus, Token } from '../../../source/redux/types';
 
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
 
 type Props = {
@@ -21,6 +23,7 @@ export function UiMiningToggle(
 function $toggle(
     { status, disabled, onToggle }: Omit<Props, 'token'>
 ) {
+    const [account] = useContext(AccountContext);
     const [focus, setFocus] = useState(false);
     useEffect(/*re-focus*/() => {
         if (focus) {
@@ -35,11 +38,53 @@ function $toggle(
         disabled={disabled || disabledFor(status)}
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
-        onClick={onToggle}
+        onClick={toggle.bind(null, { account, status, onToggle })}
     >
         {Spinner(status)}
         {$text(status)}
-    </button>
+    </button>;
+}
+function toggle(
+    { account, status, onToggle }: Pick<Props, 'status' | 'onToggle'> & {
+        account: Account | null
+    }
+) {
+    if (onToggle) {
+        const info = warning(account);
+        if (status !== MinerStatus.started && info.warn) {
+            const consent = confirm(
+                "Mining might damage your device! Continue? 🔥"
+            );
+            if (consent) {
+                persist(info)
+            } else {
+                return;
+            }
+        }
+        onToggle();
+    }
+    function warning(
+        account: Account | null,
+        max_time = 8.64e7, // daily
+        key = 'mining-toggle:not-started:warn',
+    ) {
+        if (account) {
+            key += ':' + account;
+        }
+        const now_date = new Date();
+        const old_date = new Date(localStorage.getItem(key) ?? 0);
+        const dif_time = now_date.getTime() - old_date.getTime();
+        const warn = !!ROParams.debug || dif_time > max_time;
+        return { warn, key, date: now_date };
+    }
+    function persist(
+        { warn, key, date }: { warn: boolean, key: string, date: Date }
+    ) {
+        if (warn) {
+            localStorage.setItem(key, date.toISOString());
+        }
+        return { warn, key, date };
+    }
 }
 function disabledFor(
     status: MinerStatus | null
