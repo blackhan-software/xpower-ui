@@ -23,7 +23,7 @@ export class XPowerNft extends Base {
         amount: Amount | Promise<Amount>,
         moe_index: Index | Promise<Index>
     ): Promise<Transaction> {
-        const contract = await this.otf;
+        const contract = await this.connect();
         if (ROParams.lt(Version.v2b)) {
             return contract.mint(
                 level, amount
@@ -49,7 +49,7 @@ export class XPowerNft extends Base {
         amounts: Amount[] | Promise<Amount[]>,
         moe_index: Index | Promise<Index>,
     ): Promise<Transaction> {
-        const contract = await this.otf;
+        const contract = await this.connect();
         if (ROParams.lt(Version.v2b)) {
             return contract.mintBatch(
                 levels, amounts
@@ -96,7 +96,7 @@ export class XPowerNft extends Base {
         amount: Amount | Promise<Amount>,
         moe_index: Index | Promise<Index>,
     ): Promise<Transaction> {
-        const contract = await this.otf;
+        const contract = await this.connect();
         if (ROParams.lt(Version.v8a)) {
             return contract.upgrade(
                 x40(await to), issue, level, amount, moe_index
@@ -113,7 +113,7 @@ export class XPowerNft extends Base {
         amounts: Amount[][] | Promise<Amount[][]>,
         moe_index: Index | Promise<Index>,
     ): Promise<Transaction> {
-        const contract = await this.otf;
+        const contract = await this.connect();
         if (ROParams.lt(Version.v8a)) {
             return contract.upgradeBatch(
                 x40(await to), issues, levels, amounts, moe_index
