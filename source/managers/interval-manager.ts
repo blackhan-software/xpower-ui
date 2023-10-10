@@ -81,10 +81,10 @@ export class IntervalManager extends EventEmitter {
     private get timer() {
         return this._timer;
     }
-    private set timer(value: NodeJS.Timer | undefined) {
+    private set timer(value: NodeJS.Timeout | undefined) {
         this._timer = value;
     }
     private _duration: number;
-    private _timer: NodeJS.Timer | undefined;
+    private _timer: NodeJS.Timeout | undefined;
 }
 export default IntervalManager;

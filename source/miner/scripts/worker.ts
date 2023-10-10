@@ -1,5 +1,6 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 /* eslint @typescript-eslint/no-var-requires: [off] */
+/* eslint @typescript-eslint/ban-types: [off] */
 if (typeof importScripts === 'function') importScripts(
     'https://cdn.jsdelivr.net/npm/react@18.1.0/umd/react.production.min.js',
     'https://cdn.jsdelivr.net/npm/ethers@6.3.0/dist/ethers.umd.min.js',
@@ -219,7 +220,7 @@ class Worker {
     private get iid() {
         return this._iid;
     }
-    private set iid(value: NodeJS.Timer | undefined) {
+    private set iid(value: NodeJS.Timeout | undefined) {
         this._iid = value;
     }
     private get miner() {
@@ -236,7 +237,7 @@ class Worker {
     }
     private _amount: (hash: Uint8Array) => Amount;
     private _context: Context;
-    private _iid?: NodeJS.Timer;
+    private _iid?: NodeJS.Timeout;
     private _miner: Miner;
     private _nonce: Uint8Array;
     private _running = false;
