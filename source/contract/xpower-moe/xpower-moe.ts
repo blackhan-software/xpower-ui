@@ -26,7 +26,7 @@ export class XPowerMoe extends Base {
                 version: ROParams.version
             });
         }
-        return contract.init();
+        return contract.init(this.options);
     }
     async mint(
         to: Account, block_hash: BlockHash, nonce: Nonce
