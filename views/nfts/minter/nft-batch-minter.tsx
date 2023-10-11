@@ -1,10 +1,8 @@
 import { ROParams } from '../../../source/params';
-import { AppState } from '../../../source/redux/store';
-import { NftMinterList, NftMinterStatus, TokenInfo } from '../../../source/redux/types';
-import { Tokenizer } from '../../../source/token';
+import { NftMinterList, NftMinterStatus, Token, TokenInfo, Wallet } from '../../../source/redux/types';
 
 import React, { useContext } from 'react';
-import { StateContext } from '../../../source/react';
+import { WalletContext } from '../../../source/react';
 import { Spinner } from './spinner';
 
 type Props = {
@@ -16,7 +14,7 @@ type Props = {
 export function UiNftBatchMinter(
     { approved, list, onBatchMint, status }: Props
 ) {
-    const [state] = useContext(StateContext);
+    const [wallet] = useContext(WalletContext);
     const classes = [
         'btn btn-outline-warning',
         approved ? 'show' : '',
@@ -28,7 +26,7 @@ export function UiNftBatchMinter(
     return <button
         type='button' id='nft-batch-minter'
         className={classes.join(' ')}
-        disabled={disabled({ list, status, state })}
+        disabled={disabled({ list, status, wallet })}
         onClick={onBatchMint?.bind(null, list)}
     >
         {Spinner({
@@ -42,8 +40,8 @@ function minting(
 ): boolean | null {
     return status === NftMinterStatus.minting;
 }
-function disabled({ list, status, state }: {
-    list: NftMinterList, status: NftMinterStatus | null, state: AppState | null
+function disabled({ list, status, wallet }: {
+    list: NftMinterList, status: NftMinterStatus | null, wallet: Wallet | null
 }) {
     if (minting(status)) {
         return true;
@@ -54,7 +52,7 @@ function disabled({ list, status, state }: {
     if (!inRange(list)) {
         return true;
     }
-    if (exRange(list, state)) {
+    if (exRange(list, wallet)) {
         return true;
     }
     return false;
@@ -81,20 +79,19 @@ function inRange(
     return true;
 }
 function exRange(
-    list: NftMinterList, state: AppState | null
+    list: NftMinterList, wallet: Wallet | null
 ) {
-    if (state) {
+    if (wallet) {
         const { decimals } = TokenInfo(
-            state.token, ROParams.version
+            Token.XPOW, ROParams.version
         );
         const base = 10n ** BigInt(decimals);
-        const xtoken = Tokenizer.xify(state.token);
-        const wallet = state.aft_wallet.items[xtoken];
-        if (wallet) {
+        const aft_wallet = wallet.aft_wallet.items[Token.XPOW];
+        if (aft_wallet) {
             const total = Object.entries(list)
                 .map(([l, { amount1: a }]) => 10n ** BigInt(l) * a)
                 .reduce((acc, a) => acc + a * base, 0n);
-            if (total > wallet.amount) {
+            if (total > aft_wallet.amount) {
                 return true;
             }
         }

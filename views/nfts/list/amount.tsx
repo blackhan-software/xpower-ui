@@ -1,12 +1,10 @@
 import { mobile } from '../../../source/functions';
 import { ROParams } from '../../../source/params';
-import { AppState } from '../../../source/redux/store';
-import { Amount, Nft, NftLevel, TokenInfo } from '../../../source/redux/types';
-import { Tokenizer } from '../../../source/token';
+import { Amount, Nft, NftLevel, Token, TokenInfo, Ui, Wallet } from '../../../source/redux/types';
 
 import React, { KeyboardEvent, MouseEvent, TouchEvent, useContext, useEffect, useRef } from 'react';
 import { DashCircle, PlusCircle } from '../../../public/images/tsx';
-import { StateContext, useBufferedIf, useDoubleTap } from '../../../source/react';
+import { UiContext, WalletContext, useBufferedIf, useDoubleTap } from '../../../source/react';
 
 type Props = {
     level: NftLevel,
@@ -100,14 +98,15 @@ function decreaseByWheel(
 function $amount(
     props: Props
 ) {
-    const [state] = useContext(StateContext);
+    const [ui] = useContext(UiContext);
+    const [wallet] = useContext(WalletContext);
     const $ref = useRef<HTMLInputElement>(null);
     useDoubleTap($ref, () => {
         setTimeout(() => $ref.current?.select());
         extremifyInc(props);
     });
     useEffect(() => {
-        if (readOnly(props, state)) {
+        if (readOnly(props, ui)) {
             return;
         }
         const current = $ref.current;
@@ -123,13 +122,13 @@ function $amount(
             current?.removeEventListener('wheel', dbyw);
             current?.removeEventListener('wheel', ibyw);
         };
-    }, [props, state, $ref]);
+    }, [props, wallet, ui, $ref]);
     return <input type='number' ref={$ref}
-        className={`btn btn-outline-warning amount ${invalid(props, state)}`.trim()}
+        className={`btn btn-outline-warning amount ${invalid(props, wallet, ui)}`.trim()}
         data-bs-toggle='tooltip' data-bs-placement='top'
         onChange={(e) => changeTo(props, parse(e.target.value))}
         onKeyDown={(e) => changeByArrows(props, e)}
-        readOnly={readOnly(props, state)}
+        readOnly={readOnly(props, ui)}
         title={title(props)}
         value={props.amount1.toString()}
         name={`nft-amount-${props.level}`}
@@ -142,12 +141,12 @@ function parse(value: string) {
     return BigInt(value);
 }
 function invalid(
-    props: Props, state: AppState | null
+    props: Props, wallet: Wallet | null, ui: Ui | null
 ) {
     if (!inRange(props)) {
         return 'invalid';
     }
-    if (exRange(props, state)) {
+    if (exRange(props, wallet, ui)) {
         return 'invalid';
     }
     return '';
@@ -158,21 +157,20 @@ function inRange(
     return min1 <= amount1;
 }
 function exRange(
-    { amount1 }: Props, state: AppState | null
+    { amount1 }: Props, wallet: Wallet | null, ui: Ui | null
 ) {
-    if (amount1 && state) {
+    if (amount1 && wallet && ui) {
         const { decimals } = TokenInfo(
-            state.token, ROParams.version
+            Token.XPOW, ROParams.version
         );
         const base = 10n ** BigInt(decimals);
-        const xtoken = Tokenizer.xify(state.token);
-        const wallet = state.aft_wallet.items[xtoken];
-        if (wallet && wallet.amount > base) {
+        const aft_wallet = wallet.aft_wallet.items[Token.XPOW];
+        if (aft_wallet && aft_wallet.amount > base) {
             const total = Object
-                .entries(state.nfts_ui.amounts)
+                .entries(ui.nfts_ui.amounts)
                 .map(([l, { amount1: a }]) => 10n ** BigInt(l) * a)
                 .reduce((acc, a) => acc + a * base, 0n);
-            if (total > wallet.amount) {
+            if (total > aft_wallet.amount) {
                 return true;
             }
         }
@@ -180,11 +178,11 @@ function exRange(
     return false;
 }
 function readOnly(
-    { level, max1, min1 }: Props, state: AppState | null
+    { level, max1, min1 }: Props, ui: Ui | null
 ) {
-    if (state) {
+    if (ui) {
         for (const [l, { max1 }] of Object.entries(
-            state.nfts_ui.amounts
+            ui.nfts_ui.amounts
         )) {
             if (BigInt(l) > level && max1) {
                 return false; // read-write

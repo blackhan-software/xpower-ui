@@ -2,7 +2,7 @@ import './spa.scss';
 
 import { Bus } from '../../source/bus';
 import { leafKeys } from '../../source/functions';
-import { AccountContext, AccountProvider, DebugContext, DebugProvider, StateProvider, TokenProvider } from '../../source/react';
+import { AccountContext, AccountProvider, DebugContext, DebugProvider, TokenProvider, UiProvider, WalletProvider } from '../../source/react';
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiToggled, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
 import { AppDispatch, AppState, Store } from '../../source/redux/store';
@@ -447,7 +447,9 @@ if (require.main === module) {
             <DebugProvider>
                 <AccountProvider>
                     <TokenProvider>
-                        <StateProvider>{$spa}</StateProvider>
+                        <WalletProvider>
+                            <UiProvider>{$spa}</UiProvider>
+                        </WalletProvider>
                     </TokenProvider>
                 </AccountProvider>
             </DebugProvider>
