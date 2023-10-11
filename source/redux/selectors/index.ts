@@ -13,4 +13,6 @@ export * from './ppt-total-by';
 export * from './ppts-by';
 export * from './refreshed';
 export * from './token-of';
+export * from './ui-of';
 export * from './version-by';
+export * from './wallet-of';
