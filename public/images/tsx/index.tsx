@@ -4,6 +4,7 @@ export * from './arrow-right-circle-fill';
 export * from './arrow-up-circle-fill';
 export * from './avalanche';
 export * from './bug-fill';
+export * from './check-circle-fill';
 export * from './dash-circle-fill';
 export * from './disc-fill';
 export * from './emoji-angry-fill';
