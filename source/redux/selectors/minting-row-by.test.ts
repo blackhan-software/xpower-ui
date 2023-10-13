@@ -8,9 +8,10 @@ describe('mintingRowBy', () => {
                     [0]: {
                         disabled: false,
                         display: false,
+                        ignored: false,
                         nn_counter: 0,
-                        status: null,
                         tx_counter: 0,
+                        status: null,
                     }
                 }
             }

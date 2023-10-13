@@ -3,6 +3,7 @@ export * from './mining-speed-by';
 export * from './mining-speedable';
 export * from './mining-togglable';
 export * from './minting-row-by';
+export * from './minting-rows-by';
 export * from './nft-total-by';
 export * from './nfts-by';
 export * from './nonce-by';
