@@ -177,6 +177,8 @@ function $home(
                 ...mining
             }}
             minting={{
+                onIgnore: (level, flag) =>
+                    dispatch(actions.mintingIgnore({ level, flag })),
                 onForget: (level) =>
                     dispatch(actions.mintingForget({ account, level })),
                 onMint: (level) =>

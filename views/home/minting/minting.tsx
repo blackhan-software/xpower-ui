@@ -1,4 +1,5 @@
-import { nice, nomobi } from '../../../source/functions';
+import { CheckCircle } from '../../../public/images/tsx';
+import { nice_si, nomobi } from '../../../source/functions';
 import { globalRef } from '../../../source/react';
 import { Level, MinterStatus, Minting, MintingRow, Token } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
@@ -6,18 +7,23 @@ import { Tokenizer } from '../../../source/token';
 import React, { useEffect, useState } from 'react';
 
 type Props = {
-    level: Level; rows: Minting['rows'];
-    onMint?: (level: Level) => void;
-    onForget?: (level: Level) => void;
+    level: Level;
+    rows: Minting['rows'];
+    onForget?: (
+        level: Level) => void;
+    onIgnore?: (
+        level: Level, flag: boolean) => void;
+    onMint?: (
+        level: Level) => void;
 }
 export function UiMinting(
-    { rows, onMint, onForget }: Props
+    { rows, onForget, onIgnore, onMint }: Props
 ) {
     const [focus, setFocus] = useState<Record<Level, boolean>>({});
     const status = Object.values(rows).map(({ status }) => status);
     useEffect(/*re-focus*/() => {
         const any_focused = Object.entries(focus).filter(
-            ([level, focused]) => focused // eslint-disable-line
+            ([_level, focused]) => focused
         );
         if (any_focused.length) {
             const $button = globalRef<HTMLElement>(
@@ -33,13 +39,13 @@ export function UiMinting(
             Mined Amounts Mintable
         </div>
         {Object.values(rows).map((row, i) => $mint(
-            { level: i + 1, row, onMint, onForget },
+            { level: i + 1, row, onForget, onIgnore, onMint },
             (level, flag) => setFocus({ [level]: flag })
         )).filter((row) => row)}
     </React.Fragment>;
 }
 function $mint(
-    { level, row, onMint, onForget }: Omit<Props, 'rows'> & {
+    { level, row, onForget, onIgnore, onMint }: Omit<Props, 'rows'> & {
         row: MintingRow
     },
     onFocus: (level: Level, flag: boolean) => void
@@ -52,6 +58,7 @@ function $mint(
             role='group'
             style={{ display: row.display ? 'block' : 'none' }}
         >
+            {$ignore({ level, row, onIgnore })}
             {$minter({ level, row, onMint }, onFocus)}
             {$nn_counter({ level, row })}
             {$tx_counter({ level, row })}
@@ -60,13 +67,36 @@ function $mint(
     }
     return null;
 }
+function $ignore(
+    { level, row, onIgnore }: Omit<Props, 'rows'> & {
+        row: MintingRow
+    }
+) {
+    const title = !row.ignored
+        ? `These mined tokens will be queued for minting them`
+        : `These mined tokens won't be queued for minting them`;
+    return <span
+        className='d-inline-block' title={nomobi(title)}
+        data-bs-toggle='tooltip' data-bs-placement='top'
+    >
+        <button
+            onClick={() => {
+                if (onIgnore) onIgnore(level, !row.ignored);
+            }}
+            className='btn btn-outline-warning ignore'
+            type='button'
+        >
+            <CheckCircle fill={!row.ignored} />
+        </button>
+    </span>;
+}
 function $minter(
     { level, row, onMint }: Omit<Props, 'rows'> & {
         row: MintingRow
     },
     onFocus: (level: Level, flag: boolean) => void
 ) {
-    const amount = nice(Tokenizer.amount(level));
+    const amount = nice_si(Tokenizer.amount(level));
     const minting = row.status === MinterStatus.minting;
     const $token = <span className='d-none d-sm-inline'>
         {Token.XPOW}
@@ -76,7 +106,7 @@ function $minter(
         : <span className="text">Mint {amount} {$token}</span>;
     return <button
         className='btn btn-outline-warning minter'
-        disabled={row.disabled || minting}
+        disabled={row.disabled || row.ignored || minting}
         onClick={() => { if (onMint) onMint(level); }}
         onBlur={() => onFocus(level, false)}
         onFocus={() => onFocus(level, true)}
@@ -123,7 +153,7 @@ function $forget(
         row: MintingRow
     }
 ) {
-    const title = 'Forget the tokens mined so far (without minting them)';
+    const title = 'Forget these mined tokens without minting them';
     return <span
         className='d-inline-block' title={nomobi(title)}
         data-bs-toggle='tooltip' data-bs-placement='top'

@@ -17,9 +17,10 @@ type Props = {
         onSpeed?: (by: number) => void;
     };
     minting: {
-        rows: Minting['rows'];
-        onMint?: (level: Level) => void;
         onForget?: (level: Level) => void;
+        onIgnore?: (level: Level, flag: boolean) => void;
+        onMint?: (level: Level) => void;
+        rows: Minting['rows'];
     };
     speed: number;
 }
@@ -40,8 +41,9 @@ export function UiHome(
         </div>
         <div id='minting'>
             <UiMinting
-                onForget={props.minting.onForget}
                 onMint={props.minting.onMint}
+                onForget={props.minting.onForget}
+                onIgnore={props.minting.onIgnore}
                 level={ROParams.level.min} rows={rows}
             />
         </div>

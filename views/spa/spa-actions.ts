@@ -1,6 +1,6 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import { removeNonce, removeNonceByAmount, setAftWalletBurner, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter, setRatesUiRefresher, switchToken } from '../../source/redux/actions';
-import { mintingRowBy, nftTotalBy, nftsBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
+import { mintingRowBy, mintingRowsBy, nftTotalBy, nftsBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
 import { AppThunk } from '../../source/redux/store';
 import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftBurnerStatus, NftFullId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, NftSenderStatus, NftUpgraderStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, RefresherStatus, Token } from '../../source/redux/types';
 
@@ -140,6 +140,42 @@ export const mintingForget = AppThunk('minting/forget', (args: {
     });
     for (const { item } of result) {
         api.dispatch(removeNonceByAmount(item));
+    }
+});
+export const mintingIgnore = AppThunk('minting/ignore', (args: {
+    level: Level, flag: boolean
+}, api) => {
+    const { level, flag } = args;
+    api.dispatch(setMintingRow({
+        level, row: { ignored: flag }
+    }));
+    const rows = () => mintingRowsBy(api.getState(), {
+        display: true
+    });
+    if (flag && level < ROParams.level.max) {
+        // show and consider next level
+        api.dispatch(setMintingRow({
+            level: level + 1, row: { display: true, ignored: false }
+        }));
+        // show but ignore smaller levels
+        rows().filter(([l]) => l < level).forEach(([l]) => {
+            api.dispatch(setMintingRow({
+                level: l, row: { display: true, ignored: true }
+            }));
+        });
+    } else {
+        // hide but consider greater levels
+        rows().filter(([l]) => l > level).forEach(([l]) => {
+            api.dispatch(setMintingRow({
+                level: l, row: { display: false, ignored: false }
+            }))
+        });
+    }
+    // sync with location URL (directly)
+    if (flag) {
+        RWParams.level = { mint: level + 1 };
+    } else {
+        RWParams.level = { mint: level };
     }
 });
 /**

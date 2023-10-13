@@ -4,6 +4,7 @@ export type MintingRow = {
     status: MinterStatus | null;
     disabled: boolean;
     display: boolean;
+    ignored: boolean;
     nn_counter: number;
     tx_counter: number;
 };

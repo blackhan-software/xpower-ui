@@ -1,5 +1,12 @@
 div#minting {
   div.btn-group.mint {
+    button.ignore {
+      svg {
+        position: relative;
+        top: -1px;
+      }
+      border-radius: 3px 0 0 3px;
+    }
     button.minter {
       border-right: 1px solid;
     }
@@ -24,6 +31,9 @@ div#minting {
     display: none;
   }
   div.btn-group.mint {
+    button.ignore {
+      width: 42.5px;
+    }
     button.minter {
       span.spinner {
         margin-top: 0.25em;
@@ -32,15 +42,15 @@ div#minting {
         height: 1em;
         width: 1em;
       }
-      width: calc(100% - 150px);
+      width: calc(100% - 188.5px);
     }
     button.nn-counter {
       cursor: default;
-      width: 53.75px;
+      width: 52.25px;
     }
     button.tx-counter {
       cursor: default;
-      width: 53.75px;
+      width: 52.25px;
     }
     button.forget {
       width: 42.5px;

@@ -48,6 +48,7 @@ const empty = (
     status: null,
     disabled: true,
     display: false,
+    ignored: false,
     nn_counter: 0,
     tx_counter: 0,
     ...row
