@@ -5,22 +5,39 @@ import { Tokenizer } from '../../source/token';
 import { Request } from 'express';
 import { env_of } from './env-of';
 
-export const env_of_home = (req: Request): Record<string, any> => ({
-    ...env_of(req), ...level_amounts(req), ...mining_speed(req)
-});
+export const env_of_home = (req: Request): Record<string, any> => {
+    const params = new URLSearchParams(req.query as any);
+    return {
+        ...env_of(req),
+        ...level_amounts(params),
+        ...level_range(params),
+        ...mining_speed(params),
+    }
+};
 const level_amounts = (
-    _req: Request
+    _params: URLSearchParams
 ) => {
-    return Object.fromEntries(Array.from(range(1, 65)).map((level) => {
-        return [`AMOUNT_${level}`, nice_si(Tokenizer.amount(level))];
-    }));
+    return Object.fromEntries(Array.from(range(1, 65)).map((level) => [
+        `AMOUNT_${level}`, nice_si(Tokenizer.amount(level))
+    ]));
+};
+const level_range = (
+    params: URLSearchParams
+) => {
+    const lhs = Parser.number(params.get('min-level'), 6);
+    const rhs = Parser.number(params.get('mint-level'), lhs);
+    return {
+        LHS_LEVEL: (0 + lhs).toString(),
+        LHX_LEVEL: (1 + lhs).toString(),
+        RHS_LEVEL: (0 + rhs).toString(),
+        RHX_LEVEL: (1 + rhs).toString(),
+    };
 };
 const mining_speed = (
-    req: Request
+    params: URLSearchParams
 ) => {
     const { UI_MINING_SPEED } = process.env;
     const fallback = Parser.number(UI_MINING_SPEED, 50);
-    const params = new URLSearchParams(req.query as any);
     const speed = Parser.number(params.get('speed'), fallback);
     return { UI_MINING_SPEED: speed };
 };

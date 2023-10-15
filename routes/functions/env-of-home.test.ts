@@ -106,6 +106,11 @@ describe('env_of_home', () => {
                 AMOUNT_63: "9.223E",
                 AMOUNT_64: "18.447E",
             }, ...{
+                LHS_LEVEL: "6",
+                LHX_LEVEL: "7",
+                RHS_LEVEL: "6",
+                RHX_LEVEL: "7",
+            }, ...{
                 UI_MINING_SPEED: 50,
             }, ...{
                 NFT_UNIT_DISPLAY: 'none',
