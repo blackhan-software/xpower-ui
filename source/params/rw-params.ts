@@ -1,8 +1,28 @@
-import { NftLevel, Page, Pager, Token } from '../redux/types';
+import { Level, NftLevel, Page, Pager, Token } from '../redux/types';
 import { Version } from '../types';
 import * as parsers from './parsers';
+import { ROParams } from './ro-params';
 
 export class RWParams {
+    static get level() {
+        return parsers.level(this.search());
+    }
+    static set level({ mint }: {
+        mint?: Level
+    }) {
+        const search = this.search();
+        if (mint !== undefined) {
+            const { mint: old } = this.level;
+            if (mint !== old) {
+                if (mint !== ROParams.level.min) {
+                    search.set('mint-level', mint.toString());
+                } else {
+                    search.delete('mint-level');
+                }
+            }
+        }
+        this.push({ search });
+    }
     public static get nftLevels() {
         return parsers.nftLevels(this.search());
     }
@@ -40,7 +60,11 @@ export class RWParams {
         const search = this.search();
         if (value !== 0.5 || search.get('speed') !== null) {
             value = Math.min(100, Math.max(0, 100 * value));
-            search.set('speed', value.toFixed(1));
+            if (value !== 50) {
+                search.set('speed', value.toFixed(1));
+            } else {
+                search.delete('speed');
+            }
         }
         this.push({ search });
     }

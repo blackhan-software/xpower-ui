@@ -38,15 +38,20 @@ export function debug(
 export function level(
     params: URLSearchParams
 ): {
-    min: Level, max: Level
+    max: Level, min: Level, mint: Level
 } {
-    const min = Parser.number(
-        params.get('min-level') ?? params.get('mint-level'), 6
-    );
     const max = Parser.number(
         params.get('max-level'), 64
     );
-    return { min, max };
+    const min = Parser.number(
+        params.get('min-level'), 6
+    );
+    const mint = Parser.number(
+        params.get('mint-level'), min
+    );
+    return {
+        max, min, mint: Math.min(Math.max(mint, min), max)
+    };
 }
 export function nftLevel(
     params: URLSearchParams

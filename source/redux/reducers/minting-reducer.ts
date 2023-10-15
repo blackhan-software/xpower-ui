@@ -34,11 +34,13 @@ const set = (
     return { ...rows, [level]: { ...rows[level], ...new_row } };
 };
 const init = (
+    mint_level: Level = ROParams.level.mint,
     min_level: Level = ROParams.level.min
 ): Minting['rows'] => {
     return Object.fromEntries(
         Array.from(range(1, 65)).map((l) => [l, empty({
-            display: l === min_level
+            display: l >= min_level && l <= mint_level,
+            ignored: l < mint_level
         })])
     );
 };

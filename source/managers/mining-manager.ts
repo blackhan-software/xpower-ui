@@ -87,14 +87,14 @@ export function MiningManager(
             account: Account, block_hash: BlockHash
         ) {
             miner.emit('initialized', { block_hash });
-            const { min, max } = range();
+            const { mint, max } = range();
             if (miner.running) {
                 await miner.stop();
             }
             miner.start(block_hash, ({
                 amount, nonce, worker
             }) => {
-                if (amount >= min && amount <= max) {
+                if (amount >= mint && amount <= max) {
                     api.dispatch(addNonce(nonce, {
                         account,
                         amount,
@@ -107,9 +107,9 @@ export function MiningManager(
     }
     return { miner: my_miner, toggle: my_toggle };
 }
-function range(): { min: Amount, max: Amount } {
-    const min = Tokenizer.amount(ROParams.level.min);
+function range(): { mint: Amount, max: Amount } {
+    const mint = Tokenizer.amount(ROParams.level.mint);
     const max = Tokenizer.amount(ROParams.level.max);
-    return { min, max };
+    return { mint, max };
 }
 export default MiningManager;
