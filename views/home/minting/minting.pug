@@ -1,4 +1,10 @@
 div#minting
+  style(type='text/css').
+    div#minting > div.btn-group.mint:nth-of-type(n+{{LHX_LEVEL}}):nth-of-type(-n+{{RHX_LEVEL}}) { display: block; }
+  style(type='text/css').
+    div#minting > div.btn-group.mint:nth-of-type(n+{{LHX_LEVEL}}):nth-of-type(-n+{{RHS_LEVEL}}) svg.bi-check-circle-fill { display: none; }
+  style(type='text/css').
+    div#minting > div.btn-group.mint:nth-of-type(n+{{RHX_LEVEL}}) svg.bi-check-circle { display: none; }
   div.form-label(for="mined-nonces")
     | Mined Amounts Mintable
   - let level = 1
@@ -14,6 +20,7 @@ div#minting
           type="button"
         )
           include ../../../public/images/pug/check-circle-fill.svg.pug
+          include ../../../public/images/pug/check-circle.svg.pug
       button.btn.btn-outline-warning.minter(
         type="button" disabled
       )
