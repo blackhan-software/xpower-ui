@@ -168,7 +168,7 @@ export const mintingIgnore = AppThunk('minting/ignore', (args: {
         rows().filter(([l]) => l > level).forEach(([l]) => {
             api.dispatch(setMintingRow({
                 level: l, row: { display: false, ignored: false }
-            }))
+            }));
         });
     }
     // sync with location URL (directly)
