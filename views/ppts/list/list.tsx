@@ -4,8 +4,10 @@ import './list.scss';
 import { mobile, nice_si } from '../../../source/functions';
 import { pptTotalBy } from '../../../source/redux/selectors';
 import { Amount, Nft, NftIssue, NftLevel, NftLevels, Nfts, PptDetails, Supply } from '../../../source/redux/types';
+import { Years } from '../../../source/years';
 
 import React, { useMemo } from 'react';
+import { ExclamationTriange } from '../../../public/images/tsx';
 import { UiPptDetails } from '../details/details';
 import { UiPptAmount } from './amount';
 
@@ -71,9 +73,16 @@ function $pptMinter(
     { display, toggled, amount, max, min }: PptList[NftLevel]
 ) {
     const { ppts } = props;
-    const total_by = useMemo(() => pptTotalBy({ ppts }, {
+    const by_level = useMemo(() => pptTotalBy({ ppts }, {
         level: ppt_level
     }), [
+        ppts, ppt_level
+    ]);
+    const by_issues = useMemo(() => Array.from(Years()).map(
+        (ppt_issue) => pptTotalBy({ ppts }, {
+            level: ppt_level, issue: ppt_issue
+        })
+    ), [
         ppts, ppt_level
     ]);
     if (display) {
@@ -89,7 +98,7 @@ function $pptMinter(
                 }
             })}
             {$minter(ppt_level)}
-            {$balance(ppt_level, total_by)}
+            {$balance(ppt_level, by_level, by_issues)}
             <UiPptAmount
                 amount={amount}
                 level={ppt_level}
@@ -182,24 +191,39 @@ function $minter(
     </button>;
 }
 function $balance(
-    ppt_level: NftLevel, total_by: { amount: Amount, supply: Supply }
+    ppt_level: NftLevel,
+    by_level: { amount: Amount, supply: Supply },
+    by_issues: Array<{ amount: Amount, supply: Supply }>
 ) {
+    const $warning = $upgradeable(by_issues);
     const title = mobile()
-        ? `Overall personal balance`
-        : `Overall personal balance & supply of staked ${Nft.nameOf(ppt_level)}`;
+        ? `Overall personal balance` + ($warning ? ' (with ugradeable NFTs)' : '')
+        : `Overall personal balance & supply of staked ${Nft.nameOf(ppt_level)}s`;
     return <button type='button' title={title}
         className='btn btn-outline-warning balance'
         data-bs-placement='top' data-bs-toggle='tooltip'
     >
-        <span>{
-            nice_si(total_by.amount)
-        }</span>
-        <span className='d-none d-sm-inline'>
-            &nbsp;/&nbsp;
-        </span>
-        <span className='d-none d-sm-inline'>{
-            nice_si(total_by.supply)
-        }</span>
+        {$warning}
+        <span>{nice_si(by_level.amount)}</span>
+        <span className='d-none d-sm-inline'>&nbsp;/&nbsp;</span>
+        <span className='d-none d-sm-inline'>{nice_si(by_level.supply)}</span>
     </button>;
+}
+function $upgradeable(
+    by_issues: Array<{ amount: Amount, supply: Supply }>
+) {
+    const upgradeable = by_issues.some(
+        ({ amount }) => amount >= 1000n
+    );
+    if (upgradeable) return mobile()
+        ? <span className='ugradeable-ppts'>
+            <ExclamationTriange fill={true} />
+        </span>
+        : <span
+            className='ugradeable-ppts' title='Ugradeable NFTs'
+            data-bs-placement='left' data-bs-toggle='tooltip'
+        >
+            <ExclamationTriange fill={true} />
+        </span>;
 }
 export default UiPptList;

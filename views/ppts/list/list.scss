@@ -39,24 +39,20 @@ div#ppt-single-minting {
       }
     }
     .minter {
+      padding-left: 0;
+      padding-right: 0;
       width: calc(25% - 42.5px);
     }
     .balance {
+      .ugradeable-ppts {
+        position: relative;
+        float: left;
+        top: -1px;
+      }
       width: calc(25% + 3px);
     }
     .amount {
       width: calc(50% - 83px);
-    }
-    @media (max-width: 575px) {
-      .minter {
-        width: calc(32% - 42.5px);
-      }
-      .balance {
-        width: calc(18% + 3px);
-      }
-      .amount {
-        width: calc(50% - 83px);
-      }
     }
     .minter, .balance, .amount {
       font-size: smaller;
