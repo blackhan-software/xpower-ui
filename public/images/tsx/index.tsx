@@ -11,6 +11,7 @@ export * from './emoji-angry-fill';
 export * from './emoji-dizzy-fill';
 export * from './emoji-neutral-fill';
 export * from './emoji-sunglasses-fill';
+export * from './exclamation-triangle-fill';
 export * from './fire';
 export * from './info-circle-fill';
 export * from './plus-circle-fill';
