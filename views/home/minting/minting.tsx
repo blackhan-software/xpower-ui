@@ -73,8 +73,8 @@ function $ignore(
     }
 ) {
     const title = !row.ignored
-        ? `These mined tokens will be queued for minting them`
-        : `These mined tokens won't be queued for minting them`;
+        ? `These mined tokens will be queued for minting`
+        : `These mined tokens won't be queued for minting`;
     return <span
         className='d-inline-block' title={nomobi(title)}
         data-bs-toggle='tooltip' data-bs-placement='top'
@@ -98,12 +98,15 @@ function $minter(
 ) {
     const amount = nice_si(Tokenizer.amount(level));
     const minting = row.status === MinterStatus.minting;
+    const $amount = minting
+        ? <span className='d-none d-sm-inline'>&nbsp;{amount}</span>
+        : <span>&nbsp;{amount}</span>;
     const $token = <span className='d-none d-sm-inline'>
-        {Token.XPOW}
+        &nbsp;{Token.XPOW}
     </span>;
     const text = minting
-        ? <span className="text">Minting {amount} {$token}…</span>
-        : <span className="text">Mint {amount} {$token}</span>;
+        ? <span className="text">Minting{$amount}{$token}…</span>
+        : <span className="text">Mint{$amount}{$token}</span>;
     return <button
         className='btn btn-outline-warning minter'
         disabled={row.disabled || row.ignored || minting}
@@ -153,7 +156,7 @@ function $forget(
         row: MintingRow
     }
 ) {
-    const title = 'Forget these mined tokens without minting them';
+    const title = 'Forget these mined tokens without minting';
     return <span
         className='d-inline-block' title={nomobi(title)}
         data-bs-toggle='tooltip' data-bs-placement='top'

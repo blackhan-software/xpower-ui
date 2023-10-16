@@ -7,16 +7,19 @@ div#minting {
       }
       border-radius: 3px 0 0 3px;
     }
-    button.minter {
+    button.minter,
+    button.nn-counter,
+    button.tx-counter {
       border-right: 1px solid;
     }
-    button.nn-counter {
-      border-radius: 0;
-      border-right: 1px solid;
+    button.minter:focus,
+    button.nn-counter:focus,
+    button.tx-counter:focus {
+      border-right-color: transparent;
     }
+    button.nn-counter,
     button.tx-counter {
       border-radius: 0;
-      border-right: 1px solid;
     }
     button.forget {
       border-radius: 0 3px 3px 0;
