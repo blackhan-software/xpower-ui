@@ -139,7 +139,7 @@ function $info() {
     return <button type='button'
         className='btn btn-outline-warning info'
         data-bs-toggle='tooltip' data-bs-placement='top'
-        title={`Toggle mining for the ${Token.XPOW} tokens`}
+        title={`Start mining for ${Token.XPOW}s`}
     >
         <InfoCircle fill={true} />
     </button>;
