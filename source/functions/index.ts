@@ -8,6 +8,7 @@ export * from './dom-query';
 export * from './ellipse';
 export * from './ensure';
 export * from './error';
+export * from './in-enum';
 export * from './logical-cpus';
 export * from './memoized';
 export * from './message';
