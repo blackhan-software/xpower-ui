@@ -1,9 +1,21 @@
 import { Level, NftLevel, Page, Pager, Token } from '../redux/types';
-import { Version } from '../types';
+import { DEX, Version } from '../types';
 import * as parsers from './parsers';
 import { ROParams } from './ro-params';
 
 export class RWParams {
+    static get dex() {
+        return parsers.dex(this.search());
+    }
+    static set dex(value: DEX | URL) {
+        const search = this.search();
+        if (value !== DEX.paraswap) {
+            search.set('dex', value.toString());
+        } else {
+            search.delete('dex');
+        }
+        this.push({ search });
+    }
     static get level() {
         return parsers.level(this.search());
     }

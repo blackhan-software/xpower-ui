@@ -3,6 +3,7 @@ export enum Page {
     Home = 'home',
     Nfts = 'nfts',
     Ppts = 'staking',
+    Swap = 'swap',
     About = 'about',
 }
 export function Pages(): Set<Page> {
@@ -27,6 +28,8 @@ export class Pager {
                     return Page.Nfts;
                 case 'staking':
                     return Page.Ppts;
+                case 'swap':
+                    return Page.Swap;
                 case 'about':
                     return Page.About;
             }

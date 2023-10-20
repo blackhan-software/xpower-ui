@@ -25,6 +25,7 @@ export function UiHeader(
             {$anchor(Page.Home, props)}
             {$anchor(Page.Nfts, props)}
             {$anchor(Page.Ppts, props)}
+            {$anchor(Page.Swap, props)}
             {$anchor(Page.About, props)}
         </nav>
     </React.StrictMode>;
@@ -79,6 +80,7 @@ const icons: Record<Page, string> = {
     [Page.Home]: 'bi-lightning-charge-fill',
     [Page.Nfts]: 'bi-image-fill',
     [Page.Ppts]: 'bi-cash-stack',
+    [Page.Swap]: 'bi-currency-exchange',
     [Page.About]: 'bi-lightbulb-fill',
     [Page.None]: '',
 }
@@ -86,6 +88,7 @@ const labels: Record<Page, string> = {
     [Page.Home]: 'XPower',
     [Page.Nfts]: 'NFTs',
     [Page.Ppts]: 'Staking',
+    [Page.Swap]: 'Swap',
     [Page.About]: 'About',
     [Page.None]: '',
 }

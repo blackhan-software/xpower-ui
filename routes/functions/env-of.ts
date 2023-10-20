@@ -1,9 +1,10 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import { Request } from 'express';
 import { color, nftLevels } from '../../source/params/parsers';
-import { Nft, NftLevels, Page, Pager, Token } from '../../source/redux/types';
+import { Nft, NftLevels, Page, Pager } from '../../source/redux/types';
 import { theme } from '../../source/theme';
 import { Tokenizer } from '../../source/token';
+import { DEX } from '../../source/types';
 import { capitalize } from './capitalize';
 
 export const env_of = (req: Request): Record<string, string> => {
@@ -32,11 +33,12 @@ export const env_of = (req: Request): Record<string, string> => {
     }, ...{
       ...theme(color(params)),
       ...header_page(req),
+      ...footer_page(req),
       ...cover_image(req),
       ...otf_wallet(params),
-      ...selector_token(params),
       ...nft_display(params),
       ...nft_chevron(params),
+      ...dex_swap(params),
     }
   };
 };
@@ -49,10 +51,21 @@ const header_page = (
       page === Page.Home ? 'active' : '',
     HEADER_NFTS:
       page === Page.Nfts ? 'active' : '',
-    HEADER_STAKING:
+    HEADER_PPTS:
       page === Page.Ppts ? 'active' : '',
+    HEADER_SWAP:
+      page === Page.Swap ? 'active' : '',
     HEADER_ABOUT:
       page === Page.About ? 'active' : '',
+  };
+};
+const footer_page = (
+  req: Request
+) => {
+  const page = Pager.parse(req.path);
+  return {
+    FOOTER_SWAP:
+      page === Page.Swap ? 'pt-extra' : '',
   };
 };
 const cover_image = (
@@ -78,14 +91,6 @@ const otf_wallet = (
     OTF_WALLET: !toggled ? 'd-none' : ''
   };
 };
-const selector_token = (
-  params: URLSearchParams
-) => {
-  const token = Tokenizer.token(params.get('token'));
-  return {
-    SELECT0R_XPOW: token === Token.XPOW ? 'active' : '',
-  };
-};
 const nft_display = (
   params: URLSearchParams
 ) => {
@@ -103,5 +108,20 @@ const nft_chevron = (
   return Object.fromEntries(all_levels.map((l) => [
     `NFT_${Nft.nameOf(l)}_CHEVRON`, url_levels.includes(l) ? 'up' : 'down'
   ]));
+};
+const dex_swap = (
+  params: URLSearchParams
+) => {
+  const dex = params.get('dex');
+  return {
+    ACTIVE_PARASWAP: dex === DEX.paraswap || !dex
+      ? 'active' : '',
+    ACTIVE_UNISWAP: dex === DEX.uniswap
+      ? 'active' : '',
+    COLOR_PARASWAP: dex === DEX.paraswap || !dex
+      ? 'var(--xp-dark)' : 'var(--xp-powered)',
+    COLOR_UNISWAP: dex === DEX.uniswap
+      ? 'var(--xp-dark)' : 'var(--xp-powered)',
+  };
 };
 export default env_of;

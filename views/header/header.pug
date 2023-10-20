@@ -11,10 +11,15 @@ header
             i.bi-image-fill.float-sm-start
             span.d-none.d-sm-inline.text: | NFTs
         a.btn.btn-outline-warning.flex-sm-fill.text-sm-center.nav-link.staking(
-            class="{{HEADER_STAKING}}" href="/staking?token={{TOKEN}}"
+            class="{{HEADER_PPTS}}" href="/staking?token={{TOKEN}}"
         )
             i.bi-cash-stack.float-sm-start
             span.d-none.d-sm-inline.text: | Staking
+        a.btn.btn-outline-warning.flex-sm-fill.text-sm-center.nav-link.swap(
+            class="{{HEADER_SWAP}}" href="/swao?token={{TOKEN}}"
+        )
+            i.bi-currency-exchange.float-sm-start
+            span.d-none.d-sm-inline.text: | Swap
         a.btn.btn-outline-warning.flex-sm-fill.text-sm-center.nav-link.about(
             class="{{HEADER_ABOUT}}" href="/about?token={{TOKEN}}"
         )

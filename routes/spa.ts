@@ -34,6 +34,13 @@ function routes(
       TITLE: 'XPower: Staking', ...env_of(req), ...spa_env
     });
   });
+  /** GET swap page. */
+  router.get('/swap', (req, res) => {
+    res.render('swap/swap.pig', {
+      DESCRIPTION: 'Swap XPOW & APOW Tokens on Avalanche',
+      TITLE: 'XPower: Swap', ...env_of(req), ...spa_env
+    });
+  });
   /** GET about page. */
   router.get('/about', (req, res) => {
     res.render('about/about.pig', {

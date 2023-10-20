@@ -24,6 +24,7 @@ export const LocationService = (
             [Page.Home]: 'XPower',
             [Page.Nfts]: 'XPower: NFTs',
             [Page.Ppts]: 'XPower: Staking',
+            [Page.Swap]: 'XPower: Swap',
             [Page.About]: 'XPower: About',
         };
         const title = document.title = titles[page];
@@ -38,6 +39,7 @@ export const LocationService = (
             [Page.Home]: 'Mine & Mint Proof-of-Work Tokens on Avalanche',
             [Page.Nfts]: 'Mint stakeable XPower NFTs on Avalanche',
             [Page.Ppts]: 'Stake minted XPower NFTs on Avalanche',
+            [Page.Swap]: 'Swap XPOW & APOW Tokens on Avalanche',
             [Page.About]: 'Mine & Mint Proof-of-Work Tokens on Avalanche',
         };
         if ($meta) {

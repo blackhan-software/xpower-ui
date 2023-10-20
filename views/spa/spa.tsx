@@ -19,6 +19,7 @@ import { UiCover } from '../cover/cover';
 import { UiHome } from '../home/home';
 import { UiNfts } from '../nfts/nfts';
 import { UiPpts } from '../ppts/ppts';
+import { UiSwap } from '../swap/swap';
 import { UiWallet } from '../wallet/wallet';
 
 import Years from '../../source/years';
@@ -64,6 +65,7 @@ export function SPA(
         {$home(page, mining, minting)}
         {$nfts(page, nfts, nfts_ui)}
         {$ppts(page, ppts, ppts_ui)}
+        {$swap(page)}
         {$about(page)}
     </React.StrictMode>;
 }
@@ -80,14 +82,23 @@ function $h1(
     if (page === Page.Ppts) {
         return <h1>Stake minted XPower NFTs on Avalanche {logo}</h1>;
     }
+    if (page === Page.Swap) {
+        return <h1>Swap XPOW & APOW Tokens on Avalanche {logo}</h1>;
+    }
     return null;
 }
 function $connector(
     page: Page
 ) {
-    return <form id='connector'
-        className={page === Page.About ? 'd-none' : ''}
-        onSubmit={(e) => e.preventDefault()}
+    if (page !== Page.Home &&
+        page !== Page.Nfts &&
+        page !== Page.Ppts &&
+        page !== Page.Swap
+    ) {
+        return null;
+    }
+    return <form
+        id='connector' onSubmit={(e) => e.preventDefault()}
     >
         <UiConnector />
     </form>;
@@ -133,9 +144,15 @@ function $wallet(
 ) {
     const [account] = useContext(AccountContext);
     const dispatch = useDispatch<AppDispatch>();
-    return <form id='wallet'
-        className={page === Page.About ? 'd-none' : ''}
-        onSubmit={(e) => e.preventDefault()}
+    if (page !== Page.Home &&
+        page !== Page.Nfts &&
+        page !== Page.Ppts &&
+        page !== Page.Swap
+    ) {
+        return null;
+    }
+    return <form
+        id='wallet' onSubmit={(e) => e.preventDefault()}
     >
         <UiWallet
             aft={{
@@ -427,6 +444,19 @@ function $ppts(
                 dispatch(setNftsUiFlags({ flags }));
             }}
         />
+    </form>;
+}
+function $swap(
+    page: Page
+) {
+    const classes = page !== Page.Swap
+        ? 'flex-grow-1 mb-3 d-none'
+        : 'flex-grow-1 mb-3';
+    return <form
+        id='swap' className={classes}
+        onSubmit={(e) => e.preventDefault()}
+    >
+        <UiSwap page={page} />
     </form>;
 }
 function $about(

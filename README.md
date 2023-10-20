@@ -61,6 +61,7 @@ Name | Type | Default | Description
 auto-mint | number | 3000 | auto-mint interval in milliseconds
 clear | boolean | false | flag to clear current persistence slot (as defined by persist flag)
 clear-all | boolean | false | flag to clear all persistence slots
+dex | string | paraswap | DEX: paraswap, uniswap or a URL (template: `{address}`)
 logger | boolean | false | flag to log nonces to console
 min[t]-level | number | 6 | threshold of nonces with lower corresponding amounts to be ignored
 max-level | number | 64 | threshold of nonces with higher corresponding amounts to be ignored

@@ -126,6 +126,14 @@ const configuration = ({
             chunks: ['spa']
         }),
         new HTMLWebpackPlugin({
+            templateContent: pug.renderFile('./views/swap/swap.pug', {
+                ...env.default, filters, mode
+            }),
+            filename: '../views/swap/swap.pig',
+            minify: false, inject: 'body',
+            chunks: ['spa']
+        }),
+        new HTMLWebpackPlugin({
             templateContent: pug.renderFile('./views/about/about.pug', {
                 ...env.default, filters, mode
             }),

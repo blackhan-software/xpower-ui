@@ -12,12 +12,13 @@ describe('env_of_home', () => {
                 HEADER_ABOUT: '',
                 HEADER_HOME: '',
                 HEADER_NFTS: '',
-                HEADER_STAKING: '',
+                HEADER_PPTS: '',
+                HEADER_SWAP: '',
+            }, ...{
+                FOOTER_SWAP: '',
             }, ...{
                 OTF_WALLET: 'd-none',
                 OTF_WALLET_TOGGLE: 'bi-wallet',
-            }, ...{
-                SELECT0R_XPOW: 'active',
             }, ...{
                 POWER: 'XPOWER',
                 power: 'xpower',
@@ -132,6 +133,11 @@ describe('env_of_home', () => {
                 NFT_EXA_CHEVRON: 'down',
                 NFT_ZETTA_CHEVRON: 'down',
                 NFT_YOTTA_CHEVRON: 'down',
+            }, ...{
+                ACTIVE_PARASWAP: 'active',
+                ACTIVE_UNISWAP: '',
+                COLOR_PARASWAP: 'var(--xp-dark)',
+                COLOR_UNISWAP: 'var(--xp-powered)',
             },
         });
     });
