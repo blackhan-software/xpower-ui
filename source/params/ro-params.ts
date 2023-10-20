@@ -17,6 +17,9 @@ export class ROParams {
     public static get debug() {
         return parsers.debug(this._search);
     }
+    public static get dex() {
+        return parsers.dex(this._search);
+    }
     public static get level() {
         return parsers.level(this._search);
     }

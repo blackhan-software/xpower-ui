@@ -1,3 +1,4 @@
+export * from './dex';
 export * from './global';
-export * from './version';
 export * from './tx-event';
+export * from './version';

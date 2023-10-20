@@ -1,8 +1,9 @@
+import { inEnum } from '../functions';
 import { Parser } from '../parser';
 import { Level, NftLevel, NftLevels, Page, Token } from '../redux/types';
 import { ThemeColor, ThemeColors } from '../theme';
 import { Tokenizer } from '../token';
-import { Version, Versions } from '../types';
+import { DEX, Version, Versions } from '../types';
 import { RWParams } from './rw-params';
 
 export function autoMint(
@@ -34,6 +35,15 @@ export function debug(
 ): number {
     const flag = Parser.boolean(params.get('debug'), false);
     return Parser.number(params.get('debug'), flag ? 1 : 0);
+}
+export function dex(
+    params: URLSearchParams, fallback = DEX.paraswap
+): DEX | URL {
+    const key = params.get('dex');
+    if (typeof key === 'string') {
+        return inEnum(DEX, key) ? DEX[key] : new URL(key);
+    }
+    return fallback;
 }
 export function level(
     params: URLSearchParams
