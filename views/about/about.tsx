@@ -212,8 +212,9 @@ function Spinner(
     props: { show: boolean, grow?: boolean }
 ) {
     const classes = [
-        'spinner spinner-border spinner-border-sm', 'float-start',
-        !props.show ? 'd-none' : '', props.grow ? 'spinner-grow' : ''
+        'spinner spinner-border spinner-border-sm',
+        props.grow ? 'spinner-grow' : '',
+        !props.show ? 'd-none' : '',
     ];
     return <span
         className={classes.join(' ')} role='status'
