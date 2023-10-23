@@ -15,8 +15,8 @@ import { Observable } from 'observable-fns';
 import { WorkerFunction, WorkerModule } from 'threads/dist/types/worker';
 import { expose } from 'threads/worker';
 
-import { createKeccak } from 'hash-wasm';
-let keccak: (array: Uint8Array) => Uint8Array;
+import { KeccakHasher, IHasher } from 'wasm-miner';
+let keccak_reduce: IHasher['reduce']; // miner
 let worker: Worker | undefined;
 let worker_id = 0;
 
@@ -66,8 +66,8 @@ expose({
         if (worker !== undefined) {
             throw new Error(`worker already initialized`);
         } else {
-            const keccak_hasher = await createKeccak(256);
-            keccak = (a) => keccak_hasher.init().update(a).digest('binary');
+            const keccak_hasher = await KeccakHasher();
+            keccak_reduce = keccak_hasher.reduce;
         }
         worker = new Worker({
             account,
@@ -132,15 +132,15 @@ class Worker {
         version: Version,
         versionFaked: boolean,
     }) {
-        this._amount = amount(level);
         this._context = {
             account,
             block_hash: 0n,
             contract: normalize(contract),
             interval: interval(),
         };
-        this._miner = miner(version, versionFaked);
+        this._level = level;
         this._nonce = nonce(meta.id, meta.idLength);
+        this._encoder = abi_encoder(version, versionFaked);
     }
     public start(
         block_hash: BlockHash,
@@ -177,20 +177,37 @@ class Worker {
         this.context.interval = interval();
         this.context.block_hash = block_hash;
     }
-    private loop(callback: (item: Item) => void) {
-        let khz = 100, dt = 1, dt_outer = 1, dt_inner = 0;
+    private loop(
+        callback: (item: Item) => void,
+        frequency = 1e5, // loop.length
+        period_ms = 1e2, // interval.ms
+    ) {
+        const abi_bytes = this.encoder(
+            new Uint8Array(8), this.context
+        );
+        let min_nonce = this.nonce;
+        let hertz = frequency, dt = 0;
+        let dt_outer = 1, dt_inner = 0;
         const iid = setInterval(() => {
             dt_outer = performance.now() - dt_outer;
             if (this.running) {
                 dt_inner = performance.now();
-                const i_max = Math.ceil(khz);
-                for (let i = 0; i < i_max; i++) {
-                    const item = this.work();
-                    if (item.amount > 0n) {
-                        const view = new DataView(item.nonce.buffer, 0);
-                        const nonce = hex_bytes(view.getBigUint64(0));
-                        callback({ ...item, nonce });
-                    }
+                {
+                    const dlt_nonce = BigInt(Math.ceil(hertz));
+                    const max_nonce = min_nonce + dlt_nonce;
+                    keccak_reduce(abi_bytes, {
+                        callback: (
+                            nonce: bigint, zeros: number
+                        ) => {
+                            callback({
+                                amount: amount_of(zeros),
+                                nonce: hex_bytes(nonce)
+                            });
+                        },
+                        range: [min_nonce, max_nonce],
+                        zeros: this.level
+                    });
+                    min_nonce = max_nonce;
                 }
                 dt_inner = performance.now() - dt_inner;
             } else {
@@ -198,21 +215,14 @@ class Worker {
             }
             dt = 100 * dt_outer - dt_inner;
             if (Math.abs(dt) > 10) {
-                khz += 100 / dt;
+                hertz += 100 / dt;
             }
             dt_outer = performance.now();
-        });
+        }, period_ms);
         return iid;
     }
-    private work() {
-        const nonce = this.next_nonce;
-        const amount = this.amount(
-            this.miner(nonce, this.context)
-        );
-        return { amount, nonce };
-    }
-    private get amount() {
-        return this._amount;
+    private get encoder() {
+        return this._encoder;
     }
     private get context() {
         return this._context;
@@ -223,11 +233,11 @@ class Worker {
     private set iid(value: NodeJS.Timeout | undefined) {
         this._iid = value;
     }
-    private get miner() {
-        return this._miner;
+    private get level() {
+        return this._level;
     }
-    private get next_nonce() {
-        return increment(this._nonce);
+    private get nonce() {
+        return number_of(this._nonce);
     }
     private get running() {
         return this._running;
@@ -235,12 +245,19 @@ class Worker {
     private set running(value: boolean) {
         this._running = value;
     }
-    private _amount: (hash: Uint8Array) => Amount;
+    private _encoder: (n: Uint8Array, c: Context) => Uint8Array;
     private _context: Context;
     private _iid?: NodeJS.Timeout;
-    private _miner: Miner;
+    private _level: Level;
     private _nonce: Uint8Array;
     private _running = false;
+}
+function amount_of(level: Level) {
+    return 2n ** BigInt(level) - 1n;
+}
+function number_of(array: Uint8Array) {
+    const view = new DataView(array.buffer, 0);
+    return view.getBigUint64(0);
 }
 function normalize(
     address: Address
@@ -262,47 +279,6 @@ function nonce(
     // strong uniformity with min. gap-sizes
     bytes[length - 1] = basis + delta;
     return bytes;
-}
-function increment(
-    nonce: Uint8Array, index = 0
-): Uint8Array {
-    if (nonce[index]++) {
-        return nonce;
-    }
-    return increment(
-        nonce, (index + 1) % nonce.length
-    );
-}
-function amount(
-    level: Level
-) {
-    return (hash: Uint8Array) => {
-        const lhs_zeros = zeros(hash);
-        if (lhs_zeros >= level) {
-            return 2n ** BigInt(lhs_zeros) - 1n;
-        }
-        return 0n;
-    };
-}
-function zeros(
-    hash: Uint8Array, counter = 0
-) {
-    while (hash[counter] === 0) {
-        counter++;
-    }
-    if (hash[counter] < 16) {
-        return 2 * counter + 1;
-    } else {
-        return 2 * counter;
-    }
-}
-function miner(
-    version: Version, version_faked: boolean
-) {
-    const abi_encode = abi_encoder(version, version_faked);
-    return (nonce: Uint8Array, context: Context) => keccak(
-        abi_encode(nonce, context)
-    );
 }
 function abi_encoder(
     version: Version, versionFaked: boolean
@@ -507,5 +483,4 @@ function arrayify(
     }
     return new Uint8Array(list);
 }
-// cache: (interval: number) => abi.encode(token, nonce, ...)
 const abi_encoded = {} as Record<Interval, Uint8Array>;

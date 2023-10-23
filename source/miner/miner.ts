@@ -138,7 +138,7 @@ export class Miner extends EventEmitter {
             if (head_pro.ok) {
                 const worker = new Worker(path_pro, {
                     workerData: {
-                        'hash-wasm': require('hash-wasm'),
+                        'wasm-miner': require('wasm-miner'),
                         'ethers': require('ethers'),
                         'react': require('react'),
                     }
@@ -147,7 +147,7 @@ export class Miner extends EventEmitter {
             } else {
                 const worker = new Worker(path_dev, {
                     workerData: {
-                        'hash-wasm': require('hash-wasm'),
+                        'wasm-miner': require('wasm-miner'),
                         'ethers': require('ethers'),
                         'react': require('react'),
                     }
