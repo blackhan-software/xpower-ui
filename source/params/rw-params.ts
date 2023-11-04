@@ -1,9 +1,22 @@
-import { Level, NftLevel, Page, Pager, Token } from '../redux/types';
+import { x40 } from '../functions';
+import { Account, Level, NftLevel, Page, Pager, Token } from '../redux/types';
 import { DEX, Version } from '../types';
 import * as parsers from './parsers';
 import { ROParams } from './ro-params';
 
 export class RWParams {
+    static get account() {
+        return parsers.account(this.search());
+    }
+    static set account(value: Account | null) {
+        const search = this.search();
+        if (value !== null) {
+            search.set('account', x40(value));
+        } else {
+            search.delete('account');
+        }
+        this.push({ search });
+    }
     static get dex() {
         return parsers.dex(this.search());
     }

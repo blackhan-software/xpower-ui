@@ -1,6 +1,8 @@
 import { Contract, ContractRunner, InterfaceAbi } from 'ethers';
 import { MMProvider } from '../blockchain';
 import { Address } from '../redux/types';
+import { RWParams } from '../params';
+import { x40 } from '../functions';
 
 export class Base {
     public constructor(
@@ -21,7 +23,9 @@ export class Base {
         if (!runner) {
             if (this._connected === undefined) {
                 const provider = await MMProvider();
-                const signer = await provider?.getSigner();
+                const signer = RWParams.account
+                    ? await provider?.getSigner(x40(RWParams.account))
+                    : await provider?.getSigner(); //default account
                 this._connected = this.contract(signer);
             }
             return this._connected;

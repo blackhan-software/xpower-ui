@@ -1,11 +1,28 @@
 import { inEnum } from '../functions';
 import { Parser } from '../parser';
-import { Level, NftLevel, NftLevels, Page, Token } from '../redux/types';
+import { Account, Level, NftLevel, NftLevels, Page, Token } from '../redux/types';
 import { ThemeColor, ThemeColors } from '../theme';
 import { Tokenizer } from '../token';
 import { DEX, Version, Versions } from '../types';
 import { RWParams } from './rw-params';
 
+export function account(
+    params: URLSearchParams, fallback = null
+): Account | null {
+
+    const value = params.get('account');
+    if (typeof value === 'string' && value.length === 42) try {
+        return BigInt(value);
+    } catch (ex) {
+        return fallback;
+    }
+    if (typeof value === 'string' && value.length === 47) try {
+        return BigInt(value.replace(/^avax:/, ''));
+    } catch (ex) {
+        return fallback;
+    }
+    return fallback;
+}
 export function autoMint(
     params: URLSearchParams
 ): number {
