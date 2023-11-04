@@ -13,7 +13,6 @@ export const LocationService = (
     Blockchain.onceConnect(delayed(async function reloadLocation() {
         const provider = await Blockchain.provider;
         provider?.on('chainChanged', () => location.reload());
-        provider?.on('accountsChanged', () => location.reload());
     }, 600));
     onPageSwitch(store, function syncLocationPath(page) {
         RWParams.page = page;
