@@ -1,11 +1,14 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import { Request } from 'express';
-import { color, nftLevels } from '../../source/params/parsers';
+import { x40 } from '../../source/functions';
+import { account, color, nftLevels } from '../../source/params/parsers';
 import { Nft, NftLevels, Page, Pager } from '../../source/redux/types';
 import { theme } from '../../source/theme';
 import { Tokenizer } from '../../source/token';
 import { DEX } from '../../source/types';
 import { capitalize } from './capitalize';
+
+
 
 export const env_of = (req: Request): Record<string, string> => {
   const params = new URLSearchParams(req.query as any);
@@ -31,15 +34,34 @@ export const env_of = (req: Request): Record<string, string> => {
       atoken: atoken_lc,
       aToken: 'A' + capitalize(atoken_lc.slice(1)),
     }, ...{
-      ...theme(color(params)),
-      ...header_page(req),
-      ...footer_page(req),
       ...cover_image(req),
-      ...otf_wallet(params),
-      ...nft_display(params),
-      ...nft_chevron(params),
+      ...footer_page(req),
+      ...header_page(req),
+    }, ...{
+      ...aft_wallet(params),
       ...dex_swap(params),
+      ...nft_chevron(params),
+      ...nft_display(params),
+      ...otf_wallet(params),
+      ...theme(color(params)),
     }
+  };
+};
+const cover_image = (
+  req: Request
+) => {
+  const page = Pager.parse(req.path);
+  return {
+    COVER_IMAGE: `cover-${page}`,
+  };
+};
+const footer_page = (
+  req: Request
+) => {
+  const page = Pager.parse(req.path);
+  return {
+    FOOTER_SWAP:
+      page === Page.Swap ? 'pt-extra' : '',
   };
 };
 const header_page = (
@@ -59,36 +81,26 @@ const header_page = (
       page === Page.About ? 'active' : '',
   };
 };
-const footer_page = (
-  req: Request
-) => {
-  const page = Pager.parse(req.path);
-  return {
-    FOOTER_SWAP:
-      page === Page.Swap ? 'pt-extra' : '',
-  };
-};
-const cover_image = (
-  req: Request
-) => {
-  const page = Pager.parse(req.path);
-  return {
-    COVER_IMAGE: `cover-${page}`,
-  };
-};
-const otf_wallet = (
+const aft_wallet = (
   params: URLSearchParams
 ) => {
-  const value = params.get('otf-wallet');
-  let toggled = false;
-  try {
-    toggled = JSON.parse(value ?? 'false');
-  } catch (ex) {
-    toggled = false;
-  }
   return {
-    OTF_WALLET_TOGGLE: !toggled ? 'bi-wallet' : 'bi-wallet2',
-    OTF_WALLET: !toggled ? 'd-none' : ''
+    AFT_WALLET_ACCOUNT: x40(account(params) ?? 0n)
+  };
+};
+const dex_swap = (
+  params: URLSearchParams
+) => {
+  const dex = params.get('dex');
+  return {
+    ACTIVE_PARASWAP: dex === DEX.paraswap || !dex
+      ? 'active' : '',
+    ACTIVE_UNISWAP: dex === DEX.uniswap
+      ? 'active' : '',
+    COLOR_PARASWAP: dex === DEX.paraswap || !dex
+      ? 'var(--xp-dark)' : 'var(--xp-powered)',
+    COLOR_UNISWAP: dex === DEX.uniswap
+      ? 'var(--xp-dark)' : 'var(--xp-powered)',
   };
 };
 const nft_display = (
@@ -109,19 +121,19 @@ const nft_chevron = (
     `NFT_${Nft.nameOf(l)}_CHEVRON`, url_levels.includes(l) ? 'up' : 'down'
   ]));
 };
-const dex_swap = (
+const otf_wallet = (
   params: URLSearchParams
 ) => {
-  const dex = params.get('dex');
+  const value = params.get('otf-wallet');
+  let toggled = false;
+  try {
+    toggled = JSON.parse(value ?? 'false');
+  } catch (ex) {
+    toggled = false;
+  }
   return {
-    ACTIVE_PARASWAP: dex === DEX.paraswap || !dex
-      ? 'active' : '',
-    ACTIVE_UNISWAP: dex === DEX.uniswap
-      ? 'active' : '',
-    COLOR_PARASWAP: dex === DEX.paraswap || !dex
-      ? 'var(--xp-dark)' : 'var(--xp-powered)',
-    COLOR_UNISWAP: dex === DEX.uniswap
-      ? 'var(--xp-dark)' : 'var(--xp-powered)',
+    OTF_WALLET_TOGGLE: !toggled ? 'bi-wallet' : 'bi-wallet2',
+    OTF_WALLET: !toggled ? 'd-none' : ''
   };
 };
 export default env_of;

@@ -17,6 +17,7 @@ describe('env_of_home', () => {
             }, ...{
                 FOOTER_SWAP: '',
             }, ...{
+                AFT_WALLET_ACCOUNT: '0x0000000000000000000000000000000000000000',
                 OTF_WALLET: 'd-none',
                 OTF_WALLET_TOGGLE: 'bi-wallet',
             }, ...{
