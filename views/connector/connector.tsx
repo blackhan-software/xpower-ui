@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-explicit-any: [off] */
 import './connector.scss';
 
 import React, { createElement, useEffect, useState } from 'react';
@@ -48,6 +49,11 @@ export function UiConnector() {
             $ref.current?.focus();
         }
     });
+    useEffect(() => {
+        Blockchain.onConnect(() => {
+            set_chain(Chain.CONNECTED);
+        });
+    });
     const reset = async (
         { silent } = { silent: true }
     ) => {
@@ -66,7 +72,10 @@ export function UiConnector() {
         try {
             await Blockchain.connect();
             set_chain(Chain.CONNECTED);
-        } catch (ex) {
+        } catch (ex: any) {
+            if (ex.code !== -32002) {
+                set_chain(Chain.UNCONNECTED);
+            }
             console.error(ex);
         }
     };
