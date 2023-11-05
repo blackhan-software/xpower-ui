@@ -5,7 +5,7 @@ import { AppDispatch } from '../../source/redux/store';
 import { Account, AftWallet, AftWalletBurner, Amount, Token, TokenInfo } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 
-import React, { useContext } from 'react';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { Fire, XPower } from '../../public/images/tsx';
 import { TokenContext } from '../../source/react';
@@ -13,6 +13,8 @@ import { Sector } from './sector';
 
 type Props = {
     account: Account | null;
+    set_account: Dispatch<SetStateAction<Account | null>>;
+    accounts: Account[];
     onBurn?: (token: Token, amount: Amount) => void;
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
@@ -68,14 +70,32 @@ function $otfToggle(
     </button>;
 }
 function $account(
-    { account }: Props
+    { accounts, account, set_account }: Props
 ) {
-    return <input type='text' readOnly
-        className='form-control' id='aft-wallet-address'
+    if (account === null) {
+        account = 0n;
+    }
+    if (accounts.length === 0) {
+        accounts = [account];
+    }
+    const ro_account = account && !accounts.includes(account);
+    if (ro_account) {
+        accounts = [...accounts, account];
+    }
+    const options = accounts.map((a) => (a === account && ro_account)
+        ? <option key={a} value={x40(a)}>{x40(a)}&nbsp;[read-only]</option>
+        : <option key={a} value={x40(a)}>{x40(a)}</option>
+    );
+    return <select
+        default-value={x40(0n)} value={x40(account)}
+        className='form-select' id='aft-wallet-address'
         data-bs-toggle='tooltip' data-bs-placement='top'
-        title='Wallet address'
-        value={x40(account ?? 0n)}
-    />;
+        title='Wallet address' onChange={(e) => {
+            set_account(BigInt(e.target.value))
+        }}
+    >
+        {options}
+    </select>;
 }
 function $aftBurner(
     { token, wallet, onBurn }: Props & { token: Token }

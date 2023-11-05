@@ -2,7 +2,7 @@ import './spa.scss';
 
 import { Bus } from '../../source/bus';
 import { leafKeys } from '../../source/functions';
-import { AccountContext, AccountProvider, DebugContext, DebugProvider, TokenProvider, UiProvider, WalletProvider } from '../../source/react';
+import { AccountContext, AccountProvider, AccountsContext, AccountsProvider, DebugContext, DebugProvider, TokenProvider, UiProvider, WalletProvider } from '../../source/react';
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiToggled, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
 import { AppDispatch, AppState, Store } from '../../source/redux/store';
@@ -142,7 +142,8 @@ function $wallet(
     aft_wallet: AftWallet,
     otf_wallet: OtfWallet
 ) {
-    const [account] = useContext(AccountContext);
+    const [account, set_account] = useContext(AccountContext);
+    const [accounts] = useContext(AccountsContext);
     const dispatch = useDispatch<AppDispatch>();
     if (page !== Page.Home &&
         page !== Page.Nfts &&
@@ -158,7 +159,7 @@ function $wallet(
             aft={{
                 onBurn: (token, amount) =>
                     dispatch(actions.aftBurn({ account, token, amount })),
-                ...aft_wallet, account
+                ...aft_wallet, accounts, account, set_account
             }}
             otf={{
                 onToggled: (toggled) =>
@@ -477,13 +478,15 @@ if (require.main === module) {
     createRoot($content!).render(
         <Provider store={Store()}>
             <DebugProvider>
-                <AccountProvider>
-                    <TokenProvider>
-                        <WalletProvider>
-                            <UiProvider>{$spa}</UiProvider>
-                        </WalletProvider>
-                    </TokenProvider>
-                </AccountProvider>
+                <AccountsProvider>
+                    <AccountProvider>
+                        <TokenProvider>
+                            <WalletProvider>
+                                <UiProvider>{$spa}</UiProvider>
+                            </WalletProvider>
+                        </TokenProvider>
+                    </AccountProvider>
+                </AccountsProvider>
             </DebugProvider>
         </Provider>
     );

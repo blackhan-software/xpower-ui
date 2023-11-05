@@ -18,8 +18,9 @@ div#aft-wallet {
       background-color: var(--xp-gray-dark);
       color: var(--xp-powered);
     }
-    input#aft-wallet-address {
-      cursor: text;
+    select#aft-wallet-address {
+      background-color: #e9ecef;
+      cursor: pointer;
       text-align: center;
       width: calc(100% - 234px);
     }
@@ -52,7 +53,7 @@ div#aft-wallet {
       width: 42px;
     }
     @media (max-width: 575px) {
-      input#aft-wallet-address {
+      select#aft-wallet-address {
         width: calc(100% - 192px);
       }
       button#aft-wallet-burner {
@@ -63,7 +64,7 @@ div#aft-wallet {
       text-align: center;
       width: 105px;
     }
-    input {
+    input, select {
       font-size: smaller;
     }
     button#aft-wallet-sov-toggle {
