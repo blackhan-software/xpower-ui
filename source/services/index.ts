@@ -25,9 +25,6 @@ export default <
     if (ROParams.service('location')) {
         LocationService(store);
     }
-    if (ROParams.service('history')) {
-        HistoryService(store);
-    }
     if (ROParams.service('mining')) {
         MiningService(store);
     }
@@ -54,6 +51,9 @@ export default <
     }
     if (ROParams.service('wallet')) {
         WalletService(store);
+    }
+    if (ROParams.service('history')) {
+        HistoryService(store);
     }
     return store;
 };

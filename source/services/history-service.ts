@@ -14,12 +14,12 @@ export const HistoryService = (
     store: Store<AppState>
 ) => {
     Blockchain.onceConnect(async function initBalances({
-        version
+        account, version
     }) {
         const versions = Array.from(Versions())
             .filter((v) => v < version).reverse();
         const balances = versions.map((version) => ({
-            version, balance: get_balances(version)
+            version, balance: get_balances(account, version)
         }));
         for (const { version, balance } of balances) {
             const { moe, sov, nft, ppt } = await balance;
@@ -31,12 +31,8 @@ export const HistoryService = (
     });
 }
 async function get_balances(
-    version: Version
+    account: Account, version: Version
 ) {
-    const account = await Blockchain.account;
-    if (!account) {
-        throw new Error('missing account');
-    }
     const ids = Nft.fullIds({
         issues: Array.from(Years()),
         levels: Array.from(NftLevels())
