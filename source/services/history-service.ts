@@ -16,6 +16,9 @@ export const HistoryService = (
     Blockchain.onceConnect(async function initBalances({
         account, version
     }) {
+        if (refresh(account) === false) {
+            return; // skip history check
+        }
         const versions = Array.from(Versions())
             .filter((v) => v < version).reverse();
         const balances = versions.map((version) => ({
@@ -29,6 +32,19 @@ export const HistoryService = (
             store.dispatch(actions.setPptHistory(version, ppt));
         }
     });
+}
+function refresh(
+    account: Account, interval = 864E5, key = 'history-refresh',
+) {
+    key += `:${x40(account)}`;
+    const now_date = new Date();
+    const old_date = new Date(localStorage.getItem(key) ?? now_date);
+    const dif_time = now_date.getTime() - old_date.getTime();
+    if (dif_time === 0 || dif_time > interval) {
+        localStorage.setItem(key, now_date.toISOString())
+        return true;
+    }
+    return false;
 }
 async function get_balances(
     account: Account, version: Version
