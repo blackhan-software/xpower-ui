@@ -2,7 +2,7 @@
 import { removeNonce, removeNonceByAmount, setAftWalletBurner, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter, setRatesUiRefresher, switchToken } from '../../source/redux/actions';
 import { mintingRowBy, mintingRowsBy, nftTotalBy, nftsBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
 import { AppThunk } from '../../source/redux/store';
-import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftBurnerStatus, NftFullId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, NftSenderStatus, NftUpgraderStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, RefresherStatus, Token } from '../../source/redux/types';
+import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftBurnerStatus, NftFullId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, NftSenderStatus, NftUpgraderStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, RefresherStatus, Token, TokenInfo } from '../../source/redux/types';
 
 import { MMProvider } from '../../source/blockchain';
 import { MoeTreasuryFactory, OnClaim, OnClaimBatch, OnRefresh, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
@@ -700,13 +700,13 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
         levels: Array.from(NftLevels())
     });
     const moe_treasury = MoeTreasuryFactory();
-    const claimables = await moe_treasury
-        .claimableBatch(account, ppt_ids);
-    const claimable = claimables
-        .reduce((acc, c) => acc + c, 0n);
-    if (claimable === 0n) {
+    const mintables = await moe_treasury
+        .mintableBatch(account, ppt_ids);
+    const mintable = mintables
+        .reduce((acc, c) => acc + floor(c), 0n);
+    if (mintable === 0n) {
         set_status(PptClaimerStatus.error);
-        throw error(`No claimable rewards yet; need to wait.`);
+        throw error(`Insufficient mintables yet; need to wait.`);
     }
     const on_claim_batch: OnClaimBatch = (
         account, nft_ids, amounts, ev
@@ -724,7 +724,7 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
     try {
         moe_treasury.onClaimBatch(on_claim_batch);
         tx = await moe_treasury.claimBatch(
-            account, ppt_ids.filter((_, i) => claimables[i])
+            account, ppt_ids.filter((_, i) => floor(mintables[i]))
         );
     } catch (ex: any) {
         set_status(PptClaimerStatus.error);
@@ -734,6 +734,11 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
         api.dispatch(setPptsUiMinter({
             minter: { claimer_status }
         }));
+    }
+    function floor(amount: Amount) {
+        const { decimals } = TokenInfo(Token.APOW);
+        const lower = parseUnits('1.000', decimals);
+        return lower <= amount ? amount : 0n;
     }
 });
 /**
