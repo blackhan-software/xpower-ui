@@ -187,37 +187,30 @@ class Worker {
         );
         let min_nonce = this.nonce;
         let hertz = frequency, dt = 0;
-        let dt_outer = 1, dt_inner = 0;
         const iid = setInterval(() => {
-            dt_outer = performance.now() - dt_outer;
+            dt = performance.now();
             if (this.running) {
-                dt_inner = performance.now();
-                {
-                    const dlt_nonce = BigInt(Math.ceil(hertz));
-                    const max_nonce = min_nonce + dlt_nonce;
-                    keccak_reduce(abi_bytes, {
-                        callback: (
-                            nonce: bigint, zeros: number
-                        ) => {
-                            callback({
-                                amount: amount_of(zeros),
-                                nonce: hex_bytes(nonce)
-                            });
-                        },
-                        range: [min_nonce, max_nonce],
-                        zeros: this.level
-                    });
-                    min_nonce = max_nonce;
-                }
-                dt_inner = performance.now() - dt_inner;
+                const dlt_nonce = BigInt(Math.ceil(hertz));
+                const max_nonce = min_nonce + dlt_nonce;
+                keccak_reduce(abi_bytes, {
+                    callback: (
+                        nonce: bigint, zeros: number
+                    ) => {
+                        callback({
+                            amount: amount_of(zeros),
+                            nonce: hex_bytes(nonce)
+                        });
+                    },
+                    range: [min_nonce, max_nonce],
+                    zeros: this.level
+                });
+                min_nonce = max_nonce;
             } else {
                 clearInterval(iid);
             }
-            dt = 100 * dt_outer - dt_inner;
-            if (Math.abs(dt) > 10) {
-                hertz += 100 / dt;
-            }
-            dt_outer = performance.now();
+            dt = performance.now() - dt;
+            hertz *= 7 + period_ms / dt;
+            hertz /= 8; // mov. average
         }, period_ms);
         return iid;
     }
