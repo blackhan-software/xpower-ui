@@ -2,7 +2,7 @@ import { delayed, nice, nice_si, nomobi, x40 } from '../../source/functions';
 import { ROParams } from '../../source/params';
 import { switchToken } from '../../source/redux/actions';
 import { AppDispatch } from '../../source/redux/store';
-import { Account, AftWallet, AftWalletBurner, Amount, Token, TokenInfo } from '../../source/redux/types';
+import { Account, Address, AftWallet, AftWalletBurner, Amount, Token, TokenInfo } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 
 import React, { Dispatch, SetStateAction, useContext } from 'react';
@@ -15,6 +15,7 @@ type Props = {
     account: Account | null;
     set_account: Dispatch<SetStateAction<Account | null>>;
     accounts: Account[];
+    names: Record<Address, string>;
     onBurn?: (token: Token, amount: Amount) => void;
     toggled: boolean;
     onToggled?: (toggled: boolean) => void;
@@ -70,7 +71,7 @@ function $otfToggle(
     </button>;
 }
 function $account(
-    { accounts, account, set_account }: Props
+    { account, accounts, names, set_account }: Props
 ) {
     if (account === null) {
         account = 0n;
@@ -83,8 +84,8 @@ function $account(
         accounts = [...accounts, account];
     }
     const options = accounts.map((a) => (a === account && ro_account)
-        ? <option key={a} value={x40(a)}>{x40(a)}&nbsp;[read-only]</option>
-        : <option key={a} value={x40(a)}>{x40(a)}</option>
+        ? <option key={a} value={x40(a)}>{dns(a)}&nbsp;[read-only]</option>
+        : <option key={a} value={x40(a)}>{dns(a)}</option>
     );
     return <select
         default-value={x40(0n)} value={x40(account)}
@@ -96,6 +97,13 @@ function $account(
     >
         {options}
     </select>;
+    function dns(account: Account) {
+        const a = x40(account);
+        if (names[a]) {
+            return `${names[a]} (${a.slice(0,6)}…${a.slice(-4)})`;
+        }
+        return a;
+    }
 }
 function $aftBurner(
     { token, wallet, onBurn }: Props & { token: Token }

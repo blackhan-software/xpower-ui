@@ -1,3 +1,5 @@
+export * from './avvy-domains/avvy-domains';
+export * from './avvy-domains/avvy-domains-factory';
 export * from './moe-treasury/moe-treasury';
 export * from './moe-treasury/moe-treasury-factory';
 export * from './ppt-treasury/ppt-treasury';

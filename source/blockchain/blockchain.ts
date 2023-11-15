@@ -165,6 +165,36 @@ export class Blockchain extends EventEmitter {
         }
         return false;
     }
+    public static async isMainnet(): Promise<boolean> {
+        return this.me.isMainnet();
+    }
+    private async isMainnet(): Promise<boolean> {
+        const id = await this.chainId();
+        if (id === ChainId.AVALANCHE_MAINNET) {
+            return true;
+        }
+        return false;
+    }
+    public static async isTestnet(): Promise<boolean> {
+        return this.me.isTestnet();
+    }
+    private async isTestnet(): Promise<boolean> {
+        const id = await this.chainId();
+        if (id === ChainId.AVALANCHE_FUJI) {
+            return true;
+        }
+        return false;
+    }
+    public static async isHardhat(): Promise<boolean> {
+        return this.me.isHardhat();
+    }
+    private async isHardhat(): Promise<boolean> {
+        const id = await this.chainId();
+        if (id === ChainId.HARDHAT) {
+            return true;
+        }
+        return false;
+    }
     public static async switchTo(id: ChainId) {
         await this.me.switchTo(id);
     }

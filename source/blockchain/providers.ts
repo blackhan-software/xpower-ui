@@ -99,7 +99,7 @@ async function WSProvider(
 }
 function MYProviderUrl(): string | null {
     if (typeof document === 'undefined') {
-        return 'http://127.0.0.1:9650/ext/bc/C/rpc'; // test-env
+        return global.MY_PROVIDER_URL ?? 'http://127.0.0.1:9650/ext/bc/C/rpc'; // test-env
     }
     const $url = document.querySelector<HTMLElement>(
         '#g-urls-provider-my'
