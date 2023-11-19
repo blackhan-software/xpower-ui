@@ -1,7 +1,8 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 /* eslint no-async-promise-executor: [off] */
 
-import { x40 } from '../functions';
+import { hostAt, x40 } from '../functions';
+import { inIframe } from '../functions/in-iframe';
 import { ROParams, RWParams } from '../params';
 import { Account, Token, TokenInfo, XTokens } from '../redux/types';
 import { Version } from '../types';
@@ -11,8 +12,8 @@ import detectProvider from '@metamask/detect-provider';
 import { EventEmitter } from 'events';
 
 export type Provider = Awaited<ReturnType<typeof detectProvider>> & {
+    isConnected: () => Promise<boolean>;
     request: (...args: any[]) => any;
-    isConnected: () => boolean;
 } & EventEmitter;
 export type Connect = {
     accounts: Account[];
@@ -36,8 +37,11 @@ export class Blockchain extends EventEmitter {
     }
     private async provider(): Promise<Provider | undefined> {
         if (this._provider === undefined || this._provider === null) {
-            const provider = await detectProvider() ?? undefined;
-            this._provider = provider as Provider | undefined;
+            const { SAProvider } = await import('./sa-provider');
+            const provider = await select(
+                detectProvider(), SAProvider()
+            );
+            this._provider = provider;
         }
         return this._provider;
     }
@@ -58,7 +62,7 @@ export class Blockchain extends EventEmitter {
     private async isConnected(): Promise<boolean> {
         if (this._isConnected === undefined) {
             this._isConnected = await this.provider().then(
-                (p) => Boolean(p?.isConnected())
+                async (p) => Boolean(await p?.isConnected())
             );
         }
         return Boolean(this._isConnected);
@@ -89,13 +93,12 @@ export class Blockchain extends EventEmitter {
         return this.me.connect();
     }
     private async connect(): Promise<Account[]> {
-        const accounts: Account[] | undefined = await this.provider()
+        const accounts: Account[] = await this.provider()
             .then((p) => p?.request({ method: 'eth_requestAccounts' }))
-            .then((a?: string[]) => a?.map((v) => BigInt(v)));
-        if (!accounts?.length) {
-            throw new Error('missing accounts');
-        }
-        const account = await this.accountOf(accounts);
+            .then((a?: string[]) => a?.map((v) => BigInt(v)))
+            .then((a?: bigint[]) => a ?? [])
+            .catch(() => this.accountsOf());
+        const account = this.accountOf(accounts);
         if (!account) {
             throw new Error('missing account');
         }
@@ -121,16 +124,10 @@ export class Blockchain extends EventEmitter {
     public static get account(): Promise<Account | null> {
         return this.me.accountsOf().then((a) => this.me.accountOf(a));
     }
-    private async accountOf(accounts: Account[]): Promise<Account | null> {
+    private accountOf(accounts: Account[]): Account | null {
         const account = RWParams.account;
         if (account !== null) {
-            if (accounts.length) {
-                const index = accounts.indexOf(account);
-                if (index >= 0) {
-                    return accounts[index];
-                }
-            }
-            return account; // read-only!
+            return account; // ro|rw
         }
         if (accounts.length) {
             return accounts[0];
@@ -141,8 +138,7 @@ export class Blockchain extends EventEmitter {
         if (this._accounts === undefined && this._provider) {
             this._accounts = await this.provider()
                 .then((p) => p?.request({ method: 'eth_accounts' }))
-                .then((a?: string[]) => a?.map((v) => BigInt(v))
-            );
+                .then((a?: string[]) => a?.map((v) => BigInt(v)));
         }
         return this._accounts ?? [];
     }
@@ -358,5 +354,13 @@ export class Blockchain extends EventEmitter {
     private __provider: Provider | undefined;
     private __chainId: ChainId | undefined;
     private static _me: any;
+}
+function select(
+    mm_provider: Promise<Provider | undefined | null>,
+    sa_provider: Promise<Provider | undefined | null>,
+) {
+    return (hostAt(/^safe/) || inIframe())
+        ? sa_provider.then((p) => p ?? undefined)
+        : mm_provider.then((p) => p ?? undefined);
 }
 export default Blockchain;

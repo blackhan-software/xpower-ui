@@ -62,6 +62,13 @@ export function dex(
     }
     return fallback;
 }
+export function gnosis(
+    params: URLSearchParams
+): boolean {
+    return Parser.boolean(
+        params.get('gnosis') ?? params.get('gnosis-safe'), false
+    );
+}
 export function level(
     params: URLSearchParams
 ): {

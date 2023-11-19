@@ -1,8 +1,8 @@
 import { BrowserProvider, JsonRpcApiProvider, JsonRpcProvider, WebSocketProvider } from 'ethers';
 import { Blockchain } from '.';
 
-import { Global } from '../types';
 import { ROParams } from '../params';
+import { Global } from '../types';
 declare const global: Global;
 
 export async function MMProvider(

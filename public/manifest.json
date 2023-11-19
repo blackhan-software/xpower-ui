@@ -1,0 +1,11 @@
+{
+    "name": "XPower",
+    "description": "Mine & mint proof-of-work XPOW. ⛏️⚡️ We've got NFTs, too.. with APOW rewards. 👀",
+    "icons": [
+        {
+            "src": "/images/svg/xpower-dark.svg",
+            "type": "image/svg+xml",
+            "sizes": "any"
+        }
+    ]
+}

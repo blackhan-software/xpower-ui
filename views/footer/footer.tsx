@@ -11,6 +11,7 @@ import React, { createElement, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider, connect } from 'react-redux';
 import { x40 } from '../../source/functions';
+import SafeWallet from '../../public/images/tsx/safe-wallet-fill';
 
 type Props = {
     page: Page;
@@ -55,6 +56,7 @@ function $underlay(
         </ul>
         <ul className='navbar-nav d-flex flex-row ml-auto'>
             {$migrate(props)}
+            {$gnosis()}
             {$contract(props)}
             {$addToken(props)}
             {$github()}
@@ -86,13 +88,30 @@ function $linkedin() {
 function $migrate(
     { token }: Props
 ) {
-    return <li className='nav-item pb-1 pt-1 pe-1'>
+    return <li className='nav-item pb-1 pt-1 pe-0'>
         <a className='nav-link link-light lower migrate'
             data-bs-toggle='tooltip' data-bs-placement='top'
             title='Migrate tokens' href={`/migrate?token=${token}`}
         >
             <i className='bi bi-capslock-fill'></i>
             <i className='bi bi-capslock'></i>
+        </a>
+    </li>;
+}
+function $gnosis() {
+    const [fill, set_fill] = useState(true);
+    return <li className='nav-item pb-1 pt-1 pe-0'>
+        <a className='safe-wallet nav-link'
+            href='https://app.safe.global/share/safe-app?appUrl=https%3A%2F%2Fwww.xpowermine.com&chain=avax'
+            data-bs-toggle='tooltip' data-bs-placement='top'
+            onMouseEnter={() => set_fill(false)}
+            onMouseLeave={() => set_fill(true)}
+            onTouchStart={() => set_fill(false)}
+            onTouchEnd={() => set_fill(true)}
+            target='_blank' rel='noreferrer'
+            title='Safe{WALLET}'
+        >
+            <SafeWallet fill={fill} />
         </a>
     </li>;
 }

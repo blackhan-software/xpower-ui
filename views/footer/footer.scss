@@ -4,7 +4,7 @@ footer {
         border-bottom: 1px solid var(--xp-powered);
     }
     a.nav-link {
-        svg {
+        i.bi, svg {
             color: var(--xp-powered);
         }
         color: var(--xp-powered);
@@ -52,6 +52,11 @@ footer {
         svg {
             position: relative;
             top: -1px;
+        }
+    }
+    a.github {
+        i.bi:hover {
+            color: white;
         }
     }
     a.migrate {

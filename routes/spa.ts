@@ -9,6 +9,10 @@ import { join, sep } from 'path';
 function routes(
   spa_env: Record<string, string>
 ) {
+  /** REDIRECT to manifest.json. */
+  router.get(/\/[^/]+\/manifest\.json$/, (req, res) => {
+    res.redirect('/manifest.json');
+  });
   /** REDIRECT to home page. */
   router.get('/', (req, res) => {
     res.redirect('/home');
