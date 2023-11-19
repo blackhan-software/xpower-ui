@@ -1,4 +1,4 @@
-import { delayed, nice, nice_si, nomobi, x40 } from '../../source/functions';
+import { delayed, nice, nice_si, nomobi, prompt, x40 } from '../../source/functions';
 import { ROParams } from '../../source/params';
 import { switchToken } from '../../source/redux/actions';
 import { AppDispatch } from '../../source/redux/store';
@@ -127,7 +127,7 @@ function $aftBurner(
         />
         <Fire />
     </button>;
-    function on_click(e: React.MouseEvent) {
+    async function on_click(e: React.MouseEvent) {
         if (disabled()) {
             e.defaultPrevented = true;
             e.stopPropagation();
@@ -135,7 +135,7 @@ function $aftBurner(
         }
         if (onBurn) {
             const { decimals } = TokenInfo(token);
-            const text = prompt(
+            const text = await prompt(
                 `Really? Confirm the amount of ${token} tokens to burn: 🔥`,
                 nice(amount(), { base: 10 ** decimals, maxPrecision: 18 })
             );

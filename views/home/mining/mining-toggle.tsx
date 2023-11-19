@@ -1,3 +1,4 @@
+import { confirm } from '../../../source/functions';
 import { ROParams } from '../../../source/params';
 import { AccountContext } from '../../../source/react';
 import { Account, MinerStatus, Token } from '../../../source/redux/types';
@@ -44,7 +45,7 @@ function $toggle(
         {$text(status)}
     </button>;
 }
-function toggle(
+async function toggle(
     { account, status, onToggle }: Pick<Props, 'status' | 'onToggle'> & {
         account: Account | null
     }
@@ -52,8 +53,8 @@ function toggle(
     if (onToggle) {
         const info = warning(account);
         if (status !== MinerStatus.started && info.warn) {
-            const consent = confirm(
-                "Mining might damage your device! Continue? 🔥"
+            const consent = await confirm(
+                "Mining might seriously *damage* your device! Continue? 🔥"
             );
             if (consent) {
                 persist(info)

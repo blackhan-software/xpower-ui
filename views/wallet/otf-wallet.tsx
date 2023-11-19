@@ -1,4 +1,4 @@
-import { nice, nice_si, x40 } from '../../source/functions';
+import { nice, nice_si, prompt, x40 } from '../../source/functions';
 import { ROParams } from '../../source/params';
 import { AccountContext, globalRef } from '../../source/react';
 import { Account, Amount, OtfWallet } from '../../source/redux/types';
@@ -94,7 +94,7 @@ function title(
     }
     return 'Deposit AVAX from wallet to minter address';
 }
-function transact(
+async function transact(
     { amount, processing, onDeposit, onWithdraw, account }: Props & {
         account: Account | null
     }
@@ -112,7 +112,7 @@ function transact(
         const prefix = info.warn ?
             "The minter wallet's secret is stored in a cookie. So, you *will* " +
             "loose your transferred AVAX if you delete your cookies! 💀\n\n" : "";
-        const avax = prompt(
+        const avax = await prompt(
             prefix + "Really? Confirm the amount of AVAX to transfer: 💸", "1.0"
         );
         if (typeof avax !== 'string') {
