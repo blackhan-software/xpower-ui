@@ -81,6 +81,9 @@
     "webpack-cli": "^5.1.4"
   },
   "description": "XPower UI",
+  "engines": {
+    "node": "^18.18.0"
+  },
   "license": "GPL-3.0",
   "main": "app.js",
   "name": "xpower-ui",
