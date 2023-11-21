@@ -1,0 +1,42 @@
+name: Node.js CI Next
+
+on:
+  push:
+    branches: [next]
+  pull_request:
+    branches: [next]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        folder:
+          - filters
+          - routes
+          - source/contract
+          - source/functions
+          - source/managers
+          - source/miner
+          - source/parser
+          - source/redux
+          - source/wallet
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: NPM install and build
+        run: |
+          npm ci
+          npm run build --if-present
+
+      - name: NPM test ${{ matrix.folder }}
+        run: npm run -- test ${{ matrix.folder }}
