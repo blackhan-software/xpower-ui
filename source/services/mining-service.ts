@@ -3,7 +3,7 @@ declare const global: Global;
 
 import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
-import { x32 } from '../functions';
+import { inIframe, x32 } from '../functions';
 import { HashManager, IntervalManager, MiningManager as MM } from '../managers';
 import { ROParams } from '../params';
 import { setMiningSpeed, setMiningStatus } from '../redux/actions';
@@ -21,33 +21,42 @@ export const MiningService = (
         const miner = MM(store).miner({
             account
         });
-        miner.on('initializing', () => store.dispatch(
-            setMiningStatus({ status: MinerStatus.initializing })));
-        miner.on('initialized', () => store.dispatch(
-            setMiningStatus({ status: MinerStatus.initialized })));
-        miner.on('starting', () => store.dispatch(
-            setMiningStatus({ status: MinerStatus.starting })));
-        miner.on('started', () => store.dispatch(
-            setMiningStatus({ status: MinerStatus.started })));
-        miner.on('stopping', () => store.dispatch(
-            setMiningStatus({ status: MinerStatus.stopping })));
-        miner.on('stopped', () => store.dispatch(
-            setMiningStatus({ status: MinerStatus.stopped })));
-        miner.on('pausing', () => store.dispatch(
-            setMiningStatus({ status: MinerStatus.pausing })));
-        miner.on('paused', () => store.dispatch(
-            setMiningStatus({ status: MinerStatus.paused })));
-        miner.on('resuming', () => store.dispatch(
-            setMiningStatus({ status: MinerStatus.resuming })));
-        miner.on('resumed', () => store.dispatch(
-            setMiningStatus({ status: MinerStatus.resumed })));
-        miner.on('increased', (e) => store.dispatch(
-            setMiningSpeed({ speed: e.speed })));
-        miner.on('decreased', (e) => store.dispatch(
-            setMiningSpeed({ speed: e.speed })));
-        store.dispatch(
-            setMiningStatus({ status: MinerStatus.stopped })
-        );
+        miner.on('initializing', () =>
+            set_status({ status: MinerStatus.initializing }));
+        miner.on('initialized', () =>
+            set_status({ status: MinerStatus.initialized }));
+        miner.on('starting', () =>
+            set_status({ status: MinerStatus.starting }));
+        miner.on('started', () =>
+            set_status({ status: MinerStatus.started }));
+        miner.on('stopping', () =>
+            set_status({ status: MinerStatus.stopping }));
+        miner.on('stopped', () =>
+            set_status({ status: MinerStatus.stopped }));
+        miner.on('pausing', () =>
+            set_status({ status: MinerStatus.pausing }));
+        miner.on('paused', () =>
+            set_status({ status: MinerStatus.paused }));
+        miner.on('resuming', () =>
+            set_status({ status: MinerStatus.resuming }));
+        miner.on('resumed', () =>
+            set_status({ status: MinerStatus.resumed }));
+        miner.on('increased', (e) =>
+            set_speed({ speed: e.speed }));
+        miner.on('decreased', (e) =>
+            set_speed({ speed: e.speed }));
+        function set_status({ status }: { status: MinerStatus }) {
+            const inits = [
+                MinerStatus.initializing, MinerStatus.initialized
+            ];
+            if (!inIframe() || !inits.includes(status)) {
+                store.dispatch(setMiningStatus({ status }));
+            }
+        }
+        function set_speed({ speed }: { speed: number }) {
+            store.dispatch(setMiningSpeed({ speed }));
+        }
+        set_status({ status: MinerStatus.stopped })
     });
     onPageSwitch(store, async function stopMining() {
         const account = await Blockchain.account;

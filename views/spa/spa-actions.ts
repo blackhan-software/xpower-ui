@@ -6,7 +6,7 @@ import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft
 
 import { MMProvider } from '../../source/blockchain';
 import { MoeTreasuryFactory, OnClaim, OnClaimBatch, OnRefresh, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
-import { error, x40 } from '../../source/functions';
+import { error, inIframe, x40 } from '../../source/functions';
 import { HashManager, MiningManager as MM } from '../../source/managers';
 import { ROParams, RWParams } from '../../source/params';
 import { Tokenizer } from '../../source/token';
@@ -122,7 +122,9 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
         }));
     }
     function set_status(status: MinterStatus) {
-        api.dispatch(setMintingRow({ level, row: { status } }));
+        if (!inIframe()) api.dispatch(setMintingRow({
+            level, row: { status }
+        }));
     }
 });
 export const mintingForget = AppThunk('minting/forget', (args: {
@@ -230,10 +232,8 @@ export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
         throw error(ex);
     }
     function set_status(status: NftSenderStatus) {
-        api.dispatch(setNftsUiDetails({
-            details: {
-                [level]: { [issue]: { sender: { status } } }
-            }
+        if (!inIframe()) api.dispatch(setNftsUiDetails({
+            details: { [level]: { [issue]: { sender: { status } } } }
         }));
     }
 });
@@ -268,7 +268,7 @@ export const nftsApprove = AppThunk('nfts/approve', async (args: {
         throw error(ex);
     }
     function set_approval(approval: NftMinterApproval) {
-        api.dispatch(setNftsUiMinter({
+        if (!inIframe()) api.dispatch(setNftsUiMinter({
             minter: { approval }
         }));
     }
@@ -310,7 +310,7 @@ export const nftsBatchMint = AppThunk('nfts/batch-mint', async (args: {
         throw error(ex);
     }
     function set_status(minter_status: NftMinterStatus) {
-        api.dispatch(setNftsUiMinter({
+        if (!inIframe()) api.dispatch(setNftsUiMinter({
             minter: { minter_status }
         }));
     }
@@ -384,7 +384,7 @@ export const nftsBatchBurn = AppThunk('nfts/batch-burn', async (args: {
         throw error(ex);
     }
     function set_status(burner_status: NftBurnerStatus) {
-        api.dispatch(setNftsUiMinter({
+        if (!inIframe()) api.dispatch(setNftsUiMinter({
             minter: { burner_status }
         }));
     }
@@ -448,7 +448,7 @@ export const nftsBatchUpgrade = AppThunk('nfts/batch-upgrade', async (args: {
         throw error(ex);
     }
     function set_status(upgrader_status: NftUpgraderStatus) {
-        api.dispatch(setNftsUiMinter({
+        if (!inIframe()) api.dispatch(setNftsUiMinter({
             minter: { upgrader_status }
         }));
     }
@@ -495,7 +495,7 @@ export const pptsApprove = AppThunk('ppts/approve', async (args: {
         }
     }
     function set_approval(approval: PptMinterApproval) {
-        api.dispatch(setPptsUiMinter({
+        if (!inIframe()) api.dispatch(setPptsUiMinter({
             minter: { approval }
         }));
     }
@@ -566,7 +566,7 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
         throw error(ex);
     }
     function set_status(minter_status: PptMinterStatus) {
-        api.dispatch(setPptsUiMinter({
+        if (!inIframe()) api.dispatch(setPptsUiMinter({
             minter: { minter_status }
         }));
     }
@@ -637,7 +637,7 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
         throw error(ex);
     }
     function set_status(burner_status: PptBurnerStatus) {
-        api.dispatch(setPptsUiMinter({
+        if (!inIframe()) api.dispatch(setPptsUiMinter({
             minter: { burner_status }
         }));
     }
@@ -680,10 +680,8 @@ export const pptsClaim = AppThunk('ppts/claim', async (args: {
         throw error(ex);
     }
     function set_status(status: PptClaimerStatus) {
-        api.dispatch(setPptsUiDetails({
-            details: {
-                [level]: { [issue]: { claimer: { status } } }
-            }
+        if (!inIframe()) api.dispatch(setPptsUiDetails({
+            details: { [level]: { [issue]: { claimer: { status } } } }
         }));
     }
 });
@@ -731,7 +729,7 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
         throw error(ex);
     }
     function set_status(claimer_status: PptClaimerStatus) {
-        api.dispatch(setPptsUiMinter({
+        if (!inIframe()) api.dispatch(setPptsUiMinter({
             minter: { claimer_status }
         }));
     }
@@ -780,7 +778,7 @@ export const ratesRefresh = AppThunk('rates/refresh', async (args: {
         throw error(ex);
     }
     function set_status(status: RefresherStatus) {
-        api.dispatch(setRatesUiRefresher({
+        if (!inIframe()) api.dispatch(setRatesUiRefresher({
             refresher: { status }
         }));
     }
@@ -824,7 +822,9 @@ export const aftBurnAPower = AppThunk('aft/burn-apower', async (args: {
         throw error(ex);
     }
     function set_status(burner_status: AftWalletBurner) {
-        api.dispatch(setAftWalletBurner({ burner: burner_status }));
+        if (!inIframe()) api.dispatch(setAftWalletBurner({
+            burner: burner_status
+        }));
     }
 });
 export const aftBurnXPower = AppThunk('aft/burn-xpower', async (args: {
@@ -856,7 +856,9 @@ export const aftBurnXPower = AppThunk('aft/burn-xpower', async (args: {
         throw error(ex);
     }
     function set_status(burner_status: AftWalletBurner) {
-        api.dispatch(setAftWalletBurner({ burner: burner_status }));
+        if (!inIframe()) api.dispatch(setAftWalletBurner({
+            burner: burner_status
+        }));
     }
 });
 /**
