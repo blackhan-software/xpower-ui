@@ -20,7 +20,7 @@ export const AlertManager: AppMiddleware = ({ dispatch, getState }) => (next) =>
     return next(action);
 };
 function warning(message: string) {
-    if (message.match(/^user rejected/i)) {
+    if (message.match(/rejected/i)) {
         return;
     }
     alert(message, Alert.warning, {
