@@ -38,6 +38,9 @@ export function UiAftWallet(
             {$otfToggle({
                 ...props
             })}
+            {$copy({
+                ...props
+            })}
             {$account({
                 ...props
             })}
@@ -57,7 +60,7 @@ function $otfToggle(
     { toggled, onToggled }: Props
 ) {
     const icon = toggled
-        ? 'bi-wallet2' : 'bi-wallet';
+        ? 'bi bi-wallet2' : 'bi bi-wallet';
     const title = toggled
         ? 'Disable minter wallet & hide balance of AVAX'
         : 'Enable minter wallet & show balance of AVAX';
@@ -68,6 +71,18 @@ function $otfToggle(
         role='button' title={nomobi(title)}
     >
         <i className={icon} />
+    </button>;
+}
+function $copy(
+    { account }: Pick<Props, 'account'>
+) {
+    return <button id='aft-wallet-copy'
+        className='form-control input-group-text'
+        data-bs-toggle='tooltip' data-bs-placement='top'
+        onClick={() => navigator.clipboard.writeText(x40(account!))}
+        role='button' title='Copy address'
+    >
+        <i className='bi bi-copy'></i>
     </button>;
 }
 function $account(
@@ -100,7 +115,7 @@ function $account(
     function dns(account: Account) {
         const a = x40(account);
         if (names[a]) {
-            return `${names[a]} (${a.slice(0,6)}…${a.slice(-4)})`;
+            return `${names[a]} (${a.slice(0, 6)}…${a.slice(-4)})`;
         }
         return a;
     }

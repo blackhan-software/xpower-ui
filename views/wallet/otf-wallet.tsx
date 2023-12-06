@@ -29,6 +29,7 @@ export function UiOtfWallet(
             </div>
             <div className='input-group otf-wallet-address'>
                 {$transmitter(props)}
+                {$copy(props)}
                 {$account(props)}
                 {$balance(props)}
                 {$info()}
@@ -152,6 +153,18 @@ async function transact(
         }
         return { warn, key, date };
     }
+}
+function $copy(
+    { account }: Pick<Props, 'account'>
+) {
+    return <button id='otf-wallet-copy'
+        className='form-control input-group-text'
+        data-bs-toggle='tooltip' data-bs-placement='top'
+        onClick={() => navigator.clipboard.writeText(x40(account!))}
+        role='button' title='Copy address'
+    >
+        <i className='bi bi-copy'></i>
+    </button>;
 }
 function $account(
     { account }: Pick<Props, 'account'>

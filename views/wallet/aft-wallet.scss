@@ -3,7 +3,8 @@ div#aft-wallet {
 }
 div#aft-wallet {
   div.wallet-address {
-    button#otf-wallet-toggle {
+    button#otf-wallet-toggle,
+    button#aft-wallet-copy {
       cursor: pointer;
       i {
         position: relative;
@@ -11,7 +12,8 @@ div#aft-wallet {
       }
       width: 42px;
     }
-    button#otf-wallet-toggle:hover {
+    button#otf-wallet-toggle:hover,
+    button#aft-wallet-copy:hover {
       border-bottom: 1px solid var(--xp-powered);
       border-left: 1px solid var(--xp-powered);
       border-top: 1px solid var(--xp-powered);
@@ -22,7 +24,7 @@ div#aft-wallet {
       background-color: #e9ecef;
       cursor: pointer;
       text-align: center;
-      width: calc(100% - 234px);
+      width: calc(100% - 276px);
     }
     button#aft-wallet-burner:hover:not(.disabled):not(.burning) {
       border-bottom: 1px solid var(--xp-powered);
@@ -53,6 +55,9 @@ div#aft-wallet {
       width: 42px;
     }
     @media (max-width: 575px) {
+      button#aft-wallet-copy {
+        display: none;
+      }
       select#aft-wallet-address {
         width: calc(100% - 192px);
       }

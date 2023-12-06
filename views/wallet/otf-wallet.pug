@@ -12,6 +12,11 @@ div#otf-wallet(
         role="status"
       )
       i.bi-circle
+    button#otf-wallet-copy.form-control.input-group-text(
+      data-bs-toggle="tooltip" data-bs-placement="top"
+      role="button" title="Copy address"
+    )
+      i(class="bi bi-copy")
     input#otf-wallet-address.form-control(
       data-bs-toggle="tooltip" data-bs-placement="top"
       placeholder="0x0000000000000000000000000000000000000000"
