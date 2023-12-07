@@ -6,6 +6,7 @@ import { OtfManager } from '../../source/wallet';
 
 import React, { useContext } from 'react';
 import { Avalanche } from '../../public/images/tsx';
+import { QRCode } from './qr-code';
 
 type Props = OtfWallet & {
     onDeposit?: (
@@ -27,10 +28,11 @@ export function UiOtfWallet(
             <div className='form-label'>
                 Minter Address and AVAX Balance
             </div>
-            <div className='input-group otf-wallet-address'>
+            <div className='input-group otf-wallet-address wallet-address'>
                 {$transmitter(props)}
-                {$copy(props)}
+                {$qr_code(props)}
                 {$account(props)}
+                {$copy(props)}
                 {$balance(props)}
                 {$info()}
             </div>
@@ -63,6 +65,11 @@ function $transmitter(
         />
         <i className={icon({ amount })} />
     </button>;
+}
+function $qr_code(
+    { account }: Pick<Props, 'account'>
+) {
+    return <QRCode account={account} />;
 }
 function direction(
     { amount }: Pick<Props, 'amount'>
@@ -154,6 +161,16 @@ async function transact(
         return { warn, key, date };
     }
 }
+function $account(
+    { account }: Pick<Props, 'account'>
+) {
+    return <input type='text' readOnly
+        className='form-control' id='otf-wallet-address'
+        data-bs-toggle='tooltip' data-bs-placement='top'
+        title='Minter address to pre-fund for transaction fees'
+        value={x40(account ?? 0n)}
+    />;
+}
 function $copy(
     { account }: Pick<Props, 'account'>
 ) {
@@ -165,16 +182,6 @@ function $copy(
     >
         <i className='bi bi-copy'></i>
     </button>;
-}
-function $account(
-    { account }: Pick<Props, 'account'>
-) {
-    return <input type='text' readOnly
-        className='form-control' id='otf-wallet-address'
-        data-bs-toggle='tooltip' data-bs-placement='top'
-        title='Minter address to pre-fund for transaction fees'
-        value={x40(account ?? 0n)}
-    />;
 }
 function $balance(
     { amount }: Pick<Props, 'amount'>

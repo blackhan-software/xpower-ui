@@ -1,17 +1,13 @@
 div#aft-wallet
   div.form-label
     | Wallet Address and {{TOKEN}} Balance
-  div.input-group.wallet-address
+  div.input-group.aft-wallet-address.wallet-address
     button#otf-wallet-toggle.form-control.input-group-text(
       data-bs-toggle="tooltip" data-bs-placement="top"
       role="button" title="Enable minter wallet & show balance of AVAX"
     )
       i(class="bi {{OTF_WALLET_TOGGLE}}")
-    button#aft-wallet-copy.form-control.input-group-text(
-      data-bs-toggle="tooltip" data-bs-placement="top"
-      role="button" title="Copy address"
-    )
-      i(class="bi bi-copy")
+    include ./qr-code.pug
     select#aft-wallet-address.form-select(
       default-value="0x0000000000000000000000000000000000000000"
       data-bs-toggle="tooltip" data-bs-placement="top"
@@ -20,6 +16,11 @@ div#aft-wallet
     )
       option(value="{{AFT_WALLET_ACCOUNT}}")
         | {{AFT_WALLET_ACCOUNT}}
+    button#aft-wallet-copy.form-control.input-group-text(
+      data-bs-toggle="tooltip" data-bs-placement="top"
+      role="button" title="Copy address"
+    )
+      i(class="bi bi-copy")
     button.form-control.input-group-text#aft-wallet-burner(
       data-bs-toggle="tooltip" data-bs-placement="top" disabled="disabled"
       role="tooltip" title="Burn your {{TOKEN}}"

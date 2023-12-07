@@ -1,0 +1,21 @@
+div.wallet-address {
+  button.qr-code {
+    cursor: pointer;
+    i {
+      position: relative;
+      top: 1px;
+    }
+    width: 42px;
+  }
+  button.qr-code:hover {
+    border-bottom: 1px solid var(--xp-powered);
+    border-top: 1px solid var(--xp-powered);
+    background-color: var(--xp-gray-dark);
+    color: var(--xp-powered);
+  }
+  @media (max-width: 575px) {
+    button.qr-code {
+      display: none;
+    }
+  }
+}

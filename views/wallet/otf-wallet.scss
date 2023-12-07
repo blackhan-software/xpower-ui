@@ -5,10 +5,15 @@ div#otf-wallet {
   div.otf-wallet-address {
     button#otf-wallet-transfer:hover:not(.processing),
     button#otf-wallet-copy:hover {
-      border: 1px solid var(--xp-powered);
-      border-right: 1px solid var(--xp-gray-dark);
       background-color: var(--xp-gray-dark);
       color: var(--xp-powered);
+    }
+    button#otf-wallet-transfer:hover:not(.processing) {
+      border: 1px solid var(--xp-powered);
+    }
+    button#otf-wallet-copy:hover {
+      border-bottom: 1px solid var(--xp-powered);
+      border-top: 1px solid var(--xp-powered);
     }
     button#otf-wallet-transfer.processing {
       .spinner {
@@ -36,7 +41,7 @@ div#otf-wallet {
       cursor: text;
       padding-right: 42px;
       text-align: center;
-      width: calc(100% - 276px);
+      width: calc(100% - 318px);
     }
     input#otf-wallet-balance {
       text-align: center;

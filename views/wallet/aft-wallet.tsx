@@ -9,9 +9,11 @@ import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { Fire, XPower } from '../../public/images/tsx';
 import { TokenContext } from '../../source/react';
+
+import { QRCode } from './qr-code';
 import { Sector } from './sector';
 
-type Props = {
+export type Props = {
     account: Account | null;
     set_account: Dispatch<SetStateAction<Account | null>>;
     accounts: Account[];
@@ -34,14 +36,17 @@ export function UiAftWallet(
         <div className='form-label'>
             Wallet Address and {token} Balance
         </div>
-        <div className='input-group wallet-address'>
+        <div className='input-group aft-wallet-address wallet-address'>
             {$otfToggle({
                 ...props
             })}
-            {$copy({
+            {$qr_code({
                 ...props
             })}
             {$account({
+                ...props
+            })}
+            {$copy({
                 ...props
             })}
             {$aftBurner({
@@ -72,6 +77,11 @@ function $otfToggle(
     >
         <i className={icon} />
     </button>;
+}
+function $qr_code(
+    { account }: Pick<Props, 'account'>
+) {
+    return <QRCode account={account} />;
 }
 function $copy(
     { account }: Pick<Props, 'account'>
