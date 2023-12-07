@@ -20,35 +20,35 @@ function routes(
   /** GET home page. */
   router.get('/home', (req, res) => {
     res.render('home/home.pig', {
-      DESCRIPTION: 'Mine & Mint Proof-of-Work Tokens on Avalanche',
+      DESCRIPTION: 'Mine & Mint Proof-of-Work XPower Tokens',
       TITLE: 'XPower', ...env_of_home(req), ...spa_env,
     });
   });
   /** GET nfts page. */
   router.get('/nfts', (req, res) => {
     res.render('nfts/nfts.pig', {
-      DESCRIPTION: 'Mint stakeable XPower NFTs on Avalanche',
+      DESCRIPTION: 'Mint stakeable XPower NFTs',
       TITLE: 'XPower: NFTs', ...env_of(req), ...spa_env
     });
   });
   /** GET staking page. */
   router.get('/staking', (req, res) => {
     res.render('ppts/ppts.pig', {
-      DESCRIPTION: 'Stake minted XPower NFTs on Avalanche',
+      DESCRIPTION: 'Stake minted XPower NFTs',
       TITLE: 'XPower: Staking', ...env_of(req), ...spa_env
     });
   });
   /** GET swap page. */
   router.get('/swap', (req, res) => {
     res.render('swap/swap.pig', {
-      DESCRIPTION: 'Swap XPOW & APOW Tokens on Avalanche',
+      DESCRIPTION: 'Swap XPOW & APOW Tokens',
       TITLE: 'XPower: Swap', ...env_of(req), ...spa_env
     });
   });
   /** GET about page. */
   router.get('/about', (req, res) => {
     res.render('about/about.pig', {
-      DESCRIPTION: 'Mine & Mint Proof-of-Work Tokens on Avalanche',
+      DESCRIPTION: 'Mine & Mint Proof-of-Work XPower Tokens',
       TITLE: 'XPower: About', ...env_of(req), ...spa_env
     });
   });

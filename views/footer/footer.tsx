@@ -211,7 +211,7 @@ function $twitter() {
     </li>;
 }
 function $avalanche() {
-    return <li className='nav-item d-none d-sm-block'>
+    return <li className='nav-item ps-1 d-none d-sm-block'>
         <a className='avalanche nav-link'
             data-bs-toggle='tooltip' data-bs-placement='top'
             title='Powered by Avalanche' href='https://www.avalabs.org/'

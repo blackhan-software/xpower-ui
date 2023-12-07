@@ -119,7 +119,7 @@ function $connector(
         }
     };
     const href = chain === Chain.UNAVAILABLE
-        ? 'https://about.core.app' : '#';
+        ? 'https://metamask.io/download/' : '#';
     const rel = href.length === 1
         ? 'nofollow' : undefined;
     const target = href.length > 1

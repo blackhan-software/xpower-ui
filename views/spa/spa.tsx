@@ -12,7 +12,6 @@ import React, { createElement, useContext, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider, connect, useDispatch } from 'react-redux';
 
-import { Avalanche } from '../../public/images/tsx';
 import { UiAbout } from '../about/about';
 import { UiConnector } from '../connector/connector';
 import { UiCover } from '../cover/cover';
@@ -72,18 +71,17 @@ export function SPA(
 function $h1(
     page: Page
 ) {
-    const logo = <Avalanche height={24} width={24} />;
     if (page === Page.Home) {
-        return <h1>Mine & Mint Proof-of-Work Tokens on Avalanche {logo}</h1>;
+        return <h1>Mine & Mint Proof-of-Work XPower Tokens</h1>;
     }
     if (page === Page.Nfts) {
-        return <h1>Mint stakeable XPower NFTs on Avalanche {logo}</h1>;
+        return <h1>Mint stakeable XPower NFTs</h1>;
     }
     if (page === Page.Ppts) {
-        return <h1>Stake minted XPower NFTs on Avalanche {logo}</h1>;
+        return <h1>Stake minted XPower NFTs</h1>;
     }
     if (page === Page.Swap) {
-        return <h1>Swap XPOW & APOW Tokens on Avalanche {logo}</h1>;
+        return <h1>Swap XPOW & APOW Tokens</h1>;
     }
     return null;
 }

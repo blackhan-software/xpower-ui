@@ -34,12 +34,12 @@ export const LocationService = (
             'meta[name="description"]'
         );
         const descriptions: Record<Page, string> = {
-            [Page.None]: 'Mine & Mint Proof-of-Work Tokens on Avalanche',
-            [Page.Home]: 'Mine & Mint Proof-of-Work Tokens on Avalanche',
-            [Page.Nfts]: 'Mint stakeable XPower NFTs on Avalanche',
-            [Page.Ppts]: 'Stake minted XPower NFTs on Avalanche',
-            [Page.Swap]: 'Swap XPOW & APOW Tokens on Avalanche',
-            [Page.About]: 'Mine & Mint Proof-of-Work Tokens on Avalanche',
+            [Page.None]: 'Mine & Mint Proof-of-Work XPower Tokens',
+            [Page.Home]: 'Mine & Mint Proof-of-Work XPower Tokens',
+            [Page.Nfts]: 'Mint stakeable XPower NFTs',
+            [Page.Ppts]: 'Stake minted XPower NFTs',
+            [Page.Swap]: 'Swap XPOW & APOW Tokens',
+            [Page.About]: 'Mine & Mint Proof-of-Work XPower Tokens',
         };
         if ($meta) {
             $meta.setAttribute('content', descriptions[page]);

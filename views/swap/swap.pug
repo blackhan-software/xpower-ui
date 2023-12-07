@@ -2,8 +2,7 @@ extends ../spa/spa.pug
 
 block content
   content.d-flex.flex-column.min-vh-100
-    h1: | {{DESCRIPTION}}!{' '}
-      include ../../public/images/pug/avalanche-24.svg.pug
+    h1: | {{DESCRIPTION}}
     include ../connector/connector.pug
     include ../wallet/wallet.pug
     form#swap.flex-grow-1.mb-3
