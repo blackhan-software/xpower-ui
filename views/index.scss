@@ -49,6 +49,11 @@ input, select, .btn, .ellipsis {
     background-color: var(--xp-powered);
     color: var(--xp-gray-dark);
   }
+  .btn:focus-visible:not(:hover),
+  .btn.show:not(:hover):not(:disabled) {
+    background-color: var(--xp-gray-dark);
+    color: var(--xp-powered);
+  }
 }
 .btn-group {
   .btn-group, .btn {
