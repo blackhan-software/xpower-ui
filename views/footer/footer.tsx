@@ -70,7 +70,7 @@ function $underlay(
 }
 function $linkedin() {
     return <li className='nav-item'>
-        <a className='nav-link link-light lower linkedin'
+        <a className='nav-link lower linkedin'
             data-bs-toggle='tooltip' data-bs-placement='top'
             href='https://www.linkedin.com/company/blackhan'
             title='LinkedIn' target='_blank'
@@ -89,7 +89,7 @@ function $migrate(
     { token }: Props
 ) {
     return <li className='nav-item pb-1 pt-1 pe-0'>
-        <a className='nav-link link-light lower migrate'
+        <a className='nav-link lower migrate'
             data-bs-toggle='tooltip' data-bs-placement='top'
             title='Migrate tokens' href={`/migrate?token=${token}`}
         >
@@ -120,7 +120,7 @@ function $contract(
 ) {
     const { url, tip } = contractInfo(chainId, page, token, version);
     return <li className='nav-item pb-1 pt-1 pe-1'>
-        <a className='nav-link link-light lower smart-contract'
+        <a className='nav-link lower smart-contract'
             data-bs-toggle='tooltip' data-bs-placement='top'
             title={tip} target='_blank' href={url}
         >
@@ -133,7 +133,7 @@ function $addToken(
     { token, version }: Props
 ) {
     return <li className='nav-item pb-1 pt-1 pe-1'>
-        <a className='nav-link link-light lower add-token'
+        <a className='nav-link lower add-token'
             data-bs-toggle='tooltip' data-bs-placement='top'
             title={`Add the ${token} token to your Metamask`}
             href='#' onClick={addToken.bind(null, token, version)}
@@ -145,7 +145,7 @@ function $addToken(
 }
 function $github() {
     return <li className='nav-item pb-1 pt-1 pe-1'>
-        <a className='nav-link link-light lower github'
+        <a className='nav-link lower github'
             data-bs-toggle='tooltip' data-bs-placement='top'
             title='GitHub' href='https://github.com/blackhan-software'
             target='_blank'
@@ -347,7 +347,7 @@ function $cookies(
 function $consent(
     set_ok: (ok: boolean) => void
 ) {
-    return <li className='nav-item'>
+    return <li className='nav-item btn-group'>
         <button
             className='btn btn-outline-warning'
             onClick={() => set_ok(true)} type='button'

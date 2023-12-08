@@ -14,7 +14,10 @@ footer {
         top: 1px;
     }
     a.nav-link:hover {
-        color: white;
+        i.bi, svg {
+            color: var(--xp-accentuated);
+        }
+        color: var(--xp-accentuated);
     }
     a.add-token {
         i.bi-plus-square {
@@ -52,11 +55,6 @@ footer {
         svg {
             position: relative;
             top: -1px;
-        }
-    }
-    a.github {
-        i.bi:hover {
-            color: white;
         }
     }
     a.migrate {
@@ -143,6 +141,9 @@ footer {
     }
     a.consent {
         color: var(--xp-powered);
+    }
+    a.consent:hover {
+        color: var(--xp-accentuated);
     }
     position: relative;
 }
