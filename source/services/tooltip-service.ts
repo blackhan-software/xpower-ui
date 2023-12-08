@@ -28,8 +28,10 @@ export const TooltipService = (
             return options?.force || $tip.title.length > 0;
         }
         function recreate($tip: HTMLElement) {
+            const title = $tip.title;
             Tooltip.getInstance($tip)?.dispose();
-            Tooltip.getOrCreateInstance($tip);
+            const $tt = Tooltip.getOrCreateInstance($tip);
+            $tt.setContent({ '.tooltip-inner': title });
         }
         function resubscribe($tip: HTMLElement) {
             $tip.addEventListener('shown.bs.tooltip', ({
