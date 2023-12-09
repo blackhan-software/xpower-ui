@@ -12,6 +12,7 @@ import { normalize } from './tools/apr-normalize';
 import { RateEvaluator } from './tools/rate-evaluator';
 
 import { Scale } from './cover-graph-chart-scale';
+import { style } from './cover-style';
 export { Scale };
 
 type Props = {
@@ -154,11 +155,5 @@ function middle<T>(
     array: Array<T>
 ): T | undefined {
     return array[Math.floor(array.length / 2)];
-}
-function style(
-    name: string
-) {
-    const styles = getComputedStyle(document.body);
-    return styles.getPropertyValue(name).trim();
 }
 export default UiCoverGraphChartBar;

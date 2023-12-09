@@ -2,6 +2,7 @@ import { inEnum } from '../functions';
 import { Parser } from '../parser';
 import { Account, Level, NftLevel, NftLevels, Page, Token } from '../redux/types';
 import { ThemeColor, ThemeColors } from '../theme';
+import { RGB, RGB1_REGEX, RGB2_REGEX } from "../theme/color";
 import { Tokenizer } from '../token';
 import { DEX, Version, Versions } from '../types';
 import { RWParams } from './rw-params';
@@ -40,9 +41,17 @@ export function clearAll(
 }
 export function color(
     params: URLSearchParams, fallback = ThemeColor.lime
-): ThemeColor {
+): ThemeColor | RGB {
     const key = params.get('color');
     if (typeof key === 'string') {
+        const rgb1 = key.match(RGB1_REGEX);
+        if (rgb1 && rgb1.groups) {
+            return rgb1.groups as RGB;
+        }
+        const rgb2 = key.match(RGB2_REGEX);
+        if (rgb2 && rgb2.groups) {
+            return rgb2.groups as RGB;
+        }
         return ThemeColor[key as ThemeColors] ?? fallback;
     }
     return fallback;

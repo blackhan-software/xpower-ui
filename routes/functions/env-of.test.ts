@@ -36,10 +36,10 @@ describe('env_of', () => {
                 xtoken: 'xpow',
                 xToken: 'XPow',
             }, ...{
-                XP_POWERED: '--xp-lime',
-                XP_POWERED_DARK: '--xp-lime-dark',
-                XP_POWEREDi: '--xp-lime-i',
-                XP_POWERED_DARKi: '--xp-lime-dark-i',
+                XP_POWERED: 'var(--xp-lime)',
+                XP_POWERED_DARK: 'var(--xp-lime-dark)',
+                XP_POWEREDi: 'var(--xp-lime-i)',
+                XP_POWERED_DARKi: 'var(--xp-lime-dark-i)',
             }, ...{
                 COVER_IMAGE: 'cover-none',
             }, ...{

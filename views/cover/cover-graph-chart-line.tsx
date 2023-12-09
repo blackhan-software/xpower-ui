@@ -13,6 +13,7 @@ import { normalize } from './tools/apr-normalize';
 import { RateEvaluator } from './tools/rate-evaluator';
 
 import { Scale } from './cover-graph-chart-scale';
+import { style } from './cover-style';
 export { Scale };
 
 type Props = {
@@ -204,11 +205,5 @@ function min(
     _values: number[], _level: NftLevel
 ) {
     return 0;
-}
-function style(
-    name: string
-) {
-    const styles = getComputedStyle(document.body);
-    return styles.getPropertyValue(name).trim();
 }
 export default UiCoverGraphChartLine;
