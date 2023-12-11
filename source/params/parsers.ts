@@ -40,7 +40,7 @@ export function clearAll(
     return Parser.boolean(params.get('clear-all'), false);
 }
 export function color(
-    params: URLSearchParams, fallback = ThemeColor.lime
+    params: URLSearchParams, fallback = ThemeColor.magenta
 ): ThemeColor | RGB {
     const key = params.get('color');
     if (typeof key === 'string') {
