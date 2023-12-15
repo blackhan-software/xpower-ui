@@ -41,7 +41,7 @@ describe('env_of_home', () => {
                 XP_POWEREDi: 'var(--xp-magenta-i)',
                 XP_POWERED_DARKi: 'var(--xp-magenta-dark-i)',
             }, ...{
-                COVER_IMAGE: 'cover-none',
+                COVER_IMAGE: '',
             }, ...{
                 AMOUNT_1: "1",
                 AMOUNT_2: "3",

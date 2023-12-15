@@ -41,7 +41,7 @@ describe('env_of', () => {
                 XP_POWEREDi: 'var(--xp-magenta-i)',
                 XP_POWERED_DARKi: 'var(--xp-magenta-dark-i)',
             }, ...{
-                COVER_IMAGE: 'cover-none',
+                COVER_IMAGE: '',
             }, ...{
                 NFT_UNIT_DISPLAY: 'none',
                 NFT_KILO_DISPLAY: 'none',

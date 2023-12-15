@@ -1,5 +1,6 @@
 public/**/*.LICENSE.txt
 public/content/**/*.md
+public/images/all/
 public/views/**/*.pug
 public/views/**/*.pig
 node_modules/

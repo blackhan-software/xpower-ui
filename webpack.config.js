@@ -79,6 +79,15 @@ const configuration = ({
             }, {
                 loader: 'sass-loader'
             }]
+        }, {
+            test: /\.(png|svg|jpg|jpeg|gif)$/i,
+            use: [{
+                loader: 'file-loader',
+                options: {
+                    name: '[name].[contenthash:8].[ext]',
+                    outputPath: '../images/all/',
+                },
+            }],
         }]
     },
     plugins: [

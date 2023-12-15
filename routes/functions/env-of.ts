@@ -51,8 +51,22 @@ const cover_image = (
   req: Request
 ) => {
   const page = Pager.parse(req.path);
+  switch (page) {
+    case Page.Home:
+      return {
+        COVER_IMAGE: '/images/all/cover-home.a4960415.jpg',
+      };
+    case Page.Nfts:
+      return {
+        COVER_IMAGE: '/images/all/cover-nfts.38c9c9b4.jpg',
+      };
+    case Page.Ppts:
+      return {
+        COVER_IMAGE: '/images/all/cover-ppts.e434794a.jpg',
+      };
+  }
   return {
-    COVER_IMAGE: `cover-${page}`,
+    COVER_IMAGE: '',
   };
 };
 const footer_page = (
