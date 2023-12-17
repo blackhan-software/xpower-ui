@@ -12,7 +12,7 @@ type Stroke = {
   width: number;
 }
 const my_stroke: Stroke = {
-  color: 'var(--xp-powered-i)', width: 2
+  color: 'var(--xp-powered)', width: 2
 };
 export function Sector(
   { length, radius = 10, start = 0, stroke = my_stroke }: Props

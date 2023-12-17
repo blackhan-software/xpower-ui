@@ -23,13 +23,3 @@ form#sov-integrate {
     width: 100%;
   }
 }
-form#sov-integrate {
-  div.add-sov {
-    button.add-sov:active,
-    button.add-sov:hover {
-      img {
-        border-color: var(--xp-powered-i);
-      }
-    }
-  }
-}
