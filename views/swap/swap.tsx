@@ -6,8 +6,6 @@ import { Address, Page, Token, TokenInfo } from '../../source/redux/types';
 import { DEX } from '../../source/types';
 
 import React, { memo, useContext, useEffect, useState } from 'react';
-import { Paraswap, Uniswap } from '../../public/images/tsx';
-import { capitalize } from '../../routes/functions';
 import { TokenContext } from '../../source/react';
 
 type Props = {
@@ -37,54 +35,10 @@ export function UiSwap({ page }: Props) {
     }, [page]);
     if (dex) {
         return <>
-            <DexSelectors dex={dex} set_dex={set_dex} />
             <Iframe dex={dex} token={token} />
         </>;
     }
     return <Spinner show={true} grow={true} />;
-}
-function DexSelectors({ dex, set_dex }: {
-    dex: DEX | URL, set_dex: React.Dispatch<React.SetStateAction<typeof dex | null>>
-}) {
-    return <div
-        className='btn-group mb-3 mt-2 dex-selectors' role='group'
-    >
-        <DexSelector
-            dex={DEX.paraswap}
-            active={dex === DEX.paraswap}
-            onClick={() => set_dex(DEX.paraswap)} />
-        <DexSelector
-            dex={DEX.uniswap}
-            active={dex === DEX.uniswap}
-            onClick={() => set_dex(DEX.uniswap)} />
-    </div>;
-}
-function DexSelector({ dex, active, onClick }: {
-    dex: DEX, active?: boolean, onClick?: React.MouseEventHandler,
-}) {
-    const classes = [
-        'btn', 'btn-outline-warning',
-        active ? 'active' : '',
-        'dex-selector', dex,
-    ];
-    return <button
-        className={classes.join(' ')} type='button'
-        onClick={onClick}
-    >
-        <DexIcon dex={dex} />&nbsp;{capitalize(dex)}
-    </button>;
-}
-function DexIcon({ dex }: { dex: DEX }) {
-    if (dex === DEX.paraswap) {
-        return <span className='float-start'>
-            <Paraswap />
-        </span>;
-    }
-    if (dex === DEX.uniswap) {
-        return <span className='float-start'>
-            <Uniswap />
-        </span>;
-    }
 }
 const Iframe = memo(({ dex, token }: {
     dex: DEX | URL, token: Token

@@ -6,25 +6,6 @@ block content
     include ../connector/connector.pug
     include ../wallet/wallet.pug
     form#swap.flex-grow-1.mb-3
-      div.btn-group.mb-3.mt-2.dex-selectors(
-        role="group"
-      )
-        button.btn.btn-outline-warning.dex-selector.paraswap(
-          type="button" class="{{ACTIVE_PARASWAP}}"
-        )
-          span.float-start(
-            style="color: {{COLOR_PARASWAP}}"
-          )
-            include ../../public/images/pug/paraswap.svg.pug
-          | &nbsp;Paraswap
-        button.btn.btn-outline-warning.dex-selector.uniswap(
-          type="button" class="{{ACTIVE_UNISWAP}}"
-        )
-          span.float-start(
-            style="color: {{COLOR_UNISWAP}}"
-          )
-            include ../../public/images/pug/uniswap.svg.pug
-          | &nbsp;Uniswap
       span.spinner.spinner-grow.spinner-border.spinner-border-sm(
         role="status"
       )

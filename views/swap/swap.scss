@@ -6,13 +6,6 @@ form#swap {
         top: calc(50% - 1rem);
         width: 2rem;
     }
-    .dex-selectors {
-        .dex-selector svg {
-            position: relative;
-            top: -1px;
-        }
-        width: 100%;
-    }
     iframe {
         border: 1px solid var(--xp-powered);
         border-radius: 4px;
@@ -23,6 +16,5 @@ form#swap {
     }
 }
 footer.pt-extra {
-    padding-top: calc(37.33px + 1.5em);
     z-index: -1;
 }
