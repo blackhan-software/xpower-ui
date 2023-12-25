@@ -62,7 +62,6 @@ function Spinner(
     const style = {
         color: 'var(--xp-powered)',
         display: loading ? 'block' : 'none',
-        filter: 'invert(0)',
         zIndex: loading ? -1 : undefined
     };
     return <span
