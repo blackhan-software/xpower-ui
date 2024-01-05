@@ -5,8 +5,12 @@ import { TxEvent, Version } from '../types';
 import { ERC20Wallet, OnApproval, OnTransfer } from './erc20-wallet';
 
 export { OnApproval, OnTransfer };
+
 export type OnInit = (
     block_hash: BlockHash, timestamp: Timestamp, ev: TxEvent
+) => void;
+export type OnApproveMigrate = (
+    account: Account, operator: Account, approved: boolean, ev: TxEvent
 ) => void;
 
 export class MoeWallet extends ERC20Wallet {
@@ -40,6 +44,34 @@ export class MoeWallet extends ERC20Wallet {
             this.get.then((c) => c.once('Init', on_init));
         } else {
             this.get.then((c) => c.on('Init', on_init));
+        }
+    }
+    approvedMigrate(
+        account: Address, operator: Address
+    ) {
+        return this._moe.approvedMigrate(
+            BigInt(account), BigInt(operator)
+        );
+    }
+    approveMigrate(
+        operator: Address, approved: boolean
+    ) {
+        return this._moe.approveMigrate(
+            BigInt(operator), approved
+        );
+    }
+    onApproveMigrate(
+        listener: OnApproveMigrate, { once } = { once: false }
+    ) {
+        const on_approve = (
+            account: Account, operator: Account, approved: boolean, ev: TxEvent
+        ) => {
+            listener(account, operator, approved, ev);
+        };
+        if (once) {
+            this.get.then((c) => c.once('ApproveMigrate', on_approve));
+        } else {
+            this.get.then((c) => c.on('ApproveMigrate', on_approve));
         }
     }
     get put() {

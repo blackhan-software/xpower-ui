@@ -123,6 +123,9 @@ $('button.approve-old').on('click', async function approveOldNfts(e) {
         await moeApproveNew({
             $approve
         });
+        await moeApproveNft({
+            $approve
+        });
         await nftApproveOld({
             $approve, $migrate: $migrate_nft.find(
                 '.migrate-old.xpow'
@@ -276,6 +279,64 @@ async function moeApproveNew({ $approve }: {
         });
         tx = await tgt_xpower.approve(
             await nft_target.address, MAX_UINT256
+        );
+    } catch (ex: any) {
+        if (ex.message) {
+            if (ex.data && ex.data.message) {
+                ex.message = `${ex.message} [${ex.data.message}]`;
+            }
+            alert(ex.message, Alert.warning, {
+                after: $approve.parent('div')[0]
+            });
+        }
+        console.error(ex);
+        reset();
+    }
+}
+async function moeApproveNft({ $approve }: {
+    $approve: JQuery<HTMLElement>
+}) {
+    const { account, src_version, tgt_version } = await context({
+        $el: $approve
+    });
+    const { tgt_xpower, nft_target } = await contracts({
+        account, src_version, tgt_version
+    });
+    if (!tgt_xpower) {
+        throw new Error('undefined tgt_xpower');
+    }
+    if (!nft_target) {
+        throw new Error('undefined nft_target');
+    }
+    //
+    // Approved migrate?
+    //
+    const tgt_approved = await tgt_xpower.approvedMigrate(
+        x40(account), await nft_target.address
+    );
+    console.debug(
+        `[${tgt_version}:approved-migrate]`, tgt_approved.toString()
+    );
+    if (tgt_approved) {
+        return;
+    }
+    //
+    // Approve migrate:
+    //
+    let tx: Transaction | undefined;
+    const reset = $approve.ing();
+    Alerts.hide();
+    try {
+        tgt_xpower.onApproveMigrate((
+            acc, op, flag, ev
+        ) => {
+            if (ev.log.transactionHash !== tx?.hash) {
+                return;
+            }
+            reset();
+        });
+        tx = await tgt_xpower.approveMigrate(
+            await nft_target.address, true
         );
     } catch (ex: any) {
         if (ex.message) {

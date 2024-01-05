@@ -51,6 +51,28 @@ export class XPowerMoe extends Base {
             x40(to), x64(block_hash), nonce, this.options
         );
     }
+    async approvedMigrate(
+        account: Account, operator: Account
+    ): Promise<boolean> {
+        const contract = await this.connect();
+        if (ROParams.lt(Version.v9c)) {
+            return true;
+        }
+        return contract.approvedMigrate(
+            x40(account), x40(operator)
+        );
+    }
+    async approveMigrate(
+        operator: Account, approved: boolean
+    ): Promise<Transaction | undefined> {
+        const contract = await this.connect();
+        if (ROParams.lt(Version.v9c)) {
+            return undefined;
+        }
+        return contract.approveMigrate(
+            x40(operator), approved
+        );
+    }
     private get otf() {
         return OtfManager.connect(this.connect());
     }

@@ -26,6 +26,9 @@ $('button.approve-sov-allowance').on(
             await moeApproveNew({
                 $approve
             });
+            await moeApproveSov({
+                $approve
+            });
             await sovApproveOld({
                 $approve, $migrate: $migrate.find(
                     '.sov-migrate.xpow'
@@ -144,6 +147,64 @@ async function moeApproveNew({ $approve }: {
         });
         tx = await tgt_xpower.approve(
             await tgt_apower.address, MAX_UINT256
+        );
+    } catch (ex: any) {
+        if (ex.message) {
+            if (ex.data && ex.data.message) {
+                ex.message = `${ex.message} [${ex.data.message}]`;
+            }
+            alert(ex.message, Alert.warning, {
+                after: $approve.parent('div')[0]
+            });
+        }
+        console.error(ex);
+        reset();
+    }
+}
+async function moeApproveSov({ $approve }: {
+    $approve: JQuery<HTMLElement>
+}) {
+    const { account, src_version, tgt_version } = await context({
+        $el: $approve
+    });
+    const { tgt_xpower, tgt_apower } = await contracts({
+        account, src_version, tgt_version
+    });
+    if (!tgt_xpower) {
+        throw new Error('undefined tgt_xpower');
+    }
+    if (!tgt_apower) {
+        throw new Error('undefined tgt_apower');
+    }
+    //
+    // Approved migrate?
+    //
+    const tgt_approved = await tgt_xpower.approvedMigrate(
+        x40(account), await tgt_apower.address
+    );
+    console.debug(
+        `[${tgt_version}:approved-migrate]`, tgt_approved.toString()
+    );
+    if (tgt_approved) {
+        return;
+    }
+    //
+    // Approve migrate:
+    //
+    let tx: Transaction | undefined;
+    const reset = $approve.ing();
+    Alerts.hide();
+    try {
+        tgt_xpower.onApproveMigrate((
+            acc, op, flag, ev
+        ) => {
+            if (ev.log.transactionHash !== tx?.hash) {
+                return;
+            }
+            reset();
+        });
+        tx = await tgt_xpower.approveMigrate(
+            await tgt_apower.address, true
         );
     } catch (ex: any) {
         if (ex.message) {
