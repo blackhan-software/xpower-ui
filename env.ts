@@ -51,6 +51,8 @@ const XPOW_MOE_V9a = process.env.XPOW_MOE_V9a ?? '0xBc340583e3299E43f1E993C61857
 check(XPOW_MOE_V9a, 'missing env XPOW_MOE_V9a variable');
 const XPOW_MOE_V9b = process.env.XPOW_MOE_V9b ?? '0x856cc60002Bac150b2738B424677879c02c516cb';
 check(XPOW_MOE_V9b, 'missing env XPOW_MOE_V9b variable');
+const XPOW_MOE_V9c = process.env.XPOW_MOE_V9c ?? '0x735D8f3B6A5d2c96D0405230c50Eaf96794FbB88';
+check(XPOW_MOE_V9c, 'missing env XPOW_MOE_V9c variable');
 // NFT contract addresses
 const XPOW_NFT_V2a = process.env.XPOW_NFT_V2a ?? '0x92E332cc5E9772f18e15B9ab72E2Dc86F5336d2b';
 check(XPOW_NFT_V2a, 'missing env XPOW_NFT_V2a variable');
@@ -92,6 +94,8 @@ const XPOW_NFT_V9a = process.env.XPOW_NFT_V9a ?? '0x0EA4F21B1B2A7CB88938B7B3Cb4C
 check(XPOW_NFT_V9a, 'missing env XPOW_NFT_V9a variable');
 const XPOW_NFT_V9b = process.env.XPOW_NFT_V9b ?? '0xe69eC1233Bb8d4F409e11b3622e0a36d566DcC98';
 check(XPOW_NFT_V9b, 'missing env XPOW_NFT_V9b variable');
+const XPOW_NFT_V9c = process.env.XPOW_NFT_V9c ?? '0x871832d8c04deCE15E87F1b04aCCA01DC1066Ec7';
+check(XPOW_NFT_V9c, 'missing env XPOW_NFT_V9c variable');
 // PPT contract addresses
 const XPOW_PPT_V4a = process.env.XPOW_PPT_V4a ?? '0xd4385Fbe9A8334162742254947858381EdcefdCe';
 check(XPOW_PPT_V4a, 'missing env XPOW_PPT_V4a variable');
@@ -123,6 +127,8 @@ const XPOW_PPT_V9a = process.env.XPOW_PPT_V9a ?? '0x53219B6022b4DB09F716cd044bAd
 check(XPOW_PPT_V9a, 'missing env XPOW_PPT_V9a variable');
 const XPOW_PPT_V9b = process.env.XPOW_PPT_V9b ?? '0x87D88076C2e4aCcb58cC836c2e06AD6a9D80f7C5';
 check(XPOW_PPT_V9b, 'missing env XPOW_PPT_V9b variable');
+const XPOW_PPT_V9c = process.env.XPOW_PPT_V9c ?? '0x0d7b30580A94E293BD29A9d33798617a384fCB0C';
+check(XPOW_PPT_V9c, 'missing env XPOW_PPT_V9c variable');
 // SOV contract addresses
 const XPOW_SOV_V5a = process.env.XPOW_SOV_V5a ?? '0x411c1aB1e4CcD16A0b6556C625CAF5F556580995';
 check(XPOW_SOV_V5a, 'missing env XPOW_SOV_V5a variable');
@@ -152,6 +158,8 @@ const XPOW_SOV_V9a = process.env.XPOW_SOV_V9a ?? '0x0751293D7b2209cac5D48EEf89CA
 check(XPOW_SOV_V9a, 'missing env XPOW_SOV_V9a variable');
 const XPOW_SOV_V9b = process.env.XPOW_SOV_V9b ?? '0x992fc98f5761A00A4D4Ae63fCd720cdc96dC514F';
 check(XPOW_SOV_V9b, 'missing env XPOW_SOV_V9b variable');
+const XPOW_SOV_V9c = process.env.XPOW_SOV_V9c ?? '0x7F9C841FEAdDdB4bdBB2A161cA40bEbc4F215a9A';
+check(XPOW_SOV_V9c, 'missing env XPOW_SOV_V9c variable');
 // MOE treasury contract addresses
 const XPOW_MTY_V4a = process.env.XPOW_MTY_V4a ?? '0x5823605b4d9548124E3a01f011d0834982D2b4fc';
 check(XPOW_MTY_V4a, 'missing env XPOW_MTY_V4a variable');
@@ -183,6 +191,8 @@ const XPOW_MTY_V9a = process.env.XPOW_MTY_V9a ?? '0x495A90AE733e0cBDF7C9c7495a5F
 check(XPOW_MTY_V9a, 'missing env XPOW_MTY_V9a variable');
 const XPOW_MTY_V9b = process.env.XPOW_MTY_V9b ?? '0xEC7FD452f7078D5F50aB3976Dd3E263B3d87f160';
 check(XPOW_MTY_V9b, 'missing env XPOW_MTY_V9b variable');
+const XPOW_MTY_V9c = process.env.XPOW_MTY_V9c ?? '0x6C48c9d2A3eD1153DB507Dc1D6e1ed0FCb39f909';
+check(XPOW_MTY_V9c, 'missing env XPOW_MTY_V9c variable');
 // PPT treasury contract addresses
 const XPOW_PTY_V4a = process.env.XPOW_PTY_V4a ?? '0xEe231E251b5A422cCF9514fAc1362A0a06463CeD';
 check(XPOW_PTY_V4a, 'missing env XPOW_PTY_V4a variable');
@@ -214,6 +224,8 @@ const XPOW_PTY_V9a = process.env.XPOW_PTY_V9a ?? '0x77F2827552939c1812EebDfCc09f
 check(XPOW_PTY_V9a, 'missing env XPOW_PTY_V9a variable');
 const XPOW_PTY_V9b = process.env.XPOW_PTY_V9b ?? '0xa59bE80EAf127F5a250991b12c931B6B6Da80AAb';
 check(XPOW_PTY_V9b, 'missing env XPOW_PTY_V9b variable');
+const XPOW_PTY_V9c = process.env.XPOW_PTY_V9c ?? '0x2a7faFdAb55458429EbB92f59598ED5762754Ab4';
+check(XPOW_PTY_V9c, 'missing env XPOW_PTY_V9c variable');
 // MOE contract images
 const XPOW_MOE_IMAGE = process.env.XPOW_MOE_IMAGE ?? read('./public/images/svg/xpow.data.svg', 'utf8');
 check(typeof XPOW_MOE_IMAGE === 'string', 'missing env XPOW_MOE_IMAGE variable');
@@ -251,6 +263,7 @@ export default {
         XPOW_MOE_V8c,
         XPOW_MOE_V9a,
         XPOW_MOE_V9b,
+        XPOW_MOE_V9c,
     }, ...{
         XPOW_NFT_V2a,
         XPOW_NFT_V2b,
@@ -272,6 +285,7 @@ export default {
         XPOW_NFT_V8c,
         XPOW_NFT_V9a,
         XPOW_NFT_V9b,
+        XPOW_NFT_V9c,
     }, ...{
         XPOW_PPT_V4a,
         XPOW_PPT_V5a,
@@ -288,6 +302,7 @@ export default {
         XPOW_PPT_V8c,
         XPOW_PPT_V9a,
         XPOW_PPT_V9b,
+        XPOW_PPT_V9c,
     }, ...{
         XPOW_SOV_V5a,
         XPOW_SOV_V5b,
@@ -303,6 +318,7 @@ export default {
         XPOW_SOV_V8c,
         XPOW_SOV_V9a,
         XPOW_SOV_V9b,
+        XPOW_SOV_V9c,
     }, ...{
         XPOW_MTY_V4a,
         XPOW_MTY_V5a,
@@ -319,6 +335,7 @@ export default {
         XPOW_MTY_V8c,
         XPOW_MTY_V9a,
         XPOW_MTY_V9b,
+        XPOW_MTY_V9c,
     }, ...{
         XPOW_PTY_V4a,
         XPOW_PTY_V5a,
@@ -335,6 +352,7 @@ export default {
         XPOW_PTY_V8c,
         XPOW_PTY_V9a,
         XPOW_PTY_V9b,
+        XPOW_PTY_V9c,
     }, ...{
         XPOW_MOE_IMAGE,
         XPOW_SOV_IMAGE,
