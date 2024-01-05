@@ -27,7 +27,7 @@ describe('PptWalletMock', () => {
 });
 describe('PptWalletMock', () => {
     const year = new Date().getFullYear();
-    it(`should fetch & validate uri(id=2${year}03)`, async () => {
+    it(`should fetch & validate uri(id=${year}03)`, async () => {
         const nft = new PptWalletMock(0n);
         const uri = await nft.uri(nft.idBy(year, 3));
         expect(uri).toBeDefined();
@@ -40,7 +40,7 @@ describe('PptWalletMock', () => {
                 expect(json.name).toMatch(/^KILO [A-Z]{4}/);
                 expect(json.description).toMatch(/^Staked KILO [A-Z]{4} NFT/);
                 expect(json.external_url).toMatch(/^https:\/\/www\.xpowermine\.com\/staking\?token=[A-Z]{4}$/)
-                expect(json.image).toMatch(new RegExp(`${year}/[A-z]{4}/2-[A-z]{4}_KILO.png$`))
+                expect(json.image).toMatch(new RegExp(`${year}/2-[A-z]{4}_KILO.png$`))
                 expect(json.attributes).toBeDefined();
             });
     });
