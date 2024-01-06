@@ -1,15 +1,26 @@
 div#ppt-batch-minting {
   .ppt-batch-minter {
-    #ppt-batch-claimer  {
-      border-left: 1px solid var(--xp-powered);
+    #toggle-all {
+      border-radius: 1px 0 0 1px;
     }
+    #ppt-batch-burner,
+    #ppt-batch-minter {
+      border-right: 1px solid;
+    }
+    #ppt-batch-claimer {
+      border-left: 1px solid;
+    }
+    .info {
+      border-radius: 0 1px 1px 0;
+    }
+    border: 3px double;
   }
 }
 div#ppt-batch-minting {
   .ppt-batch-minter {
     #toggle-all {
-      min-width: 42px;
-      width: 42px;
+      min-width: 42.5px;
+      width: 42.5px;
     }
     #toggle-all > i {
       position: relative;

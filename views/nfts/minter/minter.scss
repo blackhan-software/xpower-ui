@@ -1,9 +1,19 @@
 div#nft-batch-minting {
   .nft-batch-minter {
-    #nft-batch-burner,
-    #nft-batch-minter  {
-      border-right: 1px solid var(--xp-powered);
+    #toggle-all {
+      border-radius: 1px 0 0 1px;
     }
+    #nft-batch-burner,
+    #nft-batch-minter {
+      border-right: 1px solid;
+    }
+    #nft-batch-upgrader {
+      border-left: 1px solid;
+    }
+    .info {
+      border-radius: 0 1px 1px 0;
+    }
+    border: 3px double;
   }
 }
 div#nft-batch-minting {

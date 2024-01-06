@@ -4,7 +4,16 @@ div#mining {
 }
 div#mining {
   .toggle-mining {
-    button#toggle-mining {
+    #toggle-mining {
+      border-radius: 1px 0 0 1px;
+    }
+    .info {
+      border-radius: 0 1px 1px 0;
+    }
+    border: 3px double;
+  }
+  .toggle-mining {
+    #toggle-mining {
       span.spinner {
         margin-top: 0.25em;
       }
@@ -19,13 +28,13 @@ div#mining {
   .tweak-mining {
     .increaser,
     .decreaser {
-      button#decrease,
-      button#increase {
+      #decrease,
+      #increase {
         padding: 0;
         width: 42.5px;
       }
-      button#decrease > svg,
-      button#increase > svg {
+      #decrease > svg,
+      #increase > svg {
         position: relative;
         top: -1px;
       }
