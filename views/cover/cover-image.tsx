@@ -18,6 +18,7 @@ export function UiCoverImage(
         pulsate ? 'pulsate' : '', 'cover-layer'
     ];
     return <img
+        style={{ opacity: opacity(page)}}
         className={classes.join(' ')}
         width='736' height='246'
         id='cover' alt='cover'
@@ -36,5 +37,18 @@ function source(
             return Ppts;
     }
     return null;
+}
+function opacity(
+    page: Page
+) {
+    switch (page) {
+        case Page.Home:
+            return 1.0;
+        case Page.Nfts:
+            return 0.5;
+        case Page.Ppts:
+            return 0.5;
+    }
+    return 1.0;
 }
 export default UiCoverImage;
