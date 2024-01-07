@@ -58,11 +58,11 @@ const cover_image = (
       };
     case Page.Nfts:
       return {
-        COVER_IMAGE: '/images/all/cover-nfts.38c9c9b4.jpg',
+        COVER_IMAGE: '/images/all/cover-nfts.95716b50.jpg',
       };
     case Page.Ppts:
       return {
-        COVER_IMAGE: '/images/all/cover-ppts.e434794a.jpg',
+        COVER_IMAGE: '/images/all/cover-ppts.215d5ae0.jpg',
       };
   }
   return {
