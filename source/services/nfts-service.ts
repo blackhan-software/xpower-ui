@@ -70,7 +70,7 @@ export const NftsService = (
             }
         };
         const nft_wallet = new NftWallet(account);
-        nft_wallet.onTransferSingle(on_transfer)
+        nft_wallet.onTransferSingle(on_transfer);
     });
     Blockchain.onceConnect(async function onNftBatchTransfers({
         account
