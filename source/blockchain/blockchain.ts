@@ -103,7 +103,7 @@ export class Blockchain extends EventEmitter {
             throw new Error('missing account');
         }
         setTimeout(async () => {
-            this.emit('reconnect', {
+            this.emit('connect', {
                 accounts, account,
                 chainId: await this.chainId(),
                 token: RWParams.token,
@@ -252,7 +252,7 @@ export class Blockchain extends EventEmitter {
             return () => {
                 this.off('reconnect', listener)
                     .off('connect', listener);
-            }
+            };
         }
         if (context.tokens === undefined) {
             context.tokens = new Set(XTokens());
