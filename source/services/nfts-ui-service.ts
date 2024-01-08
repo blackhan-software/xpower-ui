@@ -79,7 +79,7 @@ export const NftsUiService = (
             // burn from youngest to oldest (backwards):
             const issues = Array.from(Years()).reverse();
             for (const issue of issues) {
-                if (issue + level / 3 > issues[0]) {
+                if (issue + 2 ** (level / 3) - 1 > issues[0]) {
                     continue; // irredeemable
                 }
                 const nfts = nftsBy(store.getState(), {

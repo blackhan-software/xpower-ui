@@ -338,7 +338,7 @@ export const nftsBatchBurn = AppThunk('nfts/batch-burn', async (args: {
                 if (nft_total.amount === 0n) {
                     continue; // filter empty
                 }
-                if (issue + level / 3 > issues[0]) {
+                if (issue + 2 ** (level / 3) - 1 > issues[0]) {
                     continue; // irredeemable
                 }
                 const nft_id = Nft.fullId({
