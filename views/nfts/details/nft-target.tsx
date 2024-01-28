@@ -22,9 +22,11 @@ export function UiNftTarget(
     const $ref = useRef<HTMLInputElement>(null);
     useEffect(() => {
         if ($ref.current && props.value !== null) {
-            $ref.current.value = x40(props.value);
+            $ref.current.value = props.balance ? x40(props.value) : '';
         }
-    }, [props.value]);
+    }, [
+        props.balance, props.value
+    ]);
     const classes = [
         'form-control', validity(props)
     ];
@@ -60,10 +62,10 @@ function cursor(
 function validity(
     props: Props
 ) {
-    if (props.valid === true) {
+    if (props.balance && props.valid === true) {
         return 'is-valid';
     }
-    if (props.valid === false) {
+    if (props.balance && props.valid === false) {
         return 'is-invalid';
     }
     return '';
@@ -107,8 +109,8 @@ function isSameAccount(value: string, account: Account) {
     return value.match(new RegExp(`^${x40(account)}$`, 'i'));
 }
 function title(
-    props: Props
+    { level }: Props
 ) {
-    return `Address to send minted ${Nft.nameOf(props.level)} NFTs to (for ${props.issue})`;
+    return `Address to send minted ${Nft.nameOf(level)} NFTs to`;
 }
 export default UiNftTarget;

@@ -150,7 +150,7 @@ function $balance(
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Personal balance of ${Nft.nameOf(nft_level)} NFTs (for ${nft_issue})`}
+                title={`Balance of minted ${Nft.nameOf(nft_level)} NFTs`}
             >
                 <InfoCircle fill={true} />
             </span>
@@ -173,7 +173,7 @@ function $supply(
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Total supply of ${Nft.nameOf(nft_level)} NFTs minted so far (for ${nft_issue})`}
+                title={`Supply of minted ${Nft.nameOf(nft_level)} NFTs`}
             >
                 <InfoCircle fill={true} />
             </span>

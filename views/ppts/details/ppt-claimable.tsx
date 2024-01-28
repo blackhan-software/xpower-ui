@@ -35,7 +35,7 @@ export function UiPptClaimable(
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Mintable ${Token.APOW} due to ${nice_claim} claimables (for ${issue})`}
+                title={`Mintable ${Token.APOW} due to ${nice_claim} claimables`}
             >
                 <InfoCircle fill={true} />
             </span>

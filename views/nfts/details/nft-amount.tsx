@@ -94,8 +94,8 @@ function onChange(
     }
 }
 function title(
-    props: Props
+    { level }: Props
 ) {
-    return `Amount of minted ${Nft.nameOf(props.level)} NFTs to send (for ${props.issue})`;
+    return `Amount of minted ${Nft.nameOf(level)} NFTs to send`;
 }
 export default UiNftAmount;

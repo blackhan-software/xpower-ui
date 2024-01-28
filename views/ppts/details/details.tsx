@@ -277,7 +277,7 @@ function $balance(
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Personal balance of ${Nft.nameOf(ppt_level)} NFTs staked (for ${ppt_issue})`}
+                title={`Balance of staked ${Nft.nameOf(ppt_level)} NFTs`}
             >
                 <InfoCircle fill={true} />
             </span>
@@ -300,7 +300,7 @@ function $supply(
             />
             <span className='input-group-text info'
                 data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Total supply of ${Nft.nameOf(ppt_level)} NFTs staked so far (for ${ppt_issue})`}
+                title={`Supply of staked ${Nft.nameOf(ppt_level)} NFTs`}
             >
                 <InfoCircle fill={true} />
             </span>
