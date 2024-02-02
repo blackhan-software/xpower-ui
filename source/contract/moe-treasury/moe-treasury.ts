@@ -1,6 +1,6 @@
 import { InterfaceAbi, Listener, Transaction } from 'ethers';
 import { MYProvider } from '../../blockchain';
-import { x40 } from '../../functions';
+import { LocalStorage, memoized, x40 } from '../../functions';
 import { ROParams } from '../../params';
 import { Account, Address, Amount, Index, Nft, NftFullId, NftRealId, Rate } from '../../redux/types';
 import { TxEvent, Version, VersionAt } from '../../types';
@@ -48,17 +48,25 @@ export class MoeTreasury extends Base {
         super(address, abi);
         this.version = version;
     }
-    public async aprs(
+    public aprs = memoized(async (
         ppt_id: NftFullId, index: Index
-    ): Promise<APR> {
+    ): Promise<APR> => {
         const contract = await this.get;
         const id = Nft.realId(ppt_id, {
             version: this.version
         });
         return contract.aprs(id, index).then(
-            ([stamp, value, area]: Rate[]) => ({ stamp, value, area })
+            ([stamp, value, area]: bigint[]) => ({
+                stamp, value, area
+            })
         );
-    }
+    }, (
+        ppt_id: NftFullId, index: Index
+    ) => {
+        return `apr:${ppt_id}:${index}:${this.version}`;
+    }, () => {
+        return new LocalStorage<string, Promise<APR>>();
+    });
     public async aprsLength(
         ppt_id: NftFullId
     ): Promise<number | undefined> {
@@ -71,22 +79,32 @@ export class MoeTreasury extends Base {
         }
         return contract.aprsLength(id);
     }
-    public async apbs(
+    public apbs = memoized(async (
         ppt_id: NftFullId, index: Index
-    ): Promise<APB> {
+    ): Promise<APB> => {
         const contract = await this.get;
         const id = Nft.realId(ppt_id, {
             version: this.version
         });
         if (ROParams.lt2(this.version, Version.v8a)) {
             return contract.bonuses(id, index).then(
-                ([stamp, value, area]: Rate[]) => ({ stamp, value, area })
+                ([stamp, value, area]: bigint[]) => ({
+                    stamp, value, area
+                })
             );
         }
         return contract.apbs(id, index).then(
-            ([stamp, value, area]: Rate[]) => ({ stamp, value, area })
+            ([stamp, value, area]: bigint[]) => ({
+                stamp, value, area
+            })
         );
-    }
+    }, (
+        ppt_id: NftFullId, index: Index
+    ) => {
+        return `apb:${ppt_id}:${index}:${this.version}`;
+    }, () => {
+        return new LocalStorage<string, Promise<APR>>();
+    });
     public async apbsLength(
         ppt_id: NftFullId
     ): Promise<number | undefined> {
