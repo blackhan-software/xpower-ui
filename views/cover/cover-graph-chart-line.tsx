@@ -198,12 +198,27 @@ function chart(
 function max(
     values: number[], _level: NftLevel
 ) {
-    const max = Math.max(...values);
+    const max = Math.max(...filtered(values));
     return max > 0 ? 1.01 * max : 1;
 }
 function min(
     _values: number[], _level: NftLevel
 ) {
     return 0;
+}
+function filtered(
+    a: number[], min = 0, max = 5
+) {
+    const sorted = a.slice().sort((a, b) => a - b);
+    // calculate the 1st & 3rd quartiles (Q1 and Q3)
+    const q1 = sorted[Math.floor((sorted.length - 1) / 4)];
+    const q3 = sorted[Math.floor((3 * (sorted.length - 1)) / 4)];
+    // calculate the interquartile range (IQR)
+    const iq_range = q3 - q1;
+    // define lower & upper bounds
+    const lower = q1 - min * iq_range;
+    const upper = q3 + max * iq_range;
+    // filter values within the bounds
+    return a.filter((v) => v >= lower && v <= upper);
 }
 export default UiCoverGraphChartLine;
