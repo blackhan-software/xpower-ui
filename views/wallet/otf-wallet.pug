@@ -24,6 +24,11 @@ div#otf-wallet(
       role="button" title="Copy address"
     )
       i(class="bi bi-copy")
+    button#otf-wallet-export-key.form-control.input-group-text(
+      data-bs-toggle="tooltip" data-bs-placement="top"
+      role="button" title="Export private key of address to clipboard"
+    )
+      i(class="bi bi-key")
     input#otf-wallet-balance.form-control(
       data-bs-toggle="tooltip" data-bs-placement="top"
       placeholder="0" readonly type="text"

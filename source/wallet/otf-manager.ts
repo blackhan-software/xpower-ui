@@ -21,21 +21,21 @@ export class OtfManager {
         const item = JSON.stringify(value);
         localStorage.setItem('otf-wallet:flag', item);
     }
-    public static async init(
-        key = 'otf-wallet'
-    ): Promise<Wallet> {
+    public static async init(): Promise<Wallet> {
         if (this._wallet !== undefined && global.MY_PROVIDER_OTF) {
             return Promise.resolve(this._wallet);
         }
+        const provider = global.MY_PROVIDER_OTF = await MYProvider();
+        const wallet = new OtfWallet(this.signingKey(), provider);
+        return this._wallet = global.OTF_WALLET = wallet;
+    }
+    public static signingKey(key = 'otf-wallet') {
         let value = localStorage.getItem(key);
         if (value === null) {
             value = btoa(JSON.stringify(Object.values(randomBytes(32))));
             localStorage.setItem(key, value);
         }
-        const secret = new Uint8Array(JSON.parse(atob(value)));
-        const provider = global.MY_PROVIDER_OTF = await MYProvider();
-        const wallet = new OtfWallet(new SigningKey(secret), provider);
-        return this._wallet = global.OTF_WALLET = wallet;
+        return new SigningKey(new Uint8Array(JSON.parse(atob(value))));
     }
     public static async connect(
         fallback: Promise<Contract>

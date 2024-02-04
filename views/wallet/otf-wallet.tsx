@@ -4,9 +4,12 @@ import { AccountContext, globalRef } from '../../source/react';
 import { Account, Amount, OtfWallet } from '../../source/redux/types';
 import { OtfManager } from '../../source/wallet';
 
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Avalanche } from '../../public/images/tsx';
+
+import { useInterval } from 'usehooks-ts';
 import { QRCode } from './qr-code';
+import { Sector } from './sector';
 
 type Props = OtfWallet & {
     onDeposit?: (
@@ -33,6 +36,7 @@ export function UiOtfWallet(
                 {$qr_code(props)}
                 {$account(props)}
                 {$copy(props)}
+                {$exportKey(props)}
                 {$balance(props)}
                 {$info()}
             </div>
@@ -182,6 +186,48 @@ function $copy(
     >
         <i className='bi bi-copy'></i>
     </button>;
+}
+function $exportKey(
+    _: Props
+) {
+    const [percent, set_percent] = useState(0);
+    const [delay, set_delay] = useState(0);
+    useInterval(() => {
+        if (percent >= 1) {
+            const { privateKey } = OtfManager.signingKey();
+            navigator.clipboard.writeText(privateKey);
+        }
+        if (percent < 1) {
+            set_percent(percent + 0.0025);
+        } else {
+            set_percent(0);
+            set_delay(0);
+        }
+    }, delay > 0 ? delay : null);
+    return <button id='otf-wallet-export-key'
+        className='form-control input-group-text'
+        data-bs-toggle='tooltip' data-bs-placement='top'
+        role='button' title='Export private key of address to clipboard'
+        onPointerDown={start_interval} onPointerUp={stop_interval}
+    >
+        <i className='bi bi-key'></i>
+        {$sectors({ percent })}
+    </button>;
+    function start_interval() {
+        set_delay(1); // ms
+    }
+    function stop_interval() {
+        set_percent(0);
+        set_delay(0);
+    }
+}
+function $sectors(
+    { percent }: { percent: number }
+) {
+    return <Sector
+        length={360 * percent} radius={16} start={0}
+        stroke={{ dash: [1, 2], width: 4 }}
+    />;
 }
 function $balance(
     { amount }: Pick<Props, 'amount'>
