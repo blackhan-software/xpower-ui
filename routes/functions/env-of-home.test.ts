@@ -36,10 +36,10 @@ describe('env_of_home', () => {
                 xtoken: 'xpow',
                 xToken: 'XPow',
             }, ...{
-                XP_POWERED: 'var(--xp-magenta)',
-                XP_POWERED_DARK: 'var(--xp-magenta-dark)',
-                XP_POWEREDi: 'var(--xp-magenta-i)',
-                XP_POWERED_DARKi: 'var(--xp-magenta-dark-i)',
+                XP_POWERED: 'rgba(238,238,238,1)',
+                XP_POWERED_DARK: 'rgba(119,119,119,1)',
+                XP_POWEREDi: 'rgba(17,17,17,1)',
+                XP_POWERED_DARKi: 'rgba(136,136,136,1)',
             }, ...{
                 COVER_IMAGE: '',
             }, ...{

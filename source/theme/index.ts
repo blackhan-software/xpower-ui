@@ -14,6 +14,7 @@ export enum ThemeColor {
     red = 'red',
     yellow = 'yellow',
     gray = 'gray',
+    white = 'white',
 }
 export type ThemeColors
     = keyof typeof ThemeColor;
