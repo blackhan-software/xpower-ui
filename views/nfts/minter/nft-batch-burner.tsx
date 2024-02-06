@@ -2,6 +2,7 @@ import { NftBurnerStatus, NftMinterList } from '../../../source/redux/types';
 
 import React from 'react';
 import { Spinner } from './spinner';
+import { confirm } from '../../../source/functions';
 
 type Props = {
     approved: boolean | null;
@@ -24,7 +25,14 @@ export function UiNftBatchBurner(
         type='button' id='nft-batch-burner'
         className={classes.join(' ')}
         disabled={disabled({ list, status })}
-        onClick={onBatchBurn?.bind(null, list)}
+        onClick={async () => {
+            const flag = await confirm(
+                "Really? Ensure to haved claimed APOWs and confirm burn: 🔥"
+            );
+            if (flag) {
+                onBatchBurn?.(list);
+            }
+        }}
     >
         {Spinner({
             show: burning(status), grow: true, right: true
