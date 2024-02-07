@@ -2,6 +2,8 @@ div#ppt-batch-minting {
   .ppt-batch-minter {
     #toggle-all {
       border-radius: 1px 0 0 1px;
+      min-width: 38px !important;
+      width: 38px !important;
     }
     #ppt-batch-burner,
     #ppt-batch-minter {
@@ -12,6 +14,7 @@ div#ppt-batch-minting {
     }
     .info {
       border-radius: 0 1px 1px 0;
+      width: 38px !important;
     }
     border: 3px double;
   }

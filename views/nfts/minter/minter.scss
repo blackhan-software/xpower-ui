@@ -2,6 +2,8 @@ div#nft-batch-minting {
   .nft-batch-minter {
     #toggle-all {
       border-radius: 1px 0 0 1px;
+      min-width: 38px !important;
+      width: 38px !important;
     }
     #nft-batch-burner,
     #nft-batch-minter {
@@ -12,6 +14,7 @@ div#nft-batch-minting {
     }
     .info {
       border-radius: 0 1px 1px 0;
+      width: 38px !important;
     }
     border: 3px double;
   }
