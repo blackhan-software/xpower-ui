@@ -40,11 +40,26 @@ export function clearAll(
     return Parser.boolean(params.get('clear-all'), false);
 }
 export function color(
-    params: URLSearchParams, fallback = {
-        r: 'e', g: 'e', b: 'e'
-    }
+    params: URLSearchParams, fallback = ThemeColor.white
 ): ThemeColor | RGB {
     const key = params.get('color');
+    if (typeof key === 'string') {
+        const rgb1 = key.match(RGB1_REGEX);
+        if (rgb1 && rgb1.groups) {
+            return rgb1.groups as RGB;
+        }
+        const rgb2 = key.match(RGB2_REGEX);
+        if (rgb2 && rgb2.groups) {
+            return rgb2.groups as RGB;
+        }
+        return ThemeColor[key as ThemeColors] ?? fallback;
+    }
+    return fallback;
+}
+export function colorAlt(
+    params: URLSearchParams, fallback = ThemeColor.magenta
+): ThemeColor | RGB {
+    const key = params.get('color-alt');
     if (typeof key === 'string') {
         const rgb1 = key.match(RGB1_REGEX);
         if (rgb1 && rgb1.groups) {

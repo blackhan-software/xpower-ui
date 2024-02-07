@@ -14,6 +14,9 @@ export class ROParams {
     public static get color() {
         return parsers.color(this._search);
     }
+    public static get colorAlt() {
+        return parsers.colorAlt(this._search);
+    }
     public static get debug() {
         return parsers.debug(this._search);
     }

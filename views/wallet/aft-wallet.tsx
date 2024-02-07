@@ -248,7 +248,7 @@ function $sectors(
 ) {
     return <Sector
         length={360 * percent} start={180 * (1 - percent)}
-        stroke={{ color: 'var(--xp-magenta)' }}
+        stroke={{ color: 'var(--xp-accentuated)' }}
     />;
 }
 function metric_pct(

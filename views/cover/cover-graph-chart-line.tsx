@@ -5,7 +5,6 @@ import React, { useEffect, useRef } from 'react';
 import { useIsFirstRender } from 'usehooks-ts';
 
 import { mobile, nice, nice_si, ordinal } from '../../source/functions';
-import { ROParams } from '../../source/params';
 import { useMouseDragX } from '../../source/react';
 import { Nft, NftIssue, NftLevel, Rates } from '../../source/redux/types';
 import { theme } from '../../source/theme';
@@ -52,7 +51,7 @@ function chart(
     const re = RateEvaluator(rates, level, issue, delta, 360n);
     const targets = re.targets.map(([apr, apb]) => normalize(apr + apb));
     const actuals = re.actuals.map(([apr, apb]) => normalize(apr + apb));
-    const xp_color = style(theme(ROParams.color).XP_POWERED);
+    const xp_color = style(theme().XP_POWERED);
     const xp_alpha = xp_color.replace(/1\)$/, '0.125)');
     const data = {
         labels: re.stamps,

@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import { Request } from 'express';
 import { x40 } from '../../source/functions';
-import { account, color, nftLevels } from '../../source/params/parsers';
+import { account, color, colorAlt, nftLevels } from '../../source/params/parsers';
 import { Nft, NftLevels, Page, Pager } from '../../source/redux/types';
 import { theme } from '../../source/theme';
 import { Tokenizer } from '../../source/token';
@@ -43,7 +43,7 @@ export const env_of = (req: Request): Record<string, string> => {
       ...nft_chevron(params),
       ...nft_display(params),
       ...otf_wallet(params),
-      ...theme(color(params)),
+      ...theme(color(params), colorAlt(params)),
     }
   };
 };
