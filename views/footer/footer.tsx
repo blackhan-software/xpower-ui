@@ -135,7 +135,7 @@ function $addToken(
     return <li className='nav-item pb-1 pt-1 pe-1'>
         <a className='nav-link lower add-token'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            title={`Add the ${token} token to your Metamask`}
+            title={`Add the ${token} token to your wallet`}
             href='#' onClick={addToken.bind(null, token, version)}
         >
             <i className='bi bi-plus-square-fill'></i>
