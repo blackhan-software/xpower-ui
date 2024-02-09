@@ -2,7 +2,7 @@ import './spa.scss';
 
 import { Bus } from '../../source/bus';
 import { leafKeys } from '../../source/functions';
-import { AccountContext, AccountProvider, AccountsContext, AccountsProvider, DebugContext, DebugProvider, TokenProvider, UiProvider, WalletProvider } from '../../source/react';
+import { AccountContext, AccountProvider, AccountsContext, AccountsProvider, DebugContext, DebugProvider, RpcProvider, TokenProvider, UiProvider, WalletProvider } from '../../source/react';
 import { setNftsUiAmounts, setNftsUiDetails, setNftsUiFlags, setNftsUiToggled, setPptsUiAmounts, setPptsUiDetails, setPptsUiFlags, setPptsUiToggled } from '../../source/redux/actions';
 import { miningSpeedable, miningTogglable } from '../../source/redux/selectors';
 import { AppDispatch, AppState, Store } from '../../source/redux/store';
@@ -476,15 +476,17 @@ if (require.main === module) {
     createRoot($content!).render(
         <Provider store={Store()}>
             <DebugProvider>
-                <AccountsProvider>
-                    <AccountProvider>
-                        <TokenProvider>
-                            <WalletProvider>
-                                <UiProvider>{$spa}</UiProvider>
-                            </WalletProvider>
-                        </TokenProvider>
-                    </AccountProvider>
-                </AccountsProvider>
+                <RpcProvider>
+                    <AccountsProvider>
+                        <AccountProvider>
+                            <TokenProvider>
+                                <WalletProvider>
+                                    <UiProvider>{$spa}</UiProvider>
+                                </WalletProvider>
+                            </TokenProvider>
+                        </AccountProvider>
+                    </AccountsProvider>
+                </RpcProvider>
             </DebugProvider>
         </Provider>
     );

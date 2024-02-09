@@ -6,7 +6,7 @@ import { Global } from '../types';
 declare const global: Global;
 
 export async function MMProvider(
-    polling_ms = 2000
+    polling_ms = MYProviderMs()
 ): Promise<
     BrowserProvider | undefined
 > {
@@ -22,7 +22,7 @@ export async function MMProvider(
     return global.MM_PROVIDER;
 }
 export async function MYProvider(
-    polling_ms = 2000
+    polling_ms = MYProviderMs()
 ): Promise<
     JsonRpcApiProvider | undefined
 > {
@@ -97,7 +97,7 @@ async function WSProvider(
         Blockchain.reconnect();
     }
 }
-function MYProviderUrl(): string | null {
+export function MYProviderUrl(): string | undefined {
     if (typeof document === 'undefined') {
         return global.MY_PROVIDER_URL ?? 'http://127.0.0.1:9650/ext/bc/C/rpc'; // test-env
     }
@@ -107,12 +107,39 @@ function MYProviderUrl(): string | null {
     if (!$url) {
         throw new Error('#g-urls-provider-my missing');
     }
-    const url = $url.dataset.value ?? null;
+    const url_my = localStorage.getItem('g-rpc-address');
+    const url = url_my ?? $url.dataset.value;
     if (typeof url !== 'string') {
         throw new Error('#g-urls-provider-my[data-value] missing');
     }
     if (global.MY_PROVIDER_URL === undefined && url) {
-        global.MY_PROVIDER_URL = `${new URL(url)}?code=${String.random(4)}`;
+        const uri = new URL(url);
+        if (uri.searchParams.has('code-x') === false) {
+            uri.searchParams.set('code-x', String.random(4));
+        }
+        global.MY_PROVIDER_URL = uri.toString();
     }
-    return global.MY_PROVIDER_URL ?? null;
+    return global.MY_PROVIDER_URL;
+}
+export function MYProviderMs(
+    polling_ms?: number, min = 2_000, max = 20_000
+): number {
+    if (typeof polling_ms !== 'number') {
+        if (typeof localStorage !== 'undefined') {
+            const ms = localStorage.getItem('g-rpc-polling');
+            if (ms) polling_ms = parseInt(ms);
+        } else {
+            polling_ms = min;
+        }
+    }
+    if (typeof polling_ms !== 'number' || isNaN(polling_ms)) {
+        polling_ms = min;
+    }
+    if (polling_ms < min) {
+        return min;
+    }
+    if (polling_ms > max) {
+        return max;
+    }
+    return polling_ms;
 }
