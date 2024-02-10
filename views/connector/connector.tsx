@@ -2,11 +2,12 @@
 import './connector.scss';
 
 import React, { createElement, useEffect, useState } from 'react';
+import { CSSTransition } from 'react-transition-group';
+
 import { createRoot } from 'react-dom/client';
 import { Provider, useStore } from 'react-redux';
 import { globalRef } from '../../source/react';
 
-import { Bug, Wifi } from '../../public/images/tsx';
 import { Blockchain, ChainId } from '../../source/blockchain';
 import { Bus } from '../../source/bus';
 import { delayed, mobile } from '../../source/functions';
@@ -14,29 +15,31 @@ import { ROParams } from '../../source/params';
 import { onTokenSwitch } from '../../source/redux/observers';
 import { AppState, Store } from '../../source/redux/store';
 
-type State = {
+import { Info, Label, Spinner } from './components';
+import { RpcAddress, RpcToggle } from './rpc-address';
+
+export type State = {
     chain: Chain;
 }
-enum Chain {
+export enum Chain {
     UNAVAILABLE,
     WRONG_ID,
     UNCONNECTED,
     CONNECTING,
     CONNECTED,
 }
-enum WifiLevel {
+export enum WifiLevel {
     LEVEL_0 = 0,
     LEVEL_1 = 1,
     LEVEL_2 = 2,
     LEVEL_3 = 3,
 }
 export function UiConnector() {
-    const [chain, set_chain] = useState(
-        Chain.CONNECTING
-    );
+    const [chain, set_chain] = useState(Chain.CONNECTING);
+    const [toggled, set_toggled] = useState(false);
     useEffect(() => {
         Bus.emit('refresh-tips');
-    }, [chain]);
+    }, [chain, toggled]);
     const store = useStore<AppState>();
     useEffect(() => {
         return onTokenSwitch(store, () => reset());
@@ -97,15 +100,22 @@ export function UiConnector() {
             return () => clearInterval(iid);
         }
     }, [chain, level]);
-    return <div
-        className='btn-group connect-wallet' role='group'
-    >
-        {$connector(chain)}
-        {$info(chain, level)}
-    </div>;
+    return <>
+        <div className='btn-group connect-wallet' role='group'>
+            <RpcToggle toggled={toggled} onToggled={set_toggled} />
+            <Connector chain={chain} />
+            <Info chain={chain} level={level} />
+        </div>
+        <CSSTransition
+            nodeRef={globalRef<HTMLElement>('.rpc-address')}
+            in={toggled} timeout={600} classNames='fade-in-600'
+        >
+            <RpcAddress toggled={toggled} />
+        </CSSTransition>
+    </>;
 }
-function $connector(
-    chain: State['chain']
+function Connector(
+    { chain }: Pick<State, 'chain'>
 ) {
     const on_click = async () => {
         if (chain === Chain.WRONG_ID) {
@@ -128,89 +138,17 @@ function $connector(
         ? 'disabled' : '';
     return <a type='button' ref={globalRef('#connect-wallet')}
         className={`btn btn-outline-warning ${disabled}`}
+        id='connect-wallet' onClick={on_click}
         href={href} target={target} rel={rel}
-        id='connect-wallet'
-        onClick={on_click}
     >
-        {$spinner(chain)}
-        {$text(chain)}
+        <Spinner show={connecting(chain)} grow={true} />
+        <Label chain={chain} />
     </a>;
-}
-function $spinner(
-    chain: State['chain']
-) {
-    return Spinner({
-        show: connecting(chain), grow: true
-    });
 }
 function connecting(
     chain: State['chain']
 ) {
     return chain === Chain.CONNECTING;
-}
-function $text(
-    chain: State['chain']
-) {
-    return <span className='text'>{label(chain)}</span>;
-}
-function label(
-    chain: State['chain']
-) {
-    switch (chain) {
-        case Chain.UNAVAILABLE:
-            return 'Install Wallet';
-        case Chain.WRONG_ID:
-            return 'Switch to Avalanche';
-        case Chain.UNCONNECTED:
-            return 'Connect to Wallet';
-        case Chain.CONNECTING:
-            return 'Connecting to Wallet';
-        case Chain.CONNECTED:
-            return 'Connected to Wallet';
-    }
-}
-function $info(
-    chain: State['chain'], level: WifiLevel
-) {
-    return <button
-        className='btn btn-outline-warning info'
-        data-bs-toggle='tooltip' data-bs-placement='top'
-        title={tooltip(chain)} type='button'
-    >
-        {icon(chain, level)}
-    </button>;
-}
-function icon(
-    chain: State['chain'], level: WifiLevel
-) {
-    switch (chain) {
-        case Chain.UNAVAILABLE:
-            return <Wifi level={0} />;
-        case Chain.WRONG_ID:
-            return <Bug fill={true} />;
-        case Chain.UNCONNECTED:
-            return <Wifi level={0} />;
-        case Chain.CONNECTED:
-            return <Wifi level={3} />;
-        case Chain.CONNECTING:
-            return <Wifi level={level} />;
-    }
-}
-function tooltip(
-    chain: State['chain']
-) {
-    switch (chain) {
-        case Chain.UNAVAILABLE:
-            return 'No wallet found: install one and then reload the page';
-        case Chain.WRONG_ID:
-            return 'Wrong network — switch to Avalanche and/or toggle VPN connection (if any)';
-        case Chain.UNCONNECTED:
-            return 'Connect to Avalanche — and/or toggle VPN (if any)';
-        case Chain.CONNECTED:
-            return 'Connected to Avalanche';
-        case Chain.CONNECTING:
-            return 'Connecting to Avalanche';
-    }
 }
 function ms(
     fallback?: number
@@ -239,18 +177,6 @@ function reload(
     } else {
         location.search = `?reload-ms=${delta_ms}`;
     }
-}
-function Spinner(
-    { show, grow }: { show: boolean, grow?: boolean }
-) {
-    const classes = [
-        'spinner spinner-border spinner-border-sm',
-        'float-start', grow ? 'spinner-grow' : ''
-    ];
-    return <span
-        className={classes.join(' ')} role='status'
-        style={{ visibility: show ? 'visible' : 'hidden' }}
-    />;
 }
 if (require.main === module) {
     const $connector = document.querySelector('form#connector');

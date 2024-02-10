@@ -1,13 +1,26 @@
 form#connector {
-  .info {
-    border-start-start-radius: 0;
-    border-end-start-radius: 0;
+  div.connect-wallet {
+    #rpc-toggle {
+      border-start-end-radius: 0;
+      border-end-end-radius: 0;
+    }
+    .info {
+      border-start-start-radius: 0;
+      border-end-start-radius: 0;
+    }
   }
 }
 form#connector {
   div.connect-wallet {
+    #rpc-toggle {
+      i {
+        position: relative;
+        top: 1px;
+      }
+    }
     a#connect-wallet {
       .spinner {
+        position: absolute;
         margin-top: 0.25em;
       }
     }
@@ -16,12 +29,16 @@ form#connector {
 }
 form#connector {
   div.connect-wallet {
+    #rpc-toggle {
+      min-width: 42.5px;
+      width: 42.5px;
+    }
     a#connect-wallet {
       .spinner {
         height: 1em;
         width: 1em;
       }
-      width: calc(100% - 41.5px);
+      width: calc(100% - 84px);
     }
     width: 100%;
   }

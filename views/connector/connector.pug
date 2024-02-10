@@ -1,5 +1,10 @@
 form#connector
   div.btn-group.connect-wallet(role="group")
+    button.btn.btn-outline-warning#rpc-toggle.no-ellipsis(
+      data-bs-toggle="tooltip" data-bs-placement="top"
+      title=`Show RPC end-point` type="button"
+    )
+      i.bi-chevron-down
     a#connect-wallet.btn.btn-outline-warning(
       type="button" href="#" disabled
     )
@@ -13,3 +18,4 @@ form#connector
       type="button"
     )
       include ../../public/images/pug/wifi-1.svg.pug
+  include ./rpc-address/rpc-address.pug
