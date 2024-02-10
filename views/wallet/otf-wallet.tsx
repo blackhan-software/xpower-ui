@@ -8,7 +8,7 @@ import React, { useContext, useState } from 'react';
 import { Avalanche } from '../../public/images/tsx';
 
 import { useInterval } from 'usehooks-ts';
-import { QRCode } from './qr-code';
+import { QRCode } from '../qr-code';
 import { Sector } from './sector';
 
 type Props = OtfWallet & {
@@ -73,7 +73,7 @@ function $transmitter(
 function $qr_code(
     { account }: Pick<Props, 'account'>
 ) {
-    return <QRCode account={account} />;
+    return <QRCode data={account ? x40(account) : ''} />;
 }
 function direction(
     { amount }: Pick<Props, 'amount'>

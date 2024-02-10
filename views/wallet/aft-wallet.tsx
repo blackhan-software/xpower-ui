@@ -10,7 +10,7 @@ import { useDispatch } from 'react-redux';
 import { Fire, XPower } from '../../public/images/tsx';
 import { TokenContext } from '../../source/react';
 
-import { QRCode } from './qr-code';
+import { QRCode } from '../qr-code';
 import { Sector } from './sector';
 
 export type Props = {
@@ -81,7 +81,7 @@ function $otfToggle(
 function $qr_code(
     { account }: Pick<Props, 'account'>
 ) {
-    return <QRCode account={account} />;
+    return <QRCode data={account ? x40(account) : ''} />;
 }
 function $copy(
     { account }: Pick<Props, 'account'>
