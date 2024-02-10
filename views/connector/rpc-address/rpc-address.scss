@@ -1,0 +1,62 @@
+form#connector {
+  div.input-group.rpc-address {
+    button:hover {
+      background-color: var(--xp-gray-dark);
+      border: 1px solid var(--xp-powered);
+      color: var(--xp-powered);
+    }
+    button#rpc-address-enable {
+      width: 42px;
+    }
+    input#rpc-address {
+      font-size: smaller;
+      width: calc(100% - 318px);
+    }
+    button#rpc-address-copy {
+      width: 42px;
+    }
+    button#rpc-polling-dec,
+    button#rpc-polling-inc {
+      width: 42px;
+    }
+    button#rpc-polling-dec:disabled:not(:hover),
+    button#rpc-polling-inc:disabled:not(:hover) {
+      i {
+        opacity: 0.5;
+      }
+      background-color: var(--bs-tertiary-bg);
+    }
+    input#rpc-polling {
+      font-size: smaller;
+      text-align: center;
+      width: 105px;
+    }
+    @media (max-width: 575px) {
+      input#rpc-address {
+        border-radius: 0 6px 6px 0;
+        width: calc(100% - 42px);
+      }
+      button#rpc-address-copy,
+      button#rpc-polling-dec,
+      button#rpc-polling-inc,
+      input#rpc-polling {
+        display: none;
+      }
+    }
+    display: none;
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+}
+form#connector {
+  div.input-group.rpc-address {
+    input[type=number]#rpc-polling {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+    input[type=number]#rpc-polling::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+}
