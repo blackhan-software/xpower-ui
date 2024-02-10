@@ -9,6 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment: test
 
     strategy:
       matrix:
@@ -40,3 +41,5 @@ jobs:
 
       - name: NPM test ${{ matrix.folder }}
         run: npm run -- test ${{ matrix.folder }}
+        env:
+          MY_PROVIDER_URL: ${{ secrets.MY_PROVIDER_URL }}
