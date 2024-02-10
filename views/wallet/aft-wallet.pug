@@ -7,7 +7,7 @@ div#aft-wallet
       role="button" title="Enable minter wallet & show balance of AVAX"
     )
       i(class="bi {{OTF_WALLET_TOGGLE}}")
-    include ./qr-code.pug
+    include ../qr-code/qr-code.pug
     select#aft-wallet-address.form-select(
       default-value="0x0000000000000000000000000000000000000000"
       data-bs-toggle="tooltip" data-bs-placement="top"
