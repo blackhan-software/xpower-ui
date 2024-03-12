@@ -1,16 +1,18 @@
 import './footer.scss';
 
 import { Blockchain, Chain, ChainId } from '../../source/blockchain';
+import { x40 } from '../../source/functions';
 import { ROParams } from '../../source/params';
 import { AppState, Store } from '../../source/redux/store';
 import { NFTokenInfo, PPTokenInfo, Page, Token, TokenInfo } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 import { Version } from '../../source/types';
 
-import React, { createElement, useEffect, useState } from 'react';
+import React, { createElement, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider, connect } from 'react-redux';
-import { x40 } from '../../source/functions';
+import { useLongTap } from '../../source/react';
+
 import SafeWallet from '../../public/images/tsx/safe-wallet-fill';
 
 type Props = {
@@ -60,6 +62,7 @@ function $underlay(
             {$contract(props)}
             {$addToken(props)}
             {$github()}
+            {$coingecko(props)}
             {$youtube()}
             {$discord()}
             {$telegram()}
@@ -118,9 +121,23 @@ function $gnosis() {
 function $contract(
     { chainId, page, token, version }: Props & { chainId: ChainId }
 ) {
-    const { url, tip } = contractInfo(chainId, page, token, version);
+    const $ref = useRef<HTMLAnchorElement>(null);
+    const [long] = useLongTap($ref, () => {});
+    const [ctrl, set_ctrl] = useState(false);
+    useEffect(() => {
+        const handler = (e: KeyboardEvent) => set_ctrl(e.ctrlKey);
+        global.addEventListener('keydown', handler);
+        global.addEventListener('keyup', handler);
+        return () => {
+            global.removeEventListener('keydown', handler);
+            global.removeEventListener('keyup', handler);
+        };
+    }, []);
+    const { url, tip } = contractInfo(
+        { chainId, page, token, version }, long || ctrl ? 1 : 0
+    );
     return <li className='nav-item pb-1 pt-1 pe-1'>
-        <a className='nav-link lower smart-contract'
+        <a ref={$ref} className='nav-link smart-contract lower'
             data-bs-toggle='tooltip' data-bs-placement='top'
             title={tip} target='_blank' href={url}
         >
@@ -133,9 +150,9 @@ function $addToken(
     { token, version }: Props
 ) {
     return <li className='nav-item pb-1 pt-1 pe-1'>
-        <a className='nav-link lower add-token'
+        <a className='add-token nav-link lower'
             data-bs-toggle='tooltip' data-bs-placement='top'
-            title={`Add the ${token} token to your wallet`}
+            title={`Add ${token}s to wallet`}
             href='#' onClick={addToken.bind(null, token, version)}
         >
             <i className='bi bi-plus-square-fill'></i>
@@ -143,9 +160,49 @@ function $addToken(
         </a>
     </li>;
 }
+function $coingecko(
+    { token }: Props
+) {
+    return <li className='nav-item pb-1 pt-1 pe-1'>
+        <a className='coingecko nav-link upper'
+            data-bs-toggle='tooltip' data-bs-placement='top'
+            href={`https://www.coingecko.com/en/coins/xpowermine-com-${Tokenizer.lower(token)}`}
+            rel='noreferrer' target='_blank' title={`${token}s at CoinGecko`}
+        >
+            <svg xmlns='http://www.w3.org/2000/svg' className='white bi bi-coingecko' width='16' height='16' viewBox='0 0 276 276'>
+                <path
+                    fill='none' stroke='currentColor' strokeWidth='12'
+                    d='M269.62,137.42 A131.63,131.63,0,1,1,137.41,6.37v0A131.63,131.63,0,0,1,269.62,137.42Z'
+                />
+                <path fill='currentColor' d='M202.74,92.39c-9.26-2.68-18.86-6.48-28.58-10.32-.56-2.44-2.72-5.48-7.09-9.19-6.35-5.51-18.28-5.37-28.59-2.93-11.38-2.68-22.62-3.63-33.41-1C16.82,93.26,66.86,152.57,34.46,212.19c4.61,9.78,54.3,66.84,126.2,51.53,0,0-24.59-59.09,30.9-87.45C236.57,153.18,269.09,110.46,202.74,92.39Z' />
+                <path fill='var(--xp-gray-dark)' d='M213.64,131.2a5.35,5.35,0,1,1-5.38-5.32A5.36,5.36,0,0,1,213.64,131.2Z' />
+                <path fill='currentColor' d='M138.48,69.91c6.43.46,29.68,8,35.68,12.12-5-14.5-21.83-16.43-35.68-12.12Z' />
+                <path fill='var(--xp-gray-dark)' d='M144.6,106.58a24.68,24.68,0,1,1-24.69-24.67h0a24.68,24.68,0,0,1,24.68,24.66Z' />
+                <path fill='currentColor' d='M137.28,106.8a17.36,17.36,0,1,1-17.36-17.36h0A17.36,17.36,0,0,1,137.28,106.8Z' />
+                <path fill='currentColor' d='M233.63,142.08c-20,14.09-42.74,24.78-75,24.78-15.1,0-18.16-16-28.14-8.18-5.15,4.06-23.31,13.14-37.72,12.45S55,162,48.49,131.23C45.91,162,44.59,184.65,33,210.62c23,36.83,77.84,65.24,127.62,53C155.31,226.27,188,189.69,206.34,171c7-7.09,20.3-18.66,27.29-28.91Z' />
+                <path fill='var(--xp-gray-dark)' d='M232.85,143c-6.21,5.66-13.6,9.85-21.12,13.55a134.9,134.9,0,0,1-23.7,8.63c-8.16,2.11-16.67,3.7-25.29,2.92s-17.43-3.71-23.14-10.17l.27-.31c7,4.54,15.08,6.14,23.12,6.37a108.27,108.27,0,0,0,24.3-2,132.71,132.71,0,0,0,23.61-7.3c7.63-3.15,15.18-6.8,21.68-12Z' />
+            </svg>
+            <svg xmlns='http://www.w3.org/2000/svg' className='color bi bi-coingecko' width='16' height='16' viewBox='0 0 276 276'>
+                <path
+                    fill='none' stroke='#8dc63f' strokeWidth='12'
+                    d='M269.62,137.42 A131.63,131.63,0,1,1,137.41,6.37v0A131.63,131.63,0,0,1,269.62,137.42Z'
+                />
+                <path fill='#f9e988' d='M265.65,137.44a127.63,127.63,0,1,1-128.21-127h0A127.65,127.65,0,0,1,265.65,137.44Z' />
+                <path fill='#ffffff' d='M140.35,18.66a70.18,70.18,0,0,1,24.53,0,74.75,74.75,0,0,1,23.43,7.85c7.28,4,13.57,9.43,19.83,14.52s12.49,10.3,18.42,16a93.32,93.32,0,0,1,15.71,19,108.28,108.28,0,0,1,11,22.17c5.33,15.66,7.18,32.53,4.52,48.62H257c-2.67-15.95-6.29-31.15-12-45.61A177.51,177.51,0,0,0,235.56,80,209.1,209.1,0,0,0,223.14,60a72.31,72.31,0,0,0-16.64-16.8c-6.48-4.62-13.93-7.61-21.14-10.45S171,27,163.48,24.84s-15.16-3.78-23.14-5.35Z' />
+                <path fill='#8bc53f' d='M202.74,92.39c-9.26-2.68-18.86-6.48-28.58-10.32-.56-2.44-2.72-5.48-7.09-9.19-6.35-5.51-18.28-5.37-28.59-2.93-11.38-2.68-22.62-3.63-33.41-1C16.82,93.26,66.86,152.57,34.46,212.19c4.61,9.78,54.3,66.84,126.2,51.53,0,0-24.59-59.09,30.9-87.45C236.57,153.18,269.09,110.46,202.74,92.39Z' />
+                <path fill='#ffffff' d='M213.64,131.2a5.35,5.35,0,1,1-5.38-5.32A5.36,5.36,0,0,1,213.64,131.2Z' />
+                <path fill='#009345' d='M138.48,69.91c6.43.46,29.68,8,35.68,12.12-5-14.5-21.83-16.43-35.68-12.12Z' />
+                <path fill='#ffffff' d='M144.6,106.58a24.68,24.68,0,1,1-24.69-24.67h0a24.68,24.68,0,0,1,24.68,24.66Z' />
+                <path fill='#58595b' d='M137.28,106.8a17.36,17.36,0,1,1-17.36-17.36h0A17.36,17.36,0,0,1,137.28,106.8Z' />
+                <path fill='#8bc53f' d='M233.63,142.08c-20,14.09-42.74,24.78-75,24.78-15.1,0-18.16-16-28.14-8.18-5.15,4.06-23.31,13.14-37.72,12.45S55,162,48.49,131.23C45.91,162,44.59,184.65,33,210.62c23,36.83,77.84,65.24,127.62,53C155.31,226.27,188,189.69,206.34,171c7-7.09,20.3-18.66,27.29-28.91Z' />
+                <path fill='#58595b' d='M232.85,143c-6.21,5.66-13.6,9.85-21.12,13.55a134.9,134.9,0,0,1-23.7,8.63c-8.16,2.11-16.67,3.7-25.29,2.92s-17.43-3.71-23.14-10.17l.27-.31c7,4.54,15.08,6.14,23.12,6.37a108.27,108.27,0,0,0,24.3-2,132.71,132.71,0,0,0,23.61-7.3c7.63-3.15,15.18-6.8,21.68-12Z' />
+            </svg>
+        </a>
+    </li>;
+}
 function $github() {
     return <li className='nav-item pb-1 pt-1 pe-1'>
-        <a className='nav-link lower github'
+        <a className='github nav-link lower'
             data-bs-toggle='tooltip' data-bs-placement='top'
             title='GitHub' href='https://github.com/blackhan-software'
             target='_blank'
@@ -156,7 +213,7 @@ function $github() {
 }
 function $discord() {
     return <li className='nav-item pb-1 pt-1 pe-1'>
-        <a className='discord nav-link'
+        <a className='discord nav-link upper'
             data-bs-toggle='tooltip' data-bs-placement='top'
             title='Discord' href='https://discord.gg/43ChQHEvzV'
             target='_blank' rel='noreferrer'
@@ -177,9 +234,9 @@ function $youtube() {
             <svg xmlns='http://www.w3.org/2000/svg' className='fff bi bi-youtube' width='16' height='16' fill='currentColor' viewBox='0 0 16 16'>
                 <path d='M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.007 2.007 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.007 2.007 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31.4 31.4 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.007 2.007 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A99.788 99.788 0 0 1 7.858 2h.193zM6.4 5.209v4.818l4.157-2.408L6.4 5.209z' />
             </svg>
-            <svg xmlns="http://www.w3.org/2000/svg" className="red bi bi-youtube" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M 8.051,1.999 H 8.14 c 0.822,0.003 4.987,0.033 6.11,0.335 a 2.01,2.01 0 0 1 1.415,1.42 c 0.101,0.38 0.172,0.883 0.22,1.402 l 0.01,0.104 0.022,0.26 0.008,0.104 c 0.065,0.914 0.073,1.77 0.074,1.957 v 0.075 c -0.001,0.194 -0.01,1.108 -0.082,2.06 L 15.909,9.821 15.9,9.925 c -0.05,0.572 -0.124,1.14 -0.235,1.558 a 2.007,2.007 0 0 1 -1.415,1.42 c -1.16,0.312 -5.569,0.334 -6.18,0.335 H 7.928 c -0.309,0 -1.587,-0.006 -2.927,-0.052 L 4.831,13.18 4.744,13.176 4.573,13.169 4.402,13.162 C 3.292,13.113 2.235,13.034 1.748,12.902 A 2.007,2.007 0 0 1 0.333,11.483 C 0.222,11.066 0.148,10.497 0.098,9.925 L 0.09,9.82 0.082,9.716 A 31.4,31.4 0 0 1 0,7.68 V 7.557 C 0.002,7.342 0.01,6.599 0.064,5.779 L 0.071,5.676 0.074,5.624 0.082,5.52 0.104,5.26 0.114,5.156 C 0.162,4.637 0.233,4.133 0.334,3.754 A 2.007,2.007 0 0 1 1.749,2.334 C 2.236,2.204 3.293,2.124 4.403,2.074 L 4.573,2.067 4.745,2.061 4.831,2.058 5.002,2.051 A 99.788,99.788 0 0 1 7.858,2 h 0.193 z" style={{ fill: '#ff0000' }} />
-                <path d="m 6.4,5.209 v 4.818 l 4.157,-2.408 z" style={{ fill: '#ffffff' }} />
+            <svg xmlns='http://www.w3.org/2000/svg' className='red bi bi-youtube' width='16' height='16' fill='currentColor' viewBox='0 0 16 16'>
+                <path d='M 8.051,1.999 H 8.14 c 0.822,0.003 4.987,0.033 6.11,0.335 a 2.01,2.01 0 0 1 1.415,1.42 c 0.101,0.38 0.172,0.883 0.22,1.402 l 0.01,0.104 0.022,0.26 0.008,0.104 c 0.065,0.914 0.073,1.77 0.074,1.957 v 0.075 c -0.001,0.194 -0.01,1.108 -0.082,2.06 L 15.909,9.821 15.9,9.925 c -0.05,0.572 -0.124,1.14 -0.235,1.558 a 2.007,2.007 0 0 1 -1.415,1.42 c -1.16,0.312 -5.569,0.334 -6.18,0.335 H 7.928 c -0.309,0 -1.587,-0.006 -2.927,-0.052 L 4.831,13.18 4.744,13.176 4.573,13.169 4.402,13.162 C 3.292,13.113 2.235,13.034 1.748,12.902 A 2.007,2.007 0 0 1 0.333,11.483 C 0.222,11.066 0.148,10.497 0.098,9.925 L 0.09,9.82 0.082,9.716 A 31.4,31.4 0 0 1 0,7.68 V 7.557 C 0.002,7.342 0.01,6.599 0.064,5.779 L 0.071,5.676 0.074,5.624 0.082,5.52 0.104,5.26 0.114,5.156 C 0.162,4.637 0.233,4.133 0.334,3.754 A 2.007,2.007 0 0 1 1.749,2.334 C 2.236,2.204 3.293,2.124 4.403,2.074 L 4.573,2.067 4.745,2.061 4.831,2.058 5.002,2.051 A 99.788,99.788 0 0 1 7.858,2 h 0.193 z' style={{ fill: '#ff0000' }} />
+                <path d='m 6.4,5.209 v 4.818 l 4.157,-2.408 z' style={{ fill: '#ffffff' }} />
             </svg>
         </a>
     </li>;
@@ -226,13 +283,17 @@ function $avalanche() {
         </a>
     </li>;
 }
-function contractInfo(
-    chainId: ChainId, page: Page, token: Token, version: Version
-): {
+function contractInfo({
+    chainId, page, token, version
+}: {
+    chainId: ChainId; page: Page; token: Token; version: Version;
+}, index = 0): {
     url: string; tip: string;
 } {
     const urls = new Chain(chainId).explorerUrls;
-    const explorer = urls.length ? urls[0] : '';
+    const explorer =
+        urls.length > index ? urls[index]
+            : urls.length > 0 ? urls[0] : '';
     switch (page) {
         case Page.Nfts: {
             const { address } = NFTokenInfo(token, version);

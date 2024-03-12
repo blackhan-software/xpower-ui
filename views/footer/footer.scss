@@ -13,6 +13,10 @@ footer {
         position: relative;
         top: 1px;
     }
+    a.nav-link.upper {
+        position: relative;
+        top: -1px;
+    }
     a.nav-link:hover {
         i.bi, svg {
             color: var(--xp-accentuated);
@@ -45,16 +49,25 @@ footer {
             display: inline-block;
         }
     }
-    a.discord {
-        svg:hover {
+    a.coingecko {
+        svg.color {
+            display: none;
+        }
+    }
+    a.coingecko:hover {
+        svg.white {
+            display: none;
+        }
+        svg.color {
+            display: inline-block;
+        }
+    }
+    a.discord:hover {
+        svg {
             background-color: #5865f2;
             border-radius: 2px;
             color: white;
             padding: 2px;
-        }
-        svg {
-            position: relative;
-            top: -1px;
         }
     }
     a.migrate {
@@ -83,15 +96,15 @@ footer {
             display: block;
         }
     }
-    a.telegram {
-        svg:hover {
+    a.telegram:hover {
+        svg {
             background-color: white;
             border-radius: 8px;
             color: #0088cc;
         }
     }
-    a.twitter {
-        svg:hover {
+    a.twitter:hover {
+        svg {
             color: #55acee;
         }
     }
