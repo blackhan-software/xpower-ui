@@ -62,6 +62,16 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
         account, amount, block_hash
     });
     if (!nonce) {
+        const result = noncesBy(api.getState(), {
+            account, amount
+        });
+        for (const { nonce: n, item: i } of result.filter(({
+            item: i
+        }) => {
+            return i.block_hash !== block_hash
+        })) {
+            api.dispatch(removeNonce(n, i));
+        }
         throw new Error(`missing nonce for amount=${amount}`);
     }
     const moe_wallet = new MoeWallet(account);

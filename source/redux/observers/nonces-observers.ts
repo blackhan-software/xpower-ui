@@ -76,9 +76,12 @@ export function onNonceAdded(
     );
     return observer((next) => {
         const added = (n: Nonce) => {
-            const total_by = inc_total_by(Sign.positive, next.items[n]);
-            const total = inc_total(Sign.positive, next.items[n]);
-            handler(n, next.items[n], total_by, total);
+            const item = next.items[n];
+            if (item) {
+                const total_by = inc_total_by(Sign.positive, item);
+                const total = inc_total(Sign.positive, item);
+                handler(n, item, total_by, total);
+            }
         };
         if (next.more) {
             next.more.forEach(added);
@@ -98,9 +101,12 @@ export function onNonceRemoved(
     );
     return observer((next, prev) => {
         const removed = (p: Nonce) => {
-            const total_by = inc_total_by(Sign.negative, prev.items[p]);
-            const total = inc_total(Sign.negative, prev.items[p]);
-            handler(p, prev.items[p], total_by, total);
+            const item = prev.items[p];
+            if (item) {
+                const total_by = inc_total_by(Sign.negative, item);
+                const total = inc_total(Sign.negative, item);
+                handler(p, item, total_by, total);
+            }
         };
         if (next.less) {
             next.less.forEach(removed);
