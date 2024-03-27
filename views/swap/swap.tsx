@@ -51,7 +51,7 @@ const Iframe = memo(({ dex, token }: {
 });
 const URLS = {
     [DEX.paraswap]: (a: Address) => {
-        return `https://app.paraswap.io/#/0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE-${a}/1/SELL?network=avalanche`;
+        return `https://app.paraswap.io/#/0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE-${a}/1/SELL?network=avalanche&version=5`;
     },
     [DEX.uniswap]: (a: Address) => {
         return `https://app.uniswap.org/swap?outputCurrency=${a}&chain=avalanche`;
