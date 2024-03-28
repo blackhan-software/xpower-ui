@@ -5,9 +5,9 @@ import { AppDispatch } from '../../source/redux/store';
 import { Account, Address, AftWallet, AftWalletBurner, Amount, Token, TokenInfo } from '../../source/redux/types';
 import { Tokenizer } from '../../source/token';
 
-import React, { Dispatch, SetStateAction, useContext } from 'react';
+import React, { Dispatch, SetStateAction, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Fire, XPower } from '../../public/images/tsx';
+import { Fire, ToggleAlt, XPower } from '../../public/images/tsx';
 import { TokenContext } from '../../source/react';
 
 import { QRCode } from '../qr-code';
@@ -34,7 +34,7 @@ export function UiAftWallet(
     };
     return <div id='aft-wallet'>
         <div className='form-label'>
-            Wallet Address and {token} Balance
+            Wallet Address and {token} Balance {$aftToggleMini({ aged, set_aged })}
         </div>
         <div className='input-group aft-wallet-address wallet-address'>
             {$otfToggle({
@@ -233,7 +233,7 @@ function $aftToggle(
         : `Balance of ${token}s`;
     return <button
         className='form-control input-group-text info'
-        data-bs-toggle='tooltip' data-bs-placement='top'
+        data-bs-toggle='tooltip' data-bs-placement='right'
         id='aft-wallet-sov-toggle' role='tooltip'
         title={title} onClick={() => set_aged(!aged)}
     >
@@ -242,6 +242,30 @@ function $aftToggle(
         }} />
         {aged ? $sectors({ percent: metric / 1e2 }) : null}
     </button>;
+}
+function $aftToggleMini(
+    { aged, set_aged }: {
+        aged: boolean, set_aged: (aged: boolean) => void
+    }
+) {
+    const token = aged ? Token.XPOW : Token.APOW;
+    const [on, set_on] = useState(false);
+    return <span id='aft-wallet-sov-toggle-mini'
+        data-bs-toggle='tooltip' data-bs-placement='left'
+        onMouseLeave={() => set_on(false)}
+        onMouseEnter={() => set_on(true)}
+        onClick={() => set_aged(!aged)}
+        title={`Toggle ${token}`}
+    >
+        <ToggleAlt on={on} style={{
+            transform: `rotate(${angle(on, aged)}deg)`
+        }} />
+    </span>;
+    function angle(
+        lhs: boolean, rhs: boolean
+    ) {
+        return (lhs && rhs) || (!lhs && !rhs) ? 180 : 0;
+    }
 }
 function $sectors(
     { percent }: { percent: number }

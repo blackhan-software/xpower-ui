@@ -98,8 +98,10 @@ const header_page = (
 const aft_wallet = (
   params: URLSearchParams
 ) => {
+  const token = Tokenizer.token(params.get('token'));
   return {
-    AFT_WALLET_ACCOUNT: x40(account(params) ?? 0n)
+    AFT_WALLET_ACCOUNT: x40(account(params) ?? 0n),
+    AFT_WALLET_TOGGLE_ROTATE: Tokenizer.xified(token) ? '180deg' : '0deg'
   };
 };
 const dex_swap = (

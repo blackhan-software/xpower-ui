@@ -2,6 +2,15 @@ div#aft-wallet {
   margin-bottom: 0.5em;
 }
 div#aft-wallet {
+  div.form-label {
+    span#aft-wallet-sov-toggle-mini {
+      cursor: pointer;
+      float: right;
+      padding: 0 14px;
+    }
+  }
+}
+div#aft-wallet {
   div.aft-wallet-address {
     button#otf-wallet-toggle,
     button#aft-wallet-copy {
