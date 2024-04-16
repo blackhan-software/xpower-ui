@@ -36,7 +36,7 @@ export function UiCoverGraph(
         'ui-cover-graph-issue', MAX_YEAR()
     );
     const [scale_bar, set_scale_bar] = useSessionStorage<Scale>(
-        'ui-cover-graph-scale-bar', Scale.logarithmic
+        'ui-cover-graph-scale-bar', Scale.linear
     );
     const [scale_tmp, set_scale_tmp] = useSessionStorage<Scale>(
         'ui-cover-graph-scale-tmp', Scale.linear
