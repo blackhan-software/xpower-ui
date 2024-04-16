@@ -101,7 +101,7 @@ const aft_wallet = (
   const token = Tokenizer.token(params.get('token'));
   return {
     AFT_WALLET_ACCOUNT: x40(account(params) ?? 0n),
-    AFT_WALLET_TOGGLE_ROTATE: Tokenizer.xified(token) ? '180deg' : '0deg'
+    AFT_WALLET_TOGGLE_ROTATE: Tokenizer.xified(token) ? '0deg' : '180deg'
   };
 };
 const dex_swap = (

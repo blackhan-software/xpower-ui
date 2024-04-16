@@ -18,7 +18,7 @@ describe('env_of', () => {
                 FOOTER_SWAP: '',
             }, ...{
                 AFT_WALLET_ACCOUNT: '0x0000000000000000000000000000000000000000',
-                AFT_WALLET_TOGGLE_ROTATE: '180deg',
+                AFT_WALLET_TOGGLE_ROTATE: '0deg',
                 OTF_WALLET: 'd-none',
                 OTF_WALLET_TOGGLE: 'bi-wallet',
             }, ...{

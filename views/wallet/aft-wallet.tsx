@@ -264,7 +264,7 @@ function $aftToggleMini(
     function angle(
         lhs: boolean, rhs: boolean
     ) {
-        return (lhs && rhs) || (!lhs && !rhs) ? 180 : 0;
+        return (lhs && rhs) || (!lhs && !rhs) ? 0 : 180;
     }
 }
 function $sectors(
