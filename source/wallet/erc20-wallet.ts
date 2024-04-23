@@ -74,21 +74,26 @@ export abstract class ERC20Wallet {
             spender_address, delta_allowance
         ));
     }
-    onApproval(
-        handler: OnApproval, { once } = { once: false }
+    async onApproval(
+        listener: OnApproval, { once } = { once: false }
     ) {
         const on_approval = (
             owner: string, spender: string, value: Amount, ev: TxEvent
         ) => {
-            handler(BigInt(owner), BigInt(spender), value, ev);
+            listener(BigInt(owner), BigInt(spender), value, ev);
         };
         if (once) {
-            this.get.then((c) => c.once('Approval', on_approval));
+            await this.get.then((c) => c.once('Approval', on_approval));
         } else {
-            this.get.then((c) => c.on('Approval', on_approval));
+            await this.get.then((c) => c.on('Approval', on_approval));
         }
     }
-    onTransfer(
+    async offApproval(
+        listener: OnApproval
+    ) {
+        await this.get.then((c) => c.off('Approval', listener))
+    }
+    async onTransfer(
         listener: OnTransfer, { once } = { once: false }
     ) {
         const on_transfer = (
@@ -101,11 +106,15 @@ export abstract class ERC20Wallet {
             }
         };
         if (once) {
-            this.get.then((c) => c.once('Transfer', on_transfer));
+            await this.get.then((c) => c.once('Transfer', on_transfer));
         } else {
-            this.get.then((c) => c.on('Transfer', on_transfer));
+            await this.get.then((c) => c.on('Transfer', on_transfer));
         }
-        return listener;
+    }
+    async offTransfer(
+        listener: OnTransfer
+    ) {
+        await this.get.then((c) => c.off('Transfer', listener));
     }
     get account(): Account {
         return BigInt(this._account);

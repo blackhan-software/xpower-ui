@@ -34,7 +34,7 @@ export type OnUnstakeBatch = (
 ) => void;
 
 export class PptTreasury extends Base {
-    public constructor(
+    constructor(
         address: Address, version = ROParams.version,
         abi: InterfaceAbi = ABI
     ) {
@@ -44,7 +44,7 @@ export class PptTreasury extends Base {
         super(address, abi);
         this.version = version;
     }
-    public async stake(
+    async stake(
         account: Account, nft_id: NftFullId, balance: Balance
     ): Promise<Transaction> {
         const contract = await this.connect();
@@ -55,7 +55,7 @@ export class PptTreasury extends Base {
             x40(account), id, balance
         );
     }
-    public async unstake(
+    async unstake(
         account: Account, nft_id: NftFullId, balance: Balance
     ): Promise<Transaction> {
         const contract = await this.connect();
@@ -66,7 +66,7 @@ export class PptTreasury extends Base {
             x40(account), id, balance
         );
     }
-    public async stakeBatch(
+    async stakeBatch(
         account: Account, nft_ids: NftFullId[], balances: Balance[]
     ): Promise<Transaction> {
         const contract = await this.connect();
@@ -77,7 +77,7 @@ export class PptTreasury extends Base {
             x40(account), ids, balances
         );
     }
-    public async unstakeBatch(
+    async unstakeBatch(
         account: Account, nft_ids: NftFullId[], balances: Balance[]
     ): Promise<Transaction> {
         const contract = await this.connect();
@@ -88,55 +88,103 @@ export class PptTreasury extends Base {
             x40(account), ids, balances
         );
     }
-    public async onStake(
+    async onStake(
+        listener: OnStake, { once } = { once: false }
+    ): Promise<void> {
+        const on_stake = (
+            account: string,
+            id: bigint,
+            amount: Amount,
+            ev: TxEvent
+        ) => {
+            const address = BigInt(account);
+            const nft_id = id.toString() as NftFullId;
+            listener(address, nft_id, amount, ev);
+        }
+        if (once) {
+            await this.get.then((c) => c.once('Stake', on_stake));
+        } else {
+            await this.get.then((c) => c.on('Stake', on_stake));
+        }
+    }
+    async offStake(
         listener: OnStake
     ): Promise<void> {
-        const contract = await this.get;
-        contract.on('Stake', (
-            account: string, id: bigint, amount: Amount, ev: TxEvent
+        await this.get.then((c) => c.off('Stake', listener));
+    }
+    async onUnstake(
+        listener: OnUnstake, { once } = { once: false }
+    ): Promise<void> {
+        const on_unstake = (
+            account: string,
+            id: bigint,
+            amount: Amount,
+            ev: TxEvent
         ) => {
             const address = BigInt(account);
             const nft_id = id.toString() as NftFullId;
             listener(address, nft_id, amount, ev);
-        });
+        };
+        if (once) {
+            await this.get.then((c) => c.once('Unstake', on_unstake));
+        } else {
+            await this.get.then((c) => c.on('Unstake', on_unstake));
+        }
     }
-    public async onUnstake(
+    async offUnstake(
         listener: OnUnstake
     ): Promise<void> {
-        const contract = await this.get;
-        contract.on('Unstake', (
-            account: string, id: bigint, amount: Amount, ev: TxEvent
-        ) => {
-            const address = BigInt(account);
-            const nft_id = id.toString() as NftFullId;
-            listener(address, nft_id, amount, ev);
-        });
+        await this.get.then((c) => c.off('Unstake', listener));
     }
-    public async onStakeBatch(
+    async onStakeBatch(
+        listener: OnStakeBatch, { once } = { once: false }
+    ): Promise<void> {
+        const on_stake = (
+            account: string,
+            ids: bigint[],
+            amounts: Amount[],
+            ev: TxEvent
+        ) => {
+            const nft_ids = Nft.fullIdsOf({
+                real_ids: ids.map((id) => id.toString() as NftRealId)
+            });
+            listener(BigInt(account), nft_ids, amounts, ev);
+        };
+        if (once) {
+            await this.get.then((c) => c.once('StakeBatch', on_stake));
+        } else {
+            await this.get.then((c) => c.on('StakeBatch', on_stake));
+        }
+    }
+    async offStakeBatch(
         listener: OnStakeBatch
     ): Promise<void> {
-        const contract = await this.get;
-        contract.on('StakeBatch', (
-            account: string, ids: bigint[], amounts: Amount[], ev: TxEvent
+        await this.get.then((c) => c.off('StakeBatch', listener));
+    }
+    async onUnstakeBatch(
+        listener: OnUnstakeBatch, { once } = { once: false }
+    ): Promise<void> {
+        const on_unstake = (
+            account: string,
+            ids: bigint[],
+            amounts: Amount[],
+            ev: TxEvent
         ) => {
             const nft_ids = Nft.fullIdsOf({
                 real_ids: ids.map((id) => id.toString() as NftRealId)
             });
             listener(BigInt(account), nft_ids, amounts, ev);
-        });
+        };
+        if (once) {
+            await this.get.then((c) => c.once('UnstakeBatch', on_unstake));
+        } else {
+            await this.get.then((c) => c.on('UnstakeBatch', on_unstake));
+        }
     }
-    public async onUnstakeBatch(
+    async offUnstakeBatch(
         listener: OnUnstakeBatch
     ): Promise<void> {
-        const contract = await this.get;
-        contract.on('UnstakeBatch', (
-            account: string, ids: bigint[], amounts: Amount[], ev: TxEvent
-        ) => {
-            const nft_ids = Nft.fullIdsOf({
-                real_ids: ids.map((id) => id.toString() as NftRealId)
-            });
-            listener(BigInt(account), nft_ids, amounts, ev);
-        });
+        await this.get.then((c) => c.off('UnstakeBatch', listener));
     }
     private get get() {
         return MYProvider().then((p) => this.connect(p));

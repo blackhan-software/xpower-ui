@@ -38,7 +38,7 @@ export type APB = {
 };
 
 export class MoeTreasury extends Base {
-    public constructor(
+    constructor(
         address: Address, version = ROParams.version,
         abi: InterfaceAbi = ABI
     ) {
@@ -48,7 +48,7 @@ export class MoeTreasury extends Base {
         super(address, abi);
         this.version = version;
     }
-    public aprs = memoized(async (
+    aprs = memoized(async (
         ppt_id: NftFullId, index: Index
     ): Promise<APR> => {
         const contract = await this.get;
@@ -67,7 +67,7 @@ export class MoeTreasury extends Base {
     }, () => {
         return new LocalStorage<string, Promise<APR>>();
     });
-    public async aprsLength(
+    async aprsLength(
         ppt_id: NftFullId
     ): Promise<number | undefined> {
         const contract = await this.get;
@@ -79,7 +79,7 @@ export class MoeTreasury extends Base {
         }
         return contract.aprsLength(id);
     }
-    public apbs = memoized(async (
+    apbs = memoized(async (
         ppt_id: NftFullId, index: Index
     ): Promise<APB> => {
         const contract = await this.get;
@@ -105,7 +105,7 @@ export class MoeTreasury extends Base {
     }, () => {
         return new LocalStorage<string, Promise<APR>>();
     });
-    public async apbsLength(
+    async apbsLength(
         ppt_id: NftFullId
     ): Promise<number | undefined> {
         if (ROParams.lt2(this.version, Version.v7b)) {
@@ -120,7 +120,7 @@ export class MoeTreasury extends Base {
         }
         return contract.apbsLength(id);
     }
-    public async claim(
+    async claim(
         address: Account, ppt_id: NftFullId
     ): Promise<Transaction> {
         const contract = await this.otf;
@@ -132,7 +132,7 @@ export class MoeTreasury extends Base {
         }
         return contract.claim(x40(address), id);
     }
-    public async claimBatch(
+    async claimBatch(
         address: Account, ppt_ids: NftFullId[]
     ): Promise<Transaction> {
         const contract = await this.otf;
@@ -144,7 +144,7 @@ export class MoeTreasury extends Base {
         }
         return contract.claimBatch(x40(address), ids);
     }
-    public async claimed(
+    async claimed(
         address: Account, ppt_id: NftFullId
     ): Promise<Amount> {
         const contract = await this.get;
@@ -156,7 +156,7 @@ export class MoeTreasury extends Base {
         }
         return contract.claimed(x40(address), id);
     }
-    public async claimedBatch(
+    async claimedBatch(
         address: Account, ppt_ids: NftFullId[]
     ): Promise<Amount[]> {
         const contract = await this.get;
@@ -168,7 +168,7 @@ export class MoeTreasury extends Base {
         }
         return contract.claimedBatch(x40(address), ids);
     }
-    public async claimable(
+    async claimable(
         address: Account, ppt_id: NftFullId
     ): Promise<Amount> {
         const contract = await this.get;
@@ -180,7 +180,7 @@ export class MoeTreasury extends Base {
         }
         return contract.claimable(x40(address), id);
     }
-    public async claimableBatch(
+    async claimableBatch(
         address: Account, ppt_ids: NftFullId[]
     ): Promise<Amount[]> {
         const contract = await this.get;
@@ -192,7 +192,7 @@ export class MoeTreasury extends Base {
         }
         return contract.claimableBatch(x40(address), ids);
     }
-    public async minted(
+    async minted(
         address: Account, ppt_id: NftFullId
     ): Promise<Amount> {
         const contract = await this.get;
@@ -204,7 +204,7 @@ export class MoeTreasury extends Base {
         }
         return contract.minted(x40(address), id);
     }
-    public async mintedBatch(
+    async mintedBatch(
         address: Account, ppt_ids: NftFullId[]
     ): Promise<Amount[]> {
         const contract = await this.get;
@@ -216,7 +216,7 @@ export class MoeTreasury extends Base {
         }
         return contract.mintedBatch(x40(address), ids);
     }
-    public async mintable(
+    async mintable(
         address: Account, ppt_id: NftFullId
     ): Promise<Amount> {
         const contract = await this.get;
@@ -228,7 +228,7 @@ export class MoeTreasury extends Base {
         }
         return contract.mintable(x40(address), id);
     }
-    public async mintableBatch(
+    async mintableBatch(
         address: Account, ppt_ids: NftFullId[]
     ): Promise<Amount[]> {
         const contract = await this.get;
@@ -240,7 +240,7 @@ export class MoeTreasury extends Base {
         }
         return contract.mintableBatch(x40(address), ids);
     }
-    public async aprOf(
+    async aprOf(
         ppt_id: NftFullId
     ): Promise<Rate> {
         const contract = await this.get;
@@ -249,7 +249,7 @@ export class MoeTreasury extends Base {
         });
         return contract.aprOf(id);
     }
-    public async apbOf(
+    async apbOf(
         ppt_id: NftFullId
     ): Promise<Rate> {
         const contract = await this.get;
@@ -261,7 +261,7 @@ export class MoeTreasury extends Base {
         }
         return contract.apbOf(id);
     }
-    public async aprTargetOf(
+    async aprTargetOf(
         ppt_id: NftFullId
     ): Promise<Rate> {
         const contract = await this.get;
@@ -273,7 +273,7 @@ export class MoeTreasury extends Base {
         }
         return contract.aprTargetOf(id);
     }
-    public async apbTargetOf(
+    async apbTargetOf(
         ppt_id: NftFullId
     ): Promise<Rate> {
         const contract = await this.get;
@@ -288,39 +288,57 @@ export class MoeTreasury extends Base {
         }
         return contract.apbTargetOf(id);
     }
-    public async onBlock(
+    async onBlock(
         listener: Listener
     ): Promise<void> {
         const provider = await MYProvider();
         provider?.on('block', listener);
     }
-    public async onClaim(
-        listener: OnClaim
+    async onClaim(
+        listener: OnClaim, { once } = { once: false }
     ): Promise<void> {
-        const contract = await this.get;
-        contract.on('Claim', (
+        const on_claim = (
             account: string, id: bigint, amount: Amount, ev: TxEvent
         ) => {
             const nft_id = Nft.fullIdOf({
                 real_id: id.toString() as NftRealId
             });
             listener(BigInt(account), nft_id, amount, ev);
-        });
+        };
+        if (once) {
+            await this.get.then((c) => c.once('Claim', on_claim));
+        } else {
+            await this.get.then((c) => c.on('Claim', on_claim));
+        }
     }
-    public async onClaimBatch(
-        listener: OnClaimBatch
+    async offClaim(
+        listener: OnClaim
     ): Promise<void> {
-        const contract = await this.get;
-        contract.on('ClaimBatch', (
+        await this.get.then((c) => c.off('Claim', listener));
+    }
+    async onClaimBatch(
+        listener: OnClaimBatch, { once } = { once: false }
+    ): Promise<void> {
+        const on_claim_batch = (
             account: string, ids: bigint[], amounts: Amount[], ev: TxEvent
         ) => {
             const nft_ids = Nft.fullIdsOf({
                 real_ids: ids.map((id) => id.toString() as NftRealId)
             });
             listener(BigInt(account), nft_ids, amounts, ev);
-        });
+        };
+        if (once) {
+            await this.get.then((c) => c.once('ClaimBatch', on_claim_batch));
+        } else {
+            await this.get.then((c) => c.on('ClaimBatch', on_claim_batch));
+        }
     }
-    public async refreshRates(
+    async offClaimBatch(
+        listener: OnClaimBatch
+    ): Promise<void> {
+        await this.get.then((c) => c.off('ClaimBatch', listener));
+    }
+    async refreshRates(
         all_levels: boolean
     ): Promise<Transaction> {
         const contract = await this.otf;
@@ -329,29 +347,29 @@ export class MoeTreasury extends Base {
         }
         return contract.refreshRates(all_levels);
     }
-    public async refreshable(): Promise<boolean> {
+    async refreshable(): Promise<boolean> {
         const contract = await this.get;
         if (ROParams.lt2(this.version, Version.v8a)) {
             return contract.refreshable(2);
         }
         return contract.refreshable();
     }
-    public async onRefreshRates(
-        listener: OnRefresh
+    async onRefreshRates(
+        listener: OnRefresh, { once } = { once: false }
     ): Promise<void> {
-        const contract = await this.get;
         if (ROParams.lt2(this.version, Version.v7c)) {
             return;
         }
-        if (ROParams.lt2(this.version, Version.v8a)) {
-            contract.on('RefreshRates', listener);
-            return;
+        if (once) {
+            await this.get.then((c) => c.once('RefreshRates', listener));
+        } else {
+            await this.get.then((c) => c.on('RefreshRates', listener));
         }
-        contract.on('RefreshRates', (
-            all_levels: boolean, ev: TxEvent
-        ) => {
-            listener(all_levels, ev);
-        });
+    }
+    async offRefreshRates(
+        listener: OnRefresh
+    ): Promise<void> {
+        await this.get.then((c) => c.off('RefreshRates', listener));
     }
     private get otf() {
         return OtfManager.connect(this.connect());

@@ -93,7 +93,7 @@ export abstract class ERC1155Wallet {
             operator, approved
         ));
     }
-    onApprovalForAll(
+    async onApprovalForAll(
         listener: OnApprovalForAll, { once } = { once: false }
     ) {
         const on_approval = (
@@ -107,10 +107,15 @@ export abstract class ERC1155Wallet {
             }
         };
         if (once) {
-            this.get.then((c) => c.once('ApprovalForAll', on_approval));
+            await this.get.then((c) => c.once('ApprovalForAll', on_approval));
         } else {
-            this.get.then((c) => c.on('ApprovalForAll', on_approval));
+            await this.get.then((c) => c.on('ApprovalForAll', on_approval));
         }
+    }
+    async offApprovalForAll(
+        listener: OnApprovalForAll
+    ) {
+        await this.get.then((c) => c.off('ApprovalForAll', listener));
     }
     async safeTransfer(
         to: Account | Address, full_id: NftFullId, amount: Amount
@@ -125,7 +130,7 @@ export abstract class ERC1155Wallet {
             this._account, to, real_id, amount, new Uint8Array()
         ));
     }
-    onTransferSingle(
+    async onTransferSingle(
         listener: OnTransferSingle, { once } = { once: false }
     ) {
         const on_transfer = (
@@ -149,10 +154,15 @@ export abstract class ERC1155Wallet {
             }
         };
         if (once) {
-            this.get.then((c) => c.once('TransferSingle', on_transfer));
+            await this.get.then((c) => c.once('TransferSingle', on_transfer));
         } else {
-            this.get.then((c) => c.on('TransferSingle', on_transfer));
+            await this.get.then((c) => c.on('TransferSingle', on_transfer));
         }
+    }
+    async offTransferSingle(
+        listener: OnTransferSingle
+    ) {
+        await this.get.then((c) => c.off('TransferSingle', listener));
     }
     async safeBatchTransfer(
         to: Account | Address, full_ids: NftFullId[], amounts: Amount[]
@@ -167,7 +177,7 @@ export abstract class ERC1155Wallet {
             this._account, to, real_ids, amounts, new Uint8Array()
         ));
     }
-    onTransferBatch(
+    async onTransferBatch(
         listener: OnTransferBatch, { once } = { once: false }
     ) {
         const on_transfer = (
@@ -191,10 +201,15 @@ export abstract class ERC1155Wallet {
             }
         };
         if (once) {
-            this.get.then((c) => c.once('TransferBatch', on_transfer));
+            await this.get.then((c) => c.once('TransferBatch', on_transfer));
         } else {
-            this.get.then((c) => c.on('TransferBatch', on_transfer));
+            await this.get.then((c) => c.on('TransferBatch', on_transfer));
         }
+    }
+    async offTransferBatch(
+        listener: OnTransferBatch
+    ) {
+        await this.get.then((c) => c.off('TransferBatch', listener));
     }
     async uri(
         full_id: NftFullId | Promise<NftFullId>
