@@ -4,6 +4,7 @@ import { Account, Amount, Nft, NftIssue, NftLevel } from '../../../source/redux/
 
 import React, { ChangeEvent, FormEvent, useEffect, useRef } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
+import { Div, Input, Span } from '../../../source/react';
 
 type Props = {
     issue: NftIssue;
@@ -31,13 +32,11 @@ export function UiNftTarget(
         'form-control', validity(props)
     ];
     return <React.Fragment>
-        <div className='form-label nft-transfer-to-label d-none d-sm-flex'>
+        <Div className='form-label nft-transfer-to-label d-none d-sm-flex'>
             Send To
-        </div>
-        <div className='input-group nft-transfer-to d-none d-sm-flex'
-            role='group'
-        >
-            <input type='text' ref={$ref}
+        </Div>
+        <Div className='input-group nft-transfer-to d-none d-sm-flex' role='group'>
+            <Input ref={$ref}
                 className={classes.join(' ')}
                 disabled={!props.balance} placeholder='0x…'
                 onChange={onChange.bind(null, props)}
@@ -45,13 +44,10 @@ export function UiNftTarget(
                 style={{ cursor: cursor(props) }}
                 name={`nft-transfer-to-${props.level}-${props.issue}`}
             />
-            <span className='input-group-text info'
-                data-bs-placement='top' data-bs-toggle='tooltip'
-                title={title(props)}
-            >
+            <Span className='input-group-text info' title={title(props)}>
                 <InfoCircle fill={true} />
-            </span>
-        </div>
+            </Span>
+        </Div>
     </React.Fragment>;
 }
 function cursor(

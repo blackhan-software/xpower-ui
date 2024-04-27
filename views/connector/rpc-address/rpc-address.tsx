@@ -1,7 +1,7 @@
 import './rpc-address.scss';
 
 import React, { useContext, useEffect, useState } from 'react';
-import { Rpc, RpcContext, globalRef } from '../../../source/react';
+import { Button, Input, Rpc, RpcContext, globalRef } from '../../../source/react';
 import { RpcPolling } from './rpc-polling';
 
 import { Bus } from '../../../source/bus';
@@ -45,17 +45,17 @@ function $enable(
         React.SetStateAction<Rpc | null>
     >
 ) {
-    return (
+    return function RpcAddressEnable(
         rpc: Rpc | null, valid: boolean | null
-    ) => {
-        return <button id='rpc-address-enable'
+    ) {
+        return <Button
             className='form-control input-group-text'
-            data-bs-toggle="tooltip" data-bs-placement="top"
+            id='rpc-address-enable'
             onClick={() => reload_if(rpc, valid)}
-            title={title()} role='button'
+            title={title()}
         >
             <i className={icon(rpc)}></i>
-        </button>;
+        </Button>;
     }
     function reload_if(
         rpc: Rpc | null, valid: boolean | null
@@ -91,11 +91,13 @@ function $input(
     const classes = [
         'form-control', validity()
     ];
-    return <input
-        id='rpc-address' className={classes.join(' ')}
-        data-bs-toggle='tooltip' data-bs-placement='top'
-        onChange={on_change} placeholder={placeholder()}
-        title='RPC end-point' type='text' value={rpc?.url ?? ''}
+    return <Input
+        className={classes.join(' ')}
+        id='rpc-address'
+        onChange={on_change}
+        placeholder={placeholder()}
+        title='RPC end-point'
+        value={rpc?.url ?? ''}
     />;
     function placeholder() {
         const $rpc = document.querySelector<HTMLElement>(
@@ -131,14 +133,14 @@ function $input(
 function $copy(
     rpc: Rpc | null
 ) {
-    return <button id='rpc-address-copy'
+    return <Button
         className='form-control input-group-text'
-        data-bs-toggle='tooltip' data-bs-placement='top'
+        id='rpc-address-copy'
         onClick={() => navigator.clipboard.writeText(rpc?.url ?? '')}
-        role='button' title='Copy RPC end-point'
+        title='Copy RPC end-point'
     >
         <i className='bi bi-copy'></i>
-    </button>;
+    </Button>;
 }
 function $polling(
     rpc: Rpc | null, set_rpc: React.Dispatch<

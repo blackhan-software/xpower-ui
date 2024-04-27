@@ -2,6 +2,7 @@ import './amount';
 import './list.scss';
 
 import { mobile, nice_si } from '../../../source/functions';
+import { Button, Div, Span } from '../../../source/react';
 import { nftTotalBy } from '../../../source/redux/selectors';
 import { Amount, Nft, NftDetails, NftIssue, NftLevel, NftLevels, Nfts, Supply } from '../../../source/redux/types';
 import { Years } from '../../../source/years';
@@ -83,7 +84,7 @@ function $nftMinter(
         nfts, nft_level
     ]);
     if (display) {
-        return <div
+        return <Div
             className='btn-group nft-minter' role='group'
             style={{ display: 'inline-flex' }}
         >
@@ -97,17 +98,17 @@ function $nftMinter(
             {$minter(nft_level)}
             {$balance(nft_level, by_level, by_issues)}
             <UiNftAmount
-                amount1={amount1}
-                level={nft_level}
-                max1={max1} min1={min1}
-                onUpdate={({ amount1: amount }) => {
+                amount1={amount1} level={nft_level}
+                max1={max1} min1={min1} onUpdate={({
+                    amount1: amount
+                }) => {
                     if (props.onNftList) {
                         props.onNftList({
                             [nft_level]: { amount1: amount }
                         });
                     }
                 }} />
-        </div>;
+        </Div>;
     }
 }
 function $nftDetails(
@@ -115,7 +116,7 @@ function $nftDetails(
     { display, toggled }: NftList[NftLevel]
 ) {
     if (display && toggled) {
-        return <div
+        return <Div
             className='nft-details' role='group'
             style={{ display: 'block' }}
         >
@@ -143,7 +144,7 @@ function $nftDetails(
                     props.onNftTransfer
                 }
             />
-        </div>;
+        </Div>;
     }
 }
 function $toggle(
@@ -153,20 +154,18 @@ function $toggle(
     const title = toggled
         ? `Hide ${Nft.nameOf(nft_level)} NFTs`
         : `Show ${Nft.nameOf(nft_level)} NFTs`;
-    return <div
+    return <Div
         className='btn-group' role='group'
     >
-        <button type='button'
+        <Button
             className='btn btn-outline-warning toggle no-ellipsis'
-            data-bs-placement='top' data-bs-toggle='tooltip'
-            onClick={() => onToggled(!toggled)}
-            title={title}
+            onClick={() => onToggled(!toggled)} title={title}
         >
             <i className={
                 toggled ? 'bi-chevron-up' : 'bi-chevron-down'
             } />
-        </button>
-    </div>;
+        </Button>
+    </Div>;
 }
 function $minter(
     nft_level: NftLevel
@@ -176,13 +175,12 @@ function $minter(
     ) => {
         return `Stakeable ${Nft.nameOf(nft_level)} NFTs (i.e. a deposit of ${nice_si(10 ** nft_level, { maxPrecision: 0 })} XPOW)`;
     };
-    return <button type='button'
+    return <Button
         className='btn btn-outline-warning minter'
-        data-bs-placement='top' data-bs-toggle='tooltip'
         title={title(nft_level)}
     >
-        {Nft.nameOf(nft_level)}<span className='d-none d-sm-inline'> NFTs</span>
-    </button>;
+        {Nft.nameOf(nft_level)}<Span className='d-none d-sm-inline'> NFTs</Span>
+    </Button>;
 }
 function $balance(
     nft_level: NftLevel,
@@ -193,15 +191,14 @@ function $balance(
     const title = mobile()
         ? `Overall personal balance` + ($warning ? ' (with ugradeable NFTs)' : '')
         : `Overall personal balance & supply of ${Nft.nameOf(nft_level)} NFTs`;
-    return <button type='button' title={title}
+    return <Button title={title}
         className='btn btn-outline-warning balance'
-        data-bs-placement='top' data-bs-toggle='tooltip'
     >
         {$warning}
-        <span>{nice_si(by_level.amount)}</span>
-        <span className='d-none d-sm-inline'>&nbsp;/&nbsp;</span>
-        <span className='d-none d-sm-inline'>{nice_si(by_level.supply)}</span>
-    </button>;
+        <Span>{nice_si(by_level.amount)}</Span>
+        <Span className='d-none d-sm-inline'>&nbsp;/&nbsp;</Span>
+        <Span className='d-none d-sm-inline'>{nice_si(by_level.supply)}</Span>
+    </Button>;
 }
 function $upgradeable(
     by_issues: Array<{ amount: Amount, supply: Supply }>
@@ -210,14 +207,13 @@ function $upgradeable(
         ({ amount }) => amount >= 1000n
     );
     if (upgradeable) return mobile()
-        ? <span className='ugradeable-nfts'>
+        ? <Span className='ugradeable-nfts'>
             <ExclamationTriange fill={true} />
-        </span>
-        : <span
+        </Span>
+        : <Span
             className='ugradeable-nfts' title='Ugradeable NFTs'
-            data-bs-placement='left' data-bs-toggle='tooltip'
         >
             <ExclamationTriange fill={true} />
-        </span>;
+        </Span>;
 }
 export default UiNftList;

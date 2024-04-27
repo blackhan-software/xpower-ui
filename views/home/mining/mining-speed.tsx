@@ -1,5 +1,6 @@
 import { nomobi } from '../../../source/functions';
 import { Miner } from '../../../source/miner';
+import { Button, Div } from '../../../source/react';
 
 import React from 'react';
 import { DashCircle, PlusCircle } from '../../../public/images/tsx';
@@ -13,30 +14,29 @@ export class UiMiningSpeed extends React.Component<
 > {
     render() {
         const { disabled, speed } = this.props;
-        return <div
+        return <Div
             className='btn-group tweak-mining' role='group'
         >
             {this.$decreaser(speed, disabled)}
             {this.$progressor(speed)}
             {this.$increaser(speed, disabled)}
-        </div>;
+        </Div>;
     }
     $increaser(
         speed: number, disabled: boolean
     ) {
-        return <div
+        return <Div
             className='btn-group increaser' role='group'
         >
-            <button type='button' id='increase'
+            <Button id='increase'
                 className='btn btn-outline-warning'
-                data-bs-placement='top' data-bs-toggle='tooltip'
                 disabled={!this.increasable(speed, disabled)}
                 onClick={this.increase.bind(this, speed, disabled)}
                 title={nomobi('Increase mining speed')}
             >
                 <PlusCircle fill={true} />
-            </button>
-        </div>;
+            </Button>
+        </Div>;
     }
     increasable(
         speed: number, disabled: boolean
@@ -56,19 +56,18 @@ export class UiMiningSpeed extends React.Component<
     $decreaser(
         speed: number, disabled: boolean
     ) {
-        return <div
+        return <Div
             className='btn-group decreaser' role='group'
         >
-            <button type='button' id='decrease'
+            <Button id='decrease'
                 className='btn btn-outline-warning'
-                data-bs-toggle='tooltip' data-bs-placement='top'
                 disabled={!this.decreasable(speed, disabled)}
                 onClick={this.decrease.bind(this, speed, disabled)}
                 title={nomobi('Decrease mining speed')}
             >
                 <DashCircle fill={true} />
-            </button>
-        </div>;
+            </Button>
+        </Div>;
     }
     decreasable(
         speed: number, disabled: boolean
@@ -88,19 +87,18 @@ export class UiMiningSpeed extends React.Component<
     $progressor(
         speed: number
     ) {
-        return <div
+        return <Div
             className='btn-group progressor' role='group'
-            data-bs-toggle='tooltip' data-bs-placement='top'
             title={`Mining speed: ${(100 * speed).toFixed(3)}%`}
         >
-            <div className='progress'>
-                <div id='speed'
+            <Div className='progress'>
+                <Div id='speed'
                     role='progressbar' aria-label='mining speed controller'
                     className={`progress-bar ${this.indicator(speed)}`}
                     style={{ width: `${100 * speed}%` }}
                 />
-            </div>
-        </div>;
+            </Div>
+        </Div>;
     }
     indicator(
         speed: number

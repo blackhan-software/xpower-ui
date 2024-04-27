@@ -1,21 +1,14 @@
 form#connector
   div.btn-group.connect-wallet(role="group")
-    button.btn.btn-outline-warning#rpc-toggle.no-ellipsis(
-      data-bs-toggle="tooltip" data-bs-placement="top"
-      title=`Show RPC end-point` type="button"
-    )
+    button.btn.btn-outline-warning#rpc-toggle.no-ellipsis
       i.bi-chevron-down
-    a#connect-wallet.btn.btn-outline-warning(
-      type="button" href="#" disabled
+    a.btn.btn-outline-warning#connect-wallet(
+      disabled href="#" type="button"
     )
       span.spinner.spinner-border.spinner-border-sm.float-start.spinner-grow(
         role="status" style="visibility: hidden;"
       )
       span.text: | Connecting to Wallet…
-    button.btn.btn-outline-warning.info(
-      data-bs-toggle="tooltip" data-bs-placement="top"
-      title="Authorize your wallet to be connected to"
-      type="button"
-    )
+    button.btn.btn-outline-warning.info
       include ../../public/images/pug/wifi-1.svg.pug
   include ./rpc-address/rpc-address.pug

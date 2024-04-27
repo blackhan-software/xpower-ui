@@ -1,3 +1,4 @@
+import { Button, Span } from '../../../source/react';
 import { pptTotalBy } from '../../../source/redux/selectors';
 import { Nfts, PptClaimerStatus } from '../../../source/redux/types';
 
@@ -24,20 +25,18 @@ export function UiPptBatchClaimer(
         status
     });
     const text = claiming(status)
-        ? <>Claiming<span className="d-none d-sm-inline">&nbsp;Rewards…</span></>
-        : <>Claim<span className="d-none d-sm-inline">&nbsp;Rewards</span></>;
-    return <button
-        type='button' id='ppt-batch-claimer'
+        ? <>Claiming<Span className="d-none d-sm-inline">&nbsp;Rewards…</Span></>
+        : <>Claim<Span className="d-none d-sm-inline">&nbsp;Rewards</Span></>;
+    return <Button id='ppt-batch-claimer'
         className={classes.join(' ')}
-        data-bs-placement='top' data-bs-toggle='tooltip'
         disabled={disabled({ ppts, status, title })}
         onClick={onBatchClaim?.bind(null)} title={title}
     >
         {Spinner({
             show: claiming(status), grow: true
         })}
-        <span className='text'>{text}</span>
-    </button>;
+        <Span className='text'>{text}</Span>
+    </Button>;
 }
 function disabled(
     { ppts, status, title }: Omit<Props, 'approved'> & {

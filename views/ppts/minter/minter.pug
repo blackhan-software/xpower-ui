@@ -2,35 +2,22 @@ div#ppt-batch-minting
   div.btn-group.ppt-batch-minter(
     role="group"
   )
-    button.btn.btn-outline-warning#toggle-all.no-ellipsis(
-      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-      title=`Show all NFT levels`
-    )
+    button.btn.btn-outline-warning#toggle-all.no-ellipsis
       i.bi-chevron-double-down
-    button.btn.btn-outline-warning#ppt-burn-approval(
-      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-      title="Approve staking (and unstaking) of NFTs" disabled
-    )
+    button.btn.btn-outline-warning#ppt-burn-approval(disabled)
       span.spinner.spinner-border.spinner-border-sm.float-start(
         role="status" style="display: none"
       )
       span.text: | Approve NFT Staking
-    button.btn.btn-outline-warning#ppt-batch-minter(
-      type="button" disabled
-    )
+    button.btn.btn-outline-warning#ppt-batch-minter(disabled)
       span.spinner.spinner-border.spinner-border-sm.float-start(
         role="status" style="display: none"
       )
       span.text: | Stake<span class="d-none d-sm-inline"> NFTs</span>
-    button.btn.btn-outline-warning#ppt-batch-claimer(
-      type="button" disabled data-bs-toggle="tooltip" data-bs-placement="top"
-    )
+    button.btn.btn-outline-warning#ppt-batch-claimer(disabled)
       span.spinner.spinner-border.spinner-border-sm.float-start(
         role="status" style="display: none"
       )
       span.text: | Claim<span class="d-none d-sm-inline"> Rewards</span>
-    button.btn.btn-outline-warning.info(
-      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-      title="Batch (un)stake {{TOKEN}} NFTs or claim {{aTOKEN}} rewards"
-    )
+    button.btn.btn-outline-warning.info
       include ../../../public/images/pug/info-circle-fill.svg.pug

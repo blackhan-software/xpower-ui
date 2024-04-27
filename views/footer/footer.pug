@@ -4,46 +4,30 @@ footer.mt-auto.pb-3(
     nav.navbar.px-2.py-0
         ul.navbar-nav
             li.nav-item
-                a.nav-link.lower.linkedin(
-                    data-bs-toggle="tooltip" data-bs-placement="top"
-                    href="https://www.linkedin.com/company/blackhan"
-                    title="LinkedIn" target="_blank"
-                )
+                a.nav-link.lower.company
                     span: | &copy;
                     span
                         = ' ' + new Date().getFullYear()
                     span.d-none.d-sm-inline
-                        = ' ' + 'Blackhan Software Ltd'
+                        = ' ' + 'Moorhead LLC'
 
         ul.navbar-nav.d-flex.flex-row.ml-auto
             li.nav-item.pb-1.pt-1.pe-0
-                a.nav-link.lower.migrate(
-                    href="/migrate?token={{TOKEN}}" title="Migrate tokens"
-                    data-bs-toggle="tooltip" data-bs-placement="top"
-                )
+                a.nav-link.lower.migrate
                     i.bi.bi-capslock-fill
                     i.bi.bi-capslock
             li.nav-item.pb-1.pt-1.pe-0
                 include ./footer-safe-wallet.pug
             li.nav-item.pb-1.pt-1.pe-1
-                a.nav-link.lower.smart-contract(
-                    target="_blank" title="Smart contract of the {{TOKEN}} token"
-                    data-bs-toggle="tooltip" data-bs-placement="top"
-                )
+                a.nav-link.lower.smart-contract
                     i.bi.bi-cpu-fill
                     i.bi.bi-cpu
             li.nav-item.pb-1.pt-1.pe-1
-                a.nav-link.lower.add-token(
-                    href="#" title="Add the {{TOKEN}} token to your wallet"
-                    data-bs-toggle="tooltip" data-bs-placement="top"
-                )
+                a.nav-link.lower.add-token
                     i.bi.bi-plus-square-fill
                     i.bi.bi-plus-square
             li.nav-item.pb-1.pt-1.pe-1
-                a.nav-link.lower.github(
-                    href="https://github.com/blackhan-software" target="_blank"
-                    data-bs-toggle="tooltip" data-bs-placement="top" title="GitHub"
-                )
+                a.nav-link.lower.github
                     i.bi.bi-github
             li.nav-item.pb-1.pt-1.pe-1
                 include ./footer-coingecko.pug

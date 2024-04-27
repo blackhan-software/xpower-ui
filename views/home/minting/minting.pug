@@ -12,46 +12,26 @@ div#minting
     div.btn-group.mint(
       role="group"
     )
-      span.d-inline-block(
-        tabindex=0 data-bs-toggle="tooltip" data-bs-placement="top"
-        title=`These mined tokens will be queued for minting`
-      )
-        button.btn.btn-outline-warning.ignore(
-          type="button"
-        )
+      span.d-inline-block(tabindex=0)
+        button.btn.btn-outline-warning.ignore
           include ../../../public/images/pug/check-circle-fill.svg.pug
           include ../../../public/images/pug/check-circle.svg.pug
-      button.btn.btn-outline-warning.minter(
-        type="button" disabled
-      )
+      button.btn.btn-outline-warning.minter(disabled)
         span.spinner.spinner-border.spinner-border-sm.float-start.spinner-grow(
           role="status" style="display: none"
         )
         span.text: | Mint {{AMOUNT_#{level}}} <span class="d-none d-sm-inline">{{TOKEN}}</span>
-      span.d-inline-block(
-        tabindex=0 data-bs-toggle="tooltip" data-bs-placement="left"
-        title=`Number of level {{LEVEL_${level}}} {{TOKEN}} tokens mined`
-      )
+      span.d-inline-block(tabindex=0 )
         button.btn.btn-outline-warning.nn-counter(
-          style="border-radius: 0"
-          type="button" disabled
+          disabled style="border-radius: 0"
         )
           | 0
-      span.d-inline-block(
-        tabindex=0 data-bs-toggle="tooltip" data-bs-placement="left"
-        title=`Number of level {{LEVEL_${level}}} {{TOKEN}} tokens minted`
-      )
+      span.d-inline-block(tabindex=0)
         button.btn.btn-outline-warning.tx-counter(
-          style="border-radius: 0"
-          type="button" disabled
+          disabled style="border-radius: 0"
         )
           | 0
-      span.d-inline-block(
-        tabindex=0 data-bs-toggle="tooltip" data-bs-placement="top"
-        title=`Forget these mined tokens without minting`
-      )
-        button.btn.btn-outline-warning.forget(
-          type="button" disabled
-        )
+      span.d-inline-block(tabindex=0 )
+        button.btn.btn-outline-warning.forget(disabled)
           | &times;
     - level++

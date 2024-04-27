@@ -1,3 +1,4 @@
+import { Button, Span } from '../../../source/react';
 import { NftMinterApproval } from '../../../source/redux/types';
 
 import React from 'react';
@@ -15,10 +16,8 @@ export function UiNftBurnApproval(
     const text = is_approving
         ? 'Approving NFT Minting…'
         : 'Approve NFT Minting';
-    return <button
-        type='button' id='nft-burn-approval'
+    return <Button id='nft-burn-approval'
         className='btn btn-outline-warning'
-        data-bs-placement='top' data-bs-toggle='tooltip'
         disabled={is_approving || is_approved || is_approved === null}
         onClick={onApproval?.bind(null)}
         style={{ display: !is_approved ? 'block' : 'none' }}
@@ -27,8 +26,8 @@ export function UiNftBurnApproval(
         {Spinner({
             show: !!is_approving, grow: true
         })}
-        <span className='text'>{text}</span>
-    </button>;
+        <Span className='text'>{text}</Span>
+    </Button>;
 }
 export function approved(
     approval: NftMinterApproval | null

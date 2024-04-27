@@ -1,3 +1,4 @@
+import { Button, Div } from '../../../source/react';
 import { Nfts, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../../source/redux/types';
 
 import React from 'react';
@@ -24,7 +25,7 @@ type Props = {
 export function UiPptMinter(
     props: Props
 ) {
-    return <div
+    return <Div
         className='btn-group ppt-batch-minter' role='group'
     >
         {$toggleAll(props)}
@@ -32,7 +33,7 @@ export function UiPptMinter(
         {$batchReminter(props)}
         {$batchClaimer(props)}
         {$info()}
-    </div>;
+    </Div>;
 }
 function $toggleAll(
     { toggled, onToggled }: Props
@@ -40,10 +41,8 @@ function $toggleAll(
     const title = !toggled
         ? 'Show all NFT levels'
         : 'Hide all NFT levels';
-    return <button
-        type='button' id='toggle-all'
+    return <Button id='toggle-all'
         className='btn btn-outline-warning no-ellipsis'
-        data-bs-placement='top' data-bs-toggle='tooltip'
         onClick={onToggled?.bind(null, !toggled)}
         title={title}
     >
@@ -51,7 +50,7 @@ function $toggleAll(
             ? 'bi-chevron-double-up'
             : 'bi-chevron-double-down'
         } />
-    </button>;
+    </Button>;
 }
 function $burnApproval(
     { approval, onApproval }: Props
@@ -103,12 +102,10 @@ function $batchClaimer(
     />;
 }
 function $info() {
-    return <button type='button'
-        className='btn btn-outline-warning info'
-        data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`(Un)stake ${Token.XPOW} NFTs and claim ${Token.APOW} rewards`}
-    >
+    return <Button className='btn btn-outline-warning info' title={
+        `(Un)stake ${Token.XPOW} NFTs and claim ${Token.APOW} rewards`
+    }>
         <InfoCircle fill={true} />
-    </button>;
+    </Button>;
 }
 export default UiPptMinter;

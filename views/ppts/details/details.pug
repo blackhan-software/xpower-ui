@@ -1,7 +1,5 @@
 each year in Array.from(YEARS).reverse()
   - let nft_id = 100 * year + 3 * index
-  - let now_year = new Date().getFullYear()
-  - let apr = 3 * index + (now_year - year) / 1e6
   div.row.year(
     style=`display:${
       YEARS[YEARS.length-1] - year ? 'none' : 'flex'
@@ -10,70 +8,48 @@ each year in Array.from(YEARS).reverse()
     div.col-sm.nft-details-lhs
       div.nft-image-wrap
         a(target="_blank")
-          span.spinner.spinner-border(
-            role="status"
-          )
-          img.img-fluid.nft-image(
-            data-bs-toggle="tooltip" data-bs-placement="top" loading="lazy"
-            title=`Trade staked ${levels[index]} NFTs (level ${index+1}/9 & ID #${nft_id})`
-          )
+          span.spinner.spinner-border(role="status")
+          img.img-fluid.nft-image(loading="lazy")
 
     div.col-sm.nft-details-rhs
       div.form-label
         | Year of Issuance
       div.input-group.nft-issuance-year
         input.form-control(
-          type="number" value=`${year}` readonly
+          readonly value=`${year}`
           name=`ppt-issuance-year-${levels[index]}-${year}`
         )
-        span.input-group-text.info(
-          data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Year of issuance of these staked ${levels[index]} NFTs`
-        )
+        span.input-group-text.info
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
       div.form-label
         | Personal Balance
       div.input-group.nft-balance
         input.form-control(
-          type="text" placeholder="0" readonly
+          placeholder="0" readonly
           name=`ppt-balance-${levels[index]}-${year}`
         )
-        span.input-group-text.info(
-          data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Balance of staked ${levels[index]} NFTs staked`
-        )
+        span.input-group-text.info
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
       div.form-label
         | Total Supply
       div.input-group.nft-total-supply
         input.form-control(
-          type="text" placeholder="0" readonly
+          placeholder="0" readonly
           name=`ppt-total-supply-${levels[index]}-${year}`
         )
-        span.input-group-text.info(
-          data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Supply of staked ${levels[index]} NFTs staked`
-        )
+        span.input-group-text.info
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
       div.btn-group.nft-claimer-expander.d-sm-none(
         role="group" style="margin-top: 1em; width: 100%"
       )
-        button.btn.btn-outline-warning.toggle-old.no-ellipsis(
-          type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Show older NFTs`
-        )
+        button.btn.btn-outline-warning.toggle-old.no-ellipsis
           i.bi-eye-fill
-        button.btn.btn-outline-warning.claimer-expander(
-          type="button"
-        )
+        button.btn.btn-outline-warning.claimer-expander
           i.bi-chevron-down
-        button.btn.btn-outline-warning.info(
-          type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Show claimed & claimable` style="width: 43px"
-        )
+        button.btn.btn-outline-warning.info(style="width: 43px")
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
       div.form-label.nft-claimed-label.d-none.d-sm-flex
@@ -82,13 +58,10 @@ each year in Array.from(YEARS).reverse()
         role="group"
       )
         input.form-control(
-          type="number" placeholder="0" readonly
+          placeholder="0" readonly
           name=`ppt-claimed-${levels[index]}-${year}`
         )
-        span.input-group-text.info(
-          data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Amount of claimed {{aTOKEN}} rewards so far`
-        )
+        span.input-group-text.info
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
       div.form-label.nft-claimable-label.d-none.d-sm-flex
@@ -97,34 +70,23 @@ each year in Array.from(YEARS).reverse()
         role="group"
       )
         input.form-control(
-          type="number" placeholder="0" readonly
+          placeholder="0" readonly
           name=`ppt-claimable-${levels[index]}-${year}`
         )
-        span.input-group-text.info(
-          data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Min. amount of claimable {{aTOKEN}} rewards`
-        )
+        span.input-group-text.info
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
       div.btn-group.nft-claimer.d-none.d-sm-flex(
         role="group"
       )
-        button.btn.btn-outline-warning.toggle-old.no-ellipsis(
-          type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Show older NFTs`
-        )
+        button.btn.btn-outline-warning.toggle-old.no-ellipsis
           i.bi-eye-fill
-        button.btn.btn-outline-warning.claimer(
-          type="button" disabled
-        )
+        button.btn.btn-outline-warning.claimer(disabled)
           span.spinner.spinner-border.spinner-border-sm.float-start(
             role="status" style="display: none"
           )
           span.text: | Claim Rewards
-        button.btn.btn-outline-warning.info(
-          type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Claim {{aTOKEN}}s for staked ${levels[index]} NFTs at ${apr.toFixed(2)}% APR`
-        )
+        button.btn.btn-outline-warning.info
           include ../../../public/images/pug/info-circle-fill.svg.pug
   hr.year(style=`display:${
     YEARS[YEARS.length-1] - year ? 'none' : 'block'

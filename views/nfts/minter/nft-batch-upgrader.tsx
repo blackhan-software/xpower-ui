@@ -1,3 +1,4 @@
+import { Button, Span } from '../../../source/react';
 import { NftMinterList, NftUpgraderStatus } from '../../../source/redux/types';
 
 import React from 'react';
@@ -18,10 +19,9 @@ export function UiNftBatchUpgrader(
         upgrading(status) ? 'upgrading' : '',
     ];
     const text = upgrading(status)
-        ? <>Upgrading<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
-        : <>Upgrade<span className="d-none d-sm-inline">&nbsp;NFTs</span></>;
-    return <button
-        type='button' id='nft-batch-upgrader'
+        ? <>Upgrading<Span className="d-none d-sm-inline">&nbsp;NFTs…</Span></>
+        : <>Upgrade<Span className="d-none d-sm-inline">&nbsp;NFTs</Span></>;
+    return <Button id='nft-batch-upgrader'
         className={classes.join(' ')}
         disabled={disabled({ list, status })}
         onClick={onBatchUpgrade?.bind(null, list)}
@@ -29,8 +29,8 @@ export function UiNftBatchUpgrader(
         {Spinner({
             show: Boolean(upgrading(status)), grow: true
         })}
-        <span className='text'>{text}</span>
-    </button>;
+        <Span className='text'>{text}</Span>
+    </Button>;
 }
 function upgrading(
     status: NftUpgraderStatus | null

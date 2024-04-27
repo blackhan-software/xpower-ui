@@ -1,8 +1,8 @@
 import { ROParams } from '../../../source/params';
+import { Button, Span, WalletContext } from '../../../source/react';
 import { NftMinterList, NftMinterStatus, Token, TokenInfo, Wallet } from '../../../source/redux/types';
 
 import React, { useContext } from 'react';
-import { WalletContext } from '../../../source/react';
 import { Spinner } from './spinner';
 
 type Props = {
@@ -21,10 +21,9 @@ export function UiNftBatchMinter(
         minting(status) ? 'minting' : '',
     ];
     const text = minting(status)
-        ? <>Minting<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
-        : <>Mint<span className="d-none d-sm-inline">&nbsp;NFTs</span></>;
-    return <button
-        type='button' id='nft-batch-minter'
+        ? <>Minting<Span className="d-none d-sm-inline">&nbsp;NFTs…</Span></>
+        : <>Mint<Span className="d-none d-sm-inline">&nbsp;NFTs</Span></>;
+    return <Button id='nft-batch-minter'
         className={classes.join(' ')}
         disabled={disabled({ list, status, wallet })}
         onClick={onBatchMint?.bind(null, list)}
@@ -32,8 +31,8 @@ export function UiNftBatchMinter(
         {Spinner({
             show: Boolean(minting(status)), grow: true, right: true
         })}
-        <span className='text'>{text}</span>
-    </button>;
+        <Span className='text'>{text}</Span>
+    </Button>;
 }
 function minting(
     status: NftMinterStatus | null

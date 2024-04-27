@@ -4,7 +4,7 @@ import { Amount, Nft, NftIssue, NftLevel, PptClaimerStatus, Rate, Token } from '
 
 import React, { useEffect } from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
-import { globalRef } from '../../../source/react';
+import { Button, Div, Span, globalRef } from '../../../source/react';
 import { UiPptToggle } from './ui-toggle';
 
 type Props = {
@@ -32,9 +32,10 @@ export function UiPptClaimer(
         issue: props.issue,
         level: props.level
     });
-    return <div role='group'
-        ref={globalRef(`.ppt-claimer[full-id="${full_id}"]`)}
+    return <Div
         className='btn-group nft-claimer d-none d-sm-flex'
+        ref={globalRef(`.ppt-claimer[full-id="${full_id}"]`)}
+        role='group'
     >
         <UiPptToggle
             toggled={props.toggled}
@@ -42,12 +43,12 @@ export function UiPptClaimer(
         />
         {$button(props)}
         {$info(props)}
-    </div>;
+    </Div>;
 }
 function $button(
     props: Props
 ) {
-    return <button type='button'
+    return <Button
         className='btn btn-outline-warning claimer'
         disabled={disabled(props)}
         onClick={props.onClaim?.bind(
@@ -57,10 +58,8 @@ function $button(
         {Spinner({
             show: props.status === PptClaimerStatus.claiming, grow: true
         })}
-        <span className='text'>
-            {text(props)}
-        </span>
-    </button>;
+        <Span className='text'>{text(props)}</Span>
+    </Button>;
 }
 function text(
     { status }: Props
@@ -91,15 +90,13 @@ function $info(
         () => Bus.emit('refresh-tips'), [rate]
     );
     const { level } = props;
-    return <button type='button'
-        className='btn btn-outline-warning info'
-        data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`Claim ${Token.APOW}s for staked ${Nft.nameOf(level)} NFTs at ${nice(rate, {
+    return <Button className='btn btn-outline-warning info' title={
+        `Claim ${Token.APOW}s for staked ${Nft.nameOf(level)} NFTs at ${nice(rate, {
             maxPrecision: 2, minPrecision: 2
-        })}%`}
-    >
+        })}%`
+    }>
         <InfoCircle fill={true} />
-    </button>;
+    </Button>;
 }
 function rateOf(
     { rate }: Props
@@ -113,7 +110,7 @@ function Spinner(
         'spinner spinner-border spinner-border-sm',
         'float-start', grow ? 'spinner-grow' : ''
     ];
-    return <span
+    return <Span
         className={classes.join(' ')} role='status'
         style={{ display: show ? 'inline-block' : 'none' }}
     />;

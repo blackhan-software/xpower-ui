@@ -1,6 +1,6 @@
 import { nice, nice_si, prompt, x40 } from '../../source/functions';
 import { ROParams } from '../../source/params';
-import { AccountContext, globalRef } from '../../source/react';
+import { AccountContext, Button, Div, Input, Span, globalRef } from '../../source/react';
 import { Account, Amount, OtfWallet } from '../../source/redux/types';
 import { OtfManager } from '../../source/wallet';
 
@@ -10,6 +10,7 @@ import { Avalanche } from '../../public/images/tsx';
 import { useInterval } from 'usehooks-ts';
 import { QRCode } from '../qr-code';
 import { Sector } from './sector';
+
 
 type Props = OtfWallet & {
     onDeposit?: (
@@ -24,25 +25,23 @@ export function UiOtfWallet(
     props: Props
 ) {
     const { toggled } = props;
-    if (toggled) {
-        return <div
-            id='otf-wallet' ref={globalRef('#otf-wallet')}
-        >
-            <div className='form-label'>
-                Minter Address and AVAX Balance
-            </div>
-            <div className='input-group otf-wallet-address wallet-address'>
-                {$transmitter(props)}
-                {$qr_code(props)}
-                {$account(props)}
-                {$copy(props)}
-                {$exportKey(props)}
-                {$balance(props)}
-                {$info()}
-            </div>
-        </div>;
-    }
-    return null;
+    return <Div
+        id='otf-wallet' ref={globalRef('#otf-wallet')}
+        className={!toggled ? 'd-none' : undefined}
+    >
+        <Div className='form-label'>
+            Minter Address and AVAX Balance
+        </Div>
+        <Div className='input-group otf-wallet-address wallet-address'>
+            {$transmitter(props)}
+            {$qr_code(props)}
+            {$account(props)}
+            {$copy(props)}
+            {$exportKey(props)}
+            {$balance(props)}
+            {$info()}
+        </Div>
+    </Div>;
 }
 function $transmitter(
     props: Props
@@ -57,18 +56,17 @@ function $transmitter(
     const inner_classes = [
         'spinner spinner-border spinner-border-sm', 'float-start'
     ];
-    return <button
+    return <Button
         className={outer_classes.join(' ')}
-        data-bs-toggle='tooltip' data-bs-placement='top'
         id='otf-wallet-transfer'
         onClick={transact.bind(null, { ...props, account })}
         title={title({ amount })}
     >
-        <span
+        <Span
             className={inner_classes.join(' ')} role='status'
         />
         <i className={icon({ amount })} />
-    </button>;
+    </Button>;
 }
 function $qr_code(
     { account }: Pick<Props, 'account'>
@@ -130,11 +128,11 @@ async function transact(
         if (typeof avax !== 'string') {
             return;
         }
-        const input = Number(avax.replace(/[']/g, ''));
-        if (isNaN(input) || input === 0) {
+        const Input = Number(avax.replace(/[']/g, ''));
+        if (isNaN(Input) || Input === 0) {
             return;
         }
-        const value = BigInt(Math.ceil(input * 1e18));
+        const value = BigInt(Math.ceil(Input * 1e18));
         if (value) {
             onDeposit(processing, value);
         }
@@ -168,9 +166,10 @@ async function transact(
 function $account(
     { account }: Pick<Props, 'account'>
 ) {
-    return <input type='text' readOnly
-        className='form-control' id='otf-wallet-address'
-        data-bs-toggle='tooltip' data-bs-placement='top'
+    return <Input
+        className='form-control'
+        id='otf-wallet-address'
+        readOnly
         title='Minter address to pre-fund for transaction fees'
         value={x40(account ?? 0n)}
     />;
@@ -178,14 +177,14 @@ function $account(
 function $copy(
     { account }: Pick<Props, 'account'>
 ) {
-    return <button id='otf-wallet-copy'
+    return <Button
         className='form-control input-group-text'
-        data-bs-toggle='tooltip' data-bs-placement='top'
+        id='otf-wallet-copy'
         onClick={() => navigator.clipboard.writeText(x40(account!))}
-        role='button' title='Copy address'
+        title='Copy address'
     >
         <i className='bi bi-copy'></i>
-    </button>;
+    </Button>;
 }
 function $exportKey(
     _: Props
@@ -204,15 +203,16 @@ function $exportKey(
             set_delay(0);
         }
     }, delay > 0 ? delay : null);
-    return <button id='otf-wallet-export-key'
+    return <Button
         className='form-control input-group-text'
-        data-bs-toggle='tooltip' data-bs-placement='top'
-        role='button' title='Export private key of address to clipboard'
-        onPointerDown={start_interval} onPointerUp={stop_interval}
+        id='otf-wallet-export-key'
+        onPointerDown={start_interval}
+        onPointerUp={stop_interval}
+        title='Export private key of address to clipboard'
     >
         <i className='bi bi-key'></i>
         {$sectors({ percent })}
-    </button>;
+    </Button>;
     function start_interval() {
         set_delay(1); // ms
     }
@@ -232,21 +232,21 @@ function $sectors(
 function $balance(
     { amount }: Pick<Props, 'amount'>
 ) {
-    return <input type='text' readOnly
-        className='form-control' id='otf-wallet-balance'
-        data-bs-toggle='tooltip' data-bs-placement='top'
+    return <Input
+        className='form-control'
+        id='otf-wallet-balance'
+        readOnly
         title={`${nice(amount ?? 0n, { base: 1e18 })} AVAX`}
         value={nice_si(amount ?? 0n, { base: 1e18 })}
     />;
 }
 function $info() {
-    return <button
+    return <Button
         className='form-control input-group-text info'
-        data-bs-toggle='tooltip' data-bs-placement='top'
         title='Balance of AVAX to auto-pay for transaction fees'
     >
         <Avalanche />
-    </button>;
+    </Button>;
 }
 function threshold_lte(amount: Amount) {
     return OtfManager.threshold < amount;

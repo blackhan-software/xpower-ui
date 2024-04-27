@@ -1,5 +1,6 @@
 import React from 'react';
-import { State, Chain } from '../connector';
+import { Span } from '../../../source/react';
+import { Chain, State } from '../connector';
 
 type Props = {
     chain: State['chain'];
@@ -7,7 +8,7 @@ type Props = {
 export function Label(
     { chain }: Props
 ) {
-    return <span className='text'>{text(chain)}</span>;
+    return <Span className='text'>{text(chain)}</Span>;
 }
 function text(
     chain: State['chain']

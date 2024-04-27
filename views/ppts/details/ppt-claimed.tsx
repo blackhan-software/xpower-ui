@@ -3,6 +3,7 @@ import { Amount, NftIssue, NftLevel, Token, TokenInfo } from '../../../source/re
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
+import { Div, Input, Span } from '../../../source/react';
 
 type Props = {
     issue: NftIssue;
@@ -20,26 +21,21 @@ export function UiPptClaimed(
         ? nice_si(claim, {
             base: 10 ** decimals, minPrecision: 1
         }) : '';
-    return <React.Fragment>
-        <div className='form-label nft-claimed-label d-none d-sm-flex'>
+    return <>
+        <Div className='form-label nft-claimed-label d-none d-sm-flex'>
             Minted Amount
-        </div>
-        <div className='input-group nft-claimed d-none d-sm-flex'
-            role='group'
-        >
-            <input type='text'
-                className='form-control'
-                placeholder='0' readOnly
-                value={nice_value}
+        </Div>
+        <Div className='input-group nft-claimed d-none d-sm-flex' role='group'>
+            <Input className='form-control'
                 name={`ppt-claimed-${level}-${issue}`}
+                placeholder='0' readOnly value={nice_value}
             />
-            <span className='input-group-text info'
-                data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Minted ${Token.APOW} due to ${nice_claim} claims`}
-            >
+            <Span className='input-group-text info' title={
+                `Minted ${Token.APOW} due to ${nice_claim} claims`
+            }>
                 <InfoCircle fill={true} />
-            </span>
-        </div>
-    </React.Fragment>;
+            </Span>
+        </Div>
+    </>;
 }
 export default UiPptClaimed;

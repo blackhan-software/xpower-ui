@@ -2,7 +2,7 @@ import { Bus } from '../../../source/bus';
 import { MoeTreasuryFactory } from '../../../source/contract';
 import { nice } from '../../../source/functions';
 import { ROParams } from '../../../source/params';
-import { AccountContext, globalRef } from '../../../source/react';
+import { AccountContext, Div, Input, Span, globalRef } from '../../../source/react';
 import { onPptChanged } from '../../../source/redux/observers';
 import { AppState } from '../../../source/redux/store';
 import { Account, Amount, Nft, NftFullId, NftIssue, NftLevel, NftLevels, Nfts, PptDetails, Rate, Supply } from '../../../source/redux/types';
@@ -193,14 +193,14 @@ function $row(
         amount: 0n, supply: 0n
     };
     return <React.Fragment key={full_id}>
-        <div className='row year'
+        <Div className='row year'
             ref={globalRef(`:ppt.row[full-id="${full_id}"]`)}
             style={{ display: (fixed || toggled) ? 'flex' : 'none' }}
         >
-            <div className='col-sm nft-details-lhs'>
+            <Div className='col-sm nft-details-lhs'>
                 {$image(props, ppt_issue)}
-            </div>
-            <div className='col-sm nft-details-rhs'>
+            </Div>
+            <Div className='col-sm nft-details-rhs'>
                 {$issue(props, ppt_issue)}
                 {$balance(props, ppt_issue, ppt)}
                 {$supply(props, ppt_issue, ppt)}
@@ -208,8 +208,8 @@ function $row(
                 {$claimed(props, ppt_issue, { state })}
                 {$claimable(props, ppt_issue, { state })}
                 {$claimer(props, ppt_issue, { state })}
-            </div>
-        </div>
+            </Div>
+        </Div>
         <hr className='year' style={{
             display: (fixed || toggled) &&
                 !lastHR(ppt_level, ppt_issue, toggled) ? 'block' : 'none'
@@ -244,21 +244,20 @@ function $issue(
 ) {
     const { level: ppt_level } = props;
     return <React.Fragment>
-        <div className='form-label'>
+        <Div className='form-label'>
             Year of Issuance
-        </div>
-        <div className='input-group nft-issuance-year'>
-            <input className='form-control' readOnly
-                type='number' value={ppt_issue}
+        </Div>
+        <Div className='input-group nft-issuance-year'>
+            <Input className='form-control'
                 name={`ppt-issuance-year-${ppt_level}-${ppt_issue}`}
+                readOnly value={ppt_issue}
             />
-            <span className='input-group-text info'
-                data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Year of issuance of these staked ${Nft.nameOf(ppt_level)} NFTs`}
-            >
+            <Span className='input-group-text info' title={
+                `Year of issuance of these staked ${Nft.nameOf(ppt_level)} NFTs`
+            }>
                 <InfoCircle fill={true} />
-            </span>
-        </div>
+            </Span>
+        </Div>
     </React.Fragment>;
 }
 function $balance(
@@ -267,21 +266,20 @@ function $balance(
 ) {
     const { level: ppt_level } = props;
     return <React.Fragment>
-        <div className='form-label'>
+        <Div className='form-label'>
             Personal Balance
-        </div>
-        <div className='input-group nft-balance'>
-            <input className='form-control' readOnly
-                type='text' value={nice(balance)}
+        </Div>
+        <Div className='input-group nft-balance'>
+            <Input className='form-control'
                 name={`ppt-balance-${ppt_level}-${ppt_issue}`}
+                readOnly value={nice(balance)}
             />
-            <span className='input-group-text info'
-                data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Balance of staked ${Nft.nameOf(ppt_level)} NFTs`}
-            >
+            <Span className='input-group-text info' title={
+                `Balance of staked ${Nft.nameOf(ppt_level)} NFTs`
+            }>
                 <InfoCircle fill={true} />
-            </span>
-        </div>
+            </Span>
+        </Div>
     </React.Fragment>;
 }
 function $supply(
@@ -290,21 +288,20 @@ function $supply(
 ) {
     const { level: ppt_level } = props;
     return <React.Fragment>
-        <div className='form-label'>
+        <Div className='form-label'>
             Total Supply
-        </div>
-        <div className='input-group nft-total-supply'>
-            <input className='form-control' readOnly
-                type='text' value={nice(supply)}
+        </Div>
+        <Div className='input-group nft-total-supply'>
+            <Input className='form-control'
                 name={`ppt-total-supply-${ppt_level}-${ppt_issue}`}
+                readOnly value={nice(supply)}
             />
-            <span className='input-group-text info'
-                data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Supply of staked ${Nft.nameOf(ppt_level)} NFTs`}
-            >
+            <Span className='input-group-text info' title={
+                `Supply of staked ${Nft.nameOf(ppt_level)} NFTs`
+            }>
                 <InfoCircle fill={true} />
-            </span>
-        </div>
+            </Span>
+        </Div>
     </React.Fragment>;
 }
 function $expander(

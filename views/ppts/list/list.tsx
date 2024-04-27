@@ -2,6 +2,7 @@ import './amount';
 import './list.scss';
 
 import { mobile, nice_si } from '../../../source/functions';
+import { Button, Div, Span } from '../../../source/react';
 import { pptTotalBy } from '../../../source/redux/selectors';
 import { Amount, Nft, NftIssue, NftLevel, NftLevels, Nfts, PptDetails, Supply } from '../../../source/redux/types';
 import { Years } from '../../../source/years';
@@ -86,7 +87,7 @@ function $pptMinter(
         ppts, ppt_level
     ]);
     if (display) {
-        return <div
+        return <Div
             className='btn-group ppt-minter' role='group'
             style={{ display: 'inline-flex' }}
         >
@@ -100,17 +101,17 @@ function $pptMinter(
             {$minter(ppt_level)}
             {$balance(ppt_level, by_level, by_issues)}
             <UiPptAmount
-                amount={amount}
-                level={ppt_level}
-                max={max} min={min}
-                onUpdate={({ amount }) => {
+                amount={amount} level={ppt_level}
+                max={max} min={min} onUpdate={({
+                    amount
+                }) => {
                     if (props.onPptList) {
                         props.onPptList({
                             [ppt_level]: { amount }
                         });
                     }
                 }} />
-        </div>;
+        </Div>;
     }
 }
 function $pptDetails(
@@ -118,7 +119,7 @@ function $pptDetails(
     { display, toggled }: PptList[NftLevel]
 ) {
     if (display && toggled) {
-        return <div
+        return <Div
             className='nft-details' role='group'
             style={{ display: 'block' }}
         >
@@ -149,7 +150,7 @@ function $pptDetails(
                     props.onPptClaim
                 }
             />
-        </div>;
+        </Div>;
     }
 }
 function $toggle(
@@ -159,20 +160,18 @@ function $toggle(
     const title = toggled
         ? `Hide ${Nft.nameOf(ppt_level)} NFTs`
         : `Show ${Nft.nameOf(ppt_level)} NFTs`;
-    return <div
+    return <Div
         className='btn-group' role='group'
     >
-        <button type='button'
+        <Button
             className='btn btn-outline-warning toggle no-ellipsis'
-            data-bs-placement='top' data-bs-toggle='tooltip'
-            onClick={() => onToggled(!toggled)}
-            title={title}
+            onClick={() => onToggled(!toggled)} title={title}
         >
             <i className={
                 toggled ? 'bi-chevron-up' : 'bi-chevron-down'
             } />
-        </button>
-    </div>;
+        </Button>
+    </Div>;
 }
 function $minter(
     ppt_level: NftLevel
@@ -182,13 +181,12 @@ function $minter(
     ) => {
         return `Staked ${Nft.nameOf(ppt_level)} NFTs (with claimable APOW rewards)`;
     };
-    return <button type='button'
+    return <Button
         className='btn btn-outline-warning minter'
-        data-bs-placement='top' data-bs-toggle='tooltip'
         title={title(ppt_level)}
     >
-        {Nft.nameOf(ppt_level)}<span className='d-none d-sm-inline'> NFTs</span>
-    </button>;
+        {Nft.nameOf(ppt_level)}<Span className='d-none d-sm-inline'> NFTs</Span>
+    </Button>;
 }
 function $balance(
     ppt_level: NftLevel,
@@ -199,15 +197,14 @@ function $balance(
     const title = mobile()
         ? `Overall personal balance` + ($warning ? ' (with ugradeable NFTs)' : '')
         : `Overall personal balance & supply of staked ${Nft.nameOf(ppt_level)}s`;
-    return <button type='button' title={title}
+    return <Button title={title}
         className='btn btn-outline-warning balance'
-        data-bs-placement='top' data-bs-toggle='tooltip'
     >
         {$warning}
-        <span>{nice_si(by_level.amount)}</span>
-        <span className='d-none d-sm-inline'>&nbsp;/&nbsp;</span>
-        <span className='d-none d-sm-inline'>{nice_si(by_level.supply)}</span>
-    </button>;
+        <Span>{nice_si(by_level.amount)}</Span>
+        <Span className='d-none d-sm-inline'>&nbsp;/&nbsp;</Span>
+        <Span className='d-none d-sm-inline'>{nice_si(by_level.supply)}</Span>
+    </Button>;
 }
 function $upgradeable(
     by_issues: Array<{ amount: Amount, supply: Supply }>
@@ -216,14 +213,13 @@ function $upgradeable(
         ({ amount }) => amount >= 1000n
     );
     if (upgradeable) return mobile()
-        ? <span className='ugradeable-ppts'>
+        ? <Span className='ugradeable-ppts'>
             <ExclamationTriange fill={true} />
-        </span>
-        : <span
+        </Span>
+        : <Span
             className='ugradeable-ppts' title='Ugradeable NFTs'
-            data-bs-placement='left' data-bs-toggle='tooltip'
         >
             <ExclamationTriange fill={true} />
-        </span>;
+        </Span>;
 }
 export default UiPptList;

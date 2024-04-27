@@ -1,6 +1,6 @@
 import { confirm } from '../../../source/functions';
 import { ROParams } from '../../../source/params';
-import { AccountContext } from '../../../source/react';
+import { AccountContext, Button, Div, Span } from '../../../source/react';
 import { Account, MinerStatus, Token } from '../../../source/redux/types';
 
 import React, { useContext, useEffect, useState } from 'react';
@@ -14,12 +14,12 @@ type Props = {
 export function UiMiningToggle(
     { disabled, status, onToggle }: Props
 ) {
-    return <div
+    return <Div
         className='btn-group toggle-mining' role='group'
     >
         {$toggle({ status, disabled, onToggle })}
         {$info()}
-    </div>;
+    </Div>;
 }
 function $toggle(
     { status, disabled, onToggle }: Omit<Props, 'token'>
@@ -34,16 +34,18 @@ function $toggle(
             $toggle?.focus();
         }
     }, [focus, status]);
-    return <button type='button' id='toggle-mining'
+    return <Button id='toggle-mining'
         className='btn btn-outline-warning'
         disabled={disabled || disabledFor(status)}
-        onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
-        onClick={toggle.bind(null, { account, status, onToggle })}
+        onClick={toggle.bind(null, {
+            account, status, onToggle
+        })}
+        onFocus={() => setFocus(true)}
     >
         {Spinner(status)}
         {$text(status)}
-    </button>;
+    </Button>;
 }
 async function toggle(
     { account, status, onToggle }: Pick<Props, 'status' | 'onToggle'> & {
@@ -106,9 +108,9 @@ function disabledFor(
 function $text(
     status: MinerStatus | null
 ) {
-    return <span className='text'>
+    return <Span className='text'>
         {textFor(status)}
-    </span>;
+    </Span>;
 }
 function textFor(
     status: MinerStatus | null
@@ -137,13 +139,12 @@ function textFor(
     return 'Start Mining';
 }
 function $info() {
-    return <button type='button'
+    return <Button
         className='btn btn-outline-warning info'
-        data-bs-toggle='tooltip' data-bs-placement='top'
         title={`Start mining for ${Token.XPOW}s`}
     >
         <InfoCircle fill={true} />
-    </button>;
+    </Button>;
 }
 function Spinner(
     status: MinerStatus | null
@@ -178,7 +179,7 @@ function Spinner(
         'spinner spinner-border spinner-border-sm',
         'float-start', grow(status)
     ];
-    return <span
+    return <Span
         className={classes.join(' ')} role='status'
         style={{ visibility: visible(status) }}
     />;

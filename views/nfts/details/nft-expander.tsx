@@ -1,4 +1,4 @@
-import { globalRef } from '../../../source/react';
+import { Button, Div, globalRef } from '../../../source/react';
 import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
 
 import React, { useEffect } from 'react';
@@ -40,35 +40,33 @@ function $expander(
         'btn-group', 'nft-sender-expander',
         props.expanded ? 'd-none' : 'd-sm-none'
     ];
-    return <div
+    return <Div
         className={classes.join(' ')} role='group'
         style={{ marginTop: '1em', width: '100%' }}
     >
-        <button type='button'
+        <Button
             className='btn btn-outline-warning toggle-old no-ellipsis'
-            data-bs-placement='top' data-bs-toggle='tooltip'
             onClick={toggle.bind(null, props)}
             title={title(props)}
         >
             <i className={
                 props.toggled ? 'bi-eye-slash-fill' : 'bi-eye-fill'
             } />
-        </button>
-        <button type='button'
+        </Button>
+        <Button
             className='btn btn-outline-warning sender-expander'
             onClick={expand.bind(null, props)}
         >
             <i className='bi-chevron-down' />
-        </button>
-        <button type='button'
+        </Button>
+        <Button
             className='btn btn-outline-warning info'
-            data-bs-placement='top' data-bs-toggle='tooltip'
             style={{ width: '43px' }}
             title='Show send to & amount'
         >
             <InfoCircle fill={true} />
-        </button>
-    </div>;
+        </Button>
+    </Div>;
 }
 function title(
     { toggled }: Props

@@ -1,8 +1,8 @@
-import { globalRef } from '../../../source/react';
 import { Account, Amount, Nft, NftIssue, NftLevel, NftSenderStatus } from '../../../source/redux/types';
 
 import React from 'react';
 import { InfoCircle } from '../../../public/images/tsx';
+import { Button, Div, Span, globalRef } from '../../../source/react';
 import { UiNftToggle } from './ui-toggle';
 
 type Props = {
@@ -28,7 +28,7 @@ export function UiNftSender(
         issue: props.issue,
         level: props.level
     });
-    return <div
+    return <Div
         className='btn-group nft-sender d-none d-sm-flex'
         ref={globalRef(`.nft-sender[full-id="${full_id}"]`)}
         role='group'
@@ -39,12 +39,12 @@ export function UiNftSender(
         />
         {$button(props)}
         {$info(props)}
-    </div>;
+    </Div>;
 }
 function $button(
     props: Props
 ) {
-    return <button type='button'
+    return <Button
         className='btn btn-outline-warning sender'
         disabled={disabled(props)}
         onClick={props.onTransfer?.bind(
@@ -54,8 +54,8 @@ function $button(
         {Spinner({
             show: props.status === NftSenderStatus.sending, grow: true
         })}
-        <span className='text'>{text(props)}</span>
-    </button>;
+        <Span className='text'>{text(props)}</Span>
+    </Button>;
 }
 function text(
     { level, status }: Props
@@ -81,13 +81,13 @@ function disabled(
 function $info(
     { issue, level }: Props
 ) {
-    return <button type='button'
-        className='btn btn-outline-warning info'
-        data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`Send ${Nft.nameOf(level)} NFTs to destination (for ${issue})`}
+    return <Button
+        className='btn btn-outline-warning info' title={
+            `Send ${Nft.nameOf(level)} NFTs to destination (for ${issue})`
+        }
     >
         <InfoCircle fill={true} />
-    </button>;
+    </Button>;
 }
 function Spinner(
     { show, grow }: { show: boolean, grow?: boolean }
@@ -96,7 +96,7 @@ function Spinner(
         'spinner spinner-border spinner-border-sm',
         'float-start', grow ? 'spinner-grow' : ''
     ];
-    return <span
+    return <Span
         className={classes.join(' ')} role='status'
         style={{ display: show ? 'inline-block' : 'none' }}
     />;

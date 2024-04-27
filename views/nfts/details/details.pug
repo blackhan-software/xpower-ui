@@ -8,70 +8,48 @@ each year in Array.from(YEARS).reverse()
     div.col-sm.nft-details-lhs
       div.nft-image-wrap
         a(target="_blank")
-          span.spinner.spinner-border(
-            role="status"
-          )
-          img.img-fluid.nft-image(
-            data-bs-toggle="tooltip" data-bs-placement="top" loading="lazy"
-            title=`Trade ${levels[index]} NFTs (level ${index+1}/9 & ID #${nft_id})`
-          )
+          span.spinner.spinner-border(role="status")
+          img.img-fluid.nft-image(loading="lazy")
 
     div.col-sm.nft-details-rhs
       div.form-label
         | Year of Issuance
       div.input-group.nft-issuance-year
         input.form-control(
-          type="number" value=`${year}` readonly
+          readonly value=`${year}`
           name=`nft-issuance-year-${levels[index]}-${year}`
         )
-        span.input-group-text.info(
-          data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Year of issuance of these ${levels[index]} NFTs`
-        )
+        span.input-group-text.info
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
       div.form-label
         | Personal Balance
       div.input-group.nft-balance
         input.form-control(
-          type="text" placeholder="0" readonly
+          placeholder="0" readonly
           name=`nft-balance-${levels[index]}-${year}`
         )
-        span.input-group-text.info(
-          data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Balance of minted ${levels[index]} NFTs`
-        )
+        span.input-group-text.info
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
       div.form-label
         | Total Supply
       div.input-group.nft-total-supply
         input.form-control(
-          type="text" placeholder="0" readonly
+          placeholder="0" readonly
           name=`nft-total-supply-${levels[index]}-${year}`
         )
-        span.input-group-text.info(
-          data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Supply of minted ${levels[index]} NFTs`
-        )
+        span.input-group-text.info
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
       div.btn-group.nft-sender-expander.d-sm-none(
         role="group" style="margin-top: 1em; width: 100%"
       )
-        button.btn.btn-outline-warning.toggle-old.no-ellipsis(
-          type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Show older NFTs`
-        )
+        button.btn.btn-outline-warning.toggle-old.no-ellipsis
           i.bi-eye-fill
-        button.btn.btn-outline-warning.sender-expander(
-          type="button"
-        )
+        button.btn.btn-outline-warning.sender-expander
           i.bi-chevron-down
-        button.btn.btn-outline-warning.info(
-          type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Show send to & amount` style="width: 43px"
-        )
+        button.btn.btn-outline-warning.info(style="width: 43px")
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
       div.form-label.nft-transfer-to-label.d-none.d-sm-flex
@@ -80,13 +58,10 @@ each year in Array.from(YEARS).reverse()
         role="group"
       )
         input.form-control(
-          type="text" placeholder="0x…" disabled
+          placeholder="0x…" disabled
           name=`nft-transfer-to-${levels[index]}-${year}`
       )
-        span.input-group-text.info(
-          data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Address to send minted ${levels[index]} NFTs to`
-        )
+        span.input-group-text.info
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
       div.form-label.nft-transfer-amount-label.d-none.d-sm-flex
@@ -98,31 +73,20 @@ each year in Array.from(YEARS).reverse()
           type="number" placeholder="0" min="0"  disabled
           name=`nft-transfer-amount-${levels[index]}-${year}`
         )
-        span.input-group-text.info(
-          data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Amount of minted ${levels[index]} NFTs to send`
-        )
+        span.input-group-text.info
           include ../../../public/images/pug/info-circle-fill.svg.pug
 
       div.btn-group.nft-sender.d-none.d-sm-flex(
         role="group"
       )
-        button.btn.btn-outline-warning.toggle-old.no-ellipsis(
-          data-bs-toggle="tooltip" data-bs-placement="top"
-          type="button" title=`Show older NFTs`
-        )
+        button.btn.btn-outline-warning.toggle-old.no-ellipsis
           i.bi-eye-fill
-        button.btn.btn-outline-warning.sender(
-          type="button" disabled
-        )
+        button.btn.btn-outline-warning.sender(disabled)
           span.spinner.spinner-border.spinner-border-sm.float-start(
             role="status" style="display: none"
           )
           span.text: | Send #{levels[index]} NFTs
-        button.btn.btn-outline-warning.info(
-          type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-          title=`Send ${levels[index]} NFTs to destination (for ${year})`
-        )
+        button.btn.btn-outline-warning.info
           include ../../../public/images/pug/info-circle-fill.svg.pug
   hr.year(style=`display:${
     YEARS[YEARS.length-1] - year ? 'none' : 'block'

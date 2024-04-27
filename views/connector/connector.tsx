@@ -6,7 +6,7 @@ import { CSSTransition } from 'react-transition-group';
 
 import { createRoot } from 'react-dom/client';
 import { Provider, useStore } from 'react-redux';
-import { globalRef } from '../../source/react';
+import { A, Div, globalRef } from '../../source/react';
 
 import { Blockchain, ChainId } from '../../source/blockchain';
 import { Bus } from '../../source/bus';
@@ -101,11 +101,11 @@ export function UiConnector() {
         }
     }, [chain, level]);
     return <>
-        <div className='btn-group connect-wallet' role='group'>
+        <Div className='btn-group connect-wallet' role='group'>
             <RpcToggle toggled={toggled} onToggled={set_toggled} />
             <Connector chain={chain} />
             <Info chain={chain} level={level} />
-        </div>
+        </Div>
         <CSSTransition
             nodeRef={globalRef<HTMLElement>('.rpc-address')}
             in={toggled} timeout={600} classNames='fade-in-600'
@@ -136,14 +136,14 @@ function Connector(
         ? '_blank' : undefined;
     const disabled = connecting(chain)
         ? 'disabled' : '';
-    return <a type='button' ref={globalRef('#connect-wallet')}
+    return <A type='button' ref={globalRef('#connect-wallet')}
         className={`btn btn-outline-warning ${disabled}`}
         id='connect-wallet' onClick={on_click}
         href={href} target={target} rel={rel}
     >
         <Spinner show={connecting(chain)} grow={true} />
         <Label chain={chain} />
-    </a>;
+    </A>;
 }
 function connecting(
     chain: State['chain']

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '../../../source/react';
 
 type Props = {
     toggled: boolean;
@@ -7,16 +8,15 @@ type Props = {
 export function UiNftToggle(
     props: Props
 ) {
-    return <button type='button'
+    return <Button
         className='btn btn-outline-warning toggle-old no-ellipsis'
-        data-bs-placement='top' data-bs-toggle='tooltip'
         onClick={() => toggle(props)}
         title={title(props)}
     >
         <i className={
             props.toggled ? 'bi-eye-slash-fill' : 'bi-eye-fill'
         } />
-    </button>;
+    </Button>;
 }
 function toggle(
     { toggled, onToggled }: Props

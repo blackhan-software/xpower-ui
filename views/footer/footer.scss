@@ -3,21 +3,21 @@ footer {
         border-top: 1px solid var(--xp-powered);
         border-bottom: 1px solid var(--xp-powered);
     }
-    a.nav-link {
+    .nav-link {
         i.bi, svg {
             color: var(--xp-powered);
         }
         color: var(--xp-powered);
     }
-    a.nav-link.lower {
+    .nav-link.lower {
         position: relative;
         top: 1px;
     }
-    a.nav-link.upper {
+    .nav-link.upper {
         position: relative;
         top: -1px;
     }
-    a.nav-link:hover {
+    .nav-link:hover {
         i.bi, svg {
             color: var(--xp-accentuated);
         }

@@ -1,37 +1,21 @@
 div#mining
   div.btn-group.toggle-mining(role="group")
-    button.btn.btn-outline-warning#toggle-mining(
-      type="button" disabled
-    )
+    button.btn.btn-outline-warning#toggle-mining(disabled)
       span.spinner.spinner-border.spinner-border-sm.float-start(
         role="status" style="visibility: hidden"
       )
       span.text: | Start Mining
-
-    button.btn.btn-outline-warning.info(
-      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-      title="Toggle to mine for {{xToken}}s"
-    )
+    button.btn.btn-outline-warning.info
       include ../../../public/images/pug/info-circle-fill.svg.pug
 
   div.btn-group.tweak-mining(role="group")
     div.btn-group.decreaser(role="group")
-      button.btn.btn-outline-warning#decrease(
-        type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-        title="Decrease mining speed" disabled
-      )
+      button.btn.btn-outline-warning#decrease(disabled)
         include ../../../public/images/pug/dash-circle-fill.svg.pug
-    div.btn-group.progressor(
-      role="group" data-bs-toggle="tooltip" data-bs-placement="top"
-      title="Mining speed: {{UI_MINING_SPEED}}%"
-    )
+    div.btn-group.progressor(role="group")
       div.progress: div#speed.progress-bar.with-indicator(
-        role="progressbar" aria-label="mining speed controller"
-        style="width: {{UI_MINING_SPEED}}%"
+        role="progressbar" style="width: {{UI_MINING_SPEED}}%"
       )
     div.btn-group.increaser(role="group")
-      button.btn.btn-outline-warning#increase(
-        type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-        title="Increase mining speed" disabled
-      )
+      button.btn.btn-outline-warning#increase(disabled)
         include ../../../public/images/pug/plus-circle-fill.svg.pug

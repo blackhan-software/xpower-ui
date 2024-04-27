@@ -8,10 +8,11 @@ import { Tokenizer } from '../../source/token';
 import React, { Dispatch, SetStateAction, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Fire, ToggleAlt, XPower } from '../../public/images/tsx';
-import { TokenContext } from '../../source/react';
+import { Button, Div, Input, Select, Span, TokenContext } from '../../source/react';
 
 import { QRCode } from '../qr-code';
 import { Sector } from './sector';
+
 
 export type Props = {
     account: Account | null;
@@ -32,11 +33,11 @@ export function UiAftWallet(
     const set_aged = (aged: boolean) => {
         dispatch(switchToken(aged ? Token.APOW : Token.XPOW));
     };
-    return <div id='aft-wallet'>
-        <div className='form-label'>
+    return <Div id='aft-wallet'>
+        <Div className='form-label'>
             Wallet Address and {token} Balance {$aftToggleMini({ aged, set_aged })}
-        </div>
-        <div className='input-group aft-wallet-address wallet-address'>
+        </Div>
+        <Div className='input-group aft-wallet-address wallet-address'>
             {$otfToggle({
                 ...props
             })}
@@ -58,8 +59,8 @@ export function UiAftWallet(
             {$aftToggle({
                 ...props, aged, set_aged, token
             })}
-        </div>
-    </div>;
+        </Div>
+    </Div>;
 }
 function $otfToggle(
     { toggled, onToggled }: Props
@@ -69,14 +70,14 @@ function $otfToggle(
     const title = toggled
         ? 'Disable minter wallet & hide balance of AVAX'
         : 'Enable minter wallet & show balance of AVAX';
-    return <button id='otf-wallet-toggle'
+    return <Button
         className='form-control input-group-text'
-        data-bs-toggle='tooltip' data-bs-placement='top'
+        id='otf-wallet-toggle'
         onClick={onToggled?.bind(null, !toggled)}
-        role='button' title={nomobi(title)}
+        title={nomobi(title)}
     >
         <i className={icon} />
-    </button>;
+    </Button>;
 }
 function $qr_code(
     { account }: Pick<Props, 'account'>
@@ -86,14 +87,14 @@ function $qr_code(
 function $copy(
     { account }: Pick<Props, 'account'>
 ) {
-    return <button id='aft-wallet-copy'
+    return <Button
         className='form-control input-group-text'
-        data-bs-toggle='tooltip' data-bs-placement='top'
+        id='aft-wallet-copy'
         onClick={() => navigator.clipboard.writeText(x40(account!))}
-        role='button' title='Copy address'
+        title='Copy address'
     >
         <i className='bi bi-copy'></i>
-    </button>;
+    </Button>;
 }
 function $account(
     { account, accounts, names, set_account }: Props
@@ -112,17 +113,19 @@ function $account(
         ? <option key={a} value={x40(a)}>{dns(a)}&nbsp;[read-only]</option>
         : <option key={a} value={x40(a)}>{dns(a)}</option>
     );
-    return <select
-        default-value={x40(0n)} value={x40(account)}
-        className='form-select' id='aft-wallet-address'
-        data-bs-toggle='tooltip' data-bs-placement='top'
-        title='Wallet address' onChange={(e) => {
-            set_account(BigInt(e.target.value))
-        }}
+    return <Select
+        className='form-select'
+        default-value={x40(0n)}
+        id='aft-wallet-address'
+        onChange={(e) => set_account(BigInt(e.target.value))}
+        title='Wallet address'
+        value={x40(account)}
     >
         {options}
-    </select>;
-    function dns(account: Account) {
+    </Select>;
+    function dns(
+        account: Account
+    ) {
         const a = x40(account);
         if (names[a]) {
             return `${names[a]} (${a.slice(0, 6)}…${a.slice(-4)})`;
@@ -141,18 +144,20 @@ function $aftBurner(
     const inner_classes = [
         'spinner spinner-border spinner-border-sm', 'float-start'
     ];
-    return <button aria-label={title()}
+    return <Button
         className={outer_classes.join(' ')}
-        data-bs-toggle='tooltip' data-bs-placement='top'
-        data-bs-original-title={title()} title={title()}
-        id='aft-wallet-burner' onClick={on_click} role='tooltip'
+        id='aft-wallet-burner'
+        onClick={on_click}
+        title={title()}
     >
         <span
             className={inner_classes.join(' ')} role='status'
         />
         <Fire />
-    </button>;
-    async function on_click(e: React.MouseEvent) {
+    </Button>;
+    async function on_click(
+        e: React.MouseEvent
+    ) {
         if (disabled()) {
             e.defaultPrevented = true;
             e.stopPropagation();
@@ -190,9 +195,10 @@ function $aftBurner(
     }
     function title() {
         if (Tokenizer.aified(token)) {
-            const atoken = Tokenizer.aify(token);
             const xtoken = Tokenizer.xify(token);
-            return `Burn your ${atoken} to *unwrap* ${xtoken} tokens`;
+            return `Burn your ${token} to *unwrap* ${xtoken} tokens`;
+        } else {
+            return `Burn your ${token}`;
         }
     }
 }
@@ -209,13 +215,14 @@ function $balance(
     }, 600);
     const amount = wallet.items[token]?.amount ?? 0n;
     const { decimals } = TokenInfo(token);
-    return <input type='text' readOnly
-        className='form-control' id='aft-wallet-balance'
-        data-bs-toggle='tooltip' data-bs-placement='top'
-        title={`${nice(amount, { base: 10 ** decimals })} ${token}`}
-        value={nice_si(amount, { base: 10 ** decimals })}
+    return <Input
+        className='form-control'
+        id='aft-wallet-balance'
         onTouchEnd={on_click.cancel}
         onTouchStart={on_click}
+        readOnly
+        title={`${nice(amount, { base: 10 ** decimals })} ${token}`}
+        value={nice_si(amount, { base: 10 ** decimals })}
     />;
 }
 function $aftToggle(
@@ -231,17 +238,17 @@ function $aftToggle(
             maxPrecision: 2, minPrecision: 2
         })}%`
         : `Balance of ${token}s`;
-    return <button
+    return <Button
         className='form-control input-group-text info'
-        data-bs-toggle='tooltip' data-bs-placement='right'
-        id='aft-wallet-sov-toggle' role='tooltip'
-        title={title} onClick={() => set_aged(!aged)}
+        id='aft-wallet-sov-toggle'
+        onClick={() => set_aged(!aged)}
+        title={title}
     >
         <XPower token={Tokenizer.xify(token)} style={{
             filter: aged ? 'invert(1)' : undefined
         }} />
         {aged ? $sectors({ percent: metric / 1e2 }) : null}
-    </button>;
+    </Button>;
 }
 function $aftToggleMini(
     { aged, set_aged }: {
@@ -250,17 +257,17 @@ function $aftToggleMini(
 ) {
     const token = aged ? Token.XPOW : Token.APOW;
     const [on, set_on] = useState(false);
-    return <span id='aft-wallet-sov-toggle-mini'
-        data-bs-toggle='tooltip' data-bs-placement='left'
-        onMouseLeave={() => set_on(false)}
-        onMouseEnter={() => set_on(true)}
+    return <Span
+        id='aft-wallet-sov-toggle-mini'
         onClick={() => set_aged(!aged)}
+        onMouseEnter={() => set_on(true)}
+        onMouseLeave={() => set_on(false)}
         title={`Toggle ${token}`}
     >
         <ToggleAlt on={on} style={{
             transform: `rotate(${angle(on, aged)}deg)`
         }} />
-    </span>;
+    </Span>;
     function angle(
         lhs: boolean, rhs: boolean
     ) {

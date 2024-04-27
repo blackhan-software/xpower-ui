@@ -1,3 +1,4 @@
+import { Button, Span } from '../../../source/react';
 import { NftBurnerStatus, NftMinterList } from '../../../source/redux/types';
 
 import React from 'react';
@@ -19,10 +20,9 @@ export function UiNftBatchBurner(
         burning(status) ? 'burning' : '',
     ];
     const text = burning(status)
-        ? <>Burning<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
-        : <>Burn<span className="d-none d-sm-inline">&nbsp;NFTs</span></>;
-    return <button
-        type='button' id='nft-batch-burner'
+        ? <>Burning<Span className="d-none d-sm-inline">&nbsp;NFTs…</Span></>
+        : <>Burn<Span className="d-none d-sm-inline">&nbsp;NFTs</Span></>;
+    return <Button id='nft-batch-burner'
         className={classes.join(' ')}
         disabled={disabled({ list, status })}
         onClick={async () => {
@@ -37,8 +37,8 @@ export function UiNftBatchBurner(
         {Spinner({
             show: burning(status), grow: true, right: true
         })}
-        <span className='text'>{text}</span>
-    </button>;
+        <Span className='text'>{text}</Span>
+    </Button>;
 }
 function burning(
     status: NftBurnerStatus | null

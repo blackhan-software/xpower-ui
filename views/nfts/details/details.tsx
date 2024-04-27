@@ -1,7 +1,7 @@
 import { Bus } from '../../../source/bus';
 import { nice } from '../../../source/functions';
 import { ROParams } from '../../../source/params';
-import { globalRef } from '../../../source/react';
+import { Div, Input, Span, globalRef } from '../../../source/react';
 import { Amount, Nft, NftDetails, NftIssue, NftLevel, Nfts, Supply } from '../../../source/redux/types';
 import { MAX_YEAR, MIN_YEAR, Years } from '../../../source/years';
 
@@ -66,14 +66,14 @@ function $row(
         amount: 0n, supply: 0n
     };
     return <React.Fragment key={full_id}>
-        <div className='row year'
+        <Div className='row year'
             ref={globalRef(`:nft.row[full-id="${full_id}"]`)}
             style={{ display: (fixed || toggled) ? 'flex' : 'none' }}
         >
-            <div className='col-sm nft-details-lhs'>
+            <Div className='col-sm nft-details-lhs'>
                 {$image(props, nft_issue)}
-            </div>
-            <div className='col-sm nft-details-rhs'>
+            </Div>
+            <Div className='col-sm nft-details-rhs'>
                 {$issue(props, nft_issue)}
                 {$balance(props, nft_issue, nft)}
                 {$supply(props, nft_issue, nft)}
@@ -81,8 +81,8 @@ function $row(
                 {$target(props, nft_issue, nft)}
                 {$amount(props, nft_issue, nft)}
                 {$sender(props, nft_issue)}
-            </div>
-        </div>
+            </Div>
+        </Div>
         <hr className='year' style={{
             display: (fixed || toggled) &&
                 !lastHR(nft_level, nft_issue, toggled) ? 'block' : 'none'
@@ -117,21 +117,20 @@ function $issue(
 ) {
     const { level: nft_level } = props;
     return <React.Fragment>
-        <div className='form-label'>
+        <Div className='form-label'>
             Year of Issuance
-        </div>
-        <div className='input-group nft-issuance-year'>
-            <input className='form-control' readOnly
-                type='number' value={nft_issue}
+        </Div>
+        <Div className='input-group nft-issuance-year'>
+            <Input className='form-control'
                 name={`nft-issuance-year-${nft_level}-${nft_issue}`}
+                readOnly value={nft_issue}
             />
-            <span className='input-group-text info'
-                data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Year of issuance of these ${Nft.nameOf(nft_level)} NFTs`}
-            >
+            <Span className='input-group-text info' title={
+                `Year of issuance of these ${Nft.nameOf(nft_level)} NFTs`
+            }>
                 <InfoCircle fill={true} />
-            </span>
-        </div>
+            </Span>
+        </Div>
     </React.Fragment>;
 }
 function $balance(
@@ -140,21 +139,20 @@ function $balance(
 ) {
     const { level: nft_level } = props;
     return <React.Fragment>
-        <div className='form-label'>
+        <Div className='form-label'>
             Personal Balance
-        </div>
-        <div className='input-group nft-balance'>
-            <input className='form-control' readOnly
-                type='text' value={nice(balance)}
+        </Div>
+        <Div className='input-group nft-balance'>
+            <Input className='form-control'
                 name={`nft-balance-${nft_level}-${nft_issue}`}
+                readOnly value={nice(balance)}
             />
-            <span className='input-group-text info'
-                data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Balance of minted ${Nft.nameOf(nft_level)} NFTs`}
-            >
+            <Span className='input-group-text info' title={
+                `Balance of minted ${Nft.nameOf(nft_level)} NFTs`
+            }>
                 <InfoCircle fill={true} />
-            </span>
-        </div>
+            </Span>
+        </Div>
     </React.Fragment>;
 }
 function $supply(
@@ -163,21 +161,20 @@ function $supply(
 ) {
     const { level: nft_level } = props;
     return <React.Fragment>
-        <div className='form-label'>
+        <Div className='form-label'>
             Total Supply
-        </div>
-        <div className='input-group nft-total-supply'>
-            <input className='form-control' readOnly
-                type='text' value={nice(supply)}
+        </Div>
+        <Div className='input-group nft-total-supply'>
+            <Input className='form-control'
                 name={`nft-total-supply-${nft_level}-${nft_issue}`}
+                readOnly value={nice(supply)}
             />
-            <span className='input-group-text info'
-                data-bs-placement='top' data-bs-toggle='tooltip'
-                title={`Supply of minted ${Nft.nameOf(nft_level)} NFTs`}
-            >
+            <Span className='input-group-text info' title={
+                `Supply of minted ${Nft.nameOf(nft_level)} NFTs`
+            }>
                 <InfoCircle fill={true} />
-            </span>
-        </div>
+            </Span>
+        </Div>
     </React.Fragment>;
 }
 function $expander(

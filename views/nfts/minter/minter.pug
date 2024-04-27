@@ -2,35 +2,22 @@ div#nft-batch-minting
   div.btn-group.nft-batch-minter(
     role="group"
   )
-    button.btn.btn-outline-warning#toggle-all.no-ellipsis(
-      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-      title=`Show all NFT levels`
-    )
+    button.btn.btn-outline-warning#toggle-all.no-ellipsis
       i.bi-chevron-double-down
-    button.btn.btn-outline-warning#nft-burn-approval(
-      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-      title="Approve minting of {{TOKEN}}s NFTs" disabled
-    )
+    button.btn.btn-outline-warning#nft-burn-approval(disabled)
       span.spinner.spinner-border.spinner-border-sm.float-start(
         role="status" style="display: none"
       )
       span.text: | Approve NFT Minting
-    button.btn.btn-outline-warning#nft-batch-minter(
-      type="button" disabled
-    )
+    button.btn.btn-outline-warning#nft-batch-minter(disabled)
       span.spinner.spinner-border.spinner-border-sm.float-start(
         role="status" style="display: none"
       )
       span.text: | Mint<span class="d-none d-sm-inline"> NFTs</span>
-    button.btn.btn-outline-warning#nft-batch-upgrader(
-      type="button" disabled
-    )
+    button.btn.btn-outline-warning#nft-batch-upgrader(disabled)
       span.spinner.spinner-border.spinner-border-sm.float-start(
         role="status" style="display: none"
       )
       span.text: | Upgrade<span class="d-none d-sm-inline"> NFTs</span>
-    button.btn.btn-outline-warning.info(
-      type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-      title="Batch mint or upgrade stakeable {{TOKEN}} NFTs"
-    )
+    button.btn.btn-outline-warning.info
       include ../../../public/images/pug/info-circle-fill.svg.pug

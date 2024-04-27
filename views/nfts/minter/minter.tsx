@@ -1,3 +1,4 @@
+import { Button, Div } from '../../../source/react';
 import { NftBurnerStatus, NftMinterApproval, NftMinterList, NftMinterStatus, NftUpgraderStatus, Token } from '../../../source/redux/types';
 
 import React from 'react';
@@ -23,7 +24,7 @@ type Props = {
 export function UiNftMinter(
     props: Props
 ) {
-    return <div
+    return <Div
         className='btn-group nft-batch-minter' role='group'
     >
         {$toggleAll(props)}
@@ -31,7 +32,7 @@ export function UiNftMinter(
         {$batchReminter(props)}
         {$batchUpgrader(props)}
         {$info()}
-    </div>;
+    </Div>;
 }
 function $toggleAll(
     { toggled, onToggled }: Props
@@ -39,10 +40,8 @@ function $toggleAll(
     const title = !toggled
         ? 'Show all NFT levels'
         : 'Hide all NFT levels';
-    return <button
-        type='button' id='toggle-all'
+    return <Button id='toggle-all'
         className='btn btn-outline-warning no-ellipsis'
-        data-bs-placement='top' data-bs-toggle='tooltip'
         onClick={onToggled?.bind(null, !toggled)}
         title={title}
     >
@@ -50,7 +49,7 @@ function $toggleAll(
             ? 'bi-chevron-double-up'
             : 'bi-chevron-double-down'
         } />
-    </button>;
+    </Button>;
 }
 function $burnApproval(
     { approval, onApproval }: Props
@@ -102,12 +101,10 @@ function $batchUpgrader(
     />;
 }
 function $info() {
-    return <button type='button'
-        className='btn btn-outline-warning info'
-        data-bs-placement='top' data-bs-toggle='tooltip'
-        title={`Mint, burn or upgrade ${Token.XPOW} NFTs`}
-    >
+    return <Button className='btn btn-outline-warning info' title={
+        `Mint, burn or upgrade ${Token.XPOW} NFTs`
+    }>
         <InfoCircle fill={true} />
-    </button>;
+    </Button>;
 }
 export default UiNftMinter;

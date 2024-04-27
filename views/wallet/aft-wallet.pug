@@ -1,7 +1,7 @@
 div#aft-wallet
   div.form-label
     | Wallet Address and {{TOKEN}} Balance
-    span(id="aft-wallet-sov-toggle-mini")
+    span#aft-wallet-sov-toggle-mini
       svg(class="bi bi-toggle2-off"
         xmlns="http://www.w3.org/2000/svg"
         height="16" width="16" fill="currentColor"
@@ -10,40 +10,24 @@ div#aft-wallet
         path(d="M9 11c.628-.836 1-1.874 1-3a4.978 4.978 0 0 0-1-3h4a3 3 0 1 1 0 6H9z")
         path(d="M5 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0 1A5 5 0 1 0 5 3a5 5 0 0 0 0 10z")
   div.input-group.aft-wallet-address.wallet-address
-    button#otf-wallet-toggle.form-control.input-group-text(
-      data-bs-toggle="tooltip" data-bs-placement="top"
-      role="button" title="Enable minter wallet & show balance of AVAX"
-    )
+    button.form-control.input-group-text#otf-wallet-toggle
       i(class="bi {{OTF_WALLET_TOGGLE}}")
     include ../qr-code/qr-code.pug
-    select#aft-wallet-address.form-select(
+    select.form-select#aft-wallet-address(
       default-value="0x0000000000000000000000000000000000000000"
-      data-bs-toggle="tooltip" data-bs-placement="top"
-      readonly  title="Wallet address" type="text"
-      value="{{AFT_WALLET_ACCOUNT}}"
+      readonly value="{{AFT_WALLET_ACCOUNT}}"
     )
       option(value="{{AFT_WALLET_ACCOUNT}}")
         | {{AFT_WALLET_ACCOUNT}}
-    button#aft-wallet-copy.form-control.input-group-text(
-      data-bs-toggle="tooltip" data-bs-placement="top"
-      role="button" title="Copy address"
-    )
+    button.form-control.input-group-text#aft-wallet-copy
       i(class="bi bi-copy")
-    button.form-control.input-group-text#aft-wallet-burner(
-      data-bs-toggle="tooltip" data-bs-placement="top" disabled="disabled"
-      role="tooltip" title="Burn your {{TOKEN}}"
-    )
+    button.form-control.input-group-text#aft-wallet-burner(disabled)
       span.spinner.spinner-border.spinner-border-sm.float-start(
         role="status"
       )
       include ../../public/images/pug/fire.svg.pug
-    input#aft-wallet-balance.form-control(
-      data-bs-toggle="tooltip" data-bs-placement="top"
-      placeholder="0" readonly type="text"
-      title=`Balance of proof-of-work {{TOKEN}} tokens`
+    input.form-control#aft-wallet-balance(
+      placeholder="0" readonly
     )
-    button.form-control.input-group-text.info#aft-wallet-sov-toggle(
-      data-bs-toggle="tooltip" data-bs-placement="top"
-      role="tooltip" title="Wallet address & balance of {{TOKEN}} tokens"
-    )
+    button.form-control.input-group-text.info#aft-wallet-sov-toggle
       include ../../public/images/pug/xpower.img.pug

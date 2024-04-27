@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '../../../source/react';
 
 type Props = {
     onToggled?: (toggled: boolean) => void;
@@ -10,14 +11,12 @@ export function RpcToggle(
     const title = !toggled
         ? 'Show RPC end-point'
         : 'Hide RPC end-point';
-    return <button
-        type='button' id='rpc-toggle'
+    return <Button
         className='btn btn-outline-warning no-ellipsis'
-        data-bs-placement='top' data-bs-toggle='tooltip'
         onClick={onToggled?.bind(null, !toggled)}
-        title={title}
+        id='rpc-toggle' title={title}
     >
         <i className={toggled ? 'bi-chevron-up' : 'bi-chevron-down'} />
-    </button>;
+    </Button>;
 }
 export default RpcToggle;

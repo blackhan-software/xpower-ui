@@ -1,6 +1,8 @@
 import React from 'react';
+import { Button } from '../../../source/react';
+
 import { Bug, Wifi } from '../../../public/images/tsx';
-import { State, WifiLevel, Chain } from '../connector';
+import { Chain, State, WifiLevel } from '../connector';
 
 type Props = {
     chain: State['chain'];
@@ -9,13 +11,12 @@ type Props = {
 export function Info(
     { chain, level }: Props
 ) {
-    return <button
+    return <Button
         className='btn btn-outline-warning info'
-        data-bs-toggle='tooltip' data-bs-placement='top'
-        title={tooltip(chain)} type='button'
+        title={tooltip(chain)}
     >
         {icon(chain, level)}
-    </button>;
+    </Button>;
 }
 function icon(
     chain: State['chain'], level: WifiLevel

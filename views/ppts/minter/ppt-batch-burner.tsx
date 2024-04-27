@@ -1,3 +1,4 @@
+import { Button, Span } from '../../../source/react';
 import { PptBurnerStatus, PptMinterList } from '../../../source/redux/types';
 
 import React from 'react';
@@ -18,10 +19,9 @@ export function UiPptBatchBurner(
         burning(status) ? 'burning' : '',
     ];
     const text = burning(status)
-        ? <>Unstaking<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
-        : <>Unstake<span className="d-none d-sm-inline">&nbsp;NFTs</span></>;
-    return <button
-        type='button' id='ppt-batch-burner'
+        ? <>Unstaking<Span className="d-none d-sm-inline">&nbsp;NFTs…</Span></>
+        : <>Unstake<Span className="d-none d-sm-inline">&nbsp;NFTs</Span></>;
+    return <Button id='ppt-batch-burner'
         className={classes.join(' ')}
         disabled={disabled({ list, status })}
         onClick={onBatchBurn?.bind(null, list)}
@@ -29,8 +29,8 @@ export function UiPptBatchBurner(
         {Spinner({
             show: burning(status), grow: true, right: true
         })}
-        <span className='text'>{text}</span>
-    </button>;
+        <Span className='text'>{text}</Span>
+    </Button>;
 }
 function burning(
     status: PptBurnerStatus | null

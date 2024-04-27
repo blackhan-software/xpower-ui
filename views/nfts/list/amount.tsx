@@ -4,7 +4,7 @@ import { Amount, Nft, NftLevel, Token, TokenInfo, Ui, Wallet } from '../../../so
 
 import React, { KeyboardEvent, MouseEvent, TouchEvent, useContext, useEffect, useRef } from 'react';
 import { DashCircle, PlusCircle } from '../../../public/images/tsx';
-import { UiContext, WalletContext, useBufferedIf, useDoubleTap } from '../../../source/react';
+import { Button, Div, Input, UiContext, WalletContext, useBufferedIf, useDoubleTap } from '../../../source/react';
 
 type Props = {
     level: NftLevel,
@@ -29,11 +29,11 @@ export function UiNftAmount(
     }, [
         props, delta, set_delta_now
     ]);
-    return <React.Fragment>
+    return <>
         {$decrease(props, set_delta)}
         {$amount(props)}
         {$increase(props, set_delta)}
-    </React.Fragment>;
+    </>;
 }
 function extremifyDec(
     { amount1, max1, min1, level, onUpdate }: Props
@@ -61,10 +61,10 @@ function $decrease(
     };
     const { amount1, min1 } = props;
     const decreasable = amount1 > min1;
-    return <div
+    return <Div
         className='btn-group' role='group'
     >
-        <button type='button' aria-label="Decrease"
+        <Button aria-label="Decrease"
             className='btn btn-outline-warning decrease'
             onMouseDown={!mobile() ? start : undefined}
             onMouseLeave={!mobile() ? stop : undefined}
@@ -76,8 +76,8 @@ function $decrease(
             disabled={!decreasable} ref={$ref}
         >
             <DashCircle fill={true} />
-        </button>
-    </div>;
+        </Button>
+    </Div>;
 }
 function decreaseByKeyboard(
     props: Props, e: KeyboardEvent
@@ -123,15 +123,14 @@ function $amount(
             current?.removeEventListener('wheel', ibyw);
         };
     }, [props, wallet, ui, $ref]);
-    return <input type='number' ref={$ref}
+    return <Input type='number' ref={$ref}
         className={`btn btn-outline-warning amount ${invalid(props, wallet, ui)}`.trim()}
-        data-bs-toggle='tooltip' data-bs-placement='top'
+        name={`nft-amount-${props.level}`}
         onChange={(e) => changeTo(props, parse(e.target.value))}
         onKeyDown={(e) => changeByArrows(props, e)}
         readOnly={readOnly(props, ui)}
         title={title(props)}
         value={props.amount1.toString()}
-        name={`nft-amount-${props.level}`}
     />;
 }
 function parse(value: string) {
@@ -226,10 +225,10 @@ function $increase(
     };
     const { amount1, max1 } = props;
     const increasable = amount1 < max1;
-    return <div
+    return <Div
         className='btn-group' role='group'
     >
-        <button type='button' aria-label="Increase"
+        <Button aria-label="Increase"
             className='btn btn-outline-warning increase'
             onMouseDown={!mobile() ? start : undefined}
             onMouseLeave={!mobile() ? stop : undefined}
@@ -241,8 +240,8 @@ function $increase(
             disabled={!increasable} ref={$ref}
         >
             <PlusCircle fill={true} />
-        </button>
-    </div>;
+        </Button>
+    </Div>;
 }
 function increaseByKeyboard(
     props: Props, e: KeyboardEvent

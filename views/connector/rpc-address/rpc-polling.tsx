@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Rpc, useDoubleTap } from '../../../source/react';
 import { useInterval } from 'usehooks-ts';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Input, Rpc, useDoubleTap } from '../../../source/react';
 
 import { mobile } from '../../../source/functions';
 
@@ -56,10 +56,9 @@ function $decrease(
         }
         set_ims(null);
     };
-    return <button
-        id='rpc-polling-dec' ref={$ref} role='button'
+    return <Button
+        id='rpc-polling-dec' ref={$ref}
         className='form-control input-group-text'
-        data-bs-toggle='tooltip' data-bs-placement='top'
         disabled={decrease_disabled(props)}
         onMouseDown={!mobile() ? start : undefined}
         onMouseLeave={!mobile() ? stop : undefined}
@@ -71,7 +70,7 @@ function $decrease(
         title={!mobile() ? 'Decrease RPC polling' : undefined}
     >
         <i className='bi-dash-circle'></i>
-    </button>;
+    </Button>;
 }
 function $polling_ms(
     props: Props
@@ -101,15 +100,14 @@ function $polling_ms(
     const classes = [
         'form-control', validity(props)
     ];
-    return <input ref={$ref}
-        id='rpc-polling' className={classes.join(' ')}
-        data-bs-toggle='tooltip' data-bs-placement='top'
+    return <Input
+        id='rpc-polling' ref={$ref}
+        className={classes.join(' ')}
         onChange={(e) => on_change(props, e)}
         onKeyDown={(e) => by_arrows(props, e)}
         placeholder={MIN_POLLING_MS.toString()}
+        title='RPC polling [ms]' type='number'
         value={props.rpc?.ms ?? ''}
-        title='RPC polling [ms]'
-        type='number'
     />;
 }
 function $increase(
@@ -141,10 +139,9 @@ function $increase(
         }
         set_ims(null);
     };
-    return <button
-        id='rpc-polling-inc' ref={$ref} role='button'
+    return <Button
+        id='rpc-polling-inc' ref={$ref}
         className='form-control input-group-text'
-        data-bs-toggle='tooltip' data-bs-placement='top'
         disabled={increase_disabled(props)}
         onMouseDown={!mobile() ? start : undefined}
         onMouseLeave={!mobile() ? stop : undefined}
@@ -156,7 +153,7 @@ function $increase(
         title={!mobile() ? 'Increase RPC polling' : undefined}
     >
         <i className='bi-plus-circle'></i>
-    </button>;
+    </Button>;
 }
 function validity(
     { rpc, valid }: Props,

@@ -60,3 +60,16 @@ div#minting {
   }
   margin-bottom: 0;
 }
+//
+// Hide TX counter(s):
+//
+div#minting {
+  div.btn-group.mint {
+    button.nn-counter {
+      width: 104.5px;
+    }
+    button.tx-counter {
+      display: none;
+    }
+  }
+}

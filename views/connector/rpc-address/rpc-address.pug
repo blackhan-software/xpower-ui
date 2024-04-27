@@ -1,31 +1,16 @@
 div.input-group.rpc-address(role="group")
-  button#rpc-address-enable.form-control.input-group-text(
-    data-bs-toggle="tooltip" data-bs-placement="top"
-    role="button" title="Enable RPC end-point"
-  )
+  button.form-control.input-group-text#rpc-address-enable
     i.bi-check-circle
   include ../../qr-code/qr-code.pug
-  input#rpc-address.form-control(
-    data-bs-toggle="tooltip" data-bs-placement="top"
+  input.form-control#rpc-address(
     placeholder=`${MY_PROVIDER_URL}`
-    title="RPC end-point" type="text"
   )
-  button#rpc-address-copy.form-control.input-group-text(
-    data-bs-toggle="tooltip" data-bs-placement="top"
-    role="button" title="Copy RPC end-point"
-  )
+  button.form-control.input-group-text#rpc-address-copy
     i.bi-copy
-  button#rpc-polling-dec.form-control.input-group-text(
-      data-bs-toggle="tooltip" data-bs-placement="top"
-      role="button" title="Decrease RPC polling"
-  )
+  button.form-control.input-group-text#rpc-polling-dec
     i.bi-dash-circle
-  input#rpc-polling.form-control(
-      data-bs-toggle="tooltip" data-bs-placement="bottom"
-      placeholder="2000" title="RPC polling [ms]" type="number"
+  input.form-control#rpc-polling(
+      placeholder="2000" type="number"
   )
-  button#rpc-polling-inc.form-control.input-group-text(
-      data-bs-toggle="tooltip" data-bs-placement="top"
-      role="button" title="Increase RPC polling"
-  )
+  button.form-control.input-group-text#rpc-polling-inc
     i.bi-plus-circle

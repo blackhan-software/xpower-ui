@@ -1,3 +1,4 @@
+import { Button, Span } from '../../../source/react';
 import { PptMinterList, PptMinterStatus } from '../../../source/redux/types';
 
 import React from 'react';
@@ -18,10 +19,9 @@ export function UiPptBatchMinter(
         minting(status) ? 'minting' : '',
     ];
     const text = minting(status)
-        ? <>Staking<span className="d-none d-sm-inline">&nbsp;NFTs…</span></>
-        : <>Stake<span className="d-none d-sm-inline">&nbsp;NFTs</span></>;
-    return <button
-        type='button' id='ppt-batch-minter'
+        ? <>Staking<Span className="d-none d-sm-inline">&nbsp;NFTs…</Span></>
+        : <>Stake<Span className="d-none d-sm-inline">&nbsp;NFTs</Span></>;
+    return <Button id='ppt-batch-minter'
         className={classes.join(' ')}
         disabled={disabled({ list, status })}
         onClick={onBatchMint?.bind(null, list)}
@@ -29,8 +29,8 @@ export function UiPptBatchMinter(
         {Spinner({
             show: minting(status), grow: true, right: true
         })}
-        <span className='text'>{text}</span>
-    </button>;
+        <Span className='text'>{text}</Span>
+    </Button>;
 }
 function minting(
     status: PptMinterStatus | null

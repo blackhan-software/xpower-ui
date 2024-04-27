@@ -1,4 +1,5 @@
 import React from 'react';
+import { Span } from '../../../source/react';
 
 export function Spinner(
     { show, grow }: { show: boolean; grow?: boolean; }
@@ -7,7 +8,7 @@ export function Spinner(
         'spinner spinner-border spinner-border-sm',
         'float-start', grow ? 'spinner-grow' : ''
     ];
-    return <span
+    return <Span
         className={classes.join(' ')} role='status'
         style={{ display: show ? 'block' : 'none' }}
     />;

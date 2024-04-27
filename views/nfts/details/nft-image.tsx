@@ -1,5 +1,6 @@
 import React from 'react';
 import { Nft, NftIssue, NftLevel } from '../../../source/redux/types';
+import { A, Div, Img, Span } from '../../../source/react';
 
 type Props = {
     issue: NftIssue;
@@ -16,11 +17,11 @@ export function UiNftImage(
     props: Props
 ) {
     const { url_market } = props;
-    return <div className='nft-image-wrap'>
-        <a target='_blank' href={url_market ?? undefined}>
+    return <Div className='nft-image-wrap'>
+        <A target='_blank' href={url_market ?? undefined}>
             {Spinner(props)}{$image(props)}
-        </a>
-    </div>;
+        </A>
+    </Div>;
 }
 function $image(
     props: Props
@@ -28,10 +29,8 @@ function $image(
     const { toggled, url_content, url_market } = props;
     const cursor = url_market ? 'pointer' : 'default';
     const display = url_content && toggled ? 'block' : 'none';
-    return <img
+    return <Img
         className='img-fluid nft-image'
-        data-bs-placement='top'
-        data-bs-toggle='tooltip'
         loading='lazy'
         onLoad={onLoaded.bind(null, props)}
         src={url_content ?? ''}
@@ -64,7 +63,7 @@ function Spinner(
         display: loading ? 'block' : 'none',
         zIndex: loading ? -1 : undefined
     };
-    return <span
+    return <Span
         className='spinner spinner-border'
         role='status' style={style}
     />;

@@ -4,7 +4,7 @@ import { capitalize } from '../../routes/functions';
 import { Bus } from '../../source/bus';
 import { mobile } from '../../source/functions';
 import { ROParams } from '../../source/params';
-import { useLongTap } from '../../source/react';
+import { Button, Div, useLongTap } from '../../source/react';
 import { Nft, NftLevel, RefresherStatus } from '../../source/redux/types';
 import { Scale } from './cover-graph-chart-scale';
 
@@ -35,27 +35,27 @@ export function UiCoverGraphControlLevel(
     }, [
         level, scale
     ]);
-    return <div className='control-level cover-layer'>
-        <div className='btn-group-vertical' role='group'>
+    return <Div className='control-level cover-layer'>
+        <Div className='btn-group-vertical' role='group'>
             {$next({ level, setLevel })}
             {$refresh(refresher)}
             {$prev({ level, setLevel })}
             {$toggle({ scale, setScale })}
-        </div>
-    </div>;
+        </Div>
+    </Div>;
 }
 function $next(
     { level, setLevel }: Props['controls']['levels']
 ) {
-    return <button
-        data-bs-toggle='tooltip' data-bs-placement='left'
-        data-disable='true' disabled={maximal(level)}
+    return <Button
         className='btn btn-outline-warning'
+        data-bs-placement='left'
+        data-disable='true' disabled={maximal(level)}
         onClick={() => increase({ level, setLevel })}
-        type='button' title={`${next(level)} NFTs`}
+        title={`${next(level)} NFTs`}
     >
         <ArrowUpCircle fill={true} />
-    </button>;
+    </Button>;
 }
 function $refresh(
     refresher: Props['controls']['refresher']
@@ -67,42 +67,42 @@ function $refresh(
     const refresh = (all: boolean) => {
         if (!tapped) refresher.onRefresh?.(all);
     };
-    return <button ref={$ref}
-        data-bs-toggle='tooltip' data-bs-placement='left'
-        data-disable='true' disabled={disabled(refresher)}
+    return <Button ref={$ref}
         className='btn btn-outline-warning'
+        data-bs-placement='left'
+        data-disable='true' disabled={disabled(refresher)}
         onClick={(e) => refresh(e.ctrlKey)}
-        type='button' title='Refresh Rates'
+        title='Refresh Rates'
     >
         <YinYangCircle classes={rotate(refresher)} />
-    </button>;
+    </Button>;
 }
 function $prev(
     { level, setLevel }: Props['controls']['levels']
 ) {
-    return <button
-        data-bs-toggle='tooltip' data-bs-placement='left'
-        data-disable='true' disabled={minimal(level)}
+    return <Button
         className='btn btn-outline-warning'
+        data-bs-placement='left'
+        data-disable='true' disabled={minimal(level)}
         onClick={() => decrease({ level, setLevel })}
-        type='button' title={`${previous(level)} NFTs`}
+        title={`${previous(level)} NFTs`}
     >
         <ArrowDownCircle fill={true} />
-    </button>;
+    </Button>;
 }
 function $toggle(
     { scale, setScale }: Props['controls']['toggle']
 ) {
-    return <button
-        data-bs-toggle='tooltip' data-bs-placement='left'
+    return <Button
         className='btn btn-outline-warning d-none d-sm-block'
+        data-bs-placement='left'
         onClick={() => toggle({ scale, setScale })}
-        type='button' title={`${capitalize(toggled(scale))} scale`}
+        title={`${capitalize(toggled(scale))} scale`}
     >
         <Toggle on={true} style={{
             transform: `rotate(${scale === Scale.logarithmic ? 0 : 180}deg)`
         }} />
-    </button>;
+    </Button>;
 }
 function disabled(
     refresher: Props['controls']['refresher']

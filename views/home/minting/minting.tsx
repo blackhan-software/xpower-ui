@@ -1,6 +1,6 @@
 import { CheckCircle } from '../../../public/images/tsx';
 import { nice_si, nomobi } from '../../../source/functions';
-import { globalRef } from '../../../source/react';
+import { Button, Div, Span, globalRef } from '../../../source/react';
 import { Level, MinterStatus, Minting, MintingRow, Token } from '../../../source/redux/types';
 import { Tokenizer } from '../../../source/token';
 
@@ -35,9 +35,9 @@ export function UiMinting(
         focus, status
     ]);
     return <React.Fragment>
-        <div className='form-label'>
+        <Div className='form-label'>
             Mined Amounts Mintable
-        </div>
+        </Div>
         {Object.values(rows).map((row, i) => $mint(
             { level: i + 1, row, onForget, onIgnore, onMint },
             (level, flag) => setFocus({ [level]: flag })
@@ -52,10 +52,9 @@ function $mint(
 ) {
     const { display, tx_counter, nn_counter } = row;
     if (display || tx_counter > 0 || nn_counter > 0) {
-        return <div
+        return <Div
             className='btn-group mint' key={level - 1}
-            ref={globalRef(`.mint[level="${level}"]`)}
-            role='group'
+            ref={globalRef(`.mint[level="${level}"]`)} role='group'
             style={{ display: row.display ? 'block' : 'none' }}
         >
             {$ignore({ level, row, onIgnore })}
@@ -63,7 +62,7 @@ function $mint(
             {$nn_counter({ level, row })}
             {$tx_counter({ level, row })}
             {$forget({ level, row, onForget })}
-        </div>;
+        </Div>;
     }
     return null;
 }
@@ -75,20 +74,17 @@ function $ignore(
     const title = !row.ignored
         ? `These mined tokens will be queued for minting`
         : `These mined tokens won't be queued for minting`;
-    return <span
-        className='d-inline-block' title={nomobi(title)}
-        data-bs-toggle='tooltip' data-bs-placement='top'
+    return <Span
+        className='d-inline-block'
     >
-        <button
-            onClick={() => {
-                if (onIgnore) onIgnore(level, !row.ignored);
-            }}
+        <Button
             className='btn btn-outline-warning ignore'
-            type='button'
+            onClick={() => onIgnore?.(level, !row.ignored)}
+            title={nomobi(title)}
         >
             <CheckCircle fill={!row.ignored} />
-        </button>
-    </span>;
+        </Button>
+    </Span>;
 }
 function $minter(
     { level, row, onMint }: Omit<Props, 'rows'> & {
@@ -99,76 +95,74 @@ function $minter(
     const amount = nice_si(Tokenizer.amount(level));
     const minting = row.status === MinterStatus.minting;
     const $amount = minting
-        ? <span className='d-none d-sm-inline'>&nbsp;{amount}</span>
-        : <span>&nbsp;{amount}</span>;
-    const $token = <span className='d-none d-sm-inline'>
+        ? <Span className='d-none d-sm-inline'>&nbsp;{amount}</Span>
+        : <Span>&nbsp;{amount}</Span>;
+    const $token = <Span className='d-none d-sm-inline'>
         &nbsp;{Token.XPOW}
-    </span>;
+    </Span>;
     const text = minting
-        ? <span className="text">Minting{$amount}{$token}…</span>
-        : <span className="text">Mint{$amount}{$token}</span>;
-    return <button
+        ? <Span className="text">Minting{$amount}{$token}…</Span>
+        : <Span className="text">Mint{$amount}{$token}</Span>;
+    return <Button
         className='btn btn-outline-warning minter'
         disabled={row.disabled || row.ignored || minting}
         onClick={() => { if (onMint) onMint(level); }}
         onBlur={() => onFocus(level, false)}
         onFocus={() => onFocus(level, true)}
         ref={globalRef(`.minter[level="${level}"]`)}
-        type='button'
     >
         {Spinner({ show: minting, grow: true })}{text}
-    </button>;
+    </Button>;
 }
 function $nn_counter(
     { level, row }: Omit<Props, 'rows'> & {
         row: MintingRow
     }
 ) {
-    return <span
-        className='d-inline-block'
-        data-bs-toggle='tooltip' data-bs-placement='left'
-        title={`Number of level ${level} ${Token.XPOW} tokens mined`}
+    return <Span
+        className='d-inline-block' title={
+            `Number of ${Tokenizer.amount(level)} ${Token.XPOW} tokens mined`
+        }
     >
-        <button
+        <Button
             className='btn btn-outline-warning nn-counter'
-            type='button' disabled={row.disabled}
-        >{row.nn_counter}</button>
-    </span>;
+            disabled={row.disabled}
+        >{row.nn_counter}</Button>
+    </Span>;
 }
 function $tx_counter(
     { level, row }: Omit<Props, 'rows'> & {
         row: MintingRow
     }
 ) {
-    return <span
-        className='d-inline-block'
-        data-bs-toggle='tooltip' data-bs-placement='left'
-        title={`Number of level ${level} ${Token.XPOW} tokens minted`}
+    return <Span
+        className='d-inline-block' title={
+            `Number of ${Tokenizer.amount(level)} ${Token.XPOW} tokens minted`
+        }
     >
-        <button
+        <Button
             className='btn btn-outline-warning tx-counter'
-            type='button' disabled={row.disabled}
-        >{row.tx_counter}</button>
-    </span>;
+            disabled={row.disabled}
+        >{row.tx_counter}</Button>
+    </Span>;
 }
 function $forget(
     { level, row, onForget }: Omit<Props, 'rows'> & {
         row: MintingRow
     }
 ) {
-    const title = 'Forget these mined tokens without minting';
-    return <span
+    const title = `Forget these mined ${Token.XPOW} tokens without minting`;
+    return <Span
         className='d-inline-block' title={nomobi(title)}
-        data-bs-toggle='tooltip' data-bs-placement='top'
     >
-        <button
+        <Button
             onClick={() => {
                 if (onForget) onForget(level);
             }}
             className='btn btn-outline-warning forget'
-            type='button' disabled={row.disabled}
-        >&times;</button>
-    </span>;
+            disabled={row.disabled}
+        >&times;</Button>
+    </Span>;
 }
 function Spinner(
     { show, grow }: { show: boolean, grow?: boolean }
@@ -177,7 +171,7 @@ function Spinner(
         'spinner spinner-border spinner-border-sm',
         'float-start', grow ? 'spinner-grow' : ''
     ];
-    return <span
+    return <Span
         className={classes.join(' ')} role='status'
         style={{ display: show ? 'inline-block' : 'none' }}
     />;

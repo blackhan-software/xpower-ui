@@ -6,7 +6,7 @@ import { Address, Page, Token, TokenInfo } from '../../source/redux/types';
 import { DEX } from '../../source/types';
 
 import React, { memo, useContext, useEffect, useState } from 'react';
-import { TokenContext } from '../../source/react';
+import { Span, TokenContext } from '../../source/react';
 
 type Props = {
     page: Page;
@@ -49,6 +49,7 @@ const Iframe = memo(({ dex, token }: {
         : URLS[dex](x40(address));
     return <iframe src={src} />;
 });
+Iframe.displayName = 'Iframe';
 const URLS = {
     [DEX.paraswap]: (a: Address) => {
         return `https://app.paraswap.io/#/0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE-${a}/1/SELL?network=avalanche&version=5`;
@@ -65,7 +66,7 @@ function Spinner(
         props.grow ? 'spinner-grow' : '',
         !props.show ? 'd-none' : '',
     ];
-    return <span
+    return <Span
         className={classes.join(' ')} role='status'
     />;
 }
