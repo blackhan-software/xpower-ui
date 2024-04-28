@@ -2,7 +2,7 @@
 
 import Chart from 'chart.js/auto';
 import React, { useEffect, useRef } from 'react';
-import { useIsFirstRender } from 'usehooks-ts';
+import { useIsFirstRender } from '../../source/react';
 
 import { mobile, nice, nice_si, range } from '../../source/functions';
 import { ROParams } from '../../source/params';
