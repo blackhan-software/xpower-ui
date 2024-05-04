@@ -37,7 +37,9 @@ export function useLongTap<T extends HTMLElement>(
         const el = $ref.current;
         el?.addEventListener('mousedown', start);
         el?.addEventListener('mouseup', end);
-        el?.addEventListener('touchstart', start);
+        el?.addEventListener('touchstart', start, {
+            passive: true
+        });
         el?.addEventListener('touchend', end);
         return () => {
             el?.removeEventListener('mousedown', start);

@@ -11,7 +11,9 @@ export function useDoubleTap<T extends HTMLElement>(
     const time = useRef<number>(0);
     useEffect(() => {
         const el = $ref.current;
-        el?.addEventListener('touchstart', touchstart);
+        el?.addEventListener('touchstart', touchstart, {
+            passive: true
+        });
         el?.addEventListener('dblclick', handler);
         return () => {
             el?.removeEventListener('touchstart', touchstart);
