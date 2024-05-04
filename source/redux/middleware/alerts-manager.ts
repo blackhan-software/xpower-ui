@@ -19,7 +19,12 @@ export const AlertManager: AppMiddleware = ({ dispatch, getState }) => (next) =>
     }
     return next(action);
 };
-function warning(message: string) {
+function warning(
+    message: string | undefined
+) {
+    if (message === undefined) {
+        return;
+    }
     if (message.match(/rejected/i)) {
         return;
     }

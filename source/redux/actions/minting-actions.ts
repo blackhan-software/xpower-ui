@@ -1,5 +1,5 @@
-import { createAction, DeepPartial } from '@reduxjs/toolkit';
-import { Level, Minting, MintingRow } from '../types';
+import { createAction } from '@reduxjs/toolkit';
+import { DeepPartial, Level, Minting, MintingRow } from '../types';
 
 export const clearMintingRows = createAction(
     'minting/clear-rows'

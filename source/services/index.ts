@@ -1,4 +1,4 @@
-import { AnyAction, EnhancedStore, Middleware } from '@reduxjs/toolkit';
+import { EnhancedStore, StoreEnhancer, UnknownAction } from '@reduxjs/toolkit';
 import { ROParams } from '../params';
 import { AppState } from '../redux/store';
 
@@ -13,14 +13,15 @@ import { PptsUiService } from './ppts-ui-service';
 import { RatesService } from './rates-service';
 import { TooltipService } from './tooltip-service';
 import { WalletService } from './wallet-service';
+
 import { Version } from '../types';
 
 export default <
     S extends AppState,
-    A extends AnyAction,
-    M extends Middleware<S>[]
+    A extends UnknownAction,
+    E extends StoreEnhancer<S>[]
 >(
-    store: EnhancedStore<S, A, M>
+    store: EnhancedStore<S, A, E>
 ) => {
     if (ROParams.service('location')) {
         LocationService(store);

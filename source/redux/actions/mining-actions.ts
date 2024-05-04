@@ -1,5 +1,5 @@
-import { createAction, DeepPartial } from '@reduxjs/toolkit';
-import { Mining } from '../types/mining';
+import { createAction } from '@reduxjs/toolkit';
+import { DeepPartial, Mining } from '../types';
 
 export const setMiningSpeed = createAction(
     'mining/set-speed', ({ speed }: Pick<Mining, 'speed'>) => ({

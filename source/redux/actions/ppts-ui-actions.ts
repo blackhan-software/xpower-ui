@@ -1,6 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { DeepPartial } from 'redux';
-import { PptsUi } from '../types/ppts-ui';
+import { DeepPartial, PptsUi } from '../types';
 
 export const setPptsUiAmounts = createAction('ppts:ui/set-amounts', (
     ppts_ui: DeepPartial<Pick<PptsUi, 'amounts'>>

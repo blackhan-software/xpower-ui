@@ -35,13 +35,17 @@ export const reducer = combineReducers({
 const store = configureStore({
     reducer, middleware: (m) => m({
         /**
+         * @todo: reduce initial lag & re-enable!
+         */
+        immutableCheck: false,
+        /**
          * @todo: fix bigint check & re-enable!
          */
-        serializableCheck: false
+        serializableCheck: false,
     }),
-    enhancers: (e) => [
-        ...middleware({ logger: ROParams.logger }), ...e
-    ],
+    enhancers: (e) => e().concat(
+        middleware({ logger: ROParams.logger })
+    ),
     preloadedState: db.load(ROParams.persist),
 });
 if (ROParams.persist > 0) {

@@ -1,6 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { DeepPartial } from 'redux';
-import { NftsUi } from '../types/nfts-ui';
+import { DeepPartial, NftsUi } from '../types';
 
 export const setNftsUiAmounts = createAction('nfts:ui/set-amounts', (
     nfts_ui: DeepPartial<Pick<NftsUi, 'amounts'>>

@@ -1,3 +1,4 @@
+import { isAction } from '@reduxjs/toolkit';
 import * as actions from '../actions';
 import { AppMiddleware } from '../store';
 import { Nonce } from '../types';
@@ -27,11 +28,11 @@ export const Logger: AppMiddleware = ({ dispatch, getState }) => (next) => (acti
         console.log(`[${action.type}]`, amount);
         return next(action);
     }
-    if (typeof action !== 'function') {
+    if (isAction(action)) {
         console.log(`[${action.type}]`, Object.fromEntries(
             Object.entries(action).filter(([k]) => k !== 'type'))
         );
-    } else {
+    } else if (typeof action === 'function') {
         return action(dispatch, getState);
     }
     return next(action);

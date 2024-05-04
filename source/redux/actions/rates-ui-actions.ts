@@ -1,6 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { DeepPartial } from 'redux';
-import { RatesUi } from '../types/rates-ui';
+import { DeepPartial, RatesUi } from '../types';
 
 export const setRatesUiRefresher = createAction('rates:ui/set-refresher', (
     rates_ui: DeepPartial<Pick<RatesUi, 'refresher'>>

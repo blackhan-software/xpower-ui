@@ -1,6 +1,6 @@
-import { Constructor } from './constructor';
-import { DeepPartial } from 'redux';
 import { Component } from 'react';
+import { DeepPartial } from '../types';
+import { Constructor } from './constructor';
 /**
  * @returns inferred property type from a component's constructor
  */
