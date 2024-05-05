@@ -95,6 +95,7 @@ function $input(
         className={classes.join(' ')}
         id='rpc-address'
         onChange={on_change}
+        onKeyDown={on_keydown}
         placeholder={placeholder()}
         title='RPC end-point'
         value={rpc?.url ?? ''}
@@ -119,6 +120,16 @@ function $input(
             set_valid(null);
         }
         set_rpc({ ...rpc, url: value });
+    }
+    function on_keydown(
+        ev: React.KeyboardEvent<HTMLInputElement>
+    ) {
+        if (ev.key === 'Enter' && valid) {
+            const $button = document.querySelector<HTMLButtonElement>(
+                '#rpc-address-enable'
+            );
+            $button?.click();
+        }
     }
     function validity() {
         if (rpc && valid === true) {
