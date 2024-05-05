@@ -1,6 +1,6 @@
 import markdownit from 'markdown-it';
 import anchor from 'markdown-it-anchor';
-import { minify } from 'html-minifier';
+import { minify } from 'html-minifier-terser';
 
 export function md_render(
     content: string
