@@ -1,5 +1,4 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const ESLintWebpackPlugin = require('eslint-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 
 const { Years } = require('./source/years');
@@ -82,9 +81,6 @@ const configuration = ({
         }]
     },
     plugins: [
-        new ESLintWebpackPlugin({
-            extensions: ['tsx', 'ts']
-        }),
         new HTMLWebpackPlugin({
             templateContent: pug.renderFile('./views/error/error.pug', {
                 ...env.default, filters, mode
