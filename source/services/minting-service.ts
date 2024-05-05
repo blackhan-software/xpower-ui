@@ -18,7 +18,7 @@ export const MintingService = (
     onNonceChanged(store, async function updateMinters(
         nonce, { account, amount }, total
     ) {
-        if (account !== await Blockchain.account) {
+        if (account !== (await Blockchain.account)) {
             return;
         }
         const level = Tokenizer.level(amount);

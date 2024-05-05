@@ -17,7 +17,6 @@ export function useDelayedIf<S>(
     const [state, set_state_now] = useState(initial);
     const set_state = useMemo(
         () => delayedIf(set_state_now, iff2(iff), ms),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [set_state_now, ms] // no iff to allow inline functions
     );
     return [state, set_state, set_state_now];

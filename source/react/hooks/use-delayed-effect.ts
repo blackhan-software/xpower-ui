@@ -1,4 +1,3 @@
-/* eslint react-hooks/exhaustive-deps: [off] */
 import { useEffect, useRef } from 'react';
 /**
  * A hook that delays the execution of an effect callback.
@@ -24,7 +23,7 @@ export function useDelayedEffect(
         );
         return () => clearTimeout(tid);
     }, [
-        ms, ...deps ?? []
+        ms, ...(deps ?? [])
     ]);
 }
 export default useDelayedEffect;

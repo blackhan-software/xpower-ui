@@ -16,7 +16,7 @@ export class AvvyDomains extends Base {
     public async reverseResolveEVMToName(
         account: Account
     ): Promise<string> {
-        if (await Blockchain.isMainnet() || testing()) {
+        if ((await Blockchain.isMainnet()) || testing()) {
             const contract = await this.get;
             return reverse(account, contract);
         }

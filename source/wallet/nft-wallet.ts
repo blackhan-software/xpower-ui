@@ -96,7 +96,7 @@ export class NftWallet extends ERC1155Wallet {
     async year(
         delta: Year | Promise<Year> = 0
     ): Promise<Year> {
-        return Promise.resolve(new Date().getFullYear() - await delta);
+        return Promise.resolve(new Date().getFullYear() - (await delta));
     }
     get put() {
         return this._nft.connect();
