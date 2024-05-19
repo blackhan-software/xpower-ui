@@ -108,4 +108,4 @@ http://localhost:3000?logger=true
 
 ## Copyright
 
- © 2023 [Blackhan Software Ltd](https://www.linkedin.com/company/blackhan)
+ © 2024 [Moorhead LLC](#)
