@@ -4,7 +4,7 @@ import { Parser } from '../../../source/parser';
 import { Tokenizer } from '../../../source/token';
 import { Request } from 'express';
 
-export const env_of_home = (req: Request): Record<string, any> => {
+export const env_of_mine = (req: Request): Record<string, any> => {
     const params = new URLSearchParams(req.query as any);
     return {
         ...level_amounts(params),
@@ -39,4 +39,4 @@ const mining_speed = (
     const speed = Parser.number(params.get('speed'), fallback);
     return { UI_MINING_SPEED: speed };
 };
-export default env_of_home;
+export default env_of_mine;

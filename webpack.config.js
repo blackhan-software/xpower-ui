@@ -98,10 +98,10 @@ const configuration = ({
             chunks: ['migrate']
         }),
         new HTMLWebpackPlugin({
-            templateContent: pug.renderFile('./views/home/home.pug', {
+            templateContent: pug.renderFile('./views/mine/mine.pug', {
                 ...env.default, filters, mode
             }),
-            filename: '../views/home/home.pig',
+            filename: '../views/mine/mine.pig',
             minify: false, inject: 'body',
             chunks: ['spa']
         }),

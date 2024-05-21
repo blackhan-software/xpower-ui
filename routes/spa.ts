@@ -1,4 +1,4 @@
-import { env_of_home } from './functions';
+import { env_of_mine } from './functions';
 import { env_of } from './functions';
 import { Router } from 'express';
 const router = Router();
@@ -15,13 +15,13 @@ function routes(
   });
   /** REDIRECT to home page. */
   router.get('/', (req, res) => {
-    res.redirect('/home');
+    res.redirect('/mine');
   });
-  /** GET home page. */
-  router.get('/home', (req, res) => {
-    res.render('home/home.pig', {
+  /** GET mine page. */
+  router.get('/mine', (req, res) => {
+    res.render('mine/mine.pig', {
       DESCRIPTION: 'Mine & Mint Proof-of-Work XPower Tokens',
-      TITLE: 'XPower', ...env_of_home(req), ...spa_env,
+      TITLE: 'XPower', ...env_of_mine(req), ...spa_env,
     });
   });
   /** GET nfts page. */
@@ -31,8 +31,8 @@ function routes(
       TITLE: 'XPower: NFTs', ...env_of(req), ...spa_env
     });
   });
-  /** GET staking page. */
-  router.get('/staking', (req, res) => {
+  /** GET ppts page. */
+  router.get('/stake', (req, res) => {
     res.render('ppts/ppts.pig', {
       DESCRIPTION: 'Stake minted XPower NFTs',
       TITLE: 'XPower: Staking', ...env_of(req), ...spa_env

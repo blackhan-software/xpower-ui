@@ -22,7 +22,7 @@ export function UiHeader(
         <nav id='menu' className={
             classes.join(' ')
         }>
-            {$anchor(Page.Home, props)}
+            {$anchor(Page.Mine, props)}
             {$anchor(Page.Nfts, props)}
             {$anchor(Page.Ppts, props)}
             {$anchor(Page.Swap, props)}
@@ -77,7 +77,7 @@ function $label(
     </span>;
 }
 const icons: Record<Page, string> = {
-    [Page.Home]: 'bi-lightning-charge-fill',
+    [Page.Mine]: 'bi-lightning-charge-fill',
     [Page.Nfts]: 'bi-image-fill',
     [Page.Ppts]: 'bi-cash-stack',
     [Page.Swap]: 'bi-currency-exchange',
@@ -85,9 +85,9 @@ const icons: Record<Page, string> = {
     [Page.None]: '',
 }
 const labels: Record<Page, string> = {
-    [Page.Home]: 'XPower',
+    [Page.Mine]: 'Mine',
     [Page.Nfts]: 'NFTs',
-    [Page.Ppts]: 'Staking',
+    [Page.Ppts]: 'Stake',
     [Page.Swap]: 'Swap',
     [Page.About]: 'About',
     [Page.None]: '',

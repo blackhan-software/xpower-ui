@@ -3,7 +3,7 @@ import './cover-image.scss';
 import React from 'react';
 import { Page } from '../../source/redux/types';
 
-import Home from '../../public/images/jpg/cover-home.jpg';
+import Mine from '../../public/images/jpg/cover-mine.jpg';
 import Nfts from '../../public/images/jpg/cover-nfts.jpg';
 import Ppts from '../../public/images/jpg/cover-ppts.jpg';
 
@@ -29,8 +29,8 @@ function source(
     page: Page
 ) {
     switch (page) {
-        case Page.Home:
-            return Home;
+        case Page.Mine:
+            return Mine;
         case Page.Nfts:
             return Nfts;
         case Page.Ppts:
@@ -42,7 +42,7 @@ function opacity(
     page: Page
 ) {
     switch (page) {
-        case Page.Home:
+        case Page.Mine:
             return 1.0;
         case Page.Nfts:
             return 0.5;

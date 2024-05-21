@@ -24,7 +24,7 @@ export function UiCover(
     { controls, page, options, data }: Props
 ) {
     switch (page) {
-        case Page.Home:
+        case Page.Mine:
             return <div id='cover'>
                 <UiCoverImage
                     page={page}

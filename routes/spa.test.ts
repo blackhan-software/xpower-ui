@@ -13,16 +13,16 @@ describe('GET /', () => {
 describe('GET /*/manifest.json', () => {
     let get: request.Test;
     beforeEach(() => {
-        get = request(app).get('/home/manifest.json');
+        get = request(app).get('/mine/manifest.json');
     });
     it('should return w/an HTTP code = 302 Found', async () => {
         await get.expect(302);
     });
 });
-describe('GET /home', () => {
+describe('GET /mine', () => {
     let get: request.Test;
     beforeEach(() => {
-        get = request(app).get('/home');
+        get = request(app).get('/mine');
     });
     it('should return w/an HTTP code = 200 OK', async () => {
         await get.expect(200);
@@ -55,10 +55,10 @@ describe('GET /nfts', () => {
         });
     });
 });
-describe('GET /staking', () => {
+describe('GET /stake', () => {
     let get: request.Test;
     beforeEach(() => {
-        get = request(app).get('/staking');
+        get = request(app).get('/stake');
     });
     it('should return w/an HTTP code = 200 OK', async () => {
         await get.expect(200);

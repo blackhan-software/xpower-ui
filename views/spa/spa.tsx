@@ -15,7 +15,7 @@ import { Provider, connect, useDispatch } from 'react-redux';
 import { UiAbout } from '../about/about';
 import { UiConnector } from '../connector/connector';
 import { UiCover } from '../cover/cover';
-import { UiHome } from '../home/home';
+import { UiMine } from '../mine/mine';
 import { UiNfts } from '../nfts/nfts';
 import { UiPpts } from '../ppts/ppts';
 import { UiSwap } from '../swap/swap';
@@ -61,7 +61,7 @@ export function SPA(
         {$connector(page)}
         {$cover(page, mining, rates, rates_ui)}
         {$wallet(page, aft_wallet, otf_wallet)}
-        {$home(page, mining, minting)}
+        {$mine(page, mining, minting)}
         {$nfts(page, nfts, nfts_ui)}
         {$ppts(page, ppts, ppts_ui)}
         {$swap(page)}
@@ -71,7 +71,7 @@ export function SPA(
 function $h1(
     page: Page
 ) {
-    if (page === Page.Home) {
+    if (page === Page.Mine) {
         return <h1>Mine & Mint Proof-of-Work XPower Tokens</h1>;
     }
     if (page === Page.Nfts) {
@@ -88,7 +88,7 @@ function $h1(
 function $connector(
     page: Page
 ) {
-    if (page !== Page.Home &&
+    if (page !== Page.Mine &&
         page !== Page.Nfts &&
         page !== Page.Ppts &&
         page !== Page.Swap
@@ -143,7 +143,7 @@ function $wallet(
     const [account, set_account] = useContext(AccountContext);
     const [accounts] = useContext(AccountsContext);
     const dispatch = useDispatch<AppDispatch>();
-    if (page !== Page.Home &&
+    if (page !== Page.Mine &&
         page !== Page.Nfts &&
         page !== Page.Ppts &&
         page !== Page.Swap
@@ -171,18 +171,18 @@ function $wallet(
         />
     </form>;
 }
-function $home(
+function $mine(
     page: Page, mining: Mining, minting: Minting
 ) {
     const [account] = useContext(AccountContext);
     const dispatch = useDispatch<AppDispatch>();
-    if (page !== Page.Home) {
+    if (page !== Page.Mine) {
         return null;
     }
     return <form
-        id='home' onSubmit={(e) => e.preventDefault()}
+        id='mine' onSubmit={(e) => e.preventDefault()}
     >
-        <UiHome
+        <UiMine
             mining={{
                 onToggle: () =>
                     dispatch(actions.miningToggle({ account })),

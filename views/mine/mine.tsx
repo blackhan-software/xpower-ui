@@ -1,4 +1,4 @@
-import './home.scss';
+import './mine.scss';
 
 import { Level, Mining, Minting } from '../../source/redux/types';
 
@@ -24,13 +24,13 @@ type Props = {
     };
     speed: number;
 }
-export function UiHome(
+export function UiMine(
     props: Props
 ) {
     const { status, togglable } = props.mining;
     const { speed, speedable } = props.mining;
     const { rows } = props.minting;
-    return <React.Fragment>
+    return <>
         <div id='mining'>
             <UiMining
                 onToggle={props.mining.onToggle}
@@ -47,6 +47,6 @@ export function UiHome(
                 level={ROParams.level.min} rows={rows}
             />
         </div>
-    </React.Fragment>;
+    </>;
 }
-export default UiHome;
+export default UiMine;

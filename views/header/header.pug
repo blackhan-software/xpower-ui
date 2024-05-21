@@ -1,22 +1,22 @@
 header
     nav#menu.btn-group.nav.nav-pills.nav-justified.mb-3
-        a.btn.btn-outline-warning.flex-sm-fill.text-sm-center.nav-link.home(
-            class="{{HEADER_HOME}}" href="/home?token={{TOKEN}}"
+        a.btn.btn-outline-warning.flex-sm-fill.text-sm-center.nav-link.mine(
+            class="{{HEADER_MINE}}" href="/mine?token={{TOKEN}}"
         )
             i.bi-lightning-charge-fill.float-sm-start
-            span.d-none.d-sm-inline.text: | XPower
+            span.d-none.d-sm-inline.text: | Mine
         a.btn.btn-outline-warning.flex-sm-fill.text-sm-center.nav-link.nfts(
             class="{{HEADER_NFTS}}" href="/nfts?token={{TOKEN}}"
         )
             i.bi-image-fill.float-sm-start
             span.d-none.d-sm-inline.text: | NFTs
         a.btn.btn-outline-warning.flex-sm-fill.text-sm-center.nav-link.staking(
-            class="{{HEADER_PPTS}}" href="/staking?token={{TOKEN}}"
+            class="{{HEADER_PPTS}}" href="/stake?token={{TOKEN}}"
         )
             i.bi-cash-stack.float-sm-start
-            span.d-none.d-sm-inline.text: | Staking
+            span.d-none.d-sm-inline.text: | Stake
         a.btn.btn-outline-warning.flex-sm-fill.text-sm-center.nav-link.swap(
-            class="{{HEADER_SWAP}}" href="/swao?token={{TOKEN}}"
+            class="{{HEADER_SWAP}}" href="/swap?token={{TOKEN}}"
         )
             i.bi-currency-exchange.float-sm-start
             span.d-none.d-sm-inline.text: | Swap

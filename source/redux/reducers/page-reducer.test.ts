@@ -3,13 +3,13 @@ import { switchPage } from '../actions';
 import { Page } from '../types';
 
 describe('Store w/page-reducer', () => {
-    it('should switch to home page', () => {
-        const state_0 = Page.Home;
-        const state_1 = pageReducer(state_0, switchPage(Page.Home));
-        expect(state_1).toEqual(Page.Home);
+    it('should switch to mine page', () => {
+        const state_0 = Page.Mine;
+        const state_1 = pageReducer(state_0, switchPage(Page.Mine));
+        expect(state_1).toEqual(Page.Mine);
     });
     it('should switch to nfts page', () => {
-        const state_0 = Page.Home;
+        const state_0 = Page.Mine;
         const state_1 = pageReducer(state_0, switchPage(Page.Nfts));
         expect(state_1).toEqual(Page.Nfts);
     });

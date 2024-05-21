@@ -20,7 +20,7 @@ export const LocationService = (
     onPageSwitch(store, function syncLocationTitle(page) {
         const titles: Record<Page, string> = {
             [Page.None]: 'XPower',
-            [Page.Home]: 'XPower',
+            [Page.Mine]: 'XPower',
             [Page.Nfts]: 'XPower: NFTs',
             [Page.Ppts]: 'XPower: Staking',
             [Page.Swap]: 'XPower: Swap',
@@ -35,7 +35,7 @@ export const LocationService = (
         );
         const descriptions: Record<Page, string> = {
             [Page.None]: 'Mine & Mint Proof-of-Work XPower Tokens',
-            [Page.Home]: 'Mine & Mint Proof-of-Work XPower Tokens',
+            [Page.Mine]: 'Mine & Mint Proof-of-Work XPower Tokens',
             [Page.Nfts]: 'Mint stakeable XPower NFTs',
             [Page.Ppts]: 'Stake minted XPower NFTs',
             [Page.Swap]: 'Swap XPOW & APOW Tokens',
