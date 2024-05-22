@@ -22,6 +22,7 @@ export function UiHeader(
         <nav id='menu' className={
             classes.join(' ')
         }>
+            {$anchor(Page.Home, props)}
             {$anchor(Page.Mine, props)}
             {$anchor(Page.Nfts, props)}
             {$anchor(Page.Ppts, props)}
@@ -42,6 +43,7 @@ function $anchor(
         'nav-link', active
     ];
     return <a
+        aria-label={labels[my_page]}
         className={classes.join(' ')}
         href={`/${my_page}?token=${token}`}
         onClick={(e) => onClick(dispatch)(e, my_page, { page })}
@@ -51,32 +53,37 @@ function $anchor(
     </a>;
 }
 const onClick = (dispatch: Dispatch) => (
-    e: MouseEvent, my_page: Page,
-    { page }: Pick<Props, 'page'>
+    e: MouseEvent, tgt_page: Page,
+    { page: src_page }: Pick<Props, 'page'>
 ) => {
     if (e.ctrlKey === false) {
-        if (Page.None !== page) {
+        if (src_page === Page.None) {
+            return;
+        } else {
             e.preventDefault();
         }
-        dispatch(switchPage(my_page));
+        dispatch(switchPage(tgt_page));
     }
 }
 function $icon(
     my_page: Page
 ) {
-    const classes = [
-        'float-sm-start', icons[my_page]
-    ];
+    const classes = (my_page !== Page.Home)
+        ? ['float-sm-start', icons[my_page]]
+        : [icons[my_page]];
     return <i className={classes.join(' ')} />;
 }
 function $label(
     my_page: Page,
 ) {
-    return <span className='d-none d-sm-inline text'>
-        {labels[my_page]}
-    </span>;
+    if (my_page !== Page.Home) {
+        return <span className='d-none d-sm-inline text'>
+            {labels[my_page]}
+        </span>;
+    }
 }
 const icons: Record<Page, string> = {
+    [Page.Home]: 'bi-house-fill',
     [Page.Mine]: 'bi-lightning-charge-fill',
     [Page.Nfts]: 'bi-image-fill',
     [Page.Ppts]: 'bi-cash-stack',
@@ -85,6 +92,7 @@ const icons: Record<Page, string> = {
     [Page.None]: '',
 }
 const labels: Record<Page, string> = {
+    [Page.Home]: 'Home',
     [Page.Mine]: 'Mine',
     [Page.Nfts]: 'NFTs',
     [Page.Ppts]: 'Stake',

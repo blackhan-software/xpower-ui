@@ -1,24 +1,6 @@
 import request from 'supertest';
 import app from '../app';
 
-describe('GET /', () => {
-    let get: request.Test;
-    beforeEach(() => {
-        get = request(app).get('/');
-    });
-    it('should return w/an HTTP code = 302 Found', async () => {
-        await get.expect(302);
-    });
-});
-describe('GET /*/manifest.json', () => {
-    let get: request.Test;
-    beforeEach(() => {
-        get = request(app).get('/mine/manifest.json');
-    });
-    it('should return w/an HTTP code = 302 Found', async () => {
-        await get.expect(302);
-    });
-});
 describe('GET /mine', () => {
     let get: request.Test;
     beforeEach(() => {

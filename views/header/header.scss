@@ -5,4 +5,12 @@ header {
       color: var(--xp-gray-dark);
     }
   }
+  @media (min-width: 575px) {
+    nav#menu {
+      a.nav-link.home {
+        padding: 8px 0;
+        width: 0.5em;
+      }
+    }
+  }
 }

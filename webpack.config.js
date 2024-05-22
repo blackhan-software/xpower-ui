@@ -18,11 +18,11 @@ const configuration = ({
         react: 'React',
     },
     entry: {
-        spa: {
+        app: {
             import: [
                 './library/index.ts',
                 './views/header/header.tsx',
-                './views/spa/spa.tsx',
+                './views/app.tsx',
                 './views/footer/footer.tsx',
             ],
         },
@@ -98,12 +98,20 @@ const configuration = ({
             chunks: ['migrate']
         }),
         new HTMLWebpackPlugin({
+            templateContent: pug.renderFile('./views/home/home.pug', {
+                ...env.default, filters, mode
+            }),
+            filename: '../views/home/home.pig',
+            minify: false, inject: 'body',
+            chunks: ['app']
+        }),
+        new HTMLWebpackPlugin({
             templateContent: pug.renderFile('./views/mine/mine.pug', {
                 ...env.default, filters, mode
             }),
             filename: '../views/mine/mine.pig',
             minify: false, inject: 'body',
-            chunks: ['spa']
+            chunks: ['app']
         }),
         new HTMLWebpackPlugin({
             templateContent: pug.renderFile('./views/nfts/nfts.pug', {
@@ -111,7 +119,7 @@ const configuration = ({
             }),
             filename: '../views/nfts/nfts.pig',
             minify: false, inject: 'body',
-            chunks: ['spa']
+            chunks: ['app']
         }),
         new HTMLWebpackPlugin({
             templateContent: pug.renderFile('./views/ppts/ppts.pug', {
@@ -119,7 +127,7 @@ const configuration = ({
             }),
             filename: '../views/ppts/ppts.pig',
             minify: false, inject: 'body',
-            chunks: ['spa']
+            chunks: ['app']
         }),
         new HTMLWebpackPlugin({
             templateContent: pug.renderFile('./views/swap/swap.pug', {
@@ -127,7 +135,7 @@ const configuration = ({
             }),
             filename: '../views/swap/swap.pig',
             minify: false, inject: 'body',
-            chunks: ['spa']
+            chunks: ['app']
         }),
         new HTMLWebpackPlugin({
             templateContent: pug.renderFile('./views/about/about.pug', {
@@ -135,7 +143,7 @@ const configuration = ({
             }),
             filename: '../views/about/about.pig',
             minify: false, inject: 'body',
-            chunks: ['spa']
+            chunks: ['app']
         }),
         new MiniCssExtractPlugin({
             filename: '../styles/[name].[contenthash:8].css'

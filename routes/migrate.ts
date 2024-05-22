@@ -12,13 +12,17 @@ export const router = express.Router();
 router.get('/', (req, res) => {
   const params = new URLSearchParams(req.query as any);
   res.render('migrate/index.pig', {
-    DESCRIPTION: 'Migrate old Tokens & NFTs to latest Version',
-    TITLE: 'XPower: Migrate', ...env_of(req),
-    VERSION_SRC: versionSource(params),
-    VERSION_SRC_CAPITALIZED: capitalize(versionSource(params)),
-    VERSION_TGT: versionTarget(params),
-    VERSION_TGT_CAPITALIZED: capitalize(versionTarget(params)),
-    ...env
+    ...{
+      DESCRIPTION: 'Migrate old Tokens & NFTs to latest Version',
+      TITLE: 'XPower: Migrate',
+    },
+    ...{
+      VERSION_SRC: versionSource(params),
+      VERSION_SRC_CAPITALIZED: capitalize(versionSource(params)),
+      VERSION_TGT: versionTarget(params),
+      VERSION_TGT_CAPITALIZED: capitalize(versionTarget(params)),
+    },
+    ...env_of(req), ...env
   });
 });
 export default router;

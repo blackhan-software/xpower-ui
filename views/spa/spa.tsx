@@ -81,7 +81,7 @@ function $h1(
         return <h1>Stake minted XPower NFTs</h1>;
     }
     if (page === Page.Swap) {
-        return <h1>Swap XPOW & APOW Tokens</h1>;
+        return <h1>Swap XPower & APower Tokens</h1>;
     }
     return null;
 }
@@ -470,25 +470,26 @@ function $about(
         <UiAbout />
     </form>;
 }
-if (require.main === module) {
+function UiSPA() {
     const $spa = createElement(connect((s: AppState) => s)(SPA));
-    const $content = document.querySelector('content');
-    createRoot($content!).render(
-        <Provider store={Store()}>
-            <DebugProvider>
-                <RpcProvider>
-                    <AccountsProvider>
-                        <AccountProvider>
-                            <TokenProvider>
-                                <WalletProvider>
-                                    <UiProvider>{$spa}</UiProvider>
-                                </WalletProvider>
-                            </TokenProvider>
-                        </AccountProvider>
-                    </AccountsProvider>
-                </RpcProvider>
-            </DebugProvider>
-        </Provider>
-    );
+    return <Provider store={Store()}>
+        <DebugProvider>
+            <RpcProvider>
+                <AccountsProvider>
+                    <AccountProvider>
+                        <TokenProvider>
+                            <WalletProvider>
+                                <UiProvider>{$spa}</UiProvider>
+                            </WalletProvider>
+                        </TokenProvider>
+                    </AccountProvider>
+                </AccountsProvider>
+            </RpcProvider>
+        </DebugProvider>
+    </Provider>;
 }
-export default SPA;
+if (require.main === module) {
+    const $content = document.querySelector('content');
+    createRoot($content!).render(<UiSPA />);
+}
+export default UiSPA;

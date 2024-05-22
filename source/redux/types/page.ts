@@ -1,5 +1,6 @@
 export enum Page {
     None = 'none',
+    Home = 'home',
     Mine = 'mine',
     Nfts = 'nfts',
     Ppts = 'stake',
@@ -22,6 +23,8 @@ export class Pager {
             const suffix = path.length
                 ? path[path.length - 1] : '';
             switch (suffix.toLowerCase()) {
+                case 'home':
+                    return Page.Home;
                 case 'mine':
                     return Page.Mine;
                 case 'nfts':

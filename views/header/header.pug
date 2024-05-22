@@ -1,5 +1,9 @@
 header
     nav#menu.btn-group.nav.nav-pills.nav-justified.mb-3
+        a.btn.btn-outline-warning.flex-sm-fill.text-sm-center.nav-link.home(
+            class="{{HEADER_HOME}}" href="/home?token={{TOKEN}}"
+        )
+            i.bi-house-fill
         a.btn.btn-outline-warning.flex-sm-fill.text-sm-center.nav-link.mine(
             class="{{HEADER_MINE}}" href="/mine?token={{TOKEN}}"
         )

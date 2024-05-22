@@ -1,0 +1,18 @@
+extends ../app.pug
+
+block styles
+  include ../theme/theme.pug
+
+block globals
+  include ../global/contracts.pug
+  include ../global/urls.pug
+
+block header
+  include ../header/header.pug
+
+block content
+  content
+    div: include ./content.html
+
+block footer
+  include ../footer/footer.pug

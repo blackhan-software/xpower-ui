@@ -9,13 +9,14 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // import routes
-import spa from './routes/spa';
 import error from './routes/error';
+import home from './routes/home';
+import ipfs from './routes/ipfs';
 import migrate from './routes/migrate';
 import nfts from './routes/nfts';
 import ppts from './routes/ppts';
-import ipfs from './routes/ipfs';
 import robots from './routes/robots';
+import spa from './routes/spa';
 
 // register view engine for pigs
 import { Pig } from './source/engines';
@@ -40,8 +41,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // register views
-app.use('/', spa);
 app.use('/migrate', migrate);
+app.use('/', home);
+app.use('/', spa);
 app.use('/nfts', nfts);
 app.use('/ppts', ppts);
 app.use('/robots.txt', robots);

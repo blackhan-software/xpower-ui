@@ -1,4 +1,3 @@
-import { env_of_mine } from './functions';
 import { env_of } from './functions';
 import { Router } from 'express';
 const router = Router();
@@ -9,19 +8,11 @@ import { join, sep } from 'path';
 function routes(
   spa_env: Record<string, string>
 ) {
-  /** REDIRECT to manifest.json. */
-  router.get(/\/[^/]+\/manifest\.json$/, (req, res) => {
-    res.redirect('/manifest.json');
-  });
-  /** REDIRECT to home page. */
-  router.get('/', (req, res) => {
-    res.redirect('/mine');
-  });
   /** GET mine page. */
   router.get('/mine', (req, res) => {
     res.render('mine/mine.pig', {
       DESCRIPTION: 'Mine & Mint Proof-of-Work XPower Tokens',
-      TITLE: 'XPower', ...env_of_mine(req), ...spa_env,
+      TITLE: 'XPower: Mine', ...env_of(req), ...spa_env,
     });
   });
   /** GET nfts page. */
@@ -35,13 +26,13 @@ function routes(
   router.get('/stake', (req, res) => {
     res.render('ppts/ppts.pig', {
       DESCRIPTION: 'Stake minted XPower NFTs',
-      TITLE: 'XPower: Staking', ...env_of(req), ...spa_env
+      TITLE: 'XPower: Stake', ...env_of(req), ...spa_env
     });
   });
   /** GET swap page. */
   router.get('/swap', (req, res) => {
     res.render('swap/swap.pig', {
-      DESCRIPTION: 'Swap XPOW & APOW Tokens',
+      DESCRIPTION: 'Swap XPower & APower Tokens',
       TITLE: 'XPower: Swap', ...env_of(req), ...spa_env
     });
   });
