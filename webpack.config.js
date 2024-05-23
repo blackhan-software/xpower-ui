@@ -58,18 +58,9 @@ const configuration = ({
             test: /\.tsx?$/i,
             use: 'ts-loader'
         }, {
-            test: /\.jsx?$/i,
-            exclude: [/node_modules/i, /\.(min|umd)\.js$/i],
-            use: {
-                loader: 'babel-loader',
-                options: {
-                    presets: [
-                        '@babel/preset-react',
-                        '@babel/preset-env'
-                    ],
-                    cacheDirectory: true
-                }
-            }
+            test: /\.html$/,
+            loader: 'html-loader',
+            options: { sources: false }
         }, {
             test: /\.(s[ac]ss|css)$/i,
             use: [{
