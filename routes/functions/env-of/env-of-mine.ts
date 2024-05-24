@@ -1,14 +1,12 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-import { nice_si, range } from '../../source/functions';
-import { Parser } from '../../source/parser';
-import { Tokenizer } from '../../source/token';
+import { nice_si, range } from '../../../source/functions';
+import { Parser } from '../../../source/parser';
+import { Tokenizer } from '../../../source/token';
 import { Request } from 'express';
-import { env_of } from './env-of';
 
 export const env_of_home = (req: Request): Record<string, any> => {
     const params = new URLSearchParams(req.query as any);
     return {
-        ...env_of(req),
         ...level_amounts(params),
         ...level_range(params),
         ...mining_speed(params),
