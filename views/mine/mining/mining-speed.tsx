@@ -1,3 +1,4 @@
+/* eslint react/prop-types: [off] */
 import { nomobi } from '../../../source/functions';
 import { Miner } from '../../../source/miner';
 import { Button, Div } from '../../../source/react';

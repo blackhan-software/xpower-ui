@@ -1,3 +1,4 @@
+/* eslint react/prop-types: [off] */
 import { Alert, Alerts } from '../../source/functions';
 import { versionBy } from '../../source/redux/selectors';
 import { History } from '../../source/redux/types';

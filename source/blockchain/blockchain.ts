@@ -206,6 +206,12 @@ export class Blockchain extends EventEmitter {
                 blockExplorerUrls: chain.explorerUrls
             }]
         }));
+        // await this.provider().then((p) => p?.request({
+        //     method: 'wallet_switchEthereumChain',
+        //     params: [{
+        //         chainId: chain.id,
+        //     }]
+        // }));
     }
     public static async addToken(info: TokenInfo) {
         return this.me.addToken(info);

@@ -1,7 +1,8 @@
 export function urlify(url: string) {
     try {
         return new URL(url);
-    } catch (_) {
+    } catch (e) {
+        console.assert(e);
         return null;
     }
 }

@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-require-imports: [off] */
 import { InterfaceAbi } from 'ethers';
 import { MYProvider } from '../../blockchain';
 import { ROParams } from '../../params';

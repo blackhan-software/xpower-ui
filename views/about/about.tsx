@@ -1,5 +1,5 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-/* eslint @typescript-eslint/ban-types: [off] */
+/* eslint @typescript-eslint/no-unsafe-function-type: [off] */
 import { Global } from '../../source/types';
 import './about.scss';
 declare const global: Global;

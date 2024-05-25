@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-require-imports: [off] */
 import { ROParams } from '../../params';
 import { Address } from '../../redux/types';
 import { VersionAt } from '../../types';

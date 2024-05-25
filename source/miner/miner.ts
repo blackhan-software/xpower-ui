@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-require-imports: [off] */
 import { EventEmitter } from 'events';
 import { ModuleThread, spawn, Thread, Worker } from 'threads';
 import { logical_cpus } from '../functions';
@@ -154,7 +155,8 @@ export class Miner extends EventEmitter {
                 });
                 thread = await spawn<IWorker>(worker);
             }
-        } catch (ex) {
+        } catch (e) {
+            console.assert(e);
             const worker = new Worker(path_dev);
             thread = await spawn<IWorker>(worker);
         }

@@ -92,7 +92,8 @@ class APRs {
     ): Promise<APR[]> {
         try {
             list.push(await this.mty.aprs(ppt_id, index));
-        } catch (ex) {
+        } catch (e) {
+            console.assert(e);
             return this.tail(ppt_id, list);
         }
         return this.next(ppt_id, index + 1, list);
@@ -109,8 +110,8 @@ class APRs {
     ) {
         try {
             return this.mty.aprTargetOf(ppt_id);
-        } catch (ex) {
-            console.error(ex);
+        } catch (e) {
+            console.error(e);
             return 0n;
         }
     }
@@ -146,7 +147,8 @@ class APBs {
     ): Promise<APB[]> {
         try {
             list.push(await this.mty.apbs(ppt_id, index));
-        } catch (ex) {
+        } catch (e) {
+            console.assert(e);
             return this.tail(ppt_id, list);
         }
         return this.next(ppt_id, index + 1, list);
@@ -163,8 +165,8 @@ class APBs {
     ) {
         try {
             return this.mty.apbTargetOf(ppt_id);
-        } catch (ex) {
-            console.error(ex);
+        } catch (e) {
+            console.error(e);
             return 0n;
         }
     }

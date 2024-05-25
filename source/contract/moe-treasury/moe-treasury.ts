@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-require-imports: [off] */
 import { InterfaceAbi, Listener, Transaction } from 'ethers';
 import { MYProvider } from '../../blockchain';
 import { LocalStorage, memoized, x40 } from '../../functions';

@@ -1,6 +1,6 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-/* eslint @typescript-eslint/no-var-requires: [off] */
-/* eslint @typescript-eslint/ban-types: [off] */
+/* eslint @typescript-eslint/no-require-imports: [off] */
+/* eslint @typescript-eslint/no-unsafe-function-type: [off] */
 if (typeof importScripts === 'function') importScripts(
     'https://cdn.jsdelivr.net/npm/react@18.1.0/umd/react.production.min.js',
     'https://cdn.jsdelivr.net/npm/ethers@6.3.0/dist/ethers.umd.min.js',

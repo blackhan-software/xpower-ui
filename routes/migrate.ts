@@ -1,5 +1,5 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-/* eslint @typescript-eslint/no-var-requires: [off] */
+/* eslint @typescript-eslint/no-require-imports: [off] */
 import { capitalize, env_of } from './functions';
 import express from 'express';
 import env from '../env';

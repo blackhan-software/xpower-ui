@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-require-imports: [off] */
 import { InterfaceAbi, Transaction } from 'ethers';
 import { MYProvider } from '../../blockchain';
 import { x40 } from '../../functions';

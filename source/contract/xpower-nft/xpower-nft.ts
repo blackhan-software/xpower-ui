@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-require-imports: [off] */
 import { InterfaceAbi, Transaction } from 'ethers';
 import { x40 } from '../../functions';
 import { ROParams } from '../../params';

@@ -1,4 +1,4 @@
-/* eslint @typescript-eslint/no-var-requires: [off] */
+/* eslint @typescript-eslint/no-require-imports: [off] */
 /* eslint @typescript-eslint/no-unused-vars: [off] */
 interface StringConstructor {
     random(bytes?: number): string;

@@ -76,7 +76,8 @@ function onChange(
         } else {
             value = 0n;
         }
-    } catch (ex) {
+    } catch (e) {
+        console.assert(e);
         value = null;
     }
     if (value === null || !$target.value) {

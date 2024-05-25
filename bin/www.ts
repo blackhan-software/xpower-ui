@@ -1,5 +1,5 @@
 #!/usr/bin/npx ts-node
-/* eslint @typescript-eslint/no-var-requires: [off] */
+/* eslint @typescript-eslint/no-require-imports: [off] */
 const cluster_log = require('debug')('xpower-ui:cluster');
 const server_log = require('debug')('xpower-ui:server');
 

@@ -14,12 +14,14 @@ export function account(
     const value = params.get('account');
     if (typeof value === 'string' && value.length === 42) try {
         return BigInt(value);
-    } catch (ex) {
+    } catch (e) {
+        console.assert(e);
         return fallback;
     }
     if (typeof value === 'string' && value.length === 47) try {
         return BigInt(value.replace(/^avax:/, ''));
-    } catch (ex) {
+    } catch (e) {
+        console.assert(e);
         return fallback;
     }
     return fallback;

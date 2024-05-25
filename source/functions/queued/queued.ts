@@ -1,6 +1,6 @@
 /* eslint @typescript-eslint/explicit-module-boundary-types: [off] */
 /* eslint @typescript-eslint/no-explicit-any: [off] */
-/* eslint @typescript-eslint/ban-types: [off] */
+/* eslint @typescript-eslint/no-unsafe-function-type: [off] */
 /* eslint prefer-spread: [off] */
 import { random } from '../random';
 declare type Promisor<T = any> = (...args: any[]) => Promise<T>;
