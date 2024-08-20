@@ -67,7 +67,12 @@ const configuration = ({
             }, {
                 loader: 'css-loader'
             }, {
-                loader: 'sass-loader'
+                loader: 'sass-loader',
+                options: {
+                    sassOptions: {
+                        silenceDeprecations: ['mixed-decls'],
+                    }
+                }
             }]
         }, {
             test: /\.(png|svg|jpg|jpeg|gif)$/i,
@@ -79,6 +84,10 @@ const configuration = ({
                 },
             }],
         }]
+    },
+    performance: {
+        maxAssetSize: 4194304, // 4 MiB
+        maxEntrypointSize: 4194304, // 4 MiB
     },
     plugins: [
         new HTMLWebpackPlugin({
