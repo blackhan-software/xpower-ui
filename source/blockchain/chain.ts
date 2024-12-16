@@ -63,9 +63,9 @@ export class Chain {
     public get explorerUrls(): string[] {
         switch (this._id) {
             case ChainId.AVALANCHE_MAINNET:
-                return ['https://snowtrace.io', 'https://parsec.fi'];
+                return ['https://snowtrace.io', 'https://snowscan.xyz'];
             case ChainId.AVALANCHE_FUJI:
-                return ['https://testnet.snowtrace.io'];
+                return ['https://testnet.snowtrace.io', 'https://testnet.snowscan.xyz'];
             case ChainId.AVALANCHE_LOCAL:
             case ChainId.HARDHAT:
             default:
