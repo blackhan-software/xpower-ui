@@ -231,7 +231,14 @@ export abstract class ERC1155Wallet {
             });
             const nft_uri = await this.uri(full_id);
             const uri = nft_uri.replace(/{id}/g, real_id);
-            meta = await fetch(uri).then((res) => res.json());
+            meta = await fetch(uri).then((res) => res.json()).catch((e) => {
+                console.error(e);
+                return {
+                    name: full_id.toString(),
+                    description: 'N/A',
+                    image: ''
+                };
+            });
             this._meta[full_id.toString()] = meta;
         }
         return meta;

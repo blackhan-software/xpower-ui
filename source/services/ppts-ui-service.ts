@@ -123,7 +123,10 @@ export const PptsUiService = (
         const [url_content, url_market] = await Promise.all([
             await ppt_meta({ issue, level }).then(
                 ({ image }) => image
-            ),
+            ).catch((e) => {
+                console.error(e);
+                return null;
+            }),
             await ppt_href({ issue, level }),
         ]);
         return details({

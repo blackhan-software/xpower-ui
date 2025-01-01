@@ -184,7 +184,10 @@ export const NftsUiService = (
         const [url_content, url_market] = await Promise.all([
             await nft_meta({ issue, level }).then(
                 ({ image }) => image
-            ),
+            ).catch((e) => {
+                console.error(e);
+                return null;
+            }),
             await nft_href({ issue, level }),
         ]);
         return details({
