@@ -40,7 +40,7 @@ describe('NftWalletMock', () => {
                 expect(json.name).toMatch(/^KILO [A-Z]{4}/);
                 expect(json.description).toMatch(/^Stakeable KILO [A-Z]{4} NFT/);
                 expect(json.external_url).toMatch(/^https:\/\/www\.xpowermine\.com\/nfts\?token=[A-Z]{4}$/)
-                expect(json.image).toMatch(new RegExp(`${year}/2-[A-z]{4}_KILO.png$`))
+                expect(json.image).toMatch(new RegExp(`${year}/2-KILO.png$`))
                 expect(json.attributes).toBeDefined();
             });
     });

@@ -35,7 +35,8 @@ export function XPowerNftMockFactory(): XPowerNft {
             const full_id = Nft.fullIdOf({
                 real_id: id.toString() as NftRealId
             });
-            return `/ipfs/QmPD85jsWPyJqfWxqCQSmMxbs9ygSLuzL3Y2xMoHrZEJMw/320x427/${full_id.slice(-6)}.json`;
+            /** @dev update each year; otherwise, nft-wallet.tests fail! */
+            return `/ipfs/QmSYKRBWErzT9ofgy1SvHMZg2K19hyryesCFPwEG7AVSK9/320x427/${full_id.slice(-6)}.json`;
         },
         idBy: (
             year: bigint,

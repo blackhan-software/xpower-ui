@@ -33,7 +33,8 @@ export function XPowerPptMockFactory(): XPowerPpt {
             const full_id = Nft.fullIdOf({
                 real_id: id.toString() as NftRealId
             });
-            return `/ipfs/QmWnnAUT1QQyG7ELnEx4WTfjYAs1Q1WwnEEnEwJfrvrNvx/320x427/${full_id.slice(-6)}.json`;
+            /** @dev update each year; otherwise, ppt-wallet.tests fail! */
+            return `/ipfs/QmaYKujtmA5XAS87oeYcHbUA84LeyGi5xYv6ErnXe1bRLF/320x427/${full_id.slice(-6)}.json`;
         },
         idBy: (
             year: bigint,
