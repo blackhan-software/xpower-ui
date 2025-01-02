@@ -74,7 +74,7 @@ function $underlay(
 function $company() {
     return <Li className='nav-item'>
         <Span className='nav-link lower company'
-            title='Moorhead LLC, KY'
+            title='P.O. Box 2255, Shedden Road, Georgetown, Grand Cayman KY1-1107, KY'
         >
             <span>&copy;</span>
             <span>{
@@ -119,7 +119,7 @@ function $contract(
     { chainId, page, token, version }: Props & { chainId: ChainId }
 ) {
     const $ref = useRef<HTMLAnchorElement>(null);
-    const [long] = useLongTap($ref, () => {});
+    const [long] = useLongTap($ref, () => { });
     const [ctrl, set_ctrl] = useState(false);
     useEffect(() => {
         const handler = (e: KeyboardEvent) => set_ctrl(e.ctrlKey);
