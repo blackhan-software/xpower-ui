@@ -1,7 +1,8 @@
 extends ../spa/spa.pug
 
 block content
-  content.d-flex.flex-column.min-vh-100
+  content.d-flex.flex-column.min-vh-xyz
+    include ../spa/spa-notify.pug
     h1: | {{DESCRIPTION}}
     include ../connector/connector.pug
     include ../wallet/wallet.pug

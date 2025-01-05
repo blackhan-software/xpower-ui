@@ -10,7 +10,7 @@ import { AftWallet, History, MinerStatus, Mining, Minting, NftLevels, Nfts, Nfts
 
 import React, { createElement, useContext, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Provider, connect, useDispatch } from 'react-redux';
+import { connect, Provider, useDispatch } from 'react-redux';
 
 import { UiAbout } from '../about/about';
 import { UiConnector } from '../connector/connector';
