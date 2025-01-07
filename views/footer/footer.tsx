@@ -235,7 +235,7 @@ function $youtube() {
 function $telegram() {
     return <Li className='nav-item pb-1 pt-1 pe-1'>
         <A className='telegram nav-link'
-            href='https://t.me/+hv7s-mkabhw5ZjQ0' rel='noreferrer'
+            href='https://t.me/xpowermine' rel='noreferrer'
             target='_blank' title='Telegram'
         >
             <svg xmlns='http://www.w3.org/2000/svg' className='bi bi-telegram' width='16' height='16' viewBox='0 0 16 16' role='img'>
