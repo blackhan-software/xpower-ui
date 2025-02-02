@@ -53,7 +53,7 @@ function title(
     const full_id = Nft.fullId({
         level, issue
     });
-    return `Trade staked ${name} NFTs (level ${rank}/9 & ID #${Nft.realId(full_id)})`;
+    return `Trade regular ${name} NFTs (level ${rank}/9 & ID #${Nft.realId(full_id)})`;
 }
 function Spinner(
     { loading }: Props
