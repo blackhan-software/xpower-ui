@@ -22,7 +22,7 @@ export function UiSwap({ page }: Props) {
     }, [page]);
     useEffect(() => {
         const content = document.querySelector('content');
-        const content_cls = ['d-flex', 'flex-column', 'min-vh-100'];
+        const content_cls = ['d-flex', 'flex-column', 'min-vh-xyz'];
         const footer = document.querySelector('footer');
         const footer_cls = ['pt-extra'];
         if (page === Page.Swap) {

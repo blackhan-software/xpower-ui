@@ -3,6 +3,7 @@ import { Request } from 'express';
 import env_of_cover from './env-of-cover';
 import env_of_footer from './env-of-footer';
 import env_of_header from './env-of-header';
+import env_of_home from './env-of-home';
 import env_of_mine from './env-of-mine';
 import env_of_nfts from './env-of-nfts';
 import env_of_swap from './env-of-swap';
@@ -15,6 +16,7 @@ export const env_of = (req: Request): Record<string, string> => {
     ...env_of_cover(req),
     ...env_of_footer(req),
     ...env_of_header(req),
+    ...env_of_home(req),
     ...env_of_mine(req),
     ...env_of_nfts(req),
     ...env_of_swap(req),

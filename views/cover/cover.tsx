@@ -44,6 +44,13 @@ export function UiCover(
                     page={page}
                 />
             </div>;
+        case Page.Swap:
+            return <div id='cover'>
+                <UiCoverImage
+                    page={page}
+                    pulsate={options.pulsate}
+                />
+            </div>;
         default:
             return null;
     }

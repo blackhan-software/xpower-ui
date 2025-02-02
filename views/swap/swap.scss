@@ -1,3 +1,7 @@
+content.min-vh-xyz {
+    min-height: 155vh !important;
+}
+
 form#swap {
     span.spinner {
         height: 2rem;
@@ -6,15 +10,18 @@ form#swap {
         top: calc(50% - 1rem);
         width: 2rem;
     }
+
     iframe {
         border: 1px solid var(--xp-powered);
         border-radius: 4px;
     }
+
     iframe {
         height: 100%;
         width: 100%;
     }
 }
+
 footer.pt-extra {
     z-index: -1;
 }
