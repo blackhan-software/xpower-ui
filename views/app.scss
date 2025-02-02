@@ -1,5 +1,5 @@
-@import "./theme/theme.scss";
-@import "./animate.scss";
+@use "./theme/theme.scss";
+@use "./animate.scss";
 
 html {
   height: 100%;
@@ -7,81 +7,107 @@ html {
   padding: 0;
   width: 100%;
 }
+
 body {
   height: 100%;
   margin: 0;
   padding: 0;
   width: 100%;
 }
+
 body {
   background-color: var(--xp-gray-dark);
   color: var(--xp-powered);
   overflow-y: scroll;
 }
+
 body.container {
   margin-right: auto;
   margin-left: auto;
   max-width: 768px;
 }
+
 //
 // buttons:
 //
-input, select, .btn, .ellipsis {
+input,
+select,
+.btn,
+.ellipsis {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .no-ellipsis {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: initial;
 }
+
 .btn-group,
 .btn-group-vertical {
   .btn {
     color: var(--xp-powered);
   }
+
   .btn.disabled,
   .btn:disabled {
     color: var(--xp-powered-dark);
   }
-  .btn.active, .btn:hover {
+
+  .btn.active,
+  .btn:hover {
     background-color: var(--xp-powered);
     color: var(--xp-gray-dark);
   }
+
   .btn:focus-visible:not(:hover),
   .btn.show:not(:hover):not(:disabled) {
     background-color: var(--xp-gray-dark);
     color: var(--xp-powered);
   }
 }
+
 .btn-group {
-  .btn-group, .btn {
+
+  .btn-group,
+  .btn {
     border: none;
   }
-  .btn.active, .btn:hover {
+
+  .btn.active,
+  .btn:hover {
     border-color: var(--xp-powered);
   }
+
   border: 1px solid var(--xp-powered);
 }
+
 .btn-group {
+
   >:not(:first-of-type),
   >:not(:last-of-type) {
     border-radius: 0;
   }
+
   >:first-of-type {
     border-start-start-radius: 3px;
     border-end-start-radius: 3px;
   }
+
   >:last-of-type {
     border-start-end-radius: 3px;
     border-end-end-radius: 3px;
   }
+
   border-radius: 4px;
 }
+
 .btn {
   font-weight: bold;
 }
+
 //
 // headers:
 //
@@ -90,15 +116,18 @@ h1 {
   font-weight: bold;
   text-align: center;
 }
+
 h1:first-of-type {
   margin-bottom: 0.5em;
 }
+
 //
 // forms:
 //
 .form-label {
   user-select: none;
 }
+
 //
 // info:
 //
@@ -108,11 +137,14 @@ h1:first-of-type {
     top: -1px;
   }
 }
+
 .info {
+
   img:not(.component),
   svg:not(.component) {
     margin: auto;
   }
+
   padding: 0;
   width: 42px !important;
 }

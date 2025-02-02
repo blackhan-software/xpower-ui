@@ -1,4 +1,4 @@
-@import "../app.scss";
+@use "../app.scss";
 
 .two-card {
     align-items: center;
@@ -36,6 +36,7 @@
         border-radius: 50%;
         margin: 1em 0 2em 0;
     }
+
     margin: 0 auto;
     width: 50%;
 }
