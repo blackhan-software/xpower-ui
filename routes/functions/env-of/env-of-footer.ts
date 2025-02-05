@@ -12,7 +12,7 @@ const footer_page = (
 ) => {
   const page = Pager.parse(req.path);
   return {
-    FOOTER_SWAP:
+    FOOTER_CLASS:
       page === Page.Swap ? 'pt-extra' : '',
   };
 };

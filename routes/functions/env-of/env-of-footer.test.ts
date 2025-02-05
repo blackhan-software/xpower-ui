@@ -8,7 +8,7 @@ describe('env_of_footer', () => {
             protocol: 'http'
         };
         expect(env_of_footer(req as any)).toEqual({
-            FOOTER_SWAP: '',
+            FOOTER_CLASS: '',
         });
     });
 });
