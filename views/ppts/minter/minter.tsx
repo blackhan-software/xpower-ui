@@ -1,18 +1,21 @@
 import { Button, Div } from '../../../source/react';
-import { Nfts, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, Token } from '../../../source/redux/types';
+import { Nfts, PptBurnerStatus, PptClaimerStatus, PptMinterApproval1, PptMinterList, PptMinterStatus, PptMinterApproval2, Token } from '../../../source/redux/types';
 
 import React from 'react';
+import { UiPptClaimApproval, approved2 } from './ppt-claim-approval';
+import { UiPptStakeApproval, approved1 } from './ppt-stake-approval';
 import { InfoCircle } from '../../../public/images/tsx';
 import { UiPptBatchBurner } from './ppt-batch-burner';
 import { UiPptBatchClaimer } from './ppt-batch-claimer';
 import { UiPptBatchMinter } from './ppt-batch-minter';
-import { UiPptBurnApproval, approved } from './ppt-burn-approval';
 
 type Props = {
     ppts: Nfts;
     minter_list: PptMinterList;
-    approval: PptMinterApproval | null;
-    onApproval?: () => void;
+    ppt_approval1: PptMinterApproval1 | null;
+    onPptApproval1?: () => void;
+    ppt_approval2: PptMinterApproval2 | null;
+    onPptApproval2?: () => void;
     minter_status: PptMinterStatus | null;
     onBatchMint?: (list: PptMinterList) => void;
     burner_status: PptBurnerStatus | null;
@@ -30,6 +33,7 @@ export function UiPptMinter(
     >
         {$toggleAll(props)}
         {$burnApproval(props)}
+        {$claimApproval(props)}
         {$batchReminter(props)}
         {$batchClaimer(props)}
         {$info()}
@@ -53,10 +57,20 @@ function $toggleAll(
     </Button>;
 }
 function $burnApproval(
-    { approval, onApproval }: Props
+    { ppt_approval1, ppt_approval2, onPptApproval1: onApproval }: Props
 ) {
-    return <UiPptBurnApproval
-        approval={approval}
+    return <UiPptStakeApproval
+        approval1={ppt_approval1}
+        approval2={ppt_approval2}
+        onApproval={onApproval}
+    />;
+}
+function $claimApproval(
+    { ppt_approval1, ppt_approval2, onPptApproval2: onApproval }: Props
+) {
+    return <UiPptClaimApproval
+        approval1={ppt_approval1}
+        approval2={ppt_approval2}
         onApproval={onApproval}
     />;
 }
@@ -72,30 +86,30 @@ function $batchReminter(
     }
 }
 function $batchMinter(
-    { approval, minter_list, minter_status, onBatchMint }: Props
+    { ppt_approval1, ppt_approval2, minter_list, minter_status, onBatchMint }: Props
 ) {
     return <UiPptBatchMinter
-        approved={approved(approval)}
+        approved={approved1(ppt_approval1) && approved2(ppt_approval2)}
         list={minter_list}
         onBatchMint={onBatchMint}
         status={minter_status}
     />;
 }
 function $batchBurner(
-    { approval, minter_list, burner_status, onBatchBurn }: Props
+    { ppt_approval1, ppt_approval2, minter_list, burner_status, onBatchBurn }: Props
 ) {
     return <UiPptBatchBurner
-        approved={approved(approval)}
+        approved={approved1(ppt_approval1) && approved2(ppt_approval2)}
         list={minter_list}
         onBatchBurn={onBatchBurn}
         status={burner_status}
     />;
 }
 function $batchClaimer(
-    { approval, claimer_status, ppts, onBatchClaim }: Props
+    { ppt_approval1, ppt_approval2, claimer_status, ppts, onBatchClaim }: Props
 ) {
     return <UiPptBatchClaimer
-        approved={approved(approval)}
+        approved={approved1(ppt_approval1) && approved2(ppt_approval2)}
         ppts={ppts}
         onBatchClaim={onBatchClaim}
         status={claimer_status}
@@ -103,7 +117,7 @@ function $batchClaimer(
 }
 function $info() {
     return <Button className='btn btn-outline-warning info' title={
-        `(Un)stake ${Token.XPOW} NFTs and claim ${Token.APOW} rewards`
+        `(Un)stake ${Token.XPOW} NFTs and claim *locked* ${Token.APOW}s`
     }>
         <InfoCircle fill={true} />
     </Button>;

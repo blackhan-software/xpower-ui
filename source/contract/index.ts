@@ -4,6 +4,7 @@ export * from './moe-treasury/moe-treasury';
 export * from './moe-treasury/moe-treasury-factory';
 export * from './ppt-treasury/ppt-treasury';
 export * from './ppt-treasury/ppt-treasury-factory';
+export * from "./xpb-pool/xpb-pool";
 export * from './xpower-moe/xpower-moe';
 export * from './xpower-moe/xpower-moe-factory';
 export * from './xpower-nft/xpower-nft';

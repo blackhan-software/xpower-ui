@@ -1,10 +1,10 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import './nft-migrate.scss';
 
-import { Transaction } from 'ethers';
+import { TransactionResponse } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
 import { PptTreasury, PptTreasuryFactory } from '../../source/contract';
-import { Alert, Alerts, alert, x40 } from '../../source/functions';
+import { Alert, Alerts, alert, buffered, x40 } from '../../source/functions';
 import { Account, Balance, MAX_UINT256, Nft, NftLevels } from '../../source/redux/types';
 import { Version } from '../../source/types';
 import { MoeWallet, NftWallet, PptWallet } from '../../source/wallet';
@@ -29,11 +29,13 @@ $('button.unstake-old').on('click', async function unstakeOldNfts(e) {
     const $unstake_ppt = $unstake.parents('form.unstake-old');
     const $migrate_nft = $unstake_ppt.next('form.migrate-old');
     if ($unstake.hasClass('xpow')) {
+        const reset = $unstake.ing();
         await nftUnstakeOld({
             $unstake, $approve: $migrate_nft.find(
                 '.approve-old.xpow'
             )
         });
+        reset();
     }
 });
 async function nftUnstakeOld({ $unstake, $approve }: {
@@ -77,7 +79,7 @@ async function nftUnstakeOld({ $unstake, $approve }: {
     //
     // Unstake tokens:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $unstake.ing();
     Alerts.hide();
     try {
@@ -117,6 +119,7 @@ $('button.approve-old').on('click', async function approveOldNfts(e) {
     const $approve = $(e.currentTarget);
     const $migrate_nft = $approve.parents('form.migrate-old');
     if ($approve.hasClass('xpow')) {
+        const reset = $approve.ing();
         await moeApproveOld({
             $approve
         });
@@ -131,6 +134,7 @@ $('button.approve-old').on('click', async function approveOldNfts(e) {
                 '.migrate-old.xpow'
             )
         });
+        reset();
     }
 });
 async function moeApproveOld({ $approve }: {
@@ -185,7 +189,7 @@ async function moeApproveOld({ $approve }: {
     //
     // Increase allowance:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $approve.ing();
     Alerts.hide();
     try {
@@ -265,7 +269,7 @@ async function moeApproveNew({ $approve }: {
     //
     // Increase allowance:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $approve.ing();
     Alerts.hide();
     try {
@@ -323,7 +327,7 @@ async function moeApproveNft({ $approve }: {
     //
     // Approve migrate:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $approve.ing();
     Alerts.hide();
     try {
@@ -396,7 +400,7 @@ async function nftApproveOld({ $approve, $migrate }: {
     //
     // Approve tokens:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $approve.ing();
     Alerts.hide();
     try {
@@ -506,11 +510,11 @@ async function nftMigrateOld({ $migrate, $approve }: {
     //
     // Migrate tokens:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $migrate.ing();
     Alerts.hide();
     try {
-        nft_target.onTransferBatch((
+        nft_target.onTransferBatch(buffered((
             op, from, to, ids, values, ev
         ) => {
             if (ev.log.transactionHash !== tx?.hash) {
@@ -522,7 +526,7 @@ async function nftMigrateOld({ $migrate, $approve }: {
             );
             $approve.prop('disabled', false);
             reset();
-        });
+        }));
         const nz = filter(ids, src_balances, { zero: false });
         const nft_index = await nft_target.get.then(
             (c) => c.oldIndexOf(nft_source.address)
@@ -532,8 +536,8 @@ async function nftMigrateOld({ $migrate, $approve }: {
         );
         tx = await nft_target.put.then((c) => c.migrateBatch(
             Nft.realIds(nz.ids, { version: tgt_version }), nz.balances, [
-                nft_index, moe_index
-            ]
+            nft_index, moe_index
+        ]
         ));
     } catch (ex: any) {
         if (ex.message) {
@@ -604,7 +608,7 @@ async function nftApproveNew({ $approve, $restake }: {
     //
     // Approve tokens:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $approve.ing();
     Alerts.hide();
     try {
@@ -685,7 +689,7 @@ async function nftRestakeNew({ $restake }: {
     //
     // Restake tokens:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $restake.ing();
     Alerts.hide();
     try {

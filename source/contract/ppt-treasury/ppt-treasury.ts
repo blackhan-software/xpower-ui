@@ -1,5 +1,5 @@
 /* eslint @typescript-eslint/no-require-imports: [off] */
-import { InterfaceAbi, Transaction } from 'ethers';
+import { InterfaceAbi, TransactionResponse } from 'ethers';
 import { MYProvider } from '../../blockchain';
 import { x40 } from '../../functions';
 import { ROParams } from '../../params';
@@ -47,7 +47,7 @@ export class PptTreasury extends Base {
     }
     async stake(
         account: Account, nft_id: NftFullId, balance: Balance
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         const contract = await this.connect();
         const id = Nft.realId(nft_id, {
             version: this.version
@@ -58,7 +58,7 @@ export class PptTreasury extends Base {
     }
     async unstake(
         account: Account, nft_id: NftFullId, balance: Balance
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         const contract = await this.connect();
         const id = Nft.realId(nft_id, {
             version: this.version
@@ -69,7 +69,7 @@ export class PptTreasury extends Base {
     }
     async stakeBatch(
         account: Account, nft_ids: NftFullId[], balances: Balance[]
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         const contract = await this.connect();
         const ids = Nft.realIds(nft_ids, {
             version: this.version
@@ -80,7 +80,7 @@ export class PptTreasury extends Base {
     }
     async unstakeBatch(
         account: Account, nft_ids: NftFullId[], balances: Balance[]
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         const contract = await this.connect();
         const ids = Nft.realIds(nft_ids, {
             version: this.version

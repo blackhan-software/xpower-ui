@@ -7,7 +7,7 @@ import { Token } from '../redux/types';
 import { Version } from '../types';
 
 describe('HashManager', () => {
-    const slot = { token: Token.XPOW, version: Version.v5c } as Slot;
+    const slot = { token: Token.XPOW, version: Version.v05c } as Slot;
     const block_hash = BigInt('0xb10c');
     it('should set time for block-hash', () => {
         HashManager.set(block_hash, 1n, slot);

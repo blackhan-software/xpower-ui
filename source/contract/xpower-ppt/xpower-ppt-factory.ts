@@ -12,13 +12,13 @@ export function XPowerPptFactory(
     { version } = { version: ROParams.version }
 ): XPowerPpt {
     const ppt = new XPowerPpt(address({
-        infix: 'PPT', version
+        prefix: 'APOW', infix: 'NFT', version
     }));
     return global.XPOWER_PPT = ppt;
 }
 export function XPowerPptMockFactory(): XPowerPpt {
     const mock = {
-        totalSupply: (
+        'totalSupply(uint256)': (
             /*id: string*/
         ) => {
             return 0n;

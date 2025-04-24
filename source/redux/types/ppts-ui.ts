@@ -40,12 +40,19 @@ export type PptFlags = Record<NftLevel, {
     display: boolean; toggled: boolean;
 }>
 export type PptMinter = {
-    approval: PptMinterApproval | null;
+    ppt_approval1: PptMinterApproval1 | null;
+    ppt_approval2: PptMinterApproval2 | null;
     minter_status: PptMinterStatus | null;
     burner_status: PptBurnerStatus | null;
     claimer_status: PptClaimerStatus | null;
 }
-export enum PptMinterApproval {
+export enum PptMinterApproval1 {
+    unapproved = 'unapproved',
+    approving = 'approving',
+    approved = 'approved',
+    error = 'error'
+}
+export enum PptMinterApproval2 {
     unapproved = 'unapproved',
     approving = 'approving',
     approved = 'approved',

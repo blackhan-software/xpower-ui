@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import './any-claim.scss';
 
-import { Transaction } from 'ethers';
+import { TransactionResponse } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
 import { MoeTreasury, MoeTreasuryFactory } from '../../source/contract';
 import { Alert, Alerts, alert } from '../../source/functions';
@@ -20,7 +20,9 @@ Blockchain.onConnect(function enableAllowanceButton() {
 $('button.claim-any').on('click', async function claimTokens(e) {
     const $claim = $(e.currentTarget);
     if ($claim.hasClass('xpow')) {
+        const reset = $claim.ing();
         await claim({ $claim });
+        reset();
     }
 });
 async function claim({ $claim }: {
@@ -80,7 +82,7 @@ async function claim({ $claim }: {
             );
             reset();
         });
-        const tx: Transaction = await mty_source.claimBatch(
+        const tx: TransactionResponse = await mty_source.claimBatch(
             account, nz.ids
         );
     } catch (ex: any) {

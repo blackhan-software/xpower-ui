@@ -6,7 +6,7 @@ import { setMoeHistory, setNftHistory, setPptHistory, setSovHistory } from '../a
 import { Empty, History } from '../types';
 
 describe('Store w/history-reducer (set)', () => {
-    const v = Version.v2a
+    const v = Version.v02a
     it('should set-moe-history to balance=1', () => {
         const state_0 = Empty<History>();
         const state_1 = historyReducer(state_0, setMoeHistory(v, {

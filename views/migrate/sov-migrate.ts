@@ -1,12 +1,13 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import './sov-migrate.scss';
 
-import { Transaction } from 'ethers';
+import { TransactionResponse } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { Alert, Alerts, alert, x40 } from '../../source/functions';
+import { Alert, Alerts, alert, assert, buffered, x40 } from '../../source/functions';
 import { Account, MAX_UINT256, Token } from '../../source/redux/types';
 import { Version } from '../../source/types';
 import { MoeWallet, SovWallet } from '../../source/wallet';
+import { MoeTreasury, MoeTreasuryFactory, XpbPool } from '../../source/contract';
 
 Blockchain.onConnect(function enableAllowance() {
     const $approve = $('.approve-sov-allowance').filter((i, el) => {
@@ -20,6 +21,16 @@ $('button.approve-sov-allowance').on(
         const $approve = $(e.currentTarget);
         const $migrate = $approve.parents('form.sov-migrate');
         if ($approve.hasClass('xpow')) {
+            const reset = $approve.ing();
+            await xpbApproveSov({
+                $approve
+            });
+            await sovApproveXpb({
+                $approve
+            });
+            await sovApproveMty({
+                $approve
+            });
             await moeApproveOld({
                 $approve
             });
@@ -34,9 +45,188 @@ $('button.approve-sov-allowance').on(
                     '.sov-migrate.xpow'
                 )
             });
+            reset();
         }
     }
 );
+async function xpbApproveSov({ $approve }: {
+    $approve: JQuery<HTMLElement>
+}) {
+    const { account, src_version, tgt_version } = await context({
+        $el: $approve
+    });
+    const { xpb_pool, tgt_apower } = await contracts({
+        account, src_version, tgt_version
+    });
+    if (!xpb_pool) {
+        throw new Error('undefined xpb_pool');
+    }
+    if (!tgt_apower) {
+        throw new Error('undefined tgt_apower');
+    }
+    //
+    // Check approval:
+    //
+    const approved = await xpb_pool.approvedSupply(
+        x40(account),
+        await tgt_apower.address,
+        await tgt_apower.address,
+    );
+    console.debug(
+        `[${tgt_version}:approved-supply]`, approved
+    );
+    if (approved) {
+        return;
+    }
+    //
+    // Enable approval:
+    //
+    let tx: TransactionResponse | undefined;
+    const reset = $approve.ing();
+    Alerts.hide();
+    try {
+        xpb_pool.onApproveSupply((
+            account, op, token, flag, ev
+        ) => {
+            if (ev.log.transactionHash !== tx?.hash) {
+                return;
+            }
+            reset();
+        });
+        tx = await xpb_pool.approveSupply(
+            await tgt_apower.address,
+            await tgt_apower.address,
+            true
+        );
+    } catch (ex: any) {
+        if (ex.message) {
+            if (ex.data && ex.data.message) {
+                ex.message = `${ex.message} [${ex.data.message}]`;
+            }
+            alert(ex.message, Alert.warning, {
+                after: $approve.parent('div')[0]
+            });
+        }
+        console.error(ex);
+        reset();
+    }
+}
+async function sovApproveXpb({ $approve }: {
+    $approve: JQuery<HTMLElement>
+}) {
+    const { account, src_version, tgt_version } = await context({
+        $el: $approve
+    });
+    const { xpb_pool, tgt_apower } = await contracts({
+        account, src_version, tgt_version
+    });
+    if (!xpb_pool) {
+        throw new Error('undefined xpb_pool');
+    }
+    if (!tgt_apower) {
+        throw new Error('undefined tgt_apower');
+    }
+    //
+    // Check allowance:
+    //
+    const tgt_allowance = await tgt_apower.allowance(
+        x40(account), xpb_pool.address
+    );
+    console.debug(
+        `[${tgt_version}:allowance]`, tgt_allowance.toString()
+    );
+    if (tgt_allowance === MAX_UINT256) {
+        return;
+    }
+    //
+    // Increase allowance:
+    //
+    let tx: TransactionResponse | undefined;
+    const reset = $approve.ing();
+    Alerts.hide();
+    try {
+        tgt_apower.onApproval((
+            owner, spender, value, ev
+        ) => {
+            if (ev.log.transactionHash !== tx?.hash) {
+                return;
+            }
+            reset();
+        });
+        tx = await tgt_apower.approve(
+            xpb_pool.address, MAX_UINT256
+        );
+    } catch (ex: any) {
+        if (ex.message) {
+            if (ex.data && ex.data.message) {
+                ex.message = `${ex.message} [${ex.data.message}]`;
+            }
+            alert(ex.message, Alert.warning, {
+                after: $approve.parent('div')[0]
+            });
+        }
+        console.error(ex);
+        reset();
+    }
+}
+async function sovApproveMty({ $approve }: {
+    $approve: JQuery<HTMLElement>
+}) {
+    const { account, src_version, tgt_version } = await context({
+        $el: $approve
+    });
+    const { moe_treasury, tgt_apower } = await contracts({
+        account, src_version, tgt_version
+    });
+    if (!moe_treasury) {
+        throw new Error('undefined moe_treasury');
+    }
+    if (!tgt_apower) {
+        throw new Error('undefined tgt_apower');
+    }
+    //
+    // Check allowance:
+    //
+    const tgt_allowance = await tgt_apower.allowance(
+        x40(account), moe_treasury.address
+    );
+    console.debug(
+        `[${tgt_version}:allowance]`, tgt_allowance.toString()
+    );
+    if (tgt_allowance === MAX_UINT256) {
+        return;
+    }
+    //
+    // Increase allowance:
+    //
+    let tx: TransactionResponse | undefined;
+    const reset = $approve.ing();
+    Alerts.hide();
+    try {
+        tgt_apower.onApproval((
+            owner, spender, value, ev
+        ) => {
+            if (ev.log.transactionHash !== tx?.hash) {
+                return;
+            }
+            reset();
+        });
+        tx = await tgt_apower.approve(
+            moe_treasury.address, MAX_UINT256
+        );
+    } catch (ex: any) {
+        if (ex.message) {
+            if (ex.data && ex.data.message) {
+                ex.message = `${ex.message} [${ex.data.message}]`;
+            }
+            alert(ex.message, Alert.warning, {
+                after: $approve.parent('div')[0]
+            });
+        }
+        console.error(ex);
+        reset();
+    }
+}
 async function moeApproveOld({ $approve }: {
     $approve: JQuery<HTMLElement>
 }) {
@@ -64,14 +254,13 @@ async function moeApproveOld({ $approve }: {
     console.debug(
         `[${src_version}:allowance]`, src_allowance.toString()
     );
-    const src_balance = await src_apower.balance;
-    if (src_allowance === MAX_UINT256 || !src_balance) {
+    if (src_allowance === MAX_UINT256) {
         return;
     }
     //
     // Increase allowance:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $approve.ing();
     Alerts.hide();
     try {
@@ -126,14 +315,13 @@ async function moeApproveNew({ $approve }: {
     console.debug(
         `[${tgt_version}:allowance]`, tgt_allowance.toString()
     );
-    const src_balance = await src_apower.balance;
-    if (tgt_allowance === MAX_UINT256 || !src_balance) {
+    if (tgt_allowance === MAX_UINT256) {
         return;
     }
     //
     // Increase allowance:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $approve.ing();
     Alerts.hide();
     try {
@@ -191,7 +379,7 @@ async function moeApproveSov({ $approve }: {
     //
     // Approve migrate:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $approve.ing();
     Alerts.hide();
     try {
@@ -243,8 +431,7 @@ async function sovApproveOld({ $approve, $migrate }: {
     console.debug(
         `[${src_version}:allowance]`, src_allowance.toString()
     );
-    const src_balance = await src_apower.balance;
-    if (src_allowance === MAX_UINT256 || !src_balance) {
+    if (src_allowance === MAX_UINT256) {
         alert(
             `Allowance(s) have already been approved for; you can migrate now.`,
             Alert.info, { after: $approve.parent('div')[0] }
@@ -255,7 +442,7 @@ async function sovApproveOld({ $approve, $migrate }: {
     //
     // Increase allowance:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $approve.ing();
     Alerts.hide();
     try {
@@ -303,11 +490,14 @@ async function sovMigrateOld({ $migrate }: {
         $el: $migrate
     });
     const {
-        src_apower, tgt_apower,
-        src_xpower, tgt_xpower,
+        src_apower, tgt_apower, moe_treasury,
+        src_xpower, tgt_xpower, xpb_pool,
     } = await contracts({
         account, src_version, tgt_version
     });
+    if (!moe_treasury) {
+        throw new Error('undefined moe_treasury');
+    }
     if (!src_apower) {
         throw new Error('undefined src_apower');
     }
@@ -319,6 +509,9 @@ async function sovMigrateOld({ $migrate }: {
     }
     if (!tgt_xpower) {
         throw new Error('undefined tgt_xpower');
+    }
+    if (!xpb_pool) {
+        throw new Error('undefined xpb_pool');
     }
     //
     // Check balance (of MOE):
@@ -364,11 +557,11 @@ async function sovMigrateOld({ $migrate }: {
     //
     // Migrate tokens:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $migrate.ing();
     Alerts.hide();
     try {
-        tgt_apower.onTransfer((
+        tgt_apower.onTransfer(buffered((
             from, to, amount, ev
         ) => {
             if (ev.log.transactionHash !== tx?.hash) {
@@ -379,7 +572,7 @@ async function sovMigrateOld({ $migrate }: {
                 Alert.success, { after: $migrate.parent('div')[0], id: 'success' }
             );
             reset();
-        });
+        }));
         const sov_index = await tgt_apower.get.then(
             (c) => c.oldIndexOf(src_apower.address)
         );
@@ -398,6 +591,12 @@ async function sovMigrateOld({ $migrate }: {
                 after: $migrate.parent('div')[0]
             });
         }
+        ex = moe_treasury.parse(ex);
+        ex = src_apower.parse(ex);
+        ex = tgt_apower.parse(ex);
+        ex = src_xpower.parse(ex);
+        ex = tgt_xpower.parse(ex);
+        ex = xpb_pool.parse(ex);
         console.error(ex);
         reset();
     }
@@ -468,8 +667,30 @@ async function contracts({
     } catch (ex) {
         console.error(ex);
     }
+    let moe_treasury: MoeTreasury | undefined;
+    try {
+        moe_treasury = MoeTreasuryFactory({
+            version: tgt_version
+        });
+        console.debug(
+            `[${tgt_version}:moe_treasury]`, moe_treasury.address
+        );
+    } catch (ex) {
+        console.error(ex);
+    }
+    let xpb_pool: XpbPool | undefined;
+    try {
+        xpb_pool = await moe_treasury?.pool();
+        assert(xpb_pool, 'undefined xpb_pool');
+        console.debug(
+            `[${tgt_version}:xpb_pool]`, xpb_pool.address
+        );
+    } catch (ex) {
+        console.error(ex);
+    }
     return {
         src_xpower, src_apower,
         tgt_xpower, tgt_apower,
+        moe_treasury, xpb_pool,
     };
 }

@@ -19,10 +19,10 @@ export class XPowerSov extends Base {
     }
     public async metric(): Promise<Metric> {
         const contract = await this.get;
-        if (ROParams.lt(Version.v7b)) {
+        if (ROParams.lt(Version.v07b)) {
             return 10n ** 18n; // 100%
         }
-        if (ROParams.lt(Version.v8b)) {
+        if (ROParams.lt(Version.v08b)) {
             return contract.collateralization().then(
                 (c) => c * 10n ** 12n
             );

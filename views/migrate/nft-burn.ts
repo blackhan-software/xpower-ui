@@ -21,7 +21,9 @@ Blockchain.onConnect(function enableBurnButton() {
 $('button.burn-empty-nft').on('click', async function burnEmpty(e) {
     const $burn = $(e.currentTarget);
     if ($burn.hasClass('xpow')) {
+        const reset = $burn.ing();
         await burn({ $burn });
+        reset();
     }
 });
 async function burn({ $burn }: {

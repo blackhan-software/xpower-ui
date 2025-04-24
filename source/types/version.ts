@@ -1,33 +1,36 @@
 export enum Version {
-    v1a = 'v1a',
-    v2a = 'v2a',
-    v2b = 'v2b',
-    v2c = 'v2c',
-    v3a = 'v3a',
-    v3b = 'v3b',
-    v4a = 'v4a',
-    v5a = 'v5a',
-    v5b = 'v5b',
-    v5c = 'v5c',
-    v6a = 'v6a',
-    v6b = 'v6b',
-    v6c = 'v6c',
-    v7a = 'v7a',
-    v7b = 'v7b',
-    v7c = 'v7c',
-    v8a = 'v8a',
-    v8b = 'v8b',
-    v8c = 'v8c',
-    v9a = 'v9a',
-    v9b = 'v9b',
-    v9c = 'v9c',
+    v01a = '01a',
+    v02a = '02a',
+    v02b = '02b',
+    v02c = '02c',
+    v03a = '03a',
+    v03b = '03b',
+    v04a = '04a',
+    v05a = '05a',
+    v05b = '05b',
+    v05c = '05c',
+    v06a = '06a',
+    v06b = '06b',
+    v06c = '06c',
+    v07a = '07a',
+    v07b = '07b',
+    v07c = '07c',
+    v08a = '08a',
+    v08b = '08b',
+    v08c = '08c',
+    v09a = '09a',
+    v09b = '09b',
+    v09c = '09c',
+    v10a = '10a',
 }
 export function Versions(): Set<Version> {
     const ref = Version as typeof Version & {
         _set?: Set<Version>
     };
     if (ref._set === undefined) {
-        ref._set = new Set(Object.values(Version));
+        ref._set = new Set(Object.values(Version).filter((v) => {
+            return v >= Version.v09c;
+        }));
     }
     return ref._set;
 }

@@ -155,12 +155,12 @@ export const NftsUiService = (
         ));
     });
     const nft_approval = async (
-        address: Account
+        account: Account
     ) => {
-        const moe_wallet = new MoeWallet(address);
-        const nft_wallet = new NftWallet(address);
+        const moe_wallet = new MoeWallet(account);
+        const nft_wallet = new NftWallet(account);
         const allowance = await moe_wallet.allowance(
-            address, await nft_wallet.address
+            account, await nft_wallet.address
         );
         const approval = allowance === MAX_UINT256
             ? NftMinterApproval.approved

@@ -9,7 +9,7 @@ export function XPowerSovFactory(
     { version } = { version: ROParams.version }
 ): XPowerSov {
     const sov = new XPowerSov(address({
-        infix: 'SOV', version
+        prefix: 'APOW', infix: 'SOV', version
     }));
     return global.XPOWER_SOV = sov;
 }

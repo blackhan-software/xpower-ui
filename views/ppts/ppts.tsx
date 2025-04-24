@@ -55,7 +55,8 @@ type Props = {
     /**
      * ppt-minter:
      */
-    onPptMinterApproval?: () => void
+    onPptMinterApproval1?: () => void
+    onPptMinterApproval2?: () => void
     onPptMinterBatchMint?: (list: PptMinterList) => void;
     onPptMinterBatchBurn?: (list: PptMinterList) => void;
     onPptMinterBatchClaim?: () => void;
@@ -98,11 +99,17 @@ export function UiPpts(
         </div>
         <div id='ppt-batch-minting'>
             <UiPptMinter
-                approval={
-                    minter.approval
+                ppt_approval1={
+                    minter.ppt_approval1
                 }
-                onApproval={
-                    props.onPptMinterApproval
+                onPptApproval1={
+                    props.onPptMinterApproval1
+                }
+                ppt_approval2={
+                    minter.ppt_approval2
+                }
+                onPptApproval2={
+                    props.onPptMinterApproval2
                 }
                 minter_list={
                     join(flags, amounts)

@@ -442,27 +442,27 @@ function abi_encoder(
         return encoder_v7c;
     }
     switch (version) {
-        case Version.v1a:
+        case Version.v01a:
             return encoder_v1a;
-        case Version.v2a:
-        case Version.v2b:
-        case Version.v2c:
+        case Version.v02a:
+        case Version.v02b:
+        case Version.v02c:
             return encoder_v2c;
-        case Version.v3a:
-        case Version.v3b:
+        case Version.v03a:
+        case Version.v03b:
             return encoder_v3b;
-        case Version.v4a:
-        case Version.v5a:
-        case Version.v5b:
+        case Version.v04a:
+        case Version.v05a:
+        case Version.v05b:
             return encoder_v5b;
-        case Version.v5c:
-        case Version.v6a:
+        case Version.v05c:
+        case Version.v06a:
             return encoder_v6a;
-        case Version.v6b:
-        case Version.v6c:
-        case Version.v7a:
+        case Version.v06b:
+        case Version.v06c:
+        case Version.v07a:
             return encoder_v7a;
-        case Version.v7b:
+        case Version.v07b:
             return encoder_v7b;
         default:
             return encoder_v7c;

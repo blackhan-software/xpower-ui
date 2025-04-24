@@ -37,7 +37,18 @@ div#ppt-batch-minting {
         height: 1em;
         width: 1em;
       }
-      width: calc(100% - 83px);
+      border-right: 1px solid;
+      width: calc(50% - 42.5px);
+    }
+    #ppt-claim-approval {
+      span.spinner {
+        margin-top: 0.25em;
+      }
+      span.spinner {
+        height: 1em;
+        width: 1em;
+      }
+      width: calc(50% - 42.5px);
     }
     #ppt-batch-minter {
       span.spinner {

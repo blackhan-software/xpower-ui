@@ -9,7 +9,7 @@ export function PptTreasuryFactory(
     { version } = { version: ROParams.version }
 ): PptTreasury {
     const pty_address = address({
-        infix: 'PTY', version
+        prefix: 'APOW', infix: 'NTY', version
     });
     return global.PTY = new PptTreasury(pty_address, version);
 }

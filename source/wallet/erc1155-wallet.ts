@@ -1,4 +1,4 @@
-import { Contract, Transaction } from 'ethers';
+import { Contract, TransactionResponse } from 'ethers';
 import { x40 } from '../functions';
 import { Account, Address, Amount, Balance, Nft, NftFullId, NftIssue, NftLevel, NftRealId, Supply } from '../redux/types';
 import { TxEvent, Version } from '../types';
@@ -85,7 +85,7 @@ export abstract class ERC1155Wallet {
     }
     async setApprovalForAll(
         operator: Account | Address, approved: boolean
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         if (typeof operator === 'bigint') {
             operator = x40(operator);
         }
@@ -119,7 +119,7 @@ export abstract class ERC1155Wallet {
     }
     async safeTransfer(
         to: Account | Address, full_id: NftFullId, amount: Amount
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         if (typeof to === 'bigint') {
             to = x40(to);
         }
@@ -166,7 +166,7 @@ export abstract class ERC1155Wallet {
     }
     async safeBatchTransfer(
         to: Account | Address, full_ids: NftFullId[], amounts: Amount[]
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         if (typeof to === 'bigint') {
             to = x40(to);
         }
@@ -250,7 +250,7 @@ export abstract class ERC1155Wallet {
             version: this._version
         });
         const supply: Supply = await this.get.then(
-            async (c) => c.totalSupply(real_id)
+            async (c) => c['totalSupply(uint256)'](real_id)
         );
         return supply;
     }
@@ -289,7 +289,7 @@ function* totalSupplies(
     });
     for (const full_id of full_ids) {
         const real_id = Nft.realId(full_id, { version });
-        yield nft.then((c) => c.totalSupply(real_id));
+        yield nft.then((c) => c['totalSupply(uint256)'](real_id));
     }
 }
 export default ERC1155Wallet;

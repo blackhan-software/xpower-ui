@@ -22,10 +22,7 @@ export class Base {
     ): Promise<Contract> {
         if (!runner) {
             if (this._connected === undefined) {
-                const provider = await MMProvider();
-                const signer = RWParams.account
-                    ? await provider?.getSigner(x40(RWParams.account))
-                    : await provider?.getSigner(); //default account
+                const signer = await this.signer()
                 this._connected = this.contract(signer);
             }
             return this._connected;
@@ -41,6 +38,14 @@ export class Base {
             this._contracts.set(runner, contract);
         }
         return contract;
+    }
+    protected async signer(): Promise<ContractRunner | undefined> {
+        const provider = await MMProvider();
+        if (RWParams.account) {
+            return provider?.getSigner(x40(RWParams.account));
+        } else {
+            return provider?.getSigner(); // default account
+        }
     }
     public parse(e: unknown): ErrorDescription | unknown {
         if (isCallException(e) && e.data) {

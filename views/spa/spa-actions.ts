@@ -2,11 +2,11 @@
 import { removeNonce, removeNonceByAmount, setAftWalletBurner, setMintingRow, setNftsUiDetails, setNftsUiMinter, setOtfWalletProcessing, setOtfWalletToggle, setPptsUiDetails, setPptsUiMinter, setRatesUiRefresher, switchToken } from '../../source/redux/actions';
 import { mintingRowBy, mintingRowsBy, nftTotalBy, nftsBy, nonceBy, noncesBy, pptTotalBy } from '../../source/redux/selectors';
 import { AppThunk } from '../../source/redux/store';
-import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftBurnerStatus, NftFullId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, NftSenderStatus, NftUpgraderStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval, PptMinterList, PptMinterStatus, RefresherStatus, Token, TokenInfo } from '../../source/redux/types';
+import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft, NftBurnerStatus, NftFullId, NftIssue, NftLevel, NftLevels, NftMinterApproval, NftMinterList, NftMinterStatus, NftSenderStatus, NftUpgraderStatus, OtfWallet, PptBurnerStatus, PptClaimerStatus, PptMinterApproval1, PptMinterApproval2, PptMinterList, PptMinterStatus, RefresherStatus, TIMEOUT, Token, TokenInfo } from '../../source/redux/types';
 
 import { MMProvider } from '../../source/blockchain';
-import { MoeTreasuryFactory, OnClaim, OnClaimBatch, OnRefresh, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
-import { error, inIframe, x40 } from '../../source/functions';
+import { MoeTreasuryFactory, OnApproveSupply, OnClaim, OnClaimBatch, OnRefresh, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
+import { assert, error, inIframe, x40 } from '../../source/functions';
 import { HashManager, MiningManager as MM } from '../../source/managers';
 import { ROParams, RWParams } from '../../source/params';
 import { Tokenizer } from '../../source/token';
@@ -14,7 +14,7 @@ import { MoeWallet, NftWallet, OnApproval, OnApprovalForAll, OnTransfer, OnTrans
 import { Years } from '../../source/years';
 
 import { AnyAction } from '@reduxjs/toolkit';
-import { Transaction, parseUnits } from 'ethers';
+import { TransactionResponse, parseUnits } from 'ethers';
 
 // subscribe to events only once
 const { once } = { once: true };
@@ -94,12 +94,11 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
         }
     };
     const moe_wallet = new MoeWallet(account);
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     try {
         set_status(MinterStatus.minting);
         await moe_wallet.onTransfer(on_transfer);
         tx = await moe_wallet.mint(block_hash, nonce);
-        console.debug('[mint]', tx);
         const { tx_counter } = mintingRowBy(
             api.getState(), level
         );
@@ -235,7 +234,7 @@ export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
         }));
         set_status(NftSenderStatus.sent);
     };
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     try {
         set_status(NftSenderStatus.sending);
         await nft_wallet.onTransferSingle(
@@ -278,7 +277,7 @@ export const nftsApprove = AppThunk('nfts/approve', async (args: {
         }
         set_approval(NftMinterApproval.approved);
     };
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     try {
         set_approval(NftMinterApproval.approving);
         const nft_address = await nft_wallet.address;
@@ -320,6 +319,14 @@ export const nftsBatchMint = AppThunk('nfts/batch-mint', async (args: {
     }
     const levels = nfts.map((nft) => nft.level);
     const amounts = nfts.map((nft) => nft.amount);
+    const on_mint_single: OnTransferSingle = async (
+        op, from, to, id, value, ev
+    ) => {
+        if (tx && tx.hash !== ev.log.transactionHash) {
+            return;
+        }
+        set_status(NftMinterStatus.minted);
+    };
     const on_mint_batch: OnTransferBatch = async (
         op, from, to, ids, values, ev
     ) => {
@@ -329,9 +336,12 @@ export const nftsBatchMint = AppThunk('nfts/batch-mint', async (args: {
         set_status(NftMinterStatus.minted);
     };
     const nft_wallet = new NftWallet(account);
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     try {
         set_status(NftMinterStatus.minting);
+        await nft_wallet.onTransferSingle(
+            on_mint_single, { once }
+        );
         await nft_wallet.onTransferBatch(
             on_mint_batch, { once }
         );
@@ -342,6 +352,7 @@ export const nftsBatchMint = AppThunk('nfts/batch-mint', async (args: {
         set_status(NftMinterStatus.error);
         throw error(nft_wallet.parse(ex));
     } finally {
+        nft_wallet.offTransferSingle(on_mint_single);
         nft_wallet.offTransferBatch(on_mint_batch);
     }
     function set_status(
@@ -400,6 +411,14 @@ export const nftsBatchBurn = AppThunk('nfts/batch-burn', async (args: {
     }
     const nft_ids = nft_burns.map((burn) => burn.nft_id);
     const amounts = nft_burns.map((burn) => burn.amount);
+    const on_burn_single: OnTransferSingle = async (
+        op, from, to, id, value, ev
+    ) => {
+        if (tx && tx.hash !== ev.log.transactionHash) {
+            return;
+        }
+        set_status(NftBurnerStatus.burned);
+    };
     const on_burn_batch: OnTransferBatch = async (
         op, from, to, ids, values, ev
     ) => {
@@ -409,9 +428,12 @@ export const nftsBatchBurn = AppThunk('nfts/batch-burn', async (args: {
         set_status(NftBurnerStatus.burned);
     };
     const nft_wallet = new NftWallet(account);
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     try {
         set_status(NftBurnerStatus.burning);
+        await nft_wallet.onTransferSingle(
+            on_burn_single, { once }
+        );
         await nft_wallet.onTransferBatch(
             on_burn_batch, { once }
         );
@@ -422,6 +444,7 @@ export const nftsBatchBurn = AppThunk('nfts/batch-burn', async (args: {
         set_status(NftBurnerStatus.error);
         throw error(nft_wallet.parse(ex));
     } finally {
+        nft_wallet.offTransferSingle(on_burn_single);
         nft_wallet.offTransferBatch(on_burn_batch);
     }
     function set_status(
@@ -481,7 +504,7 @@ export const nftsBatchUpgrade = AppThunk('nfts/batch-upgrade', async (args: {
         set_status(NftUpgraderStatus.upgraded);
     };
     const nft_wallet = new NftWallet(account);
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     try {
         set_status(NftUpgraderStatus.upgrading);
         await nft_wallet.onTransferBatch(
@@ -507,7 +530,7 @@ export const nftsBatchUpgrade = AppThunk('nfts/batch-upgrade', async (args: {
 /**
  * ppt-minter:
  */
-export const pptsApprove = AppThunk('ppts/approve', async (args: {
+export const pptsApprove1 = AppThunk('ppts/approve-1', async (args: {
     account: Account | null
 }, api) => {
     const { account } = args;
@@ -521,7 +544,7 @@ export const pptsApprove = AppThunk('ppts/approve', async (args: {
     );
     if (approved) {
         const minter = {
-            approval: PptMinterApproval.approved
+            ppt_approval1: PptMinterApproval1.approved
         };
         api.dispatch(setPptsUiMinter({ minter }));
     } else {
@@ -531,11 +554,11 @@ export const pptsApprove = AppThunk('ppts/approve', async (args: {
             if (tx && tx.hash !== ev.log.transactionHash) {
                 return;
             }
-            set_approval(PptMinterApproval.approved);
+            set_approval(PptMinterApproval1.approved);
         };
-        let tx: Transaction | undefined;
+        let tx: TransactionResponse | undefined;
         try {
-            set_approval(PptMinterApproval.approving);
+            set_approval(PptMinterApproval1.approving);
             await nft_wallet.onApprovalForAll(
                 on_approval, { once }
             );
@@ -543,17 +566,17 @@ export const pptsApprove = AppThunk('ppts/approve', async (args: {
                 ppt_treasury.address, true
             );
         } catch (ex) {
-            set_approval(PptMinterApproval.error);
+            set_approval(PptMinterApproval1.error);
             throw error(nft_wallet.parse(ex));
         } finally {
             nft_wallet.offApprovalForAll(on_approval);
         }
     }
     function set_approval(
-        minter_approval: PptMinterApproval
+        approval: PptMinterApproval1
     ) {
         if (!inIframe()) api.dispatch(setPptsUiMinter({
-            minter: { approval: minter_approval }
+            minter: { ppt_approval1: approval }
         }));
     }
 });
@@ -611,7 +634,7 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
         set_status(PptMinterStatus.minted);
     };
     const ppt_treasury = PptTreasuryFactory();
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     try {
         set_status(PptMinterStatus.minting);
         await ppt_treasury.onStakeBatch(
@@ -688,7 +711,7 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
         set_status(PptBurnerStatus.burned);
     };
     const ppt_treasury = PptTreasuryFactory();
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     try {
         set_status(PptBurnerStatus.burning);
         await ppt_treasury.onUnstakeBatch(
@@ -714,6 +737,122 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
 /**
  * ppt-claimer:
  */
+export const pptsApprove2 = AppThunk('ppts/approve-2', async (args: {
+    account: Account | null
+}, api) => {
+    const { account } = args;
+    if (!account) {
+        throw new Error('missing account');
+    }
+    const sov_wallet = new SovWallet(account);
+    const sov_address = await sov_wallet.address;
+    const moe_treasury = MoeTreasuryFactory();
+    const xpb_pool = await moe_treasury.pool();
+    assert(xpb_pool, 'missing moe-treasury.pool');
+    let [approved2a, allowance2b, allowance2c] = await Promise.all([
+        xpb_pool.approvedSupply(
+            x40(account), moe_treasury.address, sov_address
+        ),
+        sov_wallet.allowance(
+            x40(account), xpb_pool.address
+        ),
+        sov_wallet.allowance(
+            x40(account), moe_treasury.address
+        ),
+    ]);
+    if (approved2a
+        && allowance2b == MAX_UINT256
+        && allowance2c == MAX_UINT256
+    ) {
+        const minter = {
+            ppt_approval2: PptMinterApproval2.approved
+        };
+        api.dispatch(setPptsUiMinter({ minter }));
+    } else {
+        const on_approval2a: OnApproveSupply = (
+            account, op, token, flag, ev
+        ) => {
+            if (tx2a && tx2a.hash !== ev.log.transactionHash) {
+                return;
+            } else {
+                approved2a = true;
+            }
+            if (allowance2b === MAX_UINT256 &&
+                allowance2c === MAX_UINT256
+            ) {
+                set_approval(PptMinterApproval2.approved);
+            }
+        };
+        const on_approval2b: OnApproval = (
+            owner, spender, value, ev
+        ) => {
+            if (tx2b && tx2b.hash !== ev.log.transactionHash) {
+                return;
+            } else {
+                allowance2b = MAX_UINT256;
+            }
+            if (approved2a && allowance2c === MAX_UINT256) {
+                set_approval(PptMinterApproval2.approved);
+            }
+        };
+        const on_approval2c: OnApproval = (
+            owner, spender, value, ev
+        ) => {
+            if (tx2c && tx2c.hash !== ev.log.transactionHash) {
+                return;
+            } else {
+                allowance2c = MAX_UINT256;
+            }
+            if (approved2a && allowance2b === MAX_UINT256) {
+                set_approval(PptMinterApproval2.approved);
+            }
+        };
+        let tx2a: TransactionResponse | undefined;
+        let tx2b: TransactionResponse | undefined;
+        let tx2c: TransactionResponse | undefined;
+        try {
+            set_approval(PptMinterApproval2.approving);
+            await Promise.all([
+                xpb_pool.onApproveSupply(
+                    on_approval2a, { once }
+                ),
+                sov_wallet.onApproval(
+                    on_approval2b, { once }
+                ),
+                sov_wallet.onApproval(
+                    on_approval2c, { once }
+                ),
+            ]);
+            tx2a = await xpb_pool.approveSupply(
+                moe_treasury.address,
+                sov_address,
+                true
+            );
+            tx2b = await sov_wallet.approve(
+                xpb_pool.address, MAX_UINT256
+            );
+            tx2c = await sov_wallet.approve(
+                moe_treasury.address, MAX_UINT256
+            );
+            /** @info optimistically consider approved */
+            set_approval(PptMinterApproval2.approved);
+        } catch (ex) {
+            set_approval(PptMinterApproval2.error);
+            throw error(xpb_pool.parse(ex));
+        } finally {
+            xpb_pool.offApproveSupply(on_approval2a);
+            sov_wallet.offApproval(on_approval2b);
+            sov_wallet.offApproval(on_approval2c);
+        }
+    }
+    function set_approval(
+        approval: PptMinterApproval2
+    ) {
+        if (!inIframe()) api.dispatch(setPptsUiMinter({
+            minter: { ppt_approval2: approval }
+        }));
+    }
+});
 export const pptsClaim = AppThunk('ppts/claim', async (args: {
     account: Account | null, issue: NftIssue, level: NftLevel
 }, api) => {
@@ -737,7 +876,7 @@ export const pptsClaim = AppThunk('ppts/claim', async (args: {
     if (!Tokenizer.aified(token)) {
         api.dispatch(switchToken(Tokenizer.aify(token)));
     }
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     try {
         set_status(PptClaimerStatus.claiming);
         await moe_treasury.onClaim(
@@ -793,7 +932,7 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
     if (!Tokenizer.aified(token)) {
         api.dispatch(switchToken(Tokenizer.aify(token)));
     }
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     try {
         await moe_treasury.onClaimBatch(
             on_claim_batch, { once }
@@ -847,7 +986,7 @@ export const ratesRefresh = AppThunk('rates/refresh', async (args: {
         set_status(RefresherStatus.error);
         throw error(moe_treasury.parse(ex));
     }
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     try {
         set_status(RefresherStatus.refreshing);
         await moe_treasury.onRefreshRates(
@@ -899,7 +1038,7 @@ export const aftBurnAPower = AppThunk('aft/burn-apower', async (args: {
         }
         set_status(AftWalletBurner.burned);
     };
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     try {
         set_status(AftWalletBurner.burning);
         await sov_wallet.onTransfer(
@@ -941,7 +1080,7 @@ export const aftBurnXPower = AppThunk('aft/burn-xpower', async (args: {
         }
         set_status(AftWalletBurner.burned);
     };
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     try {
         set_status(AftWalletBurner.burning);
         await moe_wallet.onTransfer(
@@ -1018,7 +1157,7 @@ export const otfDeposit = AppThunk('otf-wallet/deposit', async (args: {
             gasLimit: gas_limit, gasPrice: gas_price,
             to: otf_address, value
         });
-        tx.wait(1, 7500).finally(() => {
+        tx.wait(1, TIMEOUT).finally(() => {
             api.dispatch(setOtfWalletProcessing({
                 processing: false
             }));
@@ -1070,7 +1209,7 @@ export const otfWithdraw = AppThunk('otf-wallet/withdraw', async (args: {
             gasLimit: gas_limit, gasPrice: gas_price,
             to: x40(account), value
         });
-        tx.wait(1, 7500).finally(() => {
+        tx.wait(1, TIMEOUT).finally(() => {
             api.dispatch(setOtfWalletProcessing({
                 processing: false
             }));

@@ -12,13 +12,13 @@ export function XPowerNftFactory(
     { version } = { version: ROParams.version }
 ): XPowerNft {
     const nft = new XPowerNft(address({
-        infix: 'NFT', version
+        prefix: 'XPOW', infix: 'NFT', version
     }));
     return global.XPOWER_NFT = nft;
 }
 export function XPowerNftMockFactory(): XPowerNft {
     const mock = {
-        totalSupply: (
+        'totalSupply(uint256)': (
             /*id: string*/
         ) => {
             return 0n;

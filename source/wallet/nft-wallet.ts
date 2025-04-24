@@ -119,6 +119,8 @@ export class NftWalletMock extends NftWallet {
     }
 }
 function moeAddress(): Account {
-    return BigInt(address({ version: ROParams.version, infix: 'MOE', }));
+    return BigInt(address({
+        prefix: 'XPOW', infix: 'MOE', version: ROParams.version,
+    }));
 }
 export default NftWallet;

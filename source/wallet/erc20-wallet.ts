@@ -1,4 +1,4 @@
-import { Contract, Transaction } from 'ethers';
+import { Contract, TransactionResponse } from 'ethers';
 import { x40 } from '../functions';
 import { Account, Address, Allowance, Amount, Balance, Decimals, Supply } from '../redux/types';
 import { TxEvent } from '../types';
@@ -28,7 +28,7 @@ export abstract class ERC20Wallet {
     }
     async burn(
         amount: Amount
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         return this.put.then((c) => c.burn(amount));
     }
     async allowance(
@@ -46,7 +46,7 @@ export abstract class ERC20Wallet {
     }
     async approve(
         spender_address: Account | Address, allowance: Allowance
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         if (typeof spender_address === 'bigint') {
             spender_address = x40(spender_address);
         }
@@ -56,7 +56,7 @@ export abstract class ERC20Wallet {
     }
     async increaseAllowance(
         spender_address: Account | Address, delta_allowance: Allowance
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         if (typeof spender_address === 'bigint') {
             spender_address = x40(spender_address);
         }
@@ -66,7 +66,7 @@ export abstract class ERC20Wallet {
     }
     async decreaseAllowance(
         spender_address: Account | Address, delta_allowance: Allowance
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         if (typeof spender_address === 'bigint') {
             spender_address = x40(spender_address);
         }

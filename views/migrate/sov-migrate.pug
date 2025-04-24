@@ -6,7 +6,9 @@ form.sov-migrate
     )
       | Approve <span class="d-none d-sm-inline">Allowance(s)</span>
     button.sov-migrate.btn.btn-outline-warning(
+      title="Migrate and supply *locked* {{aTOKEN}}s to XPowerbanq.com"
       data-source="{{VERSION_SRC}}" data-target="{{VERSION_TGT}}"
+      data-bs-toggle="tooltip" data-bs-placement="top"
       type="button" class="{{xtoken}}" disabled
     )
       | Migrate

@@ -1,9 +1,9 @@
 /* eslint @typescript-eslint/no-explicit-any: [off] */
 import './moe-migrate.scss';
 
-import { Transaction } from 'ethers';
+import { TransactionResponse } from 'ethers';
 import { Blockchain } from '../../source/blockchain';
-import { Alert, Alerts, alert, x40 } from '../../source/functions';
+import { Alert, Alerts, alert, buffered, x40 } from '../../source/functions';
 import { Account, MAX_UINT256, Token } from '../../source/redux/types';
 import { Version } from '../../source/types';
 import { MoeWallet } from '../../source/wallet';
@@ -17,11 +17,13 @@ $('button.approve-moe-allowance').on(
         const $approve = $(e.currentTarget);
         const $migrate = $approve.parents('form.moe-migrate');
         if ($approve.hasClass('xpow')) {
+            const reset = $approve.ing();
             await moeApproveOld({
                 $approve, $migrate: $migrate.find(
                     '.moe-migrate.xpow'
                 )
             });
+            reset();
         }
     }
 );
@@ -61,7 +63,7 @@ async function moeApproveOld({ $approve, $migrate }: {
     //
     // Increase allowance:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $approve.ing();
     Alerts.hide();
     try {
@@ -147,11 +149,11 @@ async function moeMigrateOld({ $migrate }: {
     //
     // Migrate tokens:
     //
-    let tx: Transaction | undefined;
+    let tx: TransactionResponse | undefined;
     const reset = $migrate.ing();
     Alerts.hide();
     try {
-        src_xpower.onTransfer((
+        src_xpower.onTransfer(buffered((
             from, to, amount, ev
         ) => {
             if (ev.log.transactionHash !== tx?.hash) {
@@ -162,7 +164,7 @@ async function moeMigrateOld({ $migrate }: {
                 Alert.success, { after: $migrate.parent('div')[0], id: 'success' }
             );
             reset();
-        });
+        }));
         const index = await tgt_xpower.get.then(
             (c) => c.oldIndexOf(src_xpower.address)
         );

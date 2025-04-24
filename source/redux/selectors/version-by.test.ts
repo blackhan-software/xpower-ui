@@ -14,74 +14,74 @@ describe('version-by', () => {
         const versions = versionBy({
             history: {
                 items: {
-                    [Version.v2a]: {
+                    [Version.v02a]: {
                         moe: { balance: 1n }
                     },
                 }
             }
         });
         expect(versions).toEqual([
-            Version.v2a
+            Version.v02a
         ]);
     });
     it('should return ["v3a", "v2a"]', () => {
         const versions = versionBy({
             history: {
                 items: {
-                    [Version.v2a]: {
+                    [Version.v02a]: {
                         moe: { balance: 1n }
                     },
-                    [Version.v3a]: {
+                    [Version.v03a]: {
                         sov: { balance: 1n }
                     },
                 }
             }
         });
         expect(versions).toEqual([
-            Version.v3a, Version.v2a
+            Version.v03a, Version.v02a
         ]);
     });
     it('should return ["v4a", "v3a", "v2a"]', () => {
         const versions = versionBy({
             history: {
                 items: {
-                    [Version.v2a]: {
+                    [Version.v02a]: {
                         moe: { balance: 1n }
                     },
-                    [Version.v3a]: {
+                    [Version.v03a]: {
                         sov: { balance: 1n }
                     },
-                    [Version.v4a]: {
+                    [Version.v04a]: {
                         nft: { [2202100]: { balance: 1n} }
                     },
                 }
             }
         });
         expect(versions).toEqual([
-            Version.v4a, Version.v3a, Version.v2a
+            Version.v04a, Version.v03a, Version.v02a
         ]);
     });
     it('should return ["v5a", "v4a", "v3a", "v2a"]', () => {
         const versions = versionBy({
             history: {
                 items: {
-                    [Version.v2a]: {
+                    [Version.v02a]: {
                         moe: { balance: 1n }
                     },
-                    [Version.v3a]: {
+                    [Version.v03a]: {
                         sov: { balance: 1n }
                     },
-                    [Version.v4a]: {
+                    [Version.v04a]: {
                         nft: { [2202100]: { balance: 1n} }
                     },
-                    [Version.v5a]: {
+                    [Version.v05a]: {
                         ppt: { [2202100]: { balance: 1n} }
                     },
                 }
             }
         });
         expect(versions).toEqual([
-            Version.v5a, Version.v4a, Version.v3a, Version.v2a
+            Version.v05a, Version.v04a, Version.v03a, Version.v02a
         ]);
     });
 });

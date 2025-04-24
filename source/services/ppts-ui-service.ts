@@ -1,15 +1,15 @@
 import { Store } from '@reduxjs/toolkit';
 import { Blockchain } from '../blockchain';
 import { Bus } from '../bus';
-import { PptTreasuryFactory } from '../contract';
-import { buffered } from '../functions';
+import { MoeTreasuryFactory, PptTreasuryFactory } from '../contract';
+import { buffered, x40 } from '../functions';
 import { setPptsUiAmounts, setPptsUiDetails, setPptsUiMinter } from '../redux/actions';
 import { onNftChanged, onPptChanged, onTokenSwitch } from '../redux/observers';
 import { pptAmounts } from '../redux/reducers';
 import { nftTotalBy, pptTotalBy } from '../redux/selectors';
 import { AppState } from '../redux/store';
-import { Account, Nft, NftIssue, NftLevel, NftLevels, PptAmounts, PptDetails, PptMinterApproval } from '../redux/types';
-import { NftWallet, PptWallet, PptWalletMock } from '../wallet';
+import { Account, MAX_UINT256, Nft, NftIssue, NftLevel, NftLevels, PptAmounts, PptDetails, PptMinterApproval1, PptMinterApproval2 } from '../redux/types';
+import { NftWallet, PptWallet, PptWalletMock, SovWallet } from '../wallet';
 import { Years } from '../years';
 
 import { PptImageMeta } from '../../views/ppts/details/ppt-image-meta';
@@ -94,18 +94,39 @@ export const PptsUiService = (
         ));
     });
     const ppt_approval = async (
-        address: Account
+        account: Account
     ) => {
+        const sov_wallet = new SovWallet(account);
+        const sov_address = await sov_wallet.address;
+        const nft_wallet = new NftWallet(account);
         const ppt_treasury = PptTreasuryFactory();
-        const nft_wallet = new NftWallet(address);
-        const approved = await nft_wallet.isApprovedForAll(
-            ppt_treasury.address
-        );
-        const approval = approved
-            ? PptMinterApproval.approved
-            : PptMinterApproval.unapproved;
+        const moe_treasury = MoeTreasuryFactory();
+        const [
+            approved1, approved2a, allowance2b, allowance2c
+        ] = await Promise.all([
+            nft_wallet.isApprovedForAll(
+                ppt_treasury.address
+            ),
+            moe_treasury.pool().then((p) => p?.approvedSupply(
+                x40(account), moe_treasury.address, sov_address
+            )),
+            moe_treasury.pool().then((p) => sov_wallet.allowance(
+                x40(account), p?.address ?? x40(1)
+            )),
+            sov_wallet.allowance(
+                x40(account), moe_treasury.address
+            ),
+        ]);
+        const approval1 = approved1
+            ? PptMinterApproval1.approved
+            : PptMinterApproval1.unapproved;
+        const approval2 = approved2a
+            && allowance2b === MAX_UINT256
+            && allowance2c === MAX_UINT256
+            ? PptMinterApproval2.approved
+            : PptMinterApproval2.unapproved;
         return {
-            minter: { approval }
+            minter: { ppt_approval1: approval1, ppt_approval2: approval2 },
         };
     };
     const ppt_image = async (

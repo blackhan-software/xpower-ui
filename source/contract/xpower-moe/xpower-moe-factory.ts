@@ -9,7 +9,7 @@ export function XPowerMoeFactory(
     { version } = { version: ROParams.version }
 ): XPowerMoe {
     const moe = new XPowerMoe(address({
-        infix: 'MOE', version
+        prefix: 'XPOW', infix: 'MOE', version
     }));
     return global.XPOWER_MOE = moe;
 }

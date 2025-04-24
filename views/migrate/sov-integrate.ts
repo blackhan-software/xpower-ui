@@ -5,7 +5,7 @@ import { Blockchain, ChainId } from '../../source/blockchain';
 import { Alert, alert, Alerts } from '../../source/functions';
 import { Token, TokenInfo } from '../../source/redux/types';
 
-$('button.add-sov.xpow').on('click', (e) => addToken(e, {
+$('button.add-sov.apow').on('click', (e) => addToken(e, {
     token: Token.APOW
 }));
 async function addToken(

@@ -9,7 +9,7 @@ export function MoeTreasuryFactory(
     { version } = { version: ROParams.version }
 ): MoeTreasury {
     const mty_address = address({
-        infix: 'MTY', version
+        prefix: 'XPOW', infix: 'MTY', version
     });
     return global.MTY = new MoeTreasury(mty_address, version);
 }

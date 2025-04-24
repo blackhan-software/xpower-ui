@@ -32,19 +32,19 @@ export default <
     if (ROParams.service('minting')) {
         MintingService(store);
     }
-    if (ROParams.service('nfts') && ROParams.gt(Version.v1a)) {
+    if (ROParams.service('nfts') && ROParams.gt(Version.v01a)) {
         NftsService(store);
     }
-    if (ROParams.service('nfts-ui') && ROParams.gt(Version.v1a)) {
+    if (ROParams.service('nfts-ui') && ROParams.gt(Version.v01a)) {
         NftsUiService(store);
     }
-    if (ROParams.service('ppts') && ROParams.gt(Version.v3b)) {
+    if (ROParams.service('ppts') && ROParams.gt(Version.v03b)) {
         PptsService(store);
     }
-    if (ROParams.service('ppts-ui') && ROParams.gt(Version.v3b)) {
+    if (ROParams.service('ppts-ui') && ROParams.gt(Version.v03b)) {
         PptsUiService(store);
     }
-    if (ROParams.service('rates') && ROParams.gt(Version.v3b)) {
+    if (ROParams.service('rates') && ROParams.gt(Version.v03b)) {
         RatesService(store);
     }
     if (ROParams.service('tooltip')) {

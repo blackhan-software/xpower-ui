@@ -409,8 +409,13 @@ function $ppts(
                     account, issue, level
                 }))
             }
-            onPptMinterApproval={() =>
-                dispatch(actions.pptsApprove({
+            onPptMinterApproval1={() =>
+                dispatch(actions.pptsApprove1({
+                    account
+                }))
+            }
+            onPptMinterApproval2={() =>
+                dispatch(actions.pptsApprove2({
                     account
                 }))
             }

@@ -27,7 +27,9 @@ export function MiningManager(
     }): Miner {
         let miner = MiningManager._miner;
         if (miner === undefined) {
-            const contract = addressOf({ infix: 'MOE' });
+            const contract = addressOf({
+                prefix: 'XPOW', infix: 'MOE'
+            });
             const speed = miningSpeedBy(api.getState());
             miner = MiningManager._miner = new Miner(
                 contract, account, speed ?? undefined, ROParams.level.min

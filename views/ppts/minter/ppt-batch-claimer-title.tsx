@@ -18,7 +18,7 @@ export function UiPptBatchClaimerTitle(
     const [account] = useContext(AccountContext);
     useEffect(() => {
         mintable(account).then((amount) => {
-            set_title(`${amount} ${Token.APOW}`);
+            set_title(`Supply ${amount} *locked* ${Token.APOW}s to XPowerbanq.com`);
             Bus.emit('refresh-tips');
         });
     }, [

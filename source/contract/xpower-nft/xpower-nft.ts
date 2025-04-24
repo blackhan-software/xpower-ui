@@ -1,10 +1,9 @@
 /* eslint @typescript-eslint/no-require-imports: [off] */
-import { InterfaceAbi, Transaction } from 'ethers';
+import { InterfaceAbi, TransactionResponse } from 'ethers';
 import { x40 } from '../../functions';
 import { ROParams } from '../../params';
 import { Account, Address, Amount, Index, Nft, NftFullId, NftIssue, NftLevel } from '../../redux/types';
 import { Version, VersionAt } from '../../types';
-import { OtfManager } from '../../wallet';
 import { Base } from '../base';
 
 import ABI from './xpower-nft.abi.json';
@@ -23,19 +22,19 @@ export class XPowerNft extends Base {
         level: NftLevel | Promise<NftLevel>,
         amount: Amount | Promise<Amount>,
         moe_index: Index | Promise<Index>
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         const contract = await this.connect();
-        if (ROParams.lt(Version.v2b)) {
+        if (ROParams.lt(Version.v02b)) {
             return contract.mint(
                 level, amount
             );
         }
-        if (ROParams.lt(Version.v6a)) {
+        if (ROParams.lt(Version.v06a)) {
             return contract.mint(
                 x40(await to), level, amount
             );
         }
-        if (ROParams.lt(Version.v8a)) {
+        if (ROParams.lt(Version.v08a)) {
             return contract.mint(
                 x40(await to), level, amount, moe_index
             );
@@ -49,19 +48,19 @@ export class XPowerNft extends Base {
         levels: NftLevel[] | Promise<NftLevel[]>,
         amounts: Amount[] | Promise<Amount[]>,
         moe_index: Index | Promise<Index>,
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         const contract = await this.connect();
-        if (ROParams.lt(Version.v2b)) {
+        if (ROParams.lt(Version.v02b)) {
             return contract.mintBatch(
                 levels, amounts
             );
         }
-        if (ROParams.lt(Version.v6a)) {
+        if (ROParams.lt(Version.v06a)) {
             return contract.mintBatch(
                 x40(await to), levels, amounts
             );
         }
-        if (ROParams.lt(Version.v8a)) {
+        if (ROParams.lt(Version.v08a)) {
             return contract.mintBatch(
                 x40(await to), levels, amounts, moe_index
             );
@@ -74,7 +73,7 @@ export class XPowerNft extends Base {
         from: Account | Promise<Account>,
         id: NftFullId | Promise<NftFullId>,
         amount: Amount | Promise<Amount>,
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         const contract = await this.connect();
         return contract.burn(
             x40(await from), Nft.realId(await id), amount
@@ -84,7 +83,7 @@ export class XPowerNft extends Base {
         from: Account | Promise<Account>,
         ids: NftFullId[] | Promise<NftFullId[]>,
         amounts: Amount[] | Promise<Amount[]>,
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         const contract = await this.connect();
         return contract.burnBatch(
             x40(await from), Nft.realIds(await ids), amounts
@@ -96,9 +95,9 @@ export class XPowerNft extends Base {
         level: NftLevel | Promise<NftLevel>,
         amount: Amount | Promise<Amount>,
         moe_index: Index | Promise<Index>,
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         const contract = await this.connect();
-        if (ROParams.lt(Version.v8a)) {
+        if (ROParams.lt(Version.v08a)) {
             return contract.upgrade(
                 x40(await to), issue, level, amount, moe_index
             );
@@ -113,9 +112,9 @@ export class XPowerNft extends Base {
         levels: NftLevel[][] | Promise<NftLevel[][]>,
         amounts: Amount[][] | Promise<Amount[][]>,
         moe_index: Index | Promise<Index>,
-    ): Promise<Transaction> {
+    ): Promise<TransactionResponse> {
         const contract = await this.connect();
-        if (ROParams.lt(Version.v8a)) {
+        if (ROParams.lt(Version.v08a)) {
             return contract.upgradeBatch(
                 x40(await to), issues, levels, amounts, moe_index
             );
@@ -128,16 +127,13 @@ export class XPowerNft extends Base {
         moe: Account | Promise<Account>
     ): Promise<Index> {
         const contract = await this.connect();
-        if (ROParams.lt(Version.v6a)) {
+        if (ROParams.lt(Version.v06a)) {
             return Promise.resolve(-1); // invalid moe-index!
         }
-        if (ROParams.lt(Version.v8a)) {
+        if (ROParams.lt(Version.v08a)) {
             return contract.moeIndexOf(x40(await moe));
         }
         return Promise.resolve(-1); // invalid moe-index!
-    }
-    private get otf() {
-        return OtfManager.connect(this.connect());
     }
 }
 export default XPowerNft;

@@ -101,7 +101,8 @@ export function pptDetails(
 }
 export function pptMinter() {
     const minter = {
-        approval: null,
+        ppt_approval1: null,
+        ppt_approval2: null,
         minter_status: null,
         burner_status: null,
         claimer_status: null,

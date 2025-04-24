@@ -293,10 +293,10 @@ function contractInfo({
         }
         case Page.Ppts: {
             const { address } = PPTokenInfo(token, version);
-            const xtoken = Tokenizer.xify(token);
+            const atoken = Tokenizer.aify(token);
             return {
                 url: `${explorer}/address/${x40(address)}`,
-                tip: `Smart contract of staked ${xtoken} NFTs`,
+                tip: `Smart contract of staked ${atoken} NFTs`,
             }
         }
         default: {
@@ -332,7 +332,7 @@ async function addMoeToken(
             Blockchain.addToken({
                 address: BigInt($moe?.dataset.value as string),
                 symbol: xtoken,
-                decimals: version < Version.v5a ? 0 : 18,
+                decimals: version < Version.v05a ? 0 : 18,
                 image: String($image?.dataset.value)
             });
         } else {
@@ -346,14 +346,13 @@ async function addSovToken(
     token: Token, version: Version
 ) {
     const atoken = Tokenizer.aify(token);
-    const xtoken = Tokenizer.xify(token);
     if (await Blockchain.isInstalled()) {
         if (await Blockchain.isAvalanche()) {
             const $sov = document.getElementById(
-                `g-${xtoken}_SOV_${version}`
+                `g-${atoken}_SOV_${version}`
             );
             const $image = document.getElementById(
-                `g-${xtoken}_SOV_IMAGE`
+                `g-${atoken}_SOV_IMAGE`
             );
             Blockchain.addToken({
                 address: BigInt($sov?.dataset.value as string),

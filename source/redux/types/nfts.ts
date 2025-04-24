@@ -85,8 +85,8 @@ export class Nft {
         if (version === undefined) {
             version = ROParams.version;
         }
-        return ROParams.lt2(version, Version.v6a)
-            || ROParams.gt2(version, Version.v7c)
+        return ROParams.lt2(version, Version.v06a)
+            || ROParams.gt2(version, Version.v07c)
             ? id.slice(-6) as NftCoreId : id;
     }
     static fullIdsOf(

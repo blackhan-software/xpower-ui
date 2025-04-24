@@ -66,17 +66,17 @@ export function TokenInfo(
         );
         return {
             address: BigInt($moe?.dataset.value ?? '0x0'),
-            decimals: version < Version.v5a ? 0 : 18,
+            decimals: version < Version.v05a ? 0 : 18,
             image: String($image?.dataset.value),
             symbol: Tokenizer.xify(token),
         };
     } else {
-        const xtoken = Tokenizer.xify(token);
+        const atoken = Tokenizer.aify(token);
         const $sov = document.getElementById(
-            `g-${xtoken}_SOV_${version}`
+            `g-${atoken}_SOV_${version}`
         );
         const $image = document.getElementById(
-            `g-${xtoken}_SOV_IMAGE`
+            `g-${atoken}_SOV_IMAGE`
         );
         return {
             address: BigInt($sov?.dataset.value ?? '0x0'),
@@ -92,7 +92,7 @@ export function NFTokenInfo(
     if (version === undefined) {
         version = ROParams.version;
     }
-    const slug = version < Version.v6a
+    const slug = version < Version.v06a
         ? Tokenizer.xify(token) : 'XPOW';
     const $nft = document.getElementById(
         `g-${slug}_NFT_${version}`
@@ -107,10 +107,10 @@ export function PPTokenInfo(
     if (version === undefined) {
         version = ROParams.version;
     }
-    const slug = version < Version.v6a
-        ? Tokenizer.xify(token) : 'XPOW';
+    const slug = version < Version.v06a
+        ? Tokenizer.aify(token) : 'APOW';
     const $sov = document.getElementById(
-        `g-${slug}_PPT_${version}`
+        `g-${slug}_NFT_${version}`
     );
     return {
         address: BigInt($sov?.dataset.value ?? '0x0'),
