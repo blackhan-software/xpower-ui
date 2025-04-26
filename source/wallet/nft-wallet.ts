@@ -1,3 +1,4 @@
+import { ErrorDescription } from 'ethers';
 import { MYProvider } from '../blockchain';
 import { XPowerNft, XPowerNftFactory, XPowerNftMockFactory } from '../contract';
 import { address } from '../contract/address';
@@ -83,6 +84,9 @@ export class NftWallet extends ERC1155Wallet {
         moe: Account | Promise<Account>
     ): Promise<Index> {
         return this._nft.moeIndexOf(moe);
+    }
+    public parse(e: unknown): ErrorDescription | unknown {
+        return this._nft.parse(e);
     }
     async idBy(
         year: Year | Promise<Year>,

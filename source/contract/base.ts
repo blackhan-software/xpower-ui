@@ -1,4 +1,4 @@
-import { Contract, ContractRunner, InterfaceAbi } from 'ethers';
+import { Contract, ContractRunner, InterfaceAbi, Interface, isCallException, ErrorDescription } from 'ethers';
 import { MMProvider } from '../blockchain';
 import { Address } from '../redux/types';
 import { RWParams } from '../params';
@@ -41,6 +41,14 @@ export class Base {
             this._contracts.set(runner, contract);
         }
         return contract;
+    }
+    public parse(e: unknown): ErrorDescription | unknown {
+        if (isCallException(e) && e.data) {
+            const iface = new Interface(this._abi);
+            const error = iface.parseError(e.data);
+            if (error) return error;
+        }
+        return e;
     }
     protected get abi() {
         return this._abi;

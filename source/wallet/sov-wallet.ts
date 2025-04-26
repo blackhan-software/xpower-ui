@@ -1,3 +1,4 @@
+import { ErrorDescription } from 'ethers';
 import { MYProvider } from '../blockchain';
 import { XPowerSov, XPowerSovFactory } from '../contract';
 import { Account, Address, Metric } from '../redux/types';
@@ -14,6 +15,9 @@ export class SovWallet extends ERC20Wallet {
         } else {
             this._sov = XPowerSovFactory();
         }
+    }
+    public parse(e: unknown): ErrorDescription | unknown {
+        return this._sov.parse(e);
     }
     get metric(): Promise<Metric> {
         return this._sov.metric();

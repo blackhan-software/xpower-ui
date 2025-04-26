@@ -1,3 +1,4 @@
+import { ErrorDescription } from 'ethers';
 import { MYProvider } from '../blockchain';
 import { XPowerMoe, XPowerMoeFactory } from '../contract';
 import { Account, Address, BlockHash, Nonce, Timestamp } from '../redux/types';
@@ -73,6 +74,9 @@ export class MoeWallet extends ERC20Wallet {
         } else {
             this.get.then((c) => c.on('ApproveMigrate', on_approve));
         }
+    }
+    public parse(e: unknown): ErrorDescription | unknown {
+        return this._moe.parse(e);
     }
     get put() {
         return this._moe.connect();

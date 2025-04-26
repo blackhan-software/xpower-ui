@@ -127,7 +127,7 @@ export const mintingMint = AppThunk('minting/mint', async (args: {
                 }
             }
         }
-        throw error(ex);
+        throw error(moe_wallet.parse(ex));
     } finally {
         moe_wallet.offTransfer(on_transfer);
         api.dispatch(removeNonce(nonce, {
@@ -246,7 +246,7 @@ export const nftsTransfer = AppThunk('nfts/transfer', async (args: {
         );
     } catch (ex: any) {
         set_status(NftSenderStatus.error);
-        throw error(ex);
+        throw error(nft_wallet.parse(ex));
     } finally {
         nft_wallet.offTransferSingle(on_single_tx);
     }
@@ -290,7 +290,7 @@ export const nftsApprove = AppThunk('nfts/approve', async (args: {
         );
     } catch (ex) {
         set_approval(NftMinterApproval.error);
-        throw error(ex);
+        throw error(moe_wallet.parse(ex));
     } finally {
         moe_wallet.offApproval(on_approval);
     }
@@ -340,7 +340,7 @@ export const nftsBatchMint = AppThunk('nfts/batch-mint', async (args: {
         );
     } catch (ex) {
         set_status(NftMinterStatus.error);
-        throw error(ex);
+        throw error(nft_wallet.parse(ex));
     } finally {
         nft_wallet.offTransferBatch(on_mint_batch);
     }
@@ -420,7 +420,7 @@ export const nftsBatchBurn = AppThunk('nfts/batch-burn', async (args: {
         );
     } catch (ex: any) {
         set_status(NftBurnerStatus.error);
-        throw error(ex);
+        throw error(nft_wallet.parse(ex));
     } finally {
         nft_wallet.offTransferBatch(on_burn_batch);
     }
@@ -492,7 +492,7 @@ export const nftsBatchUpgrade = AppThunk('nfts/batch-upgrade', async (args: {
         );
     } catch (ex) {
         set_status(NftUpgraderStatus.error);
-        throw error(ex);
+        throw error(nft_wallet.parse(ex));
     } finally {
         nft_wallet.offTransferBatch(on_batch_tx);
     }
@@ -544,7 +544,7 @@ export const pptsApprove = AppThunk('ppts/approve', async (args: {
             );
         } catch (ex) {
             set_approval(PptMinterApproval.error);
-            throw error(ex);
+            throw error(nft_wallet.parse(ex));
         } finally {
             nft_wallet.offApprovalForAll(on_approval);
         }
@@ -622,7 +622,7 @@ export const pptsBatchMint = AppThunk('ppts/batch-mint', async (args: {
         );
     } catch (ex: any) {
         set_status(PptMinterStatus.error);
-        throw error(ex);
+        throw error(ppt_treasury.parse(ex));
     } finally {
         ppt_treasury.offStakeBatch(on_stake_batch);
     }
@@ -699,7 +699,7 @@ export const pptsBatchBurn = AppThunk('ppts/batch-burn', async (args: {
         );
     } catch (ex: any) {
         set_status(PptBurnerStatus.error);
-        throw error(ex);
+        throw error(ppt_treasury.parse(ex));
     } finally {
         ppt_treasury.offUnstakeBatch(on_unstake_batch);
     }
@@ -748,7 +748,7 @@ export const pptsClaim = AppThunk('ppts/claim', async (args: {
         );
     } catch (ex: any) {
         set_status(PptClaimerStatus.error);
-        throw error(ex);
+        throw error(moe_treasury.parse(ex));
     } finally {
         moe_treasury.offClaim(on_claim_tx);
     }
@@ -803,7 +803,7 @@ export const pptsBatchClaim = AppThunk('ppts/batch-claim', async (args: {
         );
     } catch (ex: any) {
         set_status(PptClaimerStatus.error);
-        throw error(ex);
+        throw error(moe_treasury.parse(ex));
     } finally {
         moe_treasury.offClaimBatch(on_claim_batch);
     }
@@ -845,7 +845,7 @@ export const ratesRefresh = AppThunk('rates/refresh', async (args: {
         }
     } catch (ex: any) {
         set_status(RefresherStatus.error);
-        throw error(ex);
+        throw error(moe_treasury.parse(ex));
     }
     let tx: Transaction | undefined;
     try {
@@ -858,7 +858,7 @@ export const ratesRefresh = AppThunk('rates/refresh', async (args: {
         );
     } catch (ex: any) {
         set_status(RefresherStatus.error);
-        throw error(ex);
+        throw error(moe_treasury.parse(ex));
     } finally {
         moe_treasury.offRefreshRates(on_refresh_tx);
     }
@@ -910,7 +910,7 @@ export const aftBurnAPower = AppThunk('aft/burn-apower', async (args: {
         );
     } catch (ex: any) {
         set_status(AftWalletBurner.error);
-        throw error(ex);
+        throw error(sov_wallet.parse(ex));
     } finally {
         sov_wallet.offTransfer(on_transfer_tx);
     }
@@ -952,7 +952,7 @@ export const aftBurnXPower = AppThunk('aft/burn-xpower', async (args: {
         );
     } catch (ex: any) {
         set_status(AftWalletBurner.error);
-        throw error(ex);
+        throw error(moe_wallet.parse(ex));
     } finally {
         moe_wallet.offTransfer(on_transfer_tx);
     }
