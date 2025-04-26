@@ -4,7 +4,8 @@ public/images/all/
 public/views/**/*.pug
 public/views/**/*.pig
 node_modules/
-.env
+.env.*.local
+.env.local
 
 **/*.css
 **/*.css.map
