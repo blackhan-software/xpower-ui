@@ -1,24 +1,14 @@
 {
-    "compounds": [
-        {
-            "name": "Debug Application",
-            "configurations": [
-                "Debug via NPM",
-                "Watch via NPM",
-                "Attach to Chrome"
-            ],
-        }
-    ],
     "configurations": [
         {
             "console": "integratedTerminal",
-            "name": "Debug via NPM",
+            "name": "Dev [Main]",
             "request": "launch",
+            "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run-script",
-                "debug"
+                "dev@mainnet"
             ],
-            "runtimeExecutable": "npm",
             "skipFiles": [
                 "<node_internals>/**"
             ],
@@ -26,20 +16,34 @@
         },
         {
             "console": "integratedTerminal",
-            "name": "Watch via NPM",
+            "name": "Dev [Test]",
             "request": "launch",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "dev@testnet"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node",
+        },
+        {
+            "console": "integratedTerminal",
+            "name": "TSC Watch",
+            "request": "launch",
+            "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run-script",
                 "watch"
             ],
-            "runtimeExecutable": "npm",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "type": "node",
         },
         {
-            "name": "Attach to Chrome",
+            "name": "Attach",
             "port": 9222,
             "request": "attach",
             "type": "chrome",
