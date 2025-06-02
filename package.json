@@ -106,5 +106,5 @@
     "test": "jest --verbose",
     "watch": "tsc --watch"
   },
-  "version": "9.1.3"
+  "version": "10.0.0"
 }
