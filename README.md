@@ -60,21 +60,24 @@ corresponding amount.
 
 ### Query Parameters
 
-| Name          | Type    | Default  | Description                                                         |
-| ------------- | ------- | -------- | ------------------------------------------------------------------- |
-| auto-mint     | number  | 3000     | auto-mint interval in milliseconds                                  |
-| clear         | boolean | false    | flag to clear current persistence slot (as defined by persist flag) |
-| clear-all     | boolean | false    | flag to clear all persistence slots                                 |
-| color         | string  | white    | standard colorization                                               |
-| color-alt     | string  | magenta  | alternative colorization                                            |
-| dex           | string  | paraswap | DEX: paraswap, uniswap or a URL (template: `{address}`)             |
-| logger        | boolean | false    | flag to log nonces to console                                       |
-| min[t]-level  | number  | 6        | threshold of nonces with lower corresponding amounts to be ignored  |
-| max-level     | number  | 64       | threshold of nonces with higher corresponding amounts to be ignored |
-| min-nft-level | number  | 0        | threshold of NFT levels to display from (UNIT)                      |
-| max-nft-level | number  | 24       | threshold of NFT levels to display upto (YOTTA)                     |
-| persist       | number  | 0        | flag to persist nonces; each non-zero value is a persistence slot   |
-| speed         | number  | 50       | speed percentage (w.r.t a single browser tab) between 0 and 100     |
+| Name                     | Type    | Default  | Description                                                         |
+| ------------------------ | ------- | -------- | ------------------------------------------------------------------- |
+| auto-mint                | number  | 3000     | auto-mint interval in milliseconds                                  |
+| clear                    | boolean | false    | flag to clear current persistence slot (as defined by persist flag) |
+| clear-all                | boolean | false    | flag to clear all persistence slots                                 |
+| color                    | string  | white    | standard colorization                                               |
+| color-alt                | string  | magenta  | alternative colorization                                            |
+| dex                      | string  | paraswap | DEX: paraswap, uniswap or a URL (template: `{address}`)             |
+| logger                   | boolean | false    | flag to log nonces to console                                       |
+| gas-limit                | number  | 100000   | gas limit per mint (and init) in wei                                |
+| max-fee-per-gas          | number  | auto     | max fee per mint (and init) in wei                                  |
+| max-priority-fee-per-gas | number  | auto     | max priority fee per mint (and init) in wei                         |
+| min[t]-level             | number  | 6        | threshold of nonces with lower corresponding amounts to be ignored  |
+| max-level                | number  | 64       | threshold of nonces with higher corresponding amounts to be ignored |
+| min-nft-level            | number  | 0        | threshold of NFT levels to display from (UNIT)                      |
+| max-nft-level            | number  | 24       | threshold of NFT levels to display upto (YOTTA)                     |
+| persist                  | number  | 0        | flag to persist nonces; each non-zero value is a persistence slot   |
+| speed                    | number  | 50       | speed percentage (w.r.t a single browser tab) between 0 and 100     |
 
 ### Examples
 
