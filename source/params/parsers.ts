@@ -90,6 +90,30 @@ export function dex(
     }
     return fallback;
 }
+export function gasLimit(
+    params: URLSearchParams,
+): number | undefined {
+    const value = params.get('gas-limit');
+    if (value !== null) {
+        return Parser.number(value, undefined);
+    }
+}
+export function maxFeePerGas(
+    params: URLSearchParams,
+): number | undefined {
+    const value = params.get('max-fee-per-gas');
+    if (value !== null) {
+        return Parser.number(value, undefined);
+    }
+}
+export function maxPriorityFeePerGas(
+    params: URLSearchParams,
+): number | undefined {
+    const value = params.get('max-priority-fee-per-gas');
+    if (value !== null) {
+        return Parser.number(value, undefined);
+    }
+}
 export function gnosis(
     params: URLSearchParams
 ): boolean {

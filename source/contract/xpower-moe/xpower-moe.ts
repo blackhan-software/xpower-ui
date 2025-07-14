@@ -78,7 +78,11 @@ export class XPowerMoe extends Base {
         return OtfManager.connect(this.connect());
     }
     private get options() {
-        return { gasLimit: 250_000 };
+        return {
+            gasLimit: ROParams.gasLimit ?? 1e5,
+            maxFeePerGas: ROParams.maxFeePerGas,
+            maxPriorityFeePerGas: ROParams.maxPriorityFeePerGas,
+        };
     }
 }
 export default XPowerMoe;

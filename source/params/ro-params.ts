@@ -20,6 +20,15 @@ export class ROParams {
     public static get debug() {
         return parsers.debug(this._search);
     }
+    public static get gasLimit() {
+        return parsers.gasLimit(this._search);
+    }
+    public static get maxFeePerGas() {
+        return parsers.maxFeePerGas(this._search);
+    }
+    public static get maxPriorityFeePerGas() {
+        return parsers.maxPriorityFeePerGas(this._search);
+    }
     public static get gnosis() {
         return parsers.gnosis(this._search);
     }
