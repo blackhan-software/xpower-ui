@@ -1,5 +1,5 @@
 export enum DEX {
-    paraswap = 'paraswap',
+    velora = 'velora',
     uniswap = 'uniswap',
 }
 export function DEXs(): Set<DEX> {

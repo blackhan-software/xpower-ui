@@ -22,7 +22,7 @@ export class RWParams {
     }
     static set dex(value: DEX | URL) {
         const search = this.search();
-        if (value !== DEX.paraswap) {
+        if (value !== DEX.velora) {
             search.set('dex', value.toString());
         } else {
             search.delete('dex');

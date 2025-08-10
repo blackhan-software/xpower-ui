@@ -51,8 +51,8 @@ const Iframe = memo(({ dex, token }: {
 });
 Iframe.displayName = 'Iframe';
 const URLS = {
-    [DEX.paraswap]: (a: Address) => {
-        return `https://app.paraswap.io/#/swap/0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE-${a}/1/SELL?network=avalanche&version=6`;
+    [DEX.velora]: (a: Address) => {
+        return `https://app.velora.xyz/#/swap/0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE-${a}/1/SELL?network=avalanche&version=6`;
     },
     [DEX.uniswap]: (a: Address) => {
         return `https://app.uniswap.org/swap?outputCurrency=${a}&chain=avalanche`;

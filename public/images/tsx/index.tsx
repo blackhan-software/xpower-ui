@@ -14,7 +14,7 @@ export * from './emoji-sunglasses-fill';
 export * from './exclamation-triangle-fill';
 export * from './fire';
 export * from './info-circle-fill';
-export * from './paraswap';
+export * from './velora';
 export * from './plus-circle-fill';
 export * from './toggle';
 export * from './toggle-alt';

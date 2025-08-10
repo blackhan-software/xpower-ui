@@ -82,7 +82,7 @@ export function debug(
     return Parser.number(params.get('debug'), flag ? 1 : 0);
 }
 export function dex(
-    params: URLSearchParams, fallback = DEX.paraswap
+    params: URLSearchParams, fallback = DEX.velora
 ): DEX | URL {
     const key = params.get('dex');
     if (typeof key === 'string') {

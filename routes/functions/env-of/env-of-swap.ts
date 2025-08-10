@@ -13,11 +13,11 @@ const dex_swap = (
 ) => {
   const dex = params.get('dex');
   return {
-    ACTIVE_PARASWAP: dex === DEX.paraswap || !dex
+    ACTIVE_VELORA: dex === DEX.velora || !dex
       ? 'active' : '',
     ACTIVE_UNISWAP: dex === DEX.uniswap
       ? 'active' : '',
-    COLOR_PARASWAP: dex === DEX.paraswap || !dex
+    COLOR_VELORA: dex === DEX.velora || !dex
       ? 'var(--xp-dark)' : 'var(--xp-powered)',
     COLOR_UNISWAP: dex === DEX.uniswap
       ? 'var(--xp-dark)' : 'var(--xp-powered)',
