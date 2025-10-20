@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run lint)",
+      "Bash(npx tsc)",
+      "Bash(NETWORK=mainnet node -e \"const env = require(''./env'').default; const addresses = [''XPOW_MOE_10b'', ''XPOW_NFT_10b'', ''APOW_NFT_10b'', ''APOW_SOV_10b'', ''XPOW_MTY_10b'', ''APOW_NTY_10b'']; addresses.forEach(key => console.log(key + '':'', env[key]));\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
