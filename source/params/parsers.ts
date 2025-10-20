@@ -204,7 +204,7 @@ export function token(
     return Tokenizer.token(params.get('token'));
 }
 export function version(
-    params: URLSearchParams, value?: string | null, fallback = Version.v10a
+    params: URLSearchParams, value?: string | null, fallback = Version.v10b
 ): Version {
     if (value === undefined) {
         value = params.get('version');
@@ -218,12 +218,17 @@ export function version(
 export function versionSource(
     params: URLSearchParams
 ): Version {
-    return version(params, params.get('version-source'), Version.v09c);
+    return version(params, params.get('version-source'), Version.v10a);
 }
 export function versionTarget(
     params: URLSearchParams
 ): Version {
-    return version(params, params.get('version-target'));
+    const target = params.get('version-target');
+    const source = versionSource(params);
+    if (source < Version.v10a) {
+        return version(params, target, Version.v10a);
+    }
+    return version(params, target);
 }
 export function versionFaked(
     params: URLSearchParams
