@@ -15,7 +15,9 @@ export function useBufferedEffect(
     deps?: React.DependencyList
 ) {
     const handler = useRef<() => void>(callback);
-    const tid = useRef<number>();
+    const tid = useRef<number | undefined>(
+        undefined
+    );
     useEffect(() => {
         handler.current = callback;
     }, [

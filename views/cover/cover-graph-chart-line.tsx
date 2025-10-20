@@ -39,7 +39,7 @@ export function UiCoverGraphChartLine(
     </div>;
 }
 function chart(
-    $ref: React.RefObject<HTMLCanvasElement>, {
+    $ref: React.RefObject<HTMLCanvasElement | null>, {
         animate, delta, level, issue, rates, scale
     }: Props & {
         animate: boolean, delta: bigint

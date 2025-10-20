@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import { useSelector } from 'react-redux';
 import { uiOf } from '../../redux/selectors';
 import { AppState } from '../../redux/store';
