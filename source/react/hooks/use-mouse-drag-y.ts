@@ -9,7 +9,7 @@ import { useMouseDrag } from './use-mouse-drag';
 export function useMouseDragY<T extends HTMLElement & {
     height: number, width: number
 }>(
-    $ref: React.RefObject<T>, init = 0
+    $ref: React.RefObject<T | null>, init = 0
 ) {
     return useMouseDrag($ref, init, scaledY)
 }

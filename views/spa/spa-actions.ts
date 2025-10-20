@@ -6,7 +6,7 @@ import { Account, AftWalletBurner, Amount, Level, MAX_UINT256, MinterStatus, Nft
 
 import { MMProvider } from '../../source/blockchain';
 import { MoeTreasuryFactory, OnApproveSupply, OnClaim, OnClaimBatch, OnRefresh, OnStakeBatch, OnUnstakeBatch, PptTreasuryFactory } from '../../source/contract';
-import { assert, error, inIframe, x40 } from '../../source/functions';
+import { error, inIframe, x40 } from '../../source/functions';
 import { HashManager, MiningManager as MM } from '../../source/managers';
 import { ROParams, RWParams } from '../../source/params';
 import { Tokenizer } from '../../source/token';
@@ -748,14 +748,14 @@ export const pptsApprove2 = AppThunk('ppts/approve-2', async (args: {
     const sov_address = await sov_wallet.address;
     const moe_treasury = MoeTreasuryFactory();
     const xpb_pool = await moe_treasury.pool();
-    assert(xpb_pool, 'missing moe-treasury.pool');
+    // assert(xpb_pool, 'missing moe-treasury.pool');
     let [approved2a, allowance2b, allowance2c] = await Promise.all([
-        xpb_pool.approvedSupply(
+        xpb_pool?.approvedSupply(
             x40(account), moe_treasury.address, sov_address
-        ),
-        sov_wallet.allowance(
+        ) ?? true,
+        xpb_pool ? sov_wallet.allowance(
             x40(account), xpb_pool.address
-        ),
+        ) : MAX_UINT256,
         sov_wallet.allowance(
             x40(account), moe_treasury.address
         ),
@@ -813,7 +813,7 @@ export const pptsApprove2 = AppThunk('ppts/approve-2', async (args: {
         try {
             set_approval(PptMinterApproval2.approving);
             await Promise.all([
-                xpb_pool.onApproveSupply(
+                xpb_pool?.onApproveSupply(
                     on_approval2a, { once }
                 ),
                 sov_wallet.onApproval(
@@ -823,14 +823,14 @@ export const pptsApprove2 = AppThunk('ppts/approve-2', async (args: {
                     on_approval2c, { once }
                 ),
             ]);
-            tx2a = await xpb_pool.approveSupply(
+            tx2a = await xpb_pool?.approveSupply(
                 moe_treasury.address,
                 sov_address,
                 true
             );
-            tx2b = await sov_wallet.approve(
+            tx2b = xpb_pool ? await sov_wallet.approve(
                 xpb_pool.address, MAX_UINT256
-            );
+            ) : undefined;
             tx2c = await sov_wallet.approve(
                 moe_treasury.address, MAX_UINT256
             );
@@ -838,9 +838,9 @@ export const pptsApprove2 = AppThunk('ppts/approve-2', async (args: {
             set_approval(PptMinterApproval2.approved);
         } catch (ex) {
             set_approval(PptMinterApproval2.error);
-            throw error(xpb_pool.parse(ex));
+            throw error(xpb_pool?.parse(ex) ?? ex);
         } finally {
-            xpb_pool.offApproveSupply(on_approval2a);
+            xpb_pool?.offApproveSupply(on_approval2a);
             sov_wallet.offApproval(on_approval2b);
             sov_wallet.offApproval(on_approval2c);
         }

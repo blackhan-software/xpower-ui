@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState, JSX } from 'react';
 import { Blockchain } from '../../blockchain';
 import { RWParams } from '../../params';
 import { Token } from '../../redux/types';

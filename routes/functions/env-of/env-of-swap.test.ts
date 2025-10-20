@@ -8,9 +8,9 @@ describe('env_of_swap', () => {
             protocol: 'http'
         };
         expect(env_of_swap(req as any)).toEqual({
-            ACTIVE_PARASWAP: 'active',
+            ACTIVE_VELORA: 'active',
             ACTIVE_UNISWAP: '',
-            COLOR_PARASWAP: 'var(--xp-dark)',
+            COLOR_VELORA: 'var(--xp-dark)',
             COLOR_UNISWAP: 'var(--xp-powered)',
         });
     });

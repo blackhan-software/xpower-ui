@@ -35,7 +35,7 @@ export function UiCoverGraphChartBar(
     </div>;
 }
 function chart(
-    $ref: React.RefObject<HTMLCanvasElement>, {
+    $ref: React.RefObject<HTMLCanvasElement | null>, {
         animate, issue, rates, scale
     }: Props & {
         animate: boolean

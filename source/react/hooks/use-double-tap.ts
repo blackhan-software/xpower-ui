@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 export interface OnDoubleTap {
     (e: MouseEvent | TouchEvent): void
 }
-export function useDoubleTap<T extends HTMLElement>(
+export function useDoubleTap<T extends HTMLElement | null>(
     $ref: React.RefObject<T>, handler: OnDoubleTap, ms = 200
 ): [
     React.RefObject<T>

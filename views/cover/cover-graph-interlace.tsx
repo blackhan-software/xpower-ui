@@ -10,7 +10,7 @@ export function UiCoverGraphInterlace() {
     </div>;
 }
 function interlace(
-    $ref: React.RefObject<HTMLCanvasElement>
+    $ref: React.RefObject<HTMLCanvasElement | null>
 ) {
     const $canvas = $ref.current;
     if ($canvas === null) {

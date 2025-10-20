@@ -13,7 +13,7 @@ export type MouseDrag<T extends HTMLElement> = [
  * reference object; and another value for the *per drag* delta.
  */
 export function useMouseDrag<T extends HTMLElement>(
-    $ref: React.RefObject<T>, init: number,
+    $ref: React.RefObject<T | null>, init: number,
     xory: (e: MouseEvent | TouchEvent, el: T) => number,
 ) {
     const [p, set_p] = useState<number | null>(null);
