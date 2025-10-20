@@ -33,7 +33,7 @@ export function Referable<
             }
             return this._refs[name] as RefObject<T>;
         }
-        private _refs: Record<string, RefObject<U>> = {};
+        private _refs: Record<string, RefObject<U | null>> = {};
     };
 }
 /**
@@ -41,7 +41,7 @@ export function Referable<
  */
 export function globalRef<T = unknown>(
     name: string
-)  {
+) {
     if (global_refs === undefined) {
         global_refs = {};
     }

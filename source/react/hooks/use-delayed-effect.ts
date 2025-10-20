@@ -11,7 +11,9 @@ export function useDelayedEffect(
     callback: React.EffectCallback,
     deps?: React.DependencyList
 ) {
-    const handler = useRef<() => void>();
+    const handler = useRef<(() => void) | undefined>(
+        undefined
+    );
     useEffect(() => {
         handler.current = callback;
     }, [

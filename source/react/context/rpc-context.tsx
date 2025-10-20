@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState, JSX } from 'react';
 import { MYProviderUrl, MYProviderMs } from '../../blockchain';
 
 export type Rpc = Partial<{

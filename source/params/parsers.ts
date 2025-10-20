@@ -223,7 +223,12 @@ export function versionSource(
 export function versionTarget(
     params: URLSearchParams
 ): Version {
-    return version(params, params.get('version-target'));
+    const target = params.get('version-target');
+    const source = versionSource(params);
+    if (source < Version.v10a) {
+        return version(params, target, Version.v10a);
+    }
+    return version(params, target);
 }
 export function versionFaked(
     params: URLSearchParams
