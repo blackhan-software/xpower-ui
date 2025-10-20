@@ -60,6 +60,8 @@ const XPOW_MOE_09c = process.env.XPOW_MOE_09c;
 check(XPOW_MOE_09c, 'missing env XPOW_MOE_09c variable');
 const XPOW_MOE_10a = process.env.XPOW_MOE_10a;
 check(XPOW_MOE_10a, 'missing env XPOW_MOE_10a variable');
+const XPOW_MOE_10b = process.env.XPOW_MOE_10b;
+check(XPOW_MOE_10b, 'missing env XPOW_MOE_10b variable');
 // NFT contract addresses
 const XPOW_NFT_02a = process.env.XPOW_NFT_02a;
 check(XPOW_NFT_02a, 'missing env XPOW_NFT_02a variable');
@@ -105,6 +107,8 @@ const XPOW_NFT_09c = process.env.XPOW_NFT_09c;
 check(XPOW_NFT_09c, 'missing env XPOW_NFT_09c variable');
 const XPOW_NFT_10a = process.env.XPOW_NFT_10a;
 check(XPOW_NFT_10a, 'missing env XPOW_NFT_10a variable');
+const XPOW_NFT_10b = process.env.XPOW_NFT_10b;
+check(XPOW_NFT_10b, 'missing env XPOW_NFT_10b variable');
 // PPT contract addresses
 const APOW_NFT_04a = process.env.APOW_NFT_04a;
 check(APOW_NFT_04a, 'missing env APOW_NFT_04a variable');
@@ -140,6 +144,8 @@ const APOW_NFT_09c = process.env.APOW_NFT_09c;
 check(APOW_NFT_09c, 'missing env APOW_NFT_09c variable');
 const APOW_NFT_10a = process.env.APOW_NFT_10a;
 check(APOW_NFT_10a, 'missing env APOW_NFT_10a variable');
+const APOW_NFT_10b = process.env.APOW_NFT_10b;
+check(APOW_NFT_10b, 'missing env APOW_NFT_10b variable');
 // SOV contract addresses
 const APOW_SOV_05a = process.env.APOW_SOV_05a;
 check(APOW_SOV_05a, 'missing env APOW_SOV_05a variable');
@@ -173,6 +179,8 @@ const APOW_SOV_09c = process.env.APOW_SOV_09c;
 check(APOW_SOV_09c, 'missing env APOW_SOV_09c variable');
 const APOW_SOV_10a = process.env.APOW_SOV_10a;
 check(APOW_SOV_10a, 'missing env APOW_SOV_10a variable');
+const APOW_SOV_10b = process.env.APOW_SOV_10b;
+check(APOW_SOV_10b, 'missing env APOW_SOV_10b variable');
 // MOE treasury contract addresses
 const XPOW_MTY_04a = process.env.XPOW_MTY_04a;
 check(XPOW_MTY_04a, 'missing env XPOW_MTY_04a variable');
@@ -208,6 +216,8 @@ const XPOW_MTY_09c = process.env.XPOW_MTY_09c;
 check(XPOW_MTY_09c, 'missing env XPOW_MTY_09c variable');
 const XPOW_MTY_10a = process.env.XPOW_MTY_10a;
 check(XPOW_MTY_10a, 'missing env XPOW_MTY_10a variable');
+const XPOW_MTY_10b = process.env.XPOW_MTY_10b;
+check(XPOW_MTY_10b, 'missing env XPOW_MTY_10b variable');
 // PPT treasury contract addresses
 const APOW_NTY_04a = process.env.APOW_NTY_04a;
 check(APOW_NTY_04a, 'missing env APOW_NTY_04a variable');
@@ -243,6 +253,8 @@ const APOW_NTY_09c = process.env.APOW_NTY_09c;
 check(APOW_NTY_09c, 'missing env APOW_NTY_09c variable');
 const APOW_NTY_10a = process.env.APOW_NTY_10a;
 check(APOW_NTY_10a, 'missing env APOW_NTY_10a variable');
+const APOW_NTY_10b = process.env.APOW_NTY_10b;
+check(APOW_NTY_10b, 'missing env APOW_NTY_10b variable');
 // MOE contract images
 const XPOW_MOE_IMAGE = process.env.XPOW_MOE_IMAGE ?? read('./public/images/svg/xpow.data.svg', 'utf8');
 check(typeof XPOW_MOE_IMAGE === 'string', 'missing env XPOW_MOE_IMAGE variable');
@@ -282,6 +294,7 @@ export default {
         XPOW_MOE_09b,
         XPOW_MOE_09c,
         XPOW_MOE_10a,
+        XPOW_MOE_10b,
     }, ...{
         XPOW_NFT_02a,
         XPOW_NFT_02b,
@@ -305,6 +318,7 @@ export default {
         XPOW_NFT_09b,
         XPOW_NFT_09c,
         XPOW_NFT_10a,
+        XPOW_NFT_10b,
     }, ...{
         APOW_NFT_04a,
         APOW_NFT_05a,
@@ -323,6 +337,7 @@ export default {
         APOW_NFT_09b,
         APOW_NFT_09c,
         APOW_NFT_10a,
+        APOW_NFT_10b,
     }, ...{
         APOW_SOV_05a,
         APOW_SOV_05b,
@@ -340,6 +355,7 @@ export default {
         APOW_SOV_09b,
         APOW_SOV_09c,
         APOW_SOV_10a,
+        APOW_SOV_10b,
     }, ...{
         XPOW_MTY_04a,
         XPOW_MTY_05a,
@@ -358,6 +374,7 @@ export default {
         XPOW_MTY_09b,
         XPOW_MTY_09c,
         XPOW_MTY_10a,
+        XPOW_MTY_10b,
     }, ...{
         APOW_NTY_04a,
         APOW_NTY_05a,
@@ -376,6 +393,7 @@ export default {
         APOW_NTY_09b,
         APOW_NTY_09c,
         APOW_NTY_10a,
+        APOW_NTY_10b,
     }, ...{
         XPOW_MOE_IMAGE,
         APOW_SOV_IMAGE,
