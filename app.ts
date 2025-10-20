@@ -47,7 +47,7 @@ app.use('/', spa);
 app.use('/nfts', nfts);
 app.use('/ppts', ppts);
 app.use('/robots.txt', robots);
-app.use('/ipfs/*', ipfs);
+app.use('/ipfs/*path', ipfs);
 app.use(error);
 
 export default app;

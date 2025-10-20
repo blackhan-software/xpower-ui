@@ -3,12 +3,14 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 export interface OnLongTap {
     (e?: MouseEvent | TouchEvent): void
 }
-export function useLongTap<T extends HTMLElement>(
+export function useLongTap<T extends HTMLElement | null>(
     $ref: React.RefObject<T>, handler: OnLongTap, ms = 900
 ): [
     boolean, (flag: boolean) => void
 ] {
-    const timer = useRef<NodeJS.Timeout | undefined>();
+    const timer = useRef<NodeJS.Timeout | undefined>(
+        undefined
+    );
     const [stamp, set_stamp] = useState(0);
     const tapped = useRef<boolean>(false);
     const start = useCallback(() => {
