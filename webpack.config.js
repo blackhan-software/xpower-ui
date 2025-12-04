@@ -67,12 +67,7 @@ const configuration = ({
             }, {
                 loader: 'css-loader'
             }, {
-                loader: 'sass-loader',
-                options: {
-                    sassOptions: {
-                        silenceDeprecations: ['mixed-decls'],
-                    }
-                }
+                loader: 'sass-loader'
             }]
         }, {
             test: /\.(png|svg|jpg|jpeg|gif)$/i,
