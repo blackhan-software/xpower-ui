@@ -2,7 +2,7 @@ export function urlify(url: string) {
     try {
         return new URL(url);
     } catch (e) {
-        console.assert(e);
+        console.debug(e);
         return null;
     }
 }

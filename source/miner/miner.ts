@@ -156,7 +156,7 @@ export class Miner extends EventEmitter {
                 thread = await spawn<IWorker>(worker);
             }
         } catch (e) {
-            console.assert(e);
+            console.debug(e);
             const worker = new Worker(path_dev);
             thread = await spawn<IWorker>(worker);
         }

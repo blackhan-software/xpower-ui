@@ -93,7 +93,7 @@ class APRs {
         try {
             list.push(await this.mty.aprs(ppt_id, index));
         } catch (e) {
-            console.assert(e);
+            console.debug(e);
             return this.tail(ppt_id, list);
         }
         return this.next(ppt_id, index + 1, list);
@@ -148,7 +148,7 @@ class APBs {
         try {
             list.push(await this.mty.apbs(ppt_id, index));
         } catch (e) {
-            console.assert(e);
+            console.debug(e);
             return this.tail(ppt_id, list);
         }
         return this.next(ppt_id, index + 1, list);
