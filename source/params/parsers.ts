@@ -15,13 +15,13 @@ export function account(
     if (typeof value === 'string' && value.length === 42) try {
         return BigInt(value);
     } catch (e) {
-        console.assert(e);
+        console.debug(e);
         return fallback;
     }
     if (typeof value === 'string' && value.length === 47) try {
         return BigInt(value.replace(/^avax:/, ''));
     } catch (e) {
-        console.assert(e);
+        console.debug(e);
         return fallback;
     }
     return fallback;

@@ -28,7 +28,7 @@ const otf_wallet = (
   try {
     toggled = JSON.parse(value ?? 'false');
   } catch (e) {
-    console.assert(e);
+    console.debug(e);
     toggled = false;
   }
   return {
