@@ -67,13 +67,14 @@ function $underlay(
             {$discord()}
             {$telegram()}
             {$twitter()}
+            {$whitepaper()}
             {$avalanche()}
         </Ul>
     </Nav>;
 }
 function $company() {
     return <Li className='nav-item'>
-        <Span className='nav-link lower company'
+        <Span className='nav-link company lower'
             title='P.O. Box 2255, Shedden Road, Georgetown, Grand Cayman KY1-1107, KY'
         >
             <span>&copy;</span>
@@ -90,7 +91,7 @@ function $migrate(
     { token }: Props
 ) {
     return <Li className='nav-item pb-1 pt-1 pe-0'>
-        <A className='nav-link lower migrate'
+        <A className='nav-link migrate lower'
             href={`/migrate?token=${token}`}
             title='Migrate tokens'
         >
@@ -146,7 +147,7 @@ function $addToken(
     { token, version }: Props
 ) {
     return <Li className='nav-item pb-1 pt-1 pe-1'>
-        <A className='add-token nav-link lower'
+        <A className='nav-link add-token lower'
             onClick={addToken.bind(null, token, version)}
             href='#' title={`Add ${token}s to wallet`}
         >
@@ -159,7 +160,7 @@ function $coingecko(
     { token }: Props
 ) {
     return <Li className='nav-item pb-1 pt-1 pe-1'>
-        <A className='coingecko nav-link upper'
+        <A className='nav-link coingecko upper'
             href={`https://www.coingecko.com/en/coins/xpowermine-com-${Tokenizer.lower(token)}`}
             rel='noreferrer' target='_blank' title={`${token}s at CoinGecko`}
         >
@@ -196,7 +197,7 @@ function $coingecko(
 }
 function $github() {
     return <Li className='nav-item pb-1 pt-1 pe-1'>
-        <A className='github nav-link lower'
+        <A className='nav-link github lower'
             href='https://github.com/blackhan-software'
             target='_blank' title='GitHub'
         >
@@ -206,7 +207,7 @@ function $github() {
 }
 function $discord() {
     return <Li className='nav-item pb-1 pt-1 pe-1'>
-        <A className='discord nav-link upper'
+        <A className='nav-link discord upper'
             href='https://discord.gg/43ChQHEvzV' rel='noreferrer'
             target='_blank' title='Discord'
         >
@@ -218,7 +219,7 @@ function $discord() {
 }
 function $youtube() {
     return <Li className='nav-item pb-1 pt-1 pe-1'>
-        <A className='youtube nav-link'
+        <A className='nav-link youtube'
             href='https://www.youtube.com/channel/UCDcdGJmkBLYpWJO-17kCFsA'
             rel='noreferrer' target='_blank' title='YouTube'
         >
@@ -234,7 +235,7 @@ function $youtube() {
 }
 function $telegram() {
     return <Li className='nav-item pb-1 pt-1 pe-1'>
-        <A className='telegram nav-link'
+        <A className='nav-link telegram'
             href='https://t.me/xpowermine' rel='noreferrer'
             target='_blank' title='Telegram'
         >
@@ -244,9 +245,25 @@ function $telegram() {
         </A>
     </Li>;
 }
+function $whitepaper() {
+    return <Li className='nav-item pb-1 pt-1 pe-1'>
+        <A className='nav-link whitepaper'
+            href='https://ipfs.xpowermine.com/ipfs/QmSGLkSevCyUmtu19FM1wjKHfYozcp5bfeh6R1Gqh2zoVg' rel='noreferrer'
+            target='_blank' title='Whitepaper'
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-info-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+            </svg>
+        </A>
+    </Li>;
+}
 function $twitter() {
     return <Li className='nav-item pb-1 pt-1 pe-1'>
-        <A className='twitter nav-link'
+        <A className='nav-link twitter'
             href='https://twitter.com/xpowermine' rel='noreferrer'
             target='_blank' title='Twitter'
         >
@@ -258,7 +275,7 @@ function $twitter() {
 }
 function $avalanche() {
     return <Li className='nav-item ps-1 d-none d-sm-block'>
-        <A className='avalanche nav-link'
+        <A className='nav-link avalanche'
             href='https://www.avalabs.org/' rel='noreferrer'
             target='_blank' title='Powered by Avalanche'
         >
