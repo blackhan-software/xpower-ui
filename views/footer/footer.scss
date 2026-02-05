@@ -121,6 +121,19 @@ footer {
             display: inline-block;
         }
     }
+    a.whitepaper {
+        svg.bi-info-circle {
+            display: none;
+        }
+    }
+    a.whitepaper:hover {
+        svg.bi-info-circle-fill {
+            display: none;
+        }
+        svg.bi-info-circle {
+            display: inline-block;
+        }
+    }
     color: var(--xp-powered);
     user-select: none;
 }
